@@ -13,7 +13,7 @@ After some wandering, I discovered what a delight it can be to write these amazi
 <!-- more -->
 
 **Why am I blogging?**
-I am trying to become a good software engineer, eventually. There is still a lot to learn in order to ever get there. What I do know is that I learn particularly well when I try to explain things to others people, which makes writing a blog seem like an awesome idea. 
+I am trying to become a good software engineer, eventually. There is still a lot to learn in order to ever get there. What I do know is that I learn particularly well when I try to explain things to other people, which makes writing a blog seem like an awesome idea. 
 
 Recently I started to work on a reactive web project written in [Scala]( http://www.scala-lang.org ) using the [Play Framework](http://www.playframework.com) to show as part of my portfolio. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on [github]( https://github.com/matthiasn/BirdWatch), installed a demo on a [web server](http://birdwatch.matthiasnehlsen.com) and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense. 
 
