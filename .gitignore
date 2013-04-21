@@ -16,3 +16,6 @@ tmp
 .yardoc
 _yardoc
 doc/
+.pygments-cache
+.sass-cache
+.DS_Store
