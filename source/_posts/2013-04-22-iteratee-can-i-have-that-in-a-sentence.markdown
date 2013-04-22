@@ -77,7 +77,7 @@ def tweetListIteratee(f: List[Tweet] => Unit, tweetList: List[Tweet],
   }
 {% endcodeblock %}
 
-So here we have constructed an Iteratee which takes as parameters a function f which takes a List[Tweet] and returns Unit, a TweetList which will be our accumulator and n, which is the maximum size of the list in the accumulator or in other words the maximum size of our rolling window that we will reason about. Function f is by definition side-effecting as it returns Unit, so the only effect it can have is outside the tweetListIteratee. Normally we should probably shy away from side-effects, but here I would argue that this is a good thing. Any function passed in here could be defined to have side-effects, but the Unit return type guarantees that f will not be able to mess with the accumulator, it cannot have any effects on it, unlike functions transforming the accumulator. The side-effect in f is used for is pushing immutable information into the WebSocket connection. In fact, there is no mutable state in scope for this function anyways that it could mess with. 
+So here we have constructed an Iteratee which takes as parameters a function f which takes a List[Tweet] and returns Unit, a TweetList which will be our accumulator and n, which is the maximum size of the list in the accumulator or in other words the maximum size of our rolling window that we will reason about. Function f is by definition side-effecting as it returns Unit, so the only effect it can have is outside the tweetListIteratee. Normally we should probably shy away from side-effects, but here I would argue that this is a good thing. Any function passed in here could be defined to have side-effects, but the Unit return type guarantees that f will not be able to mess with the accumulator, it cannot have any effects on it, unlike functions transforming the accumulator. The side-effect f is used for is pushing immutable information into the WebSocket connection. In fact, there is no mutable state in scope for this function anyways that it could mess with. 
 
 Let's look at that function we substitute for f before we wire the Iteratee into an Enumerator:
 
@@ -142,9 +142,29 @@ def topN(tweetList: Seq[Tweet], n: Int): ListMap[String, Int] = {
 }
 {% endcodeblock %}
 
-These calculations probably warrant a separate article. For now let's just assume they do what the description states. The results of these computations is then pushed into the WebSocket channel towards the browser as JSON. That step actually involves another Enumerator / Iteratee couple, but more about that later.
+These calculations probably warrant a separate (and much shorter) article. For now let's just assume they do what the description states. The results of these computations is then pushed into the WebSocket channel towards the browser as JSON (embedded in an immutable instance of Case Class **[TweetState](https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/models/Tweet.scala)**). That step actually involves another Enumerator / Iteratee couple, but more about that later.
 
+Let us now hook the Iteratee up with an Enumerator that will drive it before dealing with the issue that the Iteratee is immutable and cannot be changed. **[PushEnumerator](http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.PushEnumerator)** is deprecated as of Play 2.10, we are supposed to use **[Concurrent.broadcast](http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.Concurrent$)** instead.
 
+{% codeblock Enumerator for tweetIteratee lang:scala https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/controllers/Twitter.scala Twitter.scala %}
+/** Creates enumerator and channel for Tweets through Concurrent factory object */
+val (enumerator, tweetChannel) = Concurrent.broadcast[Tweet]
+
+/** Iteratee processing Tweets from tweetChannel, accumulating a rolling window of tweets */
+val tweetListIteratee = WordCount.tweetListIteratee(interceptTweetList, List[Tweet](), 1000)
+enumerator |>>> tweetListIteratee // attach tweetListIteratee to enumerator
+
+/** Actor for subscribing to eventStream. Pushes received tweets into TweetChannel for
+ * consumption through iteratee (and potentially other consumers, decoupled)  */
+val subscriber = ActorStage.system.actorOf(Props(new Actor {       
+  def receive = { case t: Tweet => tweetChannel.push(t) }                         
+}))
+ActorStage.system.eventStream.subscribe(subscriber, classOf[Tweet]) // subscribe to incoming tweets
+{% endcodeblock %}
+
+We call Concurrent.broadcast[Tweet], which returns a tuple of an Enumerator (named accordingly) that we will attach our Iteratee to (using the |>>> operator) and a channel that we can use to push Tweets into. These Tweets will then be consumed by the tweetListIteratee attached to the enumerator. We will get those Tweets from the **[Akka EventBus](http://doc.akka.io/docs/akka/2.1.2/scala/event-bus.html)** by creating an actor which listens events of type Tweet on the EventBus and pushes them. We will look at the EventBus in more detail in the article dealing with the ImageProcessing actor hierarchy. For now it should be sufficient to know that we have a source of Tweets and push each individual occcurence of a Tweet event into the tweetChannel, thus creating our own open-ended stream.
+
+At a high level, what we are trying to do is this:
 
 Something does not seem right here. How can we repeatedly pass information to an immutable object which aggregates state? Turns out we can't. There is no one Iteratee receiving and processing information, instead every step of the Iteratee returns a new Iteratee, with the new state. 
 
