@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-04-22T00:05:17+02:00</updated>
+  <updated>2013-04-22T16:22:42+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,84 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Iteratee: can I have that in a sentence?]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence/"/>
+    <updated>2013-04-22T13:08:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence</id>
+    <content type="html"><![CDATA[<p>A couple of weeks back I was trying to wrap my head around Iteratees so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing which aggregates state. That did not seem right.</p>
+
+<!-- more -->
+
+
+<p>I had to see it in action in order to understand how this Iteratee thing works. So I was looking for a stream of information that I could use. I found it in the Twitter Streaming API. A stream of Tweets can be interesting, having chosen the right topic(s), and Tweets coming in at this moment for a topic is something that seems easy to relate to. I also wanted to try out a supervised actor hierarchy in this project, so I decided to download the original profile images from Twitter for every single Tweet, downconvert them using a couple of actors doing image manipulation and storing an 80x80px PNG thumbnail in MongoDB. This supervised image manipulation will be the topic of another post though.</p>
+
+<p>On the client side I wanted something flashy that makes it obvious that live information from the real world is flowing through the system and reasoned about. I had recently taken an interest in D3.js and I had seen the Wordcloud implementation by Jason Davies which is nice to look at, so I wondered if it would be difficult to drive it from data streaming to the client over a WebSocket connection. The UI at this point was not supposed to be particularly useful, it was really only for the effect. I am fully aware that a wordcloud is not the best way for showing the frequency of words, and having it regenerate every 5 seconds makes it even less useful perceptually since whatever you look at will be gone before you can even fully focus on the smaller items. That being said, I was interested in how Iteratees work. The D3 I use for this project is very basic, I will focus on doing more useful things with D3.js later on.</p>
+
+<p>So I started working on this reactive web application called BirdWatch. I will go through the parts of the application that are relevant when trying to understand Iteratees in this article.</p>
+
+<p>Let&#8217;s look at my initial high-level architectural drawing:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/BirdWatch.png" title="image" alt="images"></p>
+
+<p>At first, this seems to make sense. The WS object acts as our Enumerator, taking chunks of Array[Byte] it receives through the open HTTP connection to Twitter and passing them along into an Iteratee:</p>
+
+<figure class='code'><figcaption><span>WS-Client</span><a href='https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="s">&quot;https://stream.twitter.com/1.1/statuses/filter.json?track=&quot;</span>
+</span><span class='line'><span class="k">val</span> <span class="n">conn</span> <span class="k">=</span> <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">url</span> <span class="o">+</span> <span class="nc">TwitterClient</span><span class="o">.</span><span class="n">topics</span><span class="o">.</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;%2C&quot;</span><span class="o">).</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">,</span> <span class="s">&quot;%20&quot;</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">withTimeout</span><span class="o">(-</span><span class="mi">1</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">sign</span><span class="o">(</span><span class="nc">OAuthCalculator</span><span class="o">(</span><span class="n">consumerKey</span><span class="o">,</span> <span class="n">accessToken</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">TwitterClient</span><span class="o">.</span><span class="n">tweetIteratee</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The Iteratee then performs some action (JSON parsing, Tweet reading, sending the Tweet to the ImageConversion actor) for each chunk, without accumulating intermediate state.</p>
+
+<figure class='code'><figcaption><span>tweetIteratee (shortened)</span><a href='https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Iteratee for processing each chunk from Twitter stream of Tweets. Parses Json chunks </span>
+</span><span class='line'><span class="cm">* as Tweet instances and publishes them to eventStream. */</span>
+</span><span class='line'><span class="k">val</span> <span class="n">tweetIteratee</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]]</span> <span class="o">{</span> <span class="n">chunk</span> <span class="k">=&gt;</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">chunkString</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">chunk</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">json</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nc">TweetReads</span><span class="o">.</span><span class="n">reads</span><span class="o">(</span><span class="n">json</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsSuccess</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>      <span class="nc">ActorStage</span><span class="o">.</span><span class="n">imgSupervisor</span> <span class="o">!</span> <span class="nc">WordCount</span><span class="o">.</span><span class="n">wordsChars</span><span class="o">(</span><span class="n">stripImageUrl</span><span class="o">(</span><span class="n">t</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsError</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This at first seduced me into believing that the Iteratee was one particular instance that performed these repeated actions as specified in the foreach part. But that is actually not the case. The Iteratee is immutable and every time we pass information to an Iteratee in a step, a new one is created in return. This does not seem terribly useful as long as we only want to a foreach without accumulated state. But bear with me.</p>
+
+<p>Let&#8217;s have a look at another Enumerator / Iteratee couple in the application, then this will make more sense.</p>
+
+<p>For the wordcount which feeds both the wordcloud and the bar chart, we analyze a rolling window of tweets. For this, we need to keep state over say the last 1000 tweets as is the case here.</p>
+
+<p>Something does not seem right here. How can we repeatedly pass information to an immutable object which aggregates state? Turns out we can&#8217;t. There is no one Iteratee receiving and processing information, instead every step of the Iteratee returns a new Iteratee, with the new state.</p>
+
+<p>Okay, that makes</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Hello World]]></title>
@@ -29,7 +107,7 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
 <p><strong>Why am I blogging?</strong>
 I am fascinated by the idea of reasoning over live data streams. There are quite a few things that I still need to learn in order to turn my ideas into working code. I find that I learn particularly well when explaining things to others, so writing this blog seems like an awesome idea.</p>
 
-<p>Recently I started to work on a reactive web project for my portfolio, written in <a href="http://www.scala-lang.org">Scala</a> using the <a href="http://www.playframework.com">Play Framework</a>. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on <a href="https://github.com/matthiasn/BirdWatch">github</a>, installed a demo on a <a href="http://birdwatch.matthiasnehlsen.com">web server</a> and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense.</p>
+<p>Recently I started to work on a reactive web project for my portfolio, written in <a href="http://www.scala-lang.org">Scala</a> using the <a href="http://www.playframework.com">Play Framework</a>. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on <a href="https://github.com/matthiasn/BirdWatch">GitHub</a>, installed a demo on a <a href="http://birdwatch.matthiasnehlsen.com">web server</a> and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense.</p>
 
 <p>Then it got mentioned on Twitter, retweeted 16 times and before I knew it, I had visitors from 272 cities in 48 countries on that web server. I know because out of curiosity I wrote a little logging routine that does GeoIP-lookup for every IP-address visiting that server on the fly, but that is the topic for a future post, potentially with a live visualization for the curious website owner.</p>
 

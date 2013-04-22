@@ -1,0 +1,359 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Iteratee: can I have that in a sentence? - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="A couple of weeks back I was trying to wrap my head around Iteratees so I read what I could find on Google. Afterwards, I had a very high level idea &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Reactive Data Processing Blog</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Iteratee: can I have that in a sentence?</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-22T13:08:00+02:00" pubdate data-updated="true">04/22/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A couple of weeks back I was trying to wrap my head around Iteratees so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing which aggregates state. That did not seem right.</p>
+
+<!-- more -->
+
+
+<p>I had to see it in action in order to understand how this Iteratee thing works. So I was looking for a stream of information that I could use. I found it in the Twitter Streaming API. A stream of Tweets can be interesting, having chosen the right topic(s), and Tweets coming in at this moment for a topic is something that seems easy to relate to. I also wanted to try out a supervised actor hierarchy in this project, so I decided to download the original profile images from Twitter for every single Tweet, downconvert them using a couple of actors doing image manipulation and storing an 80x80px PNG thumbnail in MongoDB. This supervised image manipulation will be the topic of another post though.</p>
+
+<p>On the client side I wanted something flashy that makes it obvious that live information from the real world is flowing through the system and reasoned about. I had recently taken an interest in D3.js and I had seen the Wordcloud implementation by Jason Davies which is nice to look at, so I wondered if it would be difficult to drive it from data streaming to the client over a WebSocket connection. The UI at this point was not supposed to be particularly useful, it was really only for the effect. I am fully aware that a wordcloud is not the best way for showing the frequency of words, and having it regenerate every 5 seconds makes it even less useful perceptually since whatever you look at will be gone before you can even fully focus on the smaller items. That being said, I was interested in how Iteratees work. The D3 I use for this project is very basic, I will focus on doing more useful things with D3.js later on.</p>
+
+<p>So I started working on this reactive web application called BirdWatch. I will go through the parts of the application that are relevant when trying to understand Iteratees in this article.</p>
+
+<p>Let&#8217;s look at my initial high-level architectural drawing:</p>
+
+<p><img class="left" src="/images/BirdWatch.png" title="image" alt="images"></p>
+
+<p>At first, this seems to make sense. The WS object acts as our Enumerator, taking chunks of Array[Byte] it receives through the open HTTP connection to Twitter and passing them along into an Iteratee:</p>
+
+<figure class='code'><figcaption><span>WS-Client</span><a href='https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="s">&quot;https://stream.twitter.com/1.1/statuses/filter.json?track=&quot;</span>
+</span><span class='line'><span class="k">val</span> <span class="n">conn</span> <span class="k">=</span> <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">url</span> <span class="o">+</span> <span class="nc">TwitterClient</span><span class="o">.</span><span class="n">topics</span><span class="o">.</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;%2C&quot;</span><span class="o">).</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">,</span> <span class="s">&quot;%20&quot;</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">withTimeout</span><span class="o">(-</span><span class="mi">1</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">sign</span><span class="o">(</span><span class="nc">OAuthCalculator</span><span class="o">(</span><span class="n">consumerKey</span><span class="o">,</span> <span class="n">accessToken</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="nc">TwitterClient</span><span class="o">.</span><span class="n">tweetIteratee</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The Iteratee then performs some action (JSON parsing, Tweet reading, sending the Tweet to the ImageConversion actor) for each chunk, without accumulating intermediate state.</p>
+
+<figure class='code'><figcaption><span>tweetIteratee (shortened)</span><a href='https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Iteratee for processing each chunk from Twitter stream of Tweets. Parses Json chunks </span>
+</span><span class='line'><span class="cm">* as Tweet instances and publishes them to eventStream. */</span>
+</span><span class='line'><span class="k">val</span> <span class="n">tweetIteratee</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]]</span> <span class="o">{</span> <span class="n">chunk</span> <span class="k">=&gt;</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">chunkString</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">chunk</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">json</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nc">TweetReads</span><span class="o">.</span><span class="n">reads</span><span class="o">(</span><span class="n">json</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsSuccess</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>      <span class="nc">ActorStage</span><span class="o">.</span><span class="n">imgSupervisor</span> <span class="o">!</span> <span class="nc">WordCount</span><span class="o">.</span><span class="n">wordsChars</span><span class="o">(</span><span class="n">stripImageUrl</span><span class="o">(</span><span class="n">t</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsError</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This at first seduced me into believing that the Iteratee was one particular instance that performed these repeated actions as specified in the foreach part. But that is actually not the case. The Iteratee is immutable and every time we pass information to an Iteratee in a step, a new one is created in return. This does not seem terribly useful as long as we only want to a foreach without accumulated state. But bear with me.</p>
+
+<p>Let&#8217;s have a look at another Enumerator / Iteratee couple in the application, then this will make more sense.</p>
+
+<p>For the wordcount which feeds both the wordcloud and the bar chart, we analyze a rolling window of tweets. For this, we need to keep state over say the last 1000 tweets as is the case here.</p>
+
+<p>Something does not seem right here. How can we repeatedly pass information to an immutable object which aggregates state? Turns out we can&#8217;t. There is no one Iteratee receiving and processing information, instead every step of the Iteratee returns a new Iteratee, with the new state.</p>
+
+<p>Okay, that makes</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-22T13:08:00+02:00" pubdate data-updated="true">04/22/2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence/" data-via="_MNehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/04/19/hello-world/" title="Previous Post: Hello World">&laquo; Hello World</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am learning functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/hello-world/">Hello World</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Dynamic web application written in Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+  </ul>
+</section><section>
+  <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&type=follow&count=false&size=small"
+    allowtransparency="true" frameborder="0" scrolling="0" width="190" height="30"></iframe>
+  <a href="https://twitter.com/_MNehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<br />
+<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
+<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
+</a>
+
+</section>
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/100986586701798521209?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/04/22/iteratee-can-i-have-that-in-a-sentence/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
