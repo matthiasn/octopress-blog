@@ -357,6 +357,23 @@
 
 <p>We call Concurrent.broadcast[Tweet], which returns a tuple of an Enumerator (named accordingly) that we will attach our Iteratee to (using the |>>> operator) and a channel that we can use to push Tweets into. These Tweets will then be consumed by the tweetListIteratee attached to the enumerator. We will get those Tweets from the <strong><a href="http://doc.akka.io/docs/akka/2.1.2/scala/event-bus.html">Akka EventBus</a></strong> by creating an actor which listens events of type Tweet on the EventBus and pushes them. We will look at the EventBus in more detail in the article dealing with the ImageProcessing actor hierarchy. For now it should be sufficient to know that we have a source of Tweets and push each individual occurence of a Tweet event into the tweetChannel, thus creating our own open-ended stream.</p>
 
+<p>Now that we have wired our building blocks together, let&#8217;s see if we can visualize this in its initial state:</p>
+
+<p><img class="left" src="/images/Iteratee1.svg" width="800" height="300" title="image" alt="images"></p>
+
+<p>We have a systemwide EventBus to which we attach for every user connection an actor listening to Tweets and pushing them into the tweetChannel. Somehow, and we will get there, this Tweet will reach the tweetlistIteratee, where it will be prepended to the accumulator. Then the tweetlistInterceptor function will be executed, doing our computations and pushing the result into the WebSocket connection to the client.</p>
+
+<p>So far so good. But we know that the Iteratee is an immutable data type:</p>
+
+<blockquote><p>An Iteratee consumes a stream of elements of type E, producing a result of type A. The stream itself is represented by the Input trait. An Iteratee is an immutable data type, so each step in consuming the stream generates a new Iteratee with a new state.</p><footer><strong>Iteratee</strong> <cite><a href='http://www.playframework.com/documentation/api/2.1.0/scala/index.html#play.api.libs.iteratee.Iteratee'>Play 2.10 API</a></cite></footer></blockquote>
+
+
+<p>Let&#8217;s see what happens when we push a Tweet into the system:</p>
+
+<p>This is what confused me initially. How does the enumerator keep track of the current Iteratee to feed with the next element in the stream? Does this mean the enumerator has mutable internal state, holding the latest Iteratee? Turns out it depends on the definition of mutable state. Some enumerators such as</p>
+
+<p>An Iteratee can be in one of three states, Cont, Done and Error. The Done state does not seem particularly useful when dealing with truly open-ended streams. When is a Twitter stream done? When Twitter ceases to exist? For this reason I also do not care about any result on a Done state. The results over a stream are only meaningful incrementally. But a Done state could certainly be useful in other applications, such as when reading from a large file in smaller chunks or when streaming data from ReactiveMongo until the iterator runs out of data. Then a final computation makes sense.</p>
+
 <p>At a high level, what we are trying to do is this:</p>
 
 <p>Something does not seem right here. How can we repeatedly pass information to an immutable object, which aggregates state? Turns out we can&#8217;t. There is no one Iteratee receiving and processing information, instead every step of the Iteratee returns a new Iteratee, with the new state.</p>
