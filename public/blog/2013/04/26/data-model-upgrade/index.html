@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Matthias Nehlsen</title>
+  <title>ReactiveMongo 0.9-SNAPSHOT and Lossless Persistence - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -73,15 +73,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9-SNAPSHOT and Lossless Persistence</a></h1>
+      <h1 class="entry-title">ReactiveMongo 0.9-SNAPSHOT and Lossless Persistence</h1>
     
     
       <p class="meta">
@@ -104,70 +101,31 @@
   </header>
 
 
-  <div class="entry-content"><p>Initially I parsed the Tweets in the BirdWatch application into instances of a case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> 0.9-SNAPSHOT in the latest commits.</p>
+<div class="entry-content"><p>Initially I parsed the Tweets in the BirdWatch application into instances of a case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> 0.9-SNAPSHOT in the latest commits.</p>
 
+<!-- more -->
+
+
+<p>In the <strong><a href="https://github.com/matthiasn/BirdWatch/blob/6edda07bec721c61011aaef21f1ed4440130e48f/README.md">GitHub</a></strong> project description I had been ranting about how any data model will almost invariably be wrong in the future as we cannot know what we will want to analyze later. We can always change the data model at a later point and from then on store a different interpretation of the observable fact, but then we would not have complete historic information to test our hypotheses on retrospective data.</p>
+
+<p>For this reason I decided that I wanted to store the Tweets in their complete JSON representation. <strong><a href="http://www.mongodb.org">MongoDB</a></strong> is a great choice for this as it allows indexing our data while leaving the JSON structure intact. We get the best of two worlds, we have a lossless persistence this way, meaning that we can reconstruct the observable fact from the database while at the same time being able to quickly search through a potentially really large dataset. The reconstructed observable fact might not be identical on a binary level as that would depend on the JSON to text serialization library and its configuration, but the restored facts will be semantically identical, which is good enough for our purpose.</p>
+
+<p>Of course we could also store raw text in something like Hadoop or plain text files, but it would be much more effort to retrieve information later because we would have to deal with the indexing instead of leaving that to MongoDB.</p>
+
+<p>I had already stored raw Tweets in the database for a little while, but I had also still stored the case class instances and used the latter for preloading tweets upon startup of the browser. That really was not very elegant. The main change I had to make there was querying the last n raw Tweets from the database for the preloading and then parse Tweets from the JsObjects the same way I already do when ingesting the</p>
+
+<p>It turns out that it was a good idea to approach this problem</p>
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/26/data-model-upgrade/">Read on &rarr;</a>
-    </footer>
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
 
-<time datetime="2013-04-23T22:08:00+02:00" pubdate data-updated="true">04/23/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A couple of weeks back I was trying to wrap my head around <strong><a href="http://www.playframework.com/documentation/2.0.4/Iteratees">Iteratees</a></strong> so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing aggregating state over time. That did not seem right.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/19/hello-world/">Hello World</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -179,35 +137,42 @@
   
 
 
-<time datetime="2013-04-19T21:19:00+02:00" pubdate data-updated="true">04/19/2013</time>
-        
-      </p>
+<time datetime="2013-04-26T13:48:00+02:00" pubdate data-updated="true">04/26/2013</time>
+      
+
+
+    </p>
     
-  </header>
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/" data-via="_MNehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
 
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/" title="Previous Post: Iteratee: can I have that in a sentence?">&laquo; Iteratee: can I have that in a sentence?</a>
+      
+      
+    </p>
+  </footer>
+</article>
 
-  <div class="entry-content"><p><strong>Who am I?</strong>
-My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>
-
-<p>After some wandering, I discovered what a delight it can be to write these amazing little things called &#8216;programs&#8217; that come to existence almost completely through the workings of the mind. A couple of years ago, I finally decided that it was time for a major change. I knew I really wanted to be spend my time and energy in the creative process of developing applications that elegantly solve problems, so I made the move, and I haven&#8217;t looked back since.</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/19/hello-world/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     
@@ -274,6 +239,7 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -288,7 +254,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
       var disqus_shortname = 'matthiasnehlsen';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
