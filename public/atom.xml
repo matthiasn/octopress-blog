@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-04-26T16:35:44+02:00</updated>
+  <updated>2013-04-29T00:30:03+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,24 +14,261 @@
 
   
   <entry>
-    <title type="html"><![CDATA[ReactiveMongo 0.9-SNAPSHOT and Lossless Persistence]]></title>
+    <title type="html"><![CDATA[ReactiveMongo 0.9 and Lossless Persistence]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/"/>
     <updated>2013-04-26T13:48:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade</id>
-    <content type="html"><![CDATA[<p>Initially I parsed the Tweets in the BirdWatch application into instances of a case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> 0.9-SNAPSHOT in the latest commits.</p>
+    <content type="html"><![CDATA[<p>Initially I parsed the Tweets in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application into instances of a Tweet case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> version 0.9 in the latest commits, storing each  observable fact coming from the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> in its entirety.</p>
 
 <!-- more -->
 
 
-<p>In the <strong><a href="https://github.com/matthiasn/BirdWatch/blob/6edda07bec721c61011aaef21f1ed4440130e48f/README.md">GitHub</a></strong> project description I had been ranting about how any data model will almost invariably be wrong in the future as we cannot know what we will want to analyze later. We can always change the data model at a later point and from then on store a different interpretation of the observable fact, but then we would not have complete historic information to test our hypotheses on retrospective data.</p>
+<p>Any data model will almost invariably be wrong in the future as we cannot predict what we will want to analyze later. We can always change the data model at a later point and from then on store a different interpretation of the observable fact, but then we would not have complete historic information when we want to test our hypotheses on retrospective data. The solution for this is to store the Tweets in their complete <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> representation. <strong><a href="http://www.mongodb.org">MongoDB</a></strong> is a great choice for this as it allows indexing our data while leaving the <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> structure intact. We get the best of two worlds. With this lossless persistence we can always reconstruct the observable fact from the database while at the same time being able to quickly search through a potentially large dataset.</p>
 
-<p>For this reason I decided that I wanted to store the Tweets in their complete JSON representation. <strong><a href="http://www.mongodb.org">MongoDB</a></strong> is a great choice for this as it allows indexing our data while leaving the JSON structure intact. We get the best of two worlds, we have a lossless persistence this way, meaning that we can reconstruct the observable fact from the database while at the same time being able to quickly search through a potentially really large dataset. The reconstructed observable fact might not be identical on a binary level as that would depend on the JSON to text serialization library and its configuration, but the restored facts will be semantically identical, which is good enough for our purpose.</p>
+<p>I also wanted to upgrade <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> in order to fix a previous problem with Killcursors. Version 0.9 entails some changes in the API, so it was a good idea to tackle the upgrade and the Tweet persistence layer together. Let&#8217;s go through some of the changes:</p>
 
-<p>Of course we could also store raw text in something like Hadoop or plain text files, but it would be much more effort to retrieve information later because we would have to deal with the indexing instead of leaving that to MongoDB.</p>
+<figure class='code'><figcaption><span>Mongo Connection in Version 0.8</span><a href='https://github.com/matthiasn/BirdWatch/blob/53b79386ef49d80a1d4d1eae1086b9aff5485fa2/app/utils/Mongo.scala'>Mongo.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Mongo connection object */</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">Mongo</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">connection</span> <span class="k">=</span> <span class="nc">MongoConnection</span><span class="o">(</span><span class="nc">List</span><span class="o">(</span><span class="s">&quot;localhost:27017&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">db</span> <span class="k">=</span> <span class="n">connection</span><span class="o">(</span><span class="s">&quot;BirdWatch&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>I had already stored raw Tweets in the database for a little while, but I had also still stored the case class instances and used the latter for preloading tweets upon startup of the browser. That really was not very elegant. The main change I had to make there was querying the last n raw Tweets from the database for the preloading and then parse Tweets from the JsObjects the same way I already do when ingesting the</p>
 
-<p>It turns out that it was a good idea to approach this problem</p>
+
+
+<figure class='code'><figcaption><span>Mongo Connection in Version 0.9</span><a href='https://github.com/matthiasn/BirdWatch/blob/2738bfdafb2a2367a79177b615adb58ce5d51c5b/app/utils/Mongo.scala'>Mongo.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Mongo connection object */</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">Mongo</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">driver</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">MongoDriver</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">connection</span> <span class="k">=</span> <span class="n">driver</span><span class="o">.</span><span class="n">connection</span><span class="o">(</span><span class="nc">List</span><span class="o">(</span><span class="s">&quot;localhost:27017&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">db</span> <span class="k">=</span> <span class="n">connection</span><span class="o">(</span><span class="s">&quot;BirdWatch&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> now uses an instance of the <strong><a href="https://github.com/zenexity/ReactiveMongo/blob/7d2328a337a9092d31801180b97e271a343abf29/driver/src/main/scala/api/api.scala">MongoDriver</a></strong> class and its connection method. The <strong><a href="https://github.com/zenexity/ReactiveMongo/blob/7d2328a337a9092d31801180b97e271a343abf29/driver/src/main/scala/api/api.scala">MongoConnection</a></strong> class still exists, but I couldn&#8217;t get it to work for some reason.</p>
+
+<p>I have moved the Tweet collection and basic query and insert methods into a Tweet companion object, with the intention of turning this into a lightweight <strong><a href="http://en.wikipedia.org/wiki/Data_access_object">DAO (Data Access Object)</a></strong> for Tweets:</p>
+
+<figure class='code'><figcaption><span>Tweet Companion Object</span><a href='https://github.com/matthiasn/BirdWatch/blob/290c609cccbf17076074e1eb2fa4e31bb350ca37/app/models/Tweet.scala'>Tweet.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Data Access Object for Tweets*/</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">Tweet</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">rawTweets</span><span class="k">:</span> <span class="kt">JSONCollection</span> <span class="o">=</span> <span class="nc">Mongo</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">collection</span><span class="o">[</span><span class="kt">JSONCollection</span><span class="o">](</span><span class="s">&quot;rawTweets&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">insertJson</span><span class="o">(</span><span class="n">json</span><span class="k">:</span> <span class="kt">JsValue</span><span class="o">)</span> <span class="k">=</span> <span class="n">rawTweets</span><span class="o">.</span><span class="n">insert</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">](</span><span class="n">json</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** get collection size from MongoDB (fast) */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">count</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Mongo</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">command</span><span class="o">(</span><span class="nc">Count</span><span class="o">(</span><span class="s">&quot;rawTweets&quot;</span><span class="o">))</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Query latest tweets (lazily evaluated stream, result could be of arbitrary size) */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">jsonLatestN</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">cursor</span><span class="k">:</span> <span class="kt">Cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="k">=</span> <span class="n">rawTweets</span>
+</span><span class='line'>      <span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;text&quot;</span> <span class="o">-&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;$exists&quot;</span> <span class="o">-&gt;</span> <span class="kc">true</span><span class="o">)))</span>
+</span><span class='line'>      <span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;_id&quot;</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="n">cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span>
+</span><span class='line'>    <span class="n">cursor</span><span class="o">.</span><span class="n">toList</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Storing the <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> from Twitter not only prevents us from throwing away data we might need in the future, it is also much simpler than having to deal with implicit <strong><a href="https://github.com/zenexity/ReactiveMongo/blob/7d2328a337a9092d31801180b97e271a343abf29/bson/src/main/scala/handlers.scala">BSONReader</a></strong> and <strong><a href="https://github.com/zenexity/ReactiveMongo/blob/7d2328a337a9092d31801180b97e271a343abf29/bson/src/main/scala/handlers.scala">BSONWriter</a></strong> objects as was previously the case:</p>
+
+<figure class='code'><figcaption><span>BSON implicits (with 0.8)</span><a href='https://github.com/matthiasn/BirdWatch/blob/f51dac075a6d287b58e55771497b4fd6aa00f32a/app/models/TweetImplicits.scala'>TweetImplicits.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="k">implicit</span> <span class="k">object</span> <span class="nc">TweetBSONWriter</span> <span class="k">extends</span> <span class="nc">BSONWriter</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">toBSON</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>      <span class="nc">BSONDocument</span><span class="o">(</span>
+</span><span class='line'>        <span class="s">&quot;_id&quot;</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="nc">BSONObjectID</span><span class="o">.</span><span class="n">generate</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;tweet_id&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONLong</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">tweet_id</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;screen_name&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONString</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">screen_name</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;text&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONString</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">text</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;wordCount&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONInteger</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">wordCount</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;charCount&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONInteger</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">charCount</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;location&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONString</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">location</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;profile_image_url&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONString</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">profile_image_url</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;geo&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONString</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">geo</span><span class="o">.</span><span class="n">getOrElse</span><span class="o">(</span><span class="s">&quot;&quot;</span><span class="o">)),</span>
+</span><span class='line'>        <span class="s">&quot;created_at&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONDateTime</span><span class="o">(</span><span class="n">t</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">getMillis</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">implicit</span> <span class="k">object</span> <span class="nc">TweetBSONReader</span> <span class="k">extends</span> <span class="nc">BSONReader</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">fromBSON</span><span class="o">(</span><span class="n">document</span><span class="k">:</span> <span class="kt">BSONDocument</span><span class="o">)</span><span class="k">:</span> <span class="kt">Tweet</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">doc</span> <span class="k">=</span> <span class="n">document</span><span class="o">.</span><span class="n">toTraversable</span>
+</span><span class='line'>      <span class="nc">Tweet</span><span class="o">(</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONLong</span><span class="o">](</span><span class="s">&quot;tweet_id&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONString</span><span class="o">](</span><span class="s">&quot;screen_name&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONString</span><span class="o">](</span><span class="s">&quot;text&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONInteger</span><span class="o">](</span><span class="s">&quot;wordCount&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONInteger</span><span class="o">](</span><span class="s">&quot;charCount&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONString</span><span class="o">](</span><span class="s">&quot;location&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONString</span><span class="o">](</span><span class="s">&quot;profile_image_url&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">,</span>
+</span><span class='line'>        <span class="nc">None</span><span class="o">,</span>
+</span><span class='line'>        <span class="k">new</span> <span class="nc">DateTime</span><span class="o">(</span><span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONDateTime</span><span class="o">](</span><span class="s">&quot;created_at&quot;</span><span class="o">).</span><span class="n">get</span><span class="o">.</span><span class="n">value</span><span class="o">),</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="n">getAs</span><span class="o">[</span><span class="kt">BSONObjectID</span><span class="o">](</span><span class="s">&quot;_id&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Instead we just parse a <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> string from Twitter and insert the parsed <strong><a href="https://github.com/playframework/Play20/blob/2.1.1/framework/src/play/src/main/scala/play/api/libs/json/JsValue.scala">JsValue</a></strong> into the <strong><a href="https://github.com/zenexity/Play-ReactiveMongo/blob/a7164a1ac0832680ca0f4c3da0b6949ffea282b0/src/main/scala/play/modules/reactivemongo/jsoncollection.scala">JSONCollection</a></strong>:</p>
+
+<figure class='code'><figcaption><span>Inserting into database</span><a href='https://github.com/matthiasn/BirdWatch/blob/e33ce62bb36b4a1228c2f1519de60ef3d65482bd/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="k">val</span> <span class="n">json</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** persist any valid JSON from Twitter Streaming API */</span>
+</span><span class='line'>  <span class="nc">Tweet</span><span class="o">.</span><span class="n">insertJson</span><span class="o">(</span><span class="n">json</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is really all there is to storing <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> into MongoDB now. I don&#8217;t have to worry about additional fields or other changes in the Twitter Streaming API. If it is valid <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>, it will find its way into the database. Major changes to the API might break parsing into Tweets, but they would not break database persistence.</p>
+
+<p>Error and status messages from Twitter also come as <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>, so they are stored as well:</p>
+
+<figure class='code'><figcaption><span>JavaScript query in MongoDB shell </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span> <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="nx">ObjectId</span><span class="p">(</span><span class="s2">&quot;…&quot;</span><span class="p">),</span> <span class="s2">&quot;disconnect&quot;</span> <span class="o">:</span>
+</span><span class='line'>  <span class="p">{</span> <span class="s2">&quot;code&quot;</span> <span class="o">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s2">&quot;stream_name&quot;</span> <span class="o">:</span> <span class="s2">&quot;_MNehlsen-statuses237381&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="s2">&quot;reason&quot;</span> <span class="o">:</span> <span class="s2">&quot;admin logout&quot;</span> <span class="p">}</span> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Querying is more concise than before, making use of Json.obj instead of BSONDocuments:</p>
+
+<figure class='code'><figcaption><span>OLD: Query for latest Tweets</span><a href='https://github.com/matthiasn/BirdWatch/blob/53b79386ef49d80a1d4d1eae1086b9aff5485fa2/app/controllers/Twitter.scala'>Twitter.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">latestTweetQuery</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">query</span> <span class="k">=</span> <span class="nc">QueryBuilder</span><span class="o">().</span><span class="n">query</span><span class="o">(</span><span class="nc">BSONDocument</span><span class="o">(</span><span class="s">&quot;created_at&quot;</span> <span class="o">-&gt;</span>
+</span><span class='line'>    <span class="nc">BSONDocument</span><span class="o">(</span><span class="s">&quot;$lte&quot;</span> <span class="o">-&gt;</span> <span class="nc">BSONDateTime</span><span class="o">(</span><span class="nc">DateTime</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">getMillis</span><span class="o">))))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="s">&quot;created_at&quot;</span> <span class="o">-&gt;</span> <span class="nc">SortOrder</span><span class="o">.</span><span class="nc">Descending</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">val</span> <span class="n">cursor</span> <span class="k">=</span> <span class="nc">Mongo</span><span class="o">.</span><span class="n">tweets</span><span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="n">query</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">cursor</span><span class="o">.</span><span class="n">toList</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>NEW: Query for latest Tweets</span><a href='https://github.com/matthiasn/BirdWatch/blob/4abf8f2fe50986b3dd695998a553b8a9888fce71/app/models/Tweet.scala'>Tweet.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">def</span> <span class="n">jsonLatestN</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Future</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">cursor</span><span class="k">:</span> <span class="kt">Cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="k">=</span> <span class="n">rawTweets</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;text&quot;</span> <span class="o">-&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;$exists&quot;</span> <span class="o">-&gt;</span> <span class="kc">true</span><span class="o">)))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;_id&quot;</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">cursor</span><span class="o">.</span><span class="n">toList</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This looks much neater and is also close to the syntax in the MongoDB JavaScript shell:</p>
+
+<figure class='code'><figcaption><span>JavaScript query in MongoDB shell </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">rawTweets</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;text&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$exists&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">}</span> <span class="p">}</span> <span class="p">)</span>
+</span><span class='line'>  <span class="p">.</span><span class="nx">sort</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;_id&quot;</span><span class="o">:</span> <span class="o">-</span><span class="mi">1</span> <span class="p">}</span> <span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Curly braces get replaced by Json.obj() and the colon gets replaced by &#8220;->&#8221;. Other than that, the syntax is very close. Note the &#8220;$exists&#8221; part. This limits the results to only Tweets (and potentially error and status messages that have a &#8220;text&#8221; field, but I have not encountered those). The only thing I was still missing is an easy way to get the size of a collection.</p>
+
+<p>In the shell we would write:</p>
+
+<figure class='code'><figcaption><span>JavaScript query in MongoDB shell </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">db</span><span class="p">.</span><span class="nx">rawTweets</span><span class="p">.</span><span class="nx">find</span><span class="p">(</span> <span class="p">{</span> <span class="s2">&quot;text&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;$exists&quot;</span> <span class="o">:</span> <span class="kc">true</span><span class="p">}</span> <span class="p">}</span> <span class="p">).</span><span class="nx">count</span><span class="p">()</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Turns out that in ReactiveMongo, we can use the Count command for this, which returns a Future[Int] with the result (see Tweet.scala above).
+This allows us to do something upon return of the collection size in a non-blocking way:</p>
+
+<figure class='code'><figcaption><span>Using Count Command</span><a href='https://github.com/matthiasn/BirdWatch/blob/fd44fe45163233746b8caacc0dbba5c815e3f964/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="nc">Tweet</span><span class="o">.</span><span class="n">count</span><span class="o">.</span><span class="n">map</span><span class="o">(</span><span class="n">c</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;Tweets: &quot;</span> <span class="o">+</span> <span class="n">c</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Great stuff, I really like <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong>. The documentation could be more complete though; it takes some source code reading to find the good stuff. I&#8217;d be more than to happy help out here and contribute to the project documentation.</p>
+
+<p>-Matthias</p>
 ]]></content>
   </entry>
   
