@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-05-01T16:49:29+02:00</updated>
+  <updated>2013-05-01T19:29:43+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,7 +18,7 @@
     <link href="http://matthiasnehlsen.com/blog/2013/05/01/server-side-events-vs-websockets/"/>
     <updated>2013-05-01T14:59:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/01/server-side-events-vs-websockets</id>
-    <content type="html"><![CDATA[<p>So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings about this architectural choice. WebSocket communication is a separate communication protocol from HTTP, introducing new problems in the network layer, as I should soon find out. But there is an alternative: Server Side Events.</p>
+    <content type="html"><![CDATA[<p>So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings. WebSocket communication is a separate communication protocol from HTTP, introducing new problems in the network layer, as I should soon find out. But there is an alternative: Server Side Events.</p>
 
 <!-- more -->
 

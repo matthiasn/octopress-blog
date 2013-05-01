@@ -5,7 +5,7 @@ date: 2013-05-01 14:59
 comments: true
 categories: 
 ---
-So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings about this architectural choice. WebSocket communication is a separate communication protocol from HTTP, introducing new problems in the network layer, as I should soon find out. But there is an alternative: Server Side Events.
+So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings. WebSocket communication is a separate communication protocol from HTTP, introducing new problems in the network layer, as I should soon find out. But there is an alternative: Server Side Events.
 
 <!-- more -->
 
