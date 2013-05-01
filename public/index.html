@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Initially I parsed the Tweets in the BirdWatch application into instances of a Tweet case class upon ingestion and then used that case class &hellip;">
+  <meta name="description" content="So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings about this architectural &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/01/server-side-events-vs-websockets/">Server Side Events vs. WebSockets</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-01T14:59:00+02:00" pubdate data-updated="true">05/01/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings about this architectural choice. WebSocket communication is a separate communication protocol from HTTP, introducing new problems in the network layer, as I should soon find out. But there is an alternative: Server Side Events.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/05/01/server-side-events-vs-websockets/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -224,6 +265,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/01/server-side-events-vs-websockets/">Server Side Events vs. WebSockets</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a>
