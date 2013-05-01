@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-05-01T19:29:43+02:00</updated>
+  <updated>2013-05-01T19:56:19+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,24 +14,86 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Server Side Events vs. WebSockets]]></title>
+    <title type="html"><![CDATA[Server Sent Events vs. WebSockets]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/01/server-side-events-vs-websockets/"/>
     <updated>2013-05-01T14:59:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/01/server-side-events-vs-websockets</id>
-    <content type="html"><![CDATA[<p>So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings. WebSocket communication is a separate communication protocol from HTTP, introducing new problems in the network layer, as I should soon find out. But there is an alternative: Server Side Events.</p>
+    <content type="html"><![CDATA[<p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. WebSocket communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong>.</p>
 
 <!-- more -->
 
 
 <p>For BirdWatch, I wanted to have a proxy in between the outside world and the Play application, mostly because I think it is a cleaner design that would scale better, just in case, but also just because I simply wanted to try it out.</p>
 
-<p>My somewhat arbitrary choice for this was Nginx, which as I should soon learn does not support WebSocket proxying in the current stable release. Supposedly the latest development version would support it, so I downloaded the source, compiled it and set it up on my Ubuntu server. It did work for me, but whenever I asked other people to try a link, their WebSocket connection did not establish. I tried to find the problem for a short while but soon realized that I was more interested in developing my own application than in debugging my attempt at a WebSocket proxying configuration in Nginx.</p>
+<p>My somewhat arbitrary choice for this was <strong><a href="http://nginx.org/en/">Nginx</a></strong>, which as I should soon learn does not support WebSocket proxying in the current stable release. Supposedly newer <strong><a href="http://nginx.org/en/docs/http/websocket.html">development versions</a></strong> would support it, so I downloaded the source, compiled Nginx and set it up on my Ubuntu server. It did work for me, but whenever I asked other people to try the link I sent them, their WebSocket connection did not establish. I tried to find the problem for a short while but soon realized that I was more interested in developing my own application than in debugging my attempt at a WebSocket proxying configuration in Nginx.</p>
 
-<p>Why did I want to use WebSockets in the first place? The protocol promises a fast, bi-directional communication between client and server. Looking at my application, that is not exactly the requirement though. I need the fastest possible way of delivering lots of JSON data from the server to the client. The opposite is not true though. In the other direction, there will at most be only occasional control messages, nothing that could not be handled by REST style web service calls.</p>
+<p>Why did I want to use WebSockets in the first place? The protocol promises a fast, bi-directional communication between client and server. Looking at my application, that is not exactly the requirement though. I need the fastest possible way of delivering lots of <strong><a href="https://tools.ietf.org/html/rfc4627">JSON</a></strong> data from the server to the client. The opposite is not true though. In the other direction, there will at most be only occasional control messages, nothing that could not be handled by <strong><a href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm">REST</a></strong> style web service calls.</p>
 
-<p>This realization, together with the frustration from my Nginx experience with the WebSocket protocol, made me reconsider Server Side Events.</p>
+<p>This realization, together with the frustration from my Nginx experience with the WebSocket protocol, made me reconsider Server Sent Events.</p>
 
-<p>Unlike WebSockets, SSEs are plain HTTP connections for the infr</p>
+<p>Unlike WebSockets, Server Sent Events are transmitted over plain HTTP connections, which works immediately with the Nginx proxy:</p>
+
+<figure class='code'><figcaption><span>nginx.conf </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>user www-data;
+</span><span class='line'>worker_processes 4;
+</span><span class='line'>pid /var/run/nginx.pid;
+</span><span class='line'>
+</span><span class='line'>events {
+</span><span class='line'>  worker_connections 768;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>http {
+</span><span class='line'>  proxy_buffering    off;
+</span><span class='line'>  proxy_set_header   X-Real-IP $remote_addr;
+</span><span class='line'>  proxy_set_header   X-Scheme $scheme;
+</span><span class='line'>  proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>  proxy_set_header   Host $http_host;
+</span><span class='line'>
+</span><span class='line'>  upstream my-backend {
+</span><span class='line'>    server 127.0.0.1:9000;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  server {
+</span><span class='line'>    listen               80;
+</span><span class='line'>    keepalive_timeout    70;
+</span><span class='line'>    server_name birdwatch.matthiasnehlsen.com;
+</span><span class='line'>    location / {
+</span><span class='line'>      proxy_pass  http://my-backend;
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Th</p>
 ]]></content>
   </entry>
   
