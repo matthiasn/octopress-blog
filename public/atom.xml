@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-05-01T19:56:19+02:00</updated>
+  <updated>2013-05-03T01:00:55+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -15,23 +15,119 @@
   
   <entry>
     <title type="html"><![CDATA[Server Sent Events vs. WebSockets]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/05/01/server-side-events-vs-websockets/"/>
+    <link href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/"/>
     <updated>2013-05-01T14:59:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/05/01/server-side-events-vs-websockets</id>
-    <content type="html"><![CDATA[<p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. WebSocket communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong>.</p>
+    <id>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets</id>
+    <content type="html"><![CDATA[<p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>.</p>
 
 <!-- more -->
 
 
-<p>For BirdWatch, I wanted to have a proxy in between the outside world and the Play application, mostly because I think it is a cleaner design that would scale better, just in case, but also just because I simply wanted to try it out.</p>
+<p>For <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>, I wanted to experiment with having a proxy between the outside world and the Play application:</p>
 
-<p>My somewhat arbitrary choice for this was <strong><a href="http://nginx.org/en/">Nginx</a></strong>, which as I should soon learn does not support WebSocket proxying in the current stable release. Supposedly newer <strong><a href="http://nginx.org/en/docs/http/websocket.html">development versions</a></strong> would support it, so I downloaded the source, compiled Nginx and set it up on my Ubuntu server. It did work for me, but whenever I asked other people to try the link I sent them, their WebSocket connection did not establish. I tried to find the problem for a short while but soon realized that I was more interested in developing my own application than in debugging my attempt at a WebSocket proxying configuration in Nginx.</p>
+<ul>
+<li><strong>Security</strong>: the application is not directly exposed to outside world, authentication and encryption could be done at proxy layer</li>
+<li><strong>Caching</strong>: Play is designed for dynamic content, I&#8217;d rather let a proxy handle and cache static files</li>
+<li><strong>Load-Balancing</strong>: the proxy can distribute load among many instances of Play, also providing failover automatically</li>
+</ul>
 
-<p>Why did I want to use WebSockets in the first place? The protocol promises a fast, bi-directional communication between client and server. Looking at my application, that is not exactly the requirement though. I need the fastest possible way of delivering lots of <strong><a href="https://tools.ietf.org/html/rfc4627">JSON</a></strong> data from the server to the client. The opposite is not true though. In the other direction, there will at most be only occasional control messages, nothing that could not be handled by <strong><a href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm">REST</a></strong> style web service calls.</p>
 
-<p>This realization, together with the frustration from my Nginx experience with the WebSocket protocol, made me reconsider Server Sent Events.</p>
+<p>My choice for the proxy was <strong><a href="http://nginx.org/en/">Nginx</a></strong>, which as I should soon learn does not support WebSocket proxying in the current stable release. Supposedly newer <strong><a href="http://nginx.org/en/docs/http/websocket.html">development versions</a></strong> would support it, so I compiled the latest version from source and installed Nginx on my Ubuntu server. It did work when accessing the remote server from my devices, but for some reason whenever I asked other people to try the link I sent them, their WebSocket connection did not establish. I tried to find the problem for a short while but soon realized that I was more interested in developing my own application than in debugging my attempt at a WebSocket proxy configuration in a beta version of <strong><a href="http://nginx.org/en/">Nginx</a></strong>.</p>
 
-<p>Unlike WebSockets, Server Sent Events are transmitted over plain HTTP connections, which works immediately with the Nginx proxy:</p>
+<p>Why did I want to use WebSockets in the first place? The protocol promises fast, bi-directional communication between client and server. Looking at my application, that is not exactly the requirement though. I need the fastest possible way of delivering lots of <strong><a href="https://tools.ietf.org/html/rfc4627">JSON</a></strong> data from the server to the client. The opposite is not true though. In the other direction, there will only be occasional control messages, nothing that could not be handled by <strong><a href="http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm">REST</a></strong> style web service calls. REST web service calls are actually much nicer semantically for interacting with the application, as there is a rich set of <strong><a href="http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol">HTTP verbs / methods</a></strong> with meaning (<strong>GET</strong>, <strong>PUT</strong>, <strong>POST</strong>, <strong>DELETE</strong>) and also a rich set of <strong><a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html">status codes</a></strong> (e.g. <strong>200</strong>, <strong>401</strong>, <strong>404</strong>, hopefully not <strong>500</strong>). With WebSockets, I would have to start from scratch with control messages from client to server and parse every single thing from <strong><a href="https://tools.ietf.org/html/rfc4627">JSON</a></strong>.</p>
+
+<p>This realization, together with the frustration from my <strong><a href="http://nginx.org/en/">Nginx</a></strong> experience with the <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> protocol, made me reconsider <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. These are transmitted over a plain <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong> connection, which should just work with Nginx or any other proxy out there. Let&#8217;s find out.</p>
+
+<p>The changes I needed to make are surprisingly simple:</p>
+
+<figure class='code'><figcaption><span>Enumerating new Tweets into WebSocket connection</span><a href='https://github.com/matthiasn/BirdWatch/blob/466cce67a38265e311970466b3bf5529fda54f12/app/controllers/Twitter.scalaTwitter.scala'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Serves WebSocket connection updating the UI */</span>
+</span><span class='line'><span class="k">def</span> <span class="n">tweetFeed</span> <span class="k">=</span> <span class="nc">WebSocket</span><span class="o">.</span><span class="n">using</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">implicit</span> <span class="n">request</span> <span class="k">=&gt;</span>
+</span><span class='line'>    <span class="cm">/** Creates enumerator and channel for Strings through Concurrent factory object</span>
+</span><span class='line'><span class="cm">     * for pushing data through the WebSocket */</span>
+</span><span class='line'>    <span class="k">val</span> <span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">wsOutChannel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">[</span><span class="kt">...</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">(</span><span class="n">in</span><span class="o">,</span> <span class="n">out</span><span class="o">)</span> <span class="c1">// in and out channels for WebSocket connection</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>becomes:</p>
+
+<figure class='code'><figcaption><span>Enumerating new Tweets into HTTP connection</span><a href='https://github.com/matthiasn/BirdWatch/blob/b193b18749b8c3bc2c7c6f78acfdb6e7adb24cc9/app/controllers/Twitter.scala'>Twitter.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Serves Server Sent Events over HTTP connection */</span>
+</span><span class='line'><span class="k">def</span> <span class="n">tweetFeed</span><span class="o">()</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">implicit</span> <span class="n">req</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>    <span class="cm">/** Creates enumerator and channel for Strings through Concurrent factory object</span>
+</span><span class='line'><span class="cm">     * for pushing data through the WebSocket */</span>
+</span><span class='line'>    <span class="k">val</span> <span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">wsOutChannel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">[</span><span class="kt">...</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nc">Ok</span><span class="o">.</span><span class="n">feed</span><span class="o">(</span><span class="n">out</span> <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Before, any Tweet coming through the wsOutChannel would be enumerated into the WebSocket by returning the (in: Iteratee, out: Enumerator) whereas now we need to attach the <strong>out</strong> Enumerator to the Ok result feed. That is all on the server side.</p>
+
+<p>The changes on the client side are just as simple:</p>
+
+<figure class='code'><figcaption><span>WebSocket Event Handling</span><a href='https://github.com/matthiasn/BirdWatch/blob/466cce67a38265e311970466b3bf5529fda54f12/app/views/twitter/tweets.scala.html'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">var</span> <span class="nx">ws</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s2">&quot;@routes.Twitter.tweetFeed().webSocketURL()&quot;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">ws</span><span class="p">.</span><span class="nx">onMessage</span> <span class="o">=</span> <span class="nx">handler</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>becomes:</p>
+
+<figure class='code'><figcaption><span>EventSource Event Handling</span><a href='https://github.com/matthiasn/BirdWatch/blob/ac4d9488c46aeb96e6f01e09c13fcb4598e11039/app/views/twitter/tweets.scala.html'>Twitter.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s1">&#39;/tweetFeed&#39;</span><span class="p">);</span>
+</span><span class='line'>  <span class="nx">feed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I expected the SSE solution to on par with the previous WebSocket solution in terms of performance. Interestingly though, with nothing else changed, SSE is a little or a lot faster, depending on the browser. For pre-loading of 500 Tweets on loading the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> page in the browser, it took on average:</p>
+
+<ul>
+<li>Safari: <strong>7 sec</strong> using SSE and <strong>16 sec</strong> using WebSockets</li>
+<li>Chrome: <strong>5 sec</strong> using SSE and <strong>8 sec</strong> using WebSockets</li>
+<li>Firefox: <strong>6 sec</strong> using SSE and <strong>8 sec</strong> using WebSockets</li>
+</ul>
+
+
+<p>3:0 for SSE. The better performance is noticable in all browsers, especially in Safari though, which seems to have a less-than-ideal WebSocket implementation.</p>
+
+<p>This was actually super simple to implement, it took much longer to write this blog post than to implement a working solution using Server Sent Events. <strong><a href="http://www.playframework.com">Play Framework</a></strong> really does make me more productive.</p>
+
+<p>With these changes implemented, a simple <strong><a href="http://nginx.org/en/">Nginx</a></strong> configuration inspired by the <strong><a href="http://www.playframework.com/documentation/2.1.1/HTTPServer">Play documentation</a></strong> works like a charm:</p>
 
 <figure class='code'><figcaption><span>nginx.conf </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -93,7 +189,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Th</p>
+<p>The messaging between client and server should get really interesting, I am looking forward to exploring this more as the project develops. Check back for an article on that (and other things).</p>
+
+<p>-Matthias</p>
 ]]></content>
   </entry>
   
@@ -332,9 +430,60 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Curly braces get replaced by Json.obj() and the colon gets replaced by &#8220;->&#8221;. Other than that, the syntax is very close. Note the &#8220;$exists&#8221; part. This limits the results to only Tweets (and potentially error and status messages that have a &#8220;text&#8221; field, but I have not encountered those). The only thing I was still missing is an easy way to get the size of a collection.</p>
+<p>Curly braces get replaced by Json.obj() and the colon gets replaced by &#8220;->&#8221;. Other than that, the syntax is very close. Note the &#8220;$exists&#8221; part. This limits the results to only Tweets (and potentially error and status messages that have a &#8220;text&#8221; field, but I have not encountered those).</p>
 
-<p>In the shell we would write:</p>
+<p>The usage above with generating a List from the cursor works fine for small n, but for larger results sets (say hundreds of thousands of items) it would be a bad idea to build the list in memory first. Luckily ReactiveMongo allows us to stream the results. That itself is not new, but since version 0.9 we can limit the number of results, making this much more useful for a latestN scenario:</p>
+
+<figure class='code'><figcaption><span>Enumerating cursor of Tweets</span><a href='https://github.com/matthiasn/BirdWatch/blob/466cce67a38265e311970466b3bf5529fda54f12/app/models/Tweet.scala'>Tweet.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Enumerate latest Tweets (descending order) into specified Iteratee.</span>
+</span><span class='line'><span class="cm"> * @param n number of results to enumerate over</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="k">def</span> <span class="n">enumJsonLatestN</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Enumerator</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">cursor</span><span class="k">:</span> <span class="kt">Cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="k">=</span> <span class="n">rawTweets</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;text&quot;</span> <span class="o">-&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;$exists&quot;</span> <span class="o">-&gt;</span> <span class="kc">true</span><span class="o">)))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;_id&quot;</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">cursor</span><span class="o">.</span><span class="n">enumerate</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With this we create an Enumerator of JsObjects that streams the results into an Iteratee. The usage of this is simple once we understand what this pattern means. Check out my previous <strong><a href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee article</a></strong>, hope it helps a little bit.</p>
+
+<p>This allows us to stream results into an Iteratee that will do whatever we need, in this case just doing a simple foreach:</p>
+
+<figure class='code'><figcaption><span>Attaching Iteratee to Enumerator </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">dbTweetIteratee</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">json</span> <span class="k">=&gt;</span> <span class="nc">TweetReads</span><span class="o">.</span><span class="n">reads</span><span class="o">(</span><span class="n">json</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsSuccess</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class='line'>      <span class="n">tweetChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">WordCount</span><span class="o">.</span><span class="n">wordsChars</span><span class="o">(</span><span class="n">t</span><span class="o">))</span> <span class="c1">// word and char count for each t</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsError</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">json</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nc">Tweet</span><span class="o">.</span><span class="n">enumJsonLatestN</span><span class="o">(</span><span class="mi">500</span><span class="o">)(</span><span class="n">dbTweetIteratee</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I currently do not enumerate the results into an Iteratee because the Tweets would appear in the wrong order in the UI and I cannot easily reverse the direction in which the Tweets are enumerated without an auto-incrementing counter in MongoDB to determine from where to start enumerating in ascending order (from position [collectionsize - n]). But this is more a problem of the UI, the next versions will certainly make use of this pattern.</p>
+
+<p>The only thing I was still missing is an easy way to get the size of a collection. In the shell we would write:</p>
 
 <figure class='code'><figcaption><span>JavaScript query in MongoDB shell </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -350,7 +499,7 @@ This allows us to do something upon return of the collection size in a non-block
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Great stuff, I really like <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong>. The documentation could be more complete though; it takes some source code reading to find the good stuff. I&#8217;d be more than to happy help out here and contribute to the project documentation.</p>
+<p>Great stuff, I really like <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong>. The documentation has also gotten a lot better in 0.9, compared to previous versions. Nonetheless it takes some source code reading to find some of the good stuff. I&#8217;d be more than to happy help out here and contribute to the project documentation.</p>
 
 <p>-Matthias</p>
 ]]></content>
@@ -739,10 +888,10 @@ This allows us to do something upon return of the collection size in a non-block
     <content type="html"><![CDATA[<p><strong>Who am I?</strong>
 My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>
 
-<p>After some wandering, I discovered what a delight it can be to write these amazing little things called &#8216;programs&#8217; that come to existence almost completely through the workings of the mind. A couple of years ago, I finally decided that it was time for a major change. I knew I really wanted to be spend my time and energy in the creative process of developing applications that elegantly solve problems, so I made the move, and I haven&#8217;t looked back since.</p>
-
 <!-- more -->
 
+
+<p>After some wandering, I discovered what a delight it can be to write these amazing little things called &#8216;programs&#8217; that come to existence almost completely through the workings of the mind. A couple of years ago, I finally decided that it was time for a major change. I knew I really wanted to be spend my time and energy in the creative process of developing applications that elegantly solve problems, so I made the move, and I haven&#8217;t looked back since.</p>
 
 <p><strong>Why am I blogging?</strong>
 I am fascinated by the idea of reasoning over live data streams. There are quite a few things that I still need to learn in order to turn my ideas into working code. I find that I learn particularly well when explaining things to others, so writing this blog seems like an awesome idea.</p>

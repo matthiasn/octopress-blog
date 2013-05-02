@@ -142,9 +142,41 @@ db.rawTweets.find( { "text" : { "$exists" : true} } )
   .sort( { "_id": -1 } )
 {% endcodeblock %}
 
-Curly braces get replaced by Json.obj() and the colon gets replaced by "->". Other than that, the syntax is very close. Note the "$exists" part. This limits the results to only Tweets (and potentially error and status messages that have a "text" field, but I have not encountered those). The only thing I was still missing is an easy way to get the size of a collection. 
+Curly braces get replaced by Json.obj() and the colon gets replaced by "->". Other than that, the syntax is very close. Note the "$exists" part. This limits the results to only Tweets (and potentially error and status messages that have a "text" field, but I have not encountered those). 
 
-In the shell we would write:
+The usage above with generating a List from the cursor works fine for small n, but for larger results sets (say hundreds of thousands of items) it would be a bad idea to build the list in memory first. Luckily ReactiveMongo allows us to stream the results. That itself is not new, but since version 0.9 we can limit the number of results, making this much more useful for a latestN scenario:
+
+{% codeblock Enumerating cursor of Tweets lang:scala https://github.com/matthiasn/BirdWatch/blob/466cce67a38265e311970466b3bf5529fda54f12/app/models/Tweet.scala Tweet.scala %}
+/** Enumerate latest Tweets (descending order) into specified Iteratee.
+ * @param n number of results to enumerate over
+ **/
+def enumJsonLatestN(n: Int): Enumerator[JsObject] = {
+  val cursor: Cursor[JsObject] = rawTweets
+    .find(Json.obj("text" -> Json.obj("$exists" -> true)))
+    .sort(Json.obj("_id" -> -1))
+    .cursor[JsObject]
+  cursor.enumerate(n)
+}
+{% endcodeblock %}
+
+With this we create an Enumerator of JsObjects that streams the results into an Iteratee. The usage of this is simple once we understand what this pattern means. Check out my previous **[Iteratee article](http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/)**, hope it helps a little bit.
+
+This allows us to stream results into an Iteratee that will do whatever we need, in this case just doing a simple foreach:
+
+{% codeblock Attaching Iteratee to Enumerator lang:scala %}
+val dbTweetIteratee = Iteratee.foreach[JsObject] {
+  json => TweetReads.reads(json) match {
+    case JsSuccess(t: Tweet, _) =>   
+      tweetChannel.push(WordCount.wordsChars(t)) // word and char count for each t
+    case JsError(msg) => println(json)
+  }
+}
+Tweet.enumJsonLatestN(500)(dbTweetIteratee)
+{% endcodeblock %}
+
+I currently do not enumerate the results into an Iteratee because the Tweets would appear in the wrong order in the UI and I cannot easily reverse the direction in which the Tweets are enumerated without an auto-incrementing counter in MongoDB to determine from where to start enumerating in ascending order (from position [collectionsize - n]). But this is more a problem of the UI, the next versions will certainly make use of this pattern.
+
+The only thing I was still missing is an easy way to get the size of a collection. In the shell we would write:
 
 {% codeblock JavaScript query in MongoDB shell  lang:javascript %}
 db.rawTweets.find( { "text" : { "$exists" : true} } ).count()
@@ -157,8 +189,6 @@ This allows us to do something upon return of the collection size in a non-block
   Tweet.count.map(c => println("Tweets: " + c))
 {% endcodeblock %}
 
-Great stuff, I really like **[ReactiveMongo](http://reactivemongo.org)**. The documentation could be more complete though; it takes some source code reading to find the good stuff. I'd be more than to happy help out here and contribute to the project documentation.
+Great stuff, I really like **[ReactiveMongo](http://reactivemongo.org)**. The documentation has also gotten a lot better in 0.9, compared to previous versions. Nonetheless it takes some source code reading to find some of the good stuff. I'd be more than to happy help out here and contribute to the project documentation.
 
 -Matthias
-
-

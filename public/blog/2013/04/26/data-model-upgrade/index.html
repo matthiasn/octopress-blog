@@ -331,9 +331,60 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Curly braces get replaced by Json.obj() and the colon gets replaced by &#8220;->&#8221;. Other than that, the syntax is very close. Note the &#8220;$exists&#8221; part. This limits the results to only Tweets (and potentially error and status messages that have a &#8220;text&#8221; field, but I have not encountered those). The only thing I was still missing is an easy way to get the size of a collection.</p>
+<p>Curly braces get replaced by Json.obj() and the colon gets replaced by &#8220;->&#8221;. Other than that, the syntax is very close. Note the &#8220;$exists&#8221; part. This limits the results to only Tweets (and potentially error and status messages that have a &#8220;text&#8221; field, but I have not encountered those).</p>
 
-<p>In the shell we would write:</p>
+<p>The usage above with generating a List from the cursor works fine for small n, but for larger results sets (say hundreds of thousands of items) it would be a bad idea to build the list in memory first. Luckily ReactiveMongo allows us to stream the results. That itself is not new, but since version 0.9 we can limit the number of results, making this much more useful for a latestN scenario:</p>
+
+<figure class='code'><figcaption><span>Enumerating cursor of Tweets</span><a href='https://github.com/matthiasn/BirdWatch/blob/466cce67a38265e311970466b3bf5529fda54f12/app/models/Tweet.scala'>Tweet.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Enumerate latest Tweets (descending order) into specified Iteratee.</span>
+</span><span class='line'><span class="cm"> * @param n number of results to enumerate over</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="k">def</span> <span class="n">enumJsonLatestN</span><span class="o">(</span><span class="n">n</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Enumerator</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">cursor</span><span class="k">:</span> <span class="kt">Cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="k">=</span> <span class="n">rawTweets</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">find</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;text&quot;</span> <span class="o">-&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;$exists&quot;</span> <span class="o">-&gt;</span> <span class="kc">true</span><span class="o">)))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">sort</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;_id&quot;</span> <span class="o">-&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="o">))</span>
+</span><span class='line'>    <span class="o">.</span><span class="n">cursor</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span>
+</span><span class='line'>  <span class="n">cursor</span><span class="o">.</span><span class="n">enumerate</span><span class="o">(</span><span class="n">n</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With this we create an Enumerator of JsObjects that streams the results into an Iteratee. The usage of this is simple once we understand what this pattern means. Check out my previous <strong><a href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee article</a></strong>, hope it helps a little bit.</p>
+
+<p>This allows us to stream results into an Iteratee that will do whatever we need, in this case just doing a simple foreach:</p>
+
+<figure class='code'><figcaption><span>Attaching Iteratee to Enumerator </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">val</span> <span class="n">dbTweetIteratee</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">JsObject</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">json</span> <span class="k">=&gt;</span> <span class="nc">TweetReads</span><span class="o">.</span><span class="n">reads</span><span class="o">(</span><span class="n">json</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsSuccess</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span>
+</span><span class='line'>      <span class="n">tweetChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">WordCount</span><span class="o">.</span><span class="n">wordsChars</span><span class="o">(</span><span class="n">t</span><span class="o">))</span> <span class="c1">// word and char count for each t</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nc">JsError</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">json</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'><span class="nc">Tweet</span><span class="o">.</span><span class="n">enumJsonLatestN</span><span class="o">(</span><span class="mi">500</span><span class="o">)(</span><span class="n">dbTweetIteratee</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I currently do not enumerate the results into an Iteratee because the Tweets would appear in the wrong order in the UI and I cannot easily reverse the direction in which the Tweets are enumerated without an auto-incrementing counter in MongoDB to determine from where to start enumerating in ascending order (from position [collectionsize - n]). But this is more a problem of the UI, the next versions will certainly make use of this pattern.</p>
+
+<p>The only thing I was still missing is an easy way to get the size of a collection. In the shell we would write:</p>
 
 <figure class='code'><figcaption><span>JavaScript query in MongoDB shell </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -349,7 +400,7 @@ This allows us to do something upon return of the collection size in a non-block
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Great stuff, I really like <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong>. The documentation could be more complete though; it takes some source code reading to find the good stuff. I&#8217;d be more than to happy help out here and contribute to the project documentation.</p>
+<p>Great stuff, I really like <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong>. The documentation has also gotten a lot better in 0.9, compared to previous versions. Nonetheless it takes some source code reading to find some of the good stuff. I&#8217;d be more than to happy help out here and contribute to the project documentation.</p>
 
 <p>-Matthias</p>
 </div>
@@ -398,7 +449,7 @@ This allows us to do something upon return of the collection size in a non-block
         <a class="basic-alignment left" href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/" title="Previous Post: Iteratee: can I have that in a sentence?">&laquo; Iteratee: can I have that in a sentence?</a>
       
       
-        <a class="basic-alignment right" href="/blog/2013/05/01/server-side-events-vs-websockets/" title="Next Post: Server Sent Events vs. WebSockets">Server Sent Events vs. WebSockets &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2013/05/01/server-sent-events-vs-websockets/" title="Next Post: Server Sent Events vs. WebSockets">Server Sent Events vs. WebSockets &raquo;</a>
       
     </p>
   </footer>
@@ -417,7 +468,7 @@ This allows us to do something upon return of the collection size in a non-block
     
 <section>
 	<span>
-		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
 	</span>
 </section>
 <section>
@@ -430,7 +481,7 @@ This allows us to do something upon return of the collection size in a non-block
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/05/01/server-side-events-vs-websockets/">Server Sent Events vs. WebSockets</a>
+        <a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a>
       </li>
     
       <li class="post">
@@ -457,8 +508,6 @@ This allows us to do something upon return of the collection size in a non-block
     </li>
   </ul>
 </section><section>
-  <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&type=follow&count=false&size=small"
-    allowtransparency="true" frameborder="0" scrolling="0" width="190" height="30"></iframe>
   <a href="https://twitter.com/_MNehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
   <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 <br />
