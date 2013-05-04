@@ -72,13 +72,13 @@ becomes:
 
 I expected the SSE solution to on par with the previous WebSocket solution in terms of performance. Interestingly though, with nothing else changed, SSE is a little or a lot faster, depending on the browser. For pre-loading of 500 Tweets on loading the **[BirdWatch](http://birdwatch.matthiasnehlsen.com)** page in the browser, it took on average:
 
-* Safari: **7 sec** using SSE and **16 sec** using WebSockets
-* Chrome: **5 sec** using SSE and **8 sec** using WebSockets
-* Firefox: **6 sec** using SSE and **8 sec** using WebSockets
+* Safari: **7 seconds** using SSE and **16 seconds** using WebSockets
+* Chrome: **5 seconds** using SSE and **8 seconds** using WebSockets
+* Firefox: **6 seconds** using SSE and **8 seconds** using WebSockets
 
-3:0 for SSE. The better performance is noticable in all browsers, especially in Safari though, which seems to have a less-than-ideal WebSocket implementation.
+Server Sent Events win 3:0. The better performance is noticable in all browsers, especially in Safari though, which seems to have a less-than-ideal WebSocket implementation.
 
-This was actually super simple to implement, it took much longer to write this blog post than to implement a working solution using Server Sent Events. **[Play Framework](http://www.playframework.com)** really does make me more productive. 
+This was actually super simple to implement, it took much longer to write this blog post than to implement a working solution using Server Sent Events. **[Play Framework](http://www.playframework.com)** really does make me much more productive. 
 
 With these changes implemented, a simple **[Nginx](http://nginx.org/en/)** configuration inspired by the **[Play documentation](http://www.playframework.com/documentation/2.1.1/HTTPServer)** works like a charm:
 

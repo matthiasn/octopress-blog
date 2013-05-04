@@ -200,15 +200,15 @@
 <p>I expected the SSE solution to on par with the previous WebSocket solution in terms of performance. Interestingly though, with nothing else changed, SSE is a little or a lot faster, depending on the browser. For pre-loading of 500 Tweets on loading the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> page in the browser, it took on average:</p>
 
 <ul>
-<li>Safari: <strong>7 sec</strong> using SSE and <strong>16 sec</strong> using WebSockets</li>
-<li>Chrome: <strong>5 sec</strong> using SSE and <strong>8 sec</strong> using WebSockets</li>
-<li>Firefox: <strong>6 sec</strong> using SSE and <strong>8 sec</strong> using WebSockets</li>
+<li>Safari: <strong>7 seconds</strong> using SSE and <strong>16 seconds</strong> using WebSockets</li>
+<li>Chrome: <strong>5 seconds</strong> using SSE and <strong>8 seconds</strong> using WebSockets</li>
+<li>Firefox: <strong>6 seconds</strong> using SSE and <strong>8 seconds</strong> using WebSockets</li>
 </ul>
 
 
-<p>3:0 for SSE. The better performance is noticable in all browsers, especially in Safari though, which seems to have a less-than-ideal WebSocket implementation.</p>
+<p>Server Sent Events win 3:0. The better performance is noticable in all browsers, especially in Safari though, which seems to have a less-than-ideal WebSocket implementation.</p>
 
-<p>This was actually super simple to implement, it took much longer to write this blog post than to implement a working solution using Server Sent Events. <strong><a href="http://www.playframework.com">Play Framework</a></strong> really does make me more productive.</p>
+<p>This was actually super simple to implement, it took much longer to write this blog post than to implement a working solution using Server Sent Events. <strong><a href="http://www.playframework.com">Play Framework</a></strong> really does make me much more productive.</p>
 
 <p>With these changes implemented, a simple <strong><a href="http://nginx.org/en/">Nginx</a></strong> configuration inspired by the <strong><a href="http://www.playframework.com/documentation/2.1.1/HTTPServer">Play documentation</a></strong> works like a charm:</p>
 
