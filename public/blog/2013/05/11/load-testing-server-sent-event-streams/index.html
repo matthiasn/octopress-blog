@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Load Testing Server Sent Event Streams - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="Server Sent Events (SSE) turned out to be a great choice for what I am trying to achieve. Let&#8217;s review that quickly. I want to transmit &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Reactive Data Processing Blog</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Load Testing Server Sent Event Streams</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-11T22:07:00+02:00" pubdate data-updated="true">05/11/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
+
+<!-- more -->
+
+
+<p>In the current version of the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> the major part of the statistical reasoning is done on the server side, individually for each client. That is not a good idea, it just happened because I had some of the code lying around, and that was in Scala so the options were server side or re-write. I chose server-side, knowing that this technical debt would have to be addressed at some point. First of all I needed metrics on how bad the situation actually was. I found a search word that guarantees high traffic up to the &#8220;1% of all Tweets at the time&#8221; limit imposed by Twitter: &#8220;love&#8221;. At least at all times I have tested it, this cute word will saturate your <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> connection, unless you have a special agreement with them. This amounts to about 35 Tweets per second or approximately 3,000,000 Tweets per day. Any modern server should easily be able to process this number of messages and distribute them to a large number of clients, hundreds of them at the same time. Unlike <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connections, <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> streams are easy to test; it is just an HTTP connection that delivers data not at once but one chunk at a time, like this:</p>
+
+<figure class='code'><figcaption><span>One Tweet via SSE </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;tweet_id&quot;</span><span class="o">:</span><span class="mi">334409665431625728</span><span class="p">,</span><span class="s2">&quot;img_url_local&quot;</span><span class="o">:</span><span class="s2">&quot;/images/334409665431625728.png&quot;</span><span class="p">,</span><span class="s2">&quot;img_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://a0.twimg.com/profile_images/3637039114/94d639a38a9040b32397642cddbf685f_normal.jpeg&quot;</span><span class="p">,</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;Official_TMC101&quot;</span><span class="p">,</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;This week Daft Punk holds the number 1 spot with Get Lucky @DaftPunk_Online #getlucky&quot;</span><span class="p">,</span><span class="s2">&quot;followers&quot;</span><span class="o">:</span><span class="mi">34</span><span class="p">,</span><span class="s2">&quot;words&quot;</span><span class="o">:</span><span class="mi">14</span><span class="p">,</span><span class="s2">&quot;chars&quot;</span><span class="o">:</span><span class="mi">85</span><span class="p">,</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="mi">1368564451000</span><span class="p">,</span><span class="s2">&quot;timeAgo&quot;</span><span class="o">:</span><span class="s2">&quot;1 sec 141 ms ago&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can see this yourself by opening the Tweet stream on my <strong><a href="http://birdwatch.matthiasnehlsen.com/tweetFeedCF">BirdWatch server</a></strong>. This is one of the streams from a much-extended version of BirdWatch that I&#8217;ve been working on in the meantime, which allows interacting with the data in interesting ways on the client side. This version is not ready for publishing yet, but I expect to have something to show fairly soon. Pushing the Tweets to the client and reasoning about the data there was already decided on, and benchmarking confirmed how problematic the old solution was. At first I used wget in different terminal sessions with the url of the link above, and I would max out the CPU with tens of concurrent connections already when consuming the full 1% of Tweets. That is orders of magnitude less than what I expect from a modern server, but completely makes sense when looking at what heavy work the server actually has to perform.</p>
+
+<p>So I started working on delivering streams for client side reasoning. That fixed exactly what I expected it to fix, allowing orders of magnitude more concurrent connections. But now opening many terminal sessions was a much less appealing workaround. I looked around for testing tools a little and soon realized that writing a reactive web application for load testing myself would be a good learning exercise, and it would also give me the opportunity for some more experience in using <strong><a href="http://d3js.org">D3.js</a></strong> for animating the results. This it what it looks like (but with animated bar charts showing live data):</p>
+
+<p><img class="left" src="/images/sse-perf-screenshot.png" title="image" alt="images"></p>
+
+<p>I have put the code on <strong><a href="https://github.com/matthiasn/sse-perf">GitHub</a></strong> and I also run it live, putting a load of 1,500 connections on the BirdWatch server, in production. The server is not processing the full 1% stream though, and with the current load the 1,500 connections only cause a CPU utilization of 40-60% in <strong><a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/top.1.html">top</a></strong> (out of possible 800% on a quadcore machine with HyperThreading). With the full 1% stream from Twitter I can currently connect up to 700 to 800 concurrent connections without adding significant delay, thus delivering about 1.8 Billion messages a day. That sounds much more like what I was looking for. I have found that the messages per second max out at around 28,000. If these are reached then additional clients will still get the messages but they will queue up more and more. I have found that the server recovers after decreasing the number of concurrent connections, allowing all messages to be delivered to the connected clients eventually. This makes the server fail on overload very gracefully.</p>
+
+<p><strong><a href="http://birdwatch.matthiasnehlsen.com:9001">Have a look for yourself</a></strong>. Changing the load on the server requires authentication, but you will surely find this out yourself.</p>
+
+<p>In the next posts I will introduce animating live streaming data on the client and also share what I have learned when establishing thousands of connections at the same time, using <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.ws.WS$">WS</a></strong> from the <strong><a href="http://www.playframework.com">Play Framework</a></strong>. Let me know which one you would like to read first.</p>
+
+<p>-Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-11T22:07:00+02:00" pubdate data-updated="true">05/11/2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/" data-via="_MNehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/05/01/server-sent-events-vs-websockets/" title="Previous Post: Server Sent Events vs. WebSockets">&laquo; Server Sent Events vs. WebSockets</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am learning functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/19/hello-world/">Hello World</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+    </li>
+  </ul>
+</section><section>
+    <h1>Subscribe</h1>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    <br />
+  </div>
+</section><section>
+  <a href="https://twitter.com/_MNehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<br />
+<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
+<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
+</a>
+
+</section>
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/100986586701798521209?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

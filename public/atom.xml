@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-05-05T16:11:50+02:00</updated>
+  <updated>2013-05-14T23:52:39+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,40 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Load Testing Server Sent Event Streams]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/"/>
+    <updated>2013-05-11T22:07:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams</id>
+    <content type="html"><![CDATA[<p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
+
+<!-- more -->
+
+
+<p>In the current version of the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> the major part of the statistical reasoning is done on the server side, individually for each client. That is not a good idea, it just happened because I had some of the code lying around, and that was in Scala so the options were server side or re-write. I chose server-side, knowing that this technical debt would have to be addressed at some point. First of all I needed metrics on how bad the situation actually was. I found a search word that guarantees high traffic up to the &#8220;1% of all Tweets at the time&#8221; limit imposed by Twitter: &#8220;love&#8221;. At least at all times I have tested it, this cute word will saturate your <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> connection, unless you have a special agreement with them. This amounts to about 35 Tweets per second or approximately 3,000,000 Tweets per day. Any modern server should easily be able to process this number of messages and distribute them to a large number of clients, hundreds of them at the same time. Unlike <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connections, <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> streams are easy to test; it is just an HTTP connection that delivers data not at once but one chunk at a time, like this:</p>
+
+<figure class='code'><figcaption><span>One Tweet via SSE </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;tweet_id&quot;</span><span class="o">:</span><span class="mi">334409665431625728</span><span class="p">,</span><span class="s2">&quot;img_url_local&quot;</span><span class="o">:</span><span class="s2">&quot;/images/334409665431625728.png&quot;</span><span class="p">,</span><span class="s2">&quot;img_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://a0.twimg.com/profile_images/3637039114/94d639a38a9040b32397642cddbf685f_normal.jpeg&quot;</span><span class="p">,</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;Official_TMC101&quot;</span><span class="p">,</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;This week Daft Punk holds the number 1 spot with Get Lucky @DaftPunk_Online #getlucky&quot;</span><span class="p">,</span><span class="s2">&quot;followers&quot;</span><span class="o">:</span><span class="mi">34</span><span class="p">,</span><span class="s2">&quot;words&quot;</span><span class="o">:</span><span class="mi">14</span><span class="p">,</span><span class="s2">&quot;chars&quot;</span><span class="o">:</span><span class="mi">85</span><span class="p">,</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="mi">1368564451000</span><span class="p">,</span><span class="s2">&quot;timeAgo&quot;</span><span class="o">:</span><span class="s2">&quot;1 sec 141 ms ago&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can see this yourself by opening the Tweet stream on my <strong><a href="http://birdwatch.matthiasnehlsen.com/tweetFeedCF">BirdWatch server</a></strong>. This is one of the streams from a much-extended version of BirdWatch that I&#8217;ve been working on in the meantime, which allows interacting with the data in interesting ways on the client side. This version is not ready for publishing yet, but I expect to have something to show fairly soon. Pushing the Tweets to the client and reasoning about the data there was already decided on, and benchmarking confirmed how problematic the old solution was. At first I used wget in different terminal sessions with the url of the link above, and I would max out the CPU with tens of concurrent connections already when consuming the full 1% of Tweets. That is orders of magnitude less than what I expect from a modern server, but completely makes sense when looking at what heavy work the server actually has to perform.</p>
+
+<p>So I started working on delivering streams for client side reasoning. That fixed exactly what I expected it to fix, allowing orders of magnitude more concurrent connections. But now opening many terminal sessions was a much less appealing workaround. I looked around for testing tools a little and soon realized that writing a reactive web application for load testing myself would be a good learning exercise, and it would also give me the opportunity for some more experience in using <strong><a href="http://d3js.org">D3.js</a></strong> for animating the results. This it what it looks like (but with animated bar charts showing live data):</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/sse-perf-screenshot.png" title="image" alt="images"></p>
+
+<p>I have put the code on <strong><a href="https://github.com/matthiasn/sse-perf">GitHub</a></strong> and I also run it live, putting a load of 1,500 connections on the BirdWatch server, in production. The server is not processing the full 1% stream though, and with the current load the 1,500 connections only cause a CPU utilization of 40-60% in <strong><a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/top.1.html">top</a></strong> (out of possible 800% on a quadcore machine with HyperThreading). With the full 1% stream from Twitter I can currently connect up to 700 to 800 concurrent connections without adding significant delay, thus delivering about 1.8 Billion messages a day. That sounds much more like what I was looking for. I have found that the messages per second max out at around 28,000. If these are reached then additional clients will still get the messages but they will queue up more and more. I have found that the server recovers after decreasing the number of concurrent connections, allowing all messages to be delivered to the connected clients eventually. This makes the server fail on overload very gracefully.</p>
+
+<p><strong><a href="http://birdwatch.matthiasnehlsen.com:9001">Have a look for yourself</a></strong>. Changing the load on the server requires authentication, but you will surely find this out yourself.</p>
+
+<p>In the next posts I will introduce animating live streaming data on the client and also share what I have learned when establishing thousands of connections at the same time, using <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.ws.WS$">WS</a></strong> from the <strong><a href="http://www.playframework.com">Play Framework</a></strong>. Let me know which one you would like to read first.</p>
+
+<p>-Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Server Sent Events vs. WebSockets]]></title>
@@ -896,23 +930,25 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
 <p><strong>Why am I blogging?</strong>
 I am fascinated by the idea of reasoning over live data streams. There are quite a few things that I still need to learn in order to turn my ideas into working code. I find that I learn particularly well when explaining things to others, so writing this blog seems like an awesome idea.</p>
 
-<p>Recently I started to work on a reactive web project for my portfolio, written in <a href="http://www.scala-lang.org">Scala</a> using the <a href="http://www.playframework.com">Play Framework</a>. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on <a href="https://github.com/matthiasn/BirdWatch">GitHub</a>, installed a demo on a <a href="http://birdwatch.matthiasnehlsen.com">web server</a> and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense.</p>
+<p>Recently I started to work on a reactive web project for my portfolio, written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>, installed a demo on a <strong><a href="http://birdwatch.matthiasnehlsen.com">web server</a></strong> and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense.</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/screenshot.png" title="image" alt="images"></p>
 
 <p>Then it got mentioned on Twitter, retweeted 16 times and before I knew it, I had visitors from 272 cities in 48 countries on that web server. I know because out of curiosity I wrote a little logging routine that does GeoIP-lookup for every IP-address visiting that server on the fly, but that is the topic for a future post, potentially with a live visualization for the curious website owner.</p>
 
 <p><strong>What will I be blogging about?</strong>
 I will be blogging about functional programming, reactive data processing and data visualization. I am particularly interested in observable data from the real world moving through information systems, ideally for visualizations that are both useful and pleasant to look at.</p>
 
-<p>For the time being, you can expect me to use <a href="http://www.scala-lang.org">Scala</a>, <a href="http://www.playframework.com">Play</a> and <a href="http://akka.io">Akka</a> on the server side, a beautiful technology stack that allows solving concurrent problems in surprisingly short amounts of time. For the client side I am just getting started with <a href="http://d3js.org">D3.js</a>, a JavaScript library for data-driven DOM manipulation. It allows for absolutely stunning visualizations, even though I am nowhere near that as of yet.</p>
+<p>For the time being, you can expect me to use <strong><a href="http://www.scala-lang.org">Scala</a></strong>, <strong><a href="http://www.playframework.com">Play</a></strong> and <strong><a href="http://akka.io">Akka</a></strong> on the server side, a beautiful technology stack that allows solving concurrent problems in surprisingly short amounts of time. For the client side I am just getting started with <strong><a href="http://d3js.org">D3.js</a></strong>, a JavaScript library for data-driven DOM manipulation. It allows for absolutely stunning visualizations, even though I am nowhere near that as of yet.</p>
 
-<p>You can also expect me to continue getting live prototypes up and running for the things I write about, just like the one for <a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a>. I find code that is not executed to be a wasted effort, and there is no better proof for any code than running it. I already learned a lot regarding the architecture of BirdWatch and there are a few things that I would do differently in the future, but that is also a topic for a future post.</p>
+<p>You can also expect me to continue getting live prototypes up and running for the things I write about, just like the one for <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong>. I find code that is not executed to be a wasted effort, and there is no better proof for any code than running it. I already learned a lot regarding the architecture of BirdWatch and there are a few things that I would do differently in the future, but that is also a topic for a future post.</p>
 
 <p><strong>How can you leave feedback?</strong>
 I am starting this blog because I am hoping to learn a lot in the process, particularly from interaction with you, the reader. So please comment on the blog posts, correct me where I am wrong, and let me know where you think a more elegant solution could be found.</p>
 
 <p>Most importantly, ask if there is anything that you find difficult to understand. My goal in all of this is to explain things as clearly as possible, so please let me know when I&#8217;ve failed to do that. Ask questions in the comments section if you think that others might benefit from the answers as well. Of course, you can also always contact me by email, though that may take longer for a response.</p>
 
-<p>You can also follow me on Twitter <a href="https://twitter.com/_MNehlsen">@_MNehlsen</a>. I just launched my feed, so you&#8217;ll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.</p>
+<p>You can also follow me on Twitter <strong><a href="https://twitter.com/_MNehlsen">@_MNehlsen</a></strong>. I just launched my feed, so you&#8217;ll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.</p>
 
 <p>-Matthias</p>
 ]]></content>
