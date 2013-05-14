@@ -6,7 +6,6 @@ comments: true
 categories: 
 ---
 So far I have been using a **[WebSocket](http://tools.ietf.org/html/rfc6455)** connection to push data to the client in the **[BirdWatch](https://github.com/matthiasn/BirdWatch)** application, with mixed feelings. **[WebSocket](http://tools.ietf.org/html/rfc6455)** communication is a separate communication protocol from **[HTTP](http://tools.ietf.org/html/rfc2616)**, introducing new problems in the network layer, as I should soon find out. But there is an alternative: **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)**. 
-
 <!-- more -->
 
 For **[BirdWatch](https://github.com/matthiasn/BirdWatch)**, I wanted to experiment with having a proxy between the outside world and the Play application:
