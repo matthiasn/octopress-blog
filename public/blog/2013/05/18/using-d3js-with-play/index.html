@@ -1,0 +1,431 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>D3.js and Play Framework: Getting Started - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Reactive Data Processing Blog</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">D3.js and Play Framework: Getting Started</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-18T13:21:00+02:00" pubdate data-updated="true">05/18/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at noticing changes between spreadsheet cells or other text. That&#8217;s okay. I&#8217;m actually a big fan of that. Text does not usually threaten to run me over when I attempt to cross a street. So let&#8217;s create moving things with <strong><a href="http://d3js.org">D3.js</a></strong> and drive the animation reactively with data from a server written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
+
+<!-- more -->
+
+
+<p>In the <strong><a href="http://bit.ly/sse_load_testing">last article</a></strong> I have introduced <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>, a load testing tool for <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Event (SSE)</a></strong> streams. With that tool I gather data that I want to present in the browser using animated barcharts, as you can see live <strong><a href="http://bit.ly/sse-perf-live">here</a></strong>.</p>
+
+<p><img class="left" src="/images/sse-perf-screenshot.png" title="image" alt="images"></p>
+
+<p>Creating the animated barchart is a little more involved. Let us start with something really simple today. Luckily I have a problem to solve that calls for a simple animation:
+<strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong> when running might or might not have have established connections hitting a server. If it does, it becomes immediately obvious that the connection to the <strong><a href="http://bit.ly/sse-perf-live">sse-perf server</a></strong> is alive because the bars are animated. What if there are no client connections and thus there is nothing to report except zero values? I can have these zeros fly into the chart instead of the bars, but that looks really awful, I&#8217;ve tried it. But without anything moving, the connection looks dead. What do I do?</p>
+
+<p>How about a visual heartbeat? Just a simple red dot that gets bigger when a new Server Sent Event is received and then shrinks to normal size again. This succeeds in convincing me that what I am looking at is still alive:</p>
+
+<iframe width="40" height="40" src="http://matthiasnehlsen.com/iframes/heartbeat.html" frameborder="0" allowfullscreen></iframe>
+
+
+<p>Let&#8217;s implement that and drive it by a Server Sent Event stream. First of all, we need a div that will hold our animation which we can style and position by css however we like:</p>
+
+<figure class='code'><figcaption><span>heartbeat div</span><a href='https://github.com/matthiasn/sse-perf/blob/f0feae4d2a82c136eb351d2a99e18b12f8e2f953/app/views/metrics.scala.html'>from metrics.scala.html</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;heartbeat&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  @helper.requireJs(core = routes.Assets.at(&quot;javascripts/require.js&quot;).url,
+</span><span class='line'>        module = routes.Assets.at(&quot;javascripts/main&quot;).url)
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>#heartbeat css</span><a href='https://github.com/matthiasn/sse-perf/blob/f0feae4d2a82c136eb351d2a99e18b12f8e2f953/public/stylesheets/main.css'>from main.css </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#heartbeat</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">height</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">top</span><span class="o">:</span> <span class="m">18px</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">left</span><span class="o">:</span> <span class="m">530px</span><span class="p">;</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let us put all JavaScript in modules conforming to the <strong><a href="http://requirejs.org/docs/whyamd.html">require.js / AMD pattern</a></strong>. This prevents global namespace pollution, potentially loads faster and makes for a cleaner design. <strong><a href="http://www.playframework.com/documentation/2.1.0/RequireJS-support">Play handles</a></strong> loading the JavaScript with require.js for us with @helper.requireJs.</p>
+
+<p>The best thing with this approach is probably that Play will now run the closure compiler over our JavaScript code and show problems immediately by failing the build:</p>
+
+<p><img class="left" src="/images/closure_comp_err.png" title="image" alt="images"></p>
+
+<p>Sweet! Here are the excerpts of the JavaScript code that we need for the heartbeat. Full code is available on <strong><a href="http://bit.ly/sse-perf">GitHub</a></strong> as usual.</p>
+
+<figure class='code'><figcaption><span>main.js (require.js compatible)</span><a href='https://github.com/matthiasn/sse-perf/blob/f0feae4d2a82c136eb351d2a99e18b12f8e2f953/app/assets/javascripts/main.js'>from main.js</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">require</span><span class="p">([</span><span class="s2">&quot;barchart&quot;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">chart</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">heartbeat</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s2">&quot;#heartbeat&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;svg&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;cx&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;cy&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/metricsFeed&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">function</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
+</span><span class='line'>    <span class="nx">heartbeat</span><span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span><span class='line'>  <span class="p">}</span>
+</span><span class='line'>  <span class="nx">feed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We draw the dot first. Using the global d3 object, we select our #heartbeat div, append an <strong><a href="https://de.wikipedia.org/wiki/Scalable_Vector_Graphics">svg</a></strong> of size 20px by 20px, append a circle at x=10px, y=10px, give it a radius of 3px and fill it red. Thanks to <strong><a href="http://bit.ly/chaining-methods">method chaining</a></strong>, the D3 code almost reads like prose.</p>
+
+<p>We then establish an EventSource(&#8220;/metricsFeed&#8221;) connection to the metrics feed and assign a handler function as an event listener to the &#8220;message&#8221; event. <strong><a href="http://bit.ly/113clAb">See the stream for yourself</a></strong>.  We can use the handler function to trigger the animation.</p>
+
+<p>Once again, the D3 code reads like a sentence: using the heartbeat object created above, we transition the radius from the initial 3px to 7px, to 3px, to 6px and back to 3px, all of these with a duration of 700ms each.</p>
+
+<p>The stream I use as a trigger has data every 3 seconds. I found that it looks <strong><a href="http://en.wikipedia.org/wiki/Bradycardia">unhealthy</a></strong> if the heartbeat only animates 20 times a second, so I do the expansion / contraction cycle twice on each event. <strong><a href="http://d3js.org">D3.js</a></strong> is great; it has a bit of a learning curve but it is well worth it because it will give you full control over everything you could possibly want to tweak on your page.</p>
+
+<p>This is it for today, check back for more elaborate examples in the future. If you haven&#8217;t already, how about you <strong><a href="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5">subscribe to the mailing list</a></strong> so you won&#8217;t miss anything?</p>
+
+<p>-Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-18T13:21:00+02:00" pubdate data-updated="true">05/18/2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/" data-via="_MNehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/05/11/load-testing-server-sent-event-streams/" title="Previous Post: Load Testing Server Sent Event Streams">&laquo; Load Testing Server Sent Event Streams</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/18/using-d3js-with-play/">D3.js and Play Framework: Getting Started</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+    </li>
+  </ul>
+</section><section>
+    <h1>Subscribe</h1>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    <br />
+  </div>
+</section><section>
+  <a href="https://twitter.com/_MNehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<br />
+<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
+<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
+</a>
+
+</section>
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/100986586701798521209?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

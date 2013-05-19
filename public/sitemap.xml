@@ -8,7 +8,7 @@
         <loc>
             http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/
         </loc>
-        <lastmod>2013-04-24T03:13:09+02:00</lastmod>
+        <lastmod>2013-05-19T00:16:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/</loc>
@@ -22,15 +22,19 @@
         <loc>
             http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/
         </loc>
-        <lastmod>2013-05-14T23:52:22+02:00</lastmod>
+        <lastmod>2013-05-15T00:34:39+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/</loc>
+        <lastmod>2013-05-18T15:13:18+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
-        <lastmod>2013-05-14T23:52:22+02:00</lastmod>
+        <lastmod>2013-05-19T00:16:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
-        <lastmod>2013-05-14T23:52:22+02:00</lastmod>
+        <lastmod>2013-05-19T00:16:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/robots.txt</loc>

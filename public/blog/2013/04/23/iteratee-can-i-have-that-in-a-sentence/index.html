@@ -363,7 +363,7 @@
 
 <p><img class="left" src="/images/Iteratee1.svg" width="800" height="300" title="image" alt="images"></p>
 
-<p>We have a systemwide EventBus to which we attach for every user connection an actor listening to Tweets and pushing them into the tweetChannel. Somehow, and we will get there, this Tweet will reach the tweetlistIteratee, which acts as the consumer or sink of this information. Once it has reached the reached the tweetlistIteratee, we would expect to have the Tweet within the rolling window of Tweets and also to have the interceptor function run.</p>
+<p>We have a systemwide EventBus to which we attach for every user connection an actor listening to Tweets and pushing them into the tweetChannel. Somehow, and we will get there, this Tweet will reach the tweetlistIteratee, which acts as the consumer or sink of this information. Once it has reached the tweetlistIteratee, we would expect to have the Tweet within the rolling window of Tweets and also to have the interceptor function run.</p>
 
 <p>So far so good. But remember that the Iteratee is an immutable data type:</p>
 
@@ -538,12 +538,16 @@
 </section>
 <section>
   <h1>About Me</h1>
-  <p>Hello everyone. My name is Matthias Nehlsen and I am learning functional programming, data visualization and real-time information processing.</p>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
 </section>
 
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/18/using-d3js-with-play/">D3.js and Play Framework: Getting Started</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a>
@@ -559,10 +563,6 @@
     
       <li class="post">
         <a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/19/hello-world/">Hello World</a>
       </li>
     
   </ul>

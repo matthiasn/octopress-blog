@@ -114,7 +114,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>You can see this yourself by opening the Tweet stream on my <strong><a href="http://birdwatch.matthiasnehlsen.com/tweetFeedCF">BirdWatch server</a></strong>. This is one of the streams from a much-extended version of BirdWatch that I&#8217;ve been working on in the meantime, which allows interacting with the data in interesting ways on the client side. This version is not ready for publishing yet, but I expect to have something to show fairly soon. Pushing the Tweets to the client and reasoning about the data there was already decided on, and benchmarking confirmed how problematic the old solution was. At first I used wget in different terminal sessions with the url of the link above, and I would max out the CPU with tens of concurrent connections already when consuming the full 1% of Tweets. That is orders of magnitude less than what I expect from a modern server, but completely makes sense when looking at what heavy work the server actually has to perform.</p>
+<p>You can see this yourself by opening the Tweet stream on my <strong><a href="http://birdwatch.matthiasnehlsen.com/tweetFeedCF">BirdWatch server</a></strong>. This is one of the streams from a much-extended version of BirdWatch that I&#8217;ve been working on in the meantime, which allows interacting with the data in interesting ways on the client side. This version is not ready for publishing yet, but I expect to have something to show fairly soon. Pushing the Tweets to the client and reasoning about the data there was already decided on, and benchmarking confirmed how problematic the old solution was. At first I used wget in different terminal sessions with the URL of the link above, and I would max out the CPU with tens of concurrent connections already when consuming the full 1% of Tweets. That is orders of magnitude less than what I expect from a modern server, but completely makes sense when looking at what heavy work the server actually has to perform.</p>
 
 <p>So I started working on delivering streams for client side reasoning. That fixed exactly what I expected it to fix, allowing orders of magnitude more concurrent connections. But now opening many terminal sessions was a much less appealing workaround. I looked around for testing tools a little and soon realized that writing a reactive web application for load testing myself would be a good learning exercise, and it would also give me the opportunity for some more experience in using <strong><a href="http://d3js.org">D3.js</a></strong> for animating the results. This it what it looks like (but with animated bar charts showing live data):</p>
 
@@ -173,6 +173,8 @@
         <a class="basic-alignment left" href="/blog/2013/05/01/server-sent-events-vs-websockets/" title="Previous Post: Server Sent Events vs. WebSockets">&laquo; Server Sent Events vs. WebSockets</a>
       
       
+        <a class="basic-alignment right" href="/blog/2013/05/18/using-d3js-with-play/" title="Next Post: D3.js and Play Framework: Getting Started">D3.js and Play Framework: Getting Started &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -195,12 +197,16 @@
 </section>
 <section>
   <h1>About Me</h1>
-  <p>Hello everyone. My name is Matthias Nehlsen and I am learning functional programming, data visualization and real-time information processing.</p>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
 </section>
 
 <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/05/18/using-d3js-with-play/">D3.js and Play Framework: Getting Started</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a>
@@ -216,10 +222,6 @@
     
       <li class="post">
         <a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/19/hello-world/">Hello World</a>
       </li>
     
   </ul>

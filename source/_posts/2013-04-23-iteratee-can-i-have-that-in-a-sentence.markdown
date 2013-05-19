@@ -169,7 +169,7 @@ Now that we have wired our building blocks together, let's see if we can visuali
 
 {% img left /images/Iteratee1.svg 800 300 'image' 'images' %}
 
-We have a systemwide EventBus to which we attach for every user connection an actor listening to Tweets and pushing them into the tweetChannel. Somehow, and we will get there, this Tweet will reach the tweetlistIteratee, which acts as the consumer or sink of this information. Once it has reached the reached the tweetlistIteratee, we would expect to have the Tweet within the rolling window of Tweets and also to have the interceptor function run.
+We have a systemwide EventBus to which we attach for every user connection an actor listening to Tweets and pushing them into the tweetChannel. Somehow, and we will get there, this Tweet will reach the tweetlistIteratee, which acts as the consumer or sink of this information. Once it has reached the tweetlistIteratee, we would expect to have the Tweet within the rolling window of Tweets and also to have the interceptor function run.
 
 So far so good. But remember that the Iteratee is an immutable data type:
  
