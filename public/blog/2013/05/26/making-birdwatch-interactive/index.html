@@ -101,7 +101,7 @@
   </header>
 
 
-<div class="entry-content"><p>Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more interested in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though as the server side reasoning did not scale well at all. I the latest update I adress both client-side reasoning and the first steps in making the application interactive.</p>
+<div class="entry-content"><p>Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more interested in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though as the server side reasoning did not scale well at all. I the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
 
 <!-- more -->
 
@@ -114,15 +114,29 @@
 
 <p>Let&#8217;s look at a few implementation details in the current version:</p>
 
-<h4>filter enumeratee</h4>
+<h4>Filter Enumeratee</h4>
 
-<h4>coffeescript compiled into require.js compatible JavaScript</h4>
+<p>Tweets from the TwitterClient are delivered to connected clients using a channel and enumerator provided by Concurrent.broadcast in the Play Iteratee API. The Tweets are from there fed into the EventSource object which acts as a simple Iteratee that does nothing more than generate a chunked HTTP response, with &#8220;data: &#8221; prepended to every piece of data (Tweets as JSON in this case). I already used a transforming Enumeratee before, for transforming Tweets in case class form into JSON. This Enumerator piping into an Enumeratee and then into the Iteratee made it very simple to put another Enumeratee into this chain for filtering only those Tweets that contain the desired search words.</p>
 
 <h4>REST endpoints for queries and streams</h4>
 
-<h4>wordcount implementation on client</h4>
-
 <h4>No more image processing</h4>
+
+<p>Initially I was playing around with image processing on the server side. But once that was working with a supervised actor hierarchy, it really wasn&#8217;t all that interesting any more. I know that I can easily process 4 million of the large Twitter profile images a day without putting substantial load on my quadcore server. That&#8217;s what I wanted to know. Other than that, the images were littering my harddrive space, without being useful enough for me to keep them. I removed that functionality from the application.</p>
+
+<h4>Client-side Wordcount implementation in Coffeescript</h4>
+
+<p>I wanted to move the Wordcount functionality into the client when I discovered that Play comes with nice features for compiling Coffeescript into JavaScript. I have done a little bit with Coffeescript in the past and I remembered finding it pleasant enough to give it another try. But that will be the topic for a future article.</p>
+
+<h4>Performance of the current version</h4>
+
+<p>Right before the Champions League final, I measured the performance for the search words I had selected for the game. At that time I was receiving about 4 Tweets per second which I was then able to simultaneausly stream to 10,000 clients.</p>
+
+<p><img class="left" src="/images/champions_league_10k.png" title="image" alt="images"></p>
+
+<p>Not too bad, I&#8217;m really glad Play does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. I remains to be seen how much of a performance hit the matching algorithm will incur.</p>
+
+<p>-Matthias</p>
 </div>
 
 
