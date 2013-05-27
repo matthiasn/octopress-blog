@@ -5,7 +5,7 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Matthias Nehlsen</title>
+  <title>Making BirdWatch Interactive - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -73,15 +73,12 @@
 </nav>
   <div id="main">
     <div id="content">
-      <div class="blog-index">
+      <div>
+<article class="hentry" role="article">
   
-  
-  
-    <article>
-      
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2013/05/26/making-birdwatch-interactive/">Making BirdWatch Interactive</a></h1>
+      <h1 class="entry-title">Making BirdWatch Interactive</h1>
     
     
       <p class="meta">
@@ -104,70 +101,39 @@
   </header>
 
 
-  <div class="entry-content"><p>Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more interested in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though as the server side reasoning did not scale well at all. I the latest update I adress both client-side reasoning and the first steps in making the application interactive.</p>
+<div class="entry-content"><p>Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more interested in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though as the server side reasoning did not scale well at all. I the latest update I adress both client-side reasoning and the first steps in making the application interactive.</p>
 
+<!-- more -->
+
+
+<p>My other application on GitHub, sse-perf, was quite useful in identifying where the scalability problem was. When getting as many as 1% of all Tweets from Twitter, which is the current limit for the Twitter Streaming API (3-4 million Tweets a day), server-side calculations for each client only allowed somewhere between ten and twenty concurrent connections whereas moving the calculations now allows about 600 concurrent connections under the same load.</p>
+
+<p>With that problem out of the way, I also added interactive functionality where the words in the word cloud and in the bar chart are now clickable, allowing to drill into the data. Currently this works with a logical AND. Only previous and live Tweets are now shown that contain all of the search words. The queries are now resources that can be bookmarked, with the query encoded in the URL, comparable to a Google search.</p>
+
+<p>Ok, this is becoming a little more interesting than the previous version where the observer did not have any influence over what was shown on the screen. But it is definitely not as useful as it could be. I have used the version you can find on GitHub for following Tweets about the Champions League final between Bayern München and Borussia Dortmund at Wembley stadium (besides the TV, of course). It was interesting to see a correlation between events in the game and the teams being mentioned in the Tweets. But that experience also showed me what is missing and could be addressed in a future version: a time component. I would find it interesting to track words and hashtags over time. That will be something for a future version.</p>
+
+<p>Let&#8217;s look at a few implementation details in the current version:</p>
+
+<h4>filter enumeratee</h4>
+
+<h4>coffeescript compiled into require.js compatible JavaScript</h4>
+
+<h4>REST endpoints for queries and streams</h4>
+
+<h4>wordcount implementation on client</h4>
+
+<h4>No more image processing</h4>
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/26/making-birdwatch-interactive/">Read on &rarr;</a>
-    </footer>
-  
 
 
-    </article>
-  
-  
-    <article>
+  <footer>
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/18/using-d3js-with-play/">D3.js and Play Framework: Getting Started</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
   
 
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
 
-<time datetime="2013-05-18T13:21:00+02:00" pubdate data-updated="true">05/18/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at noticing changes between spreadsheet cells or other text. That&#8217;s okay. I&#8217;m actually a big fan of that. Text does not usually threaten to run me over when I attempt to cross a street. So let&#8217;s create moving things with <strong><a href="http://d3js.org">D3.js</a></strong> and drive the animation reactively with data from a server written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/18/using-d3js-with-play/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a></h1>
-    
-    
-      <p class="meta">
-        
 
 
 
@@ -179,197 +145,42 @@
   
 
 
-<time datetime="2013-05-11T22:07:00+02:00" pubdate data-updated="true">05/11/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+<time datetime="2013-05-26T20:45:00+02:00" pubdate data-updated="true">05/26/2013</time>
       
-  <header>
+
+
+    </p>
     
-      <h1 class="entry-title"><a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+      <div class="sharing">
   
-
-
-<time datetime="2013-05-01T14:59:00+02:00" pubdate data-updated="true">05/01/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>.</p>
-
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/" data-via="_MNehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/01/server-sent-events-vs-websockets/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  
-    <article>
+    
+    <p class="meta">
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-26T13:48:00+02:00" pubdate data-updated="true">04/26/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Initially I parsed the Tweets in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application into instances of a Tweet case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> version 0.9 in the latest commits, storing each  observable fact coming from the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> in its entirety.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/26/data-model-upgrade/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
+        <a class="basic-alignment left" href="/blog/2013/05/18/using-d3js-with-play/" title="Previous Post: D3.js and Play Framework: Getting Started">&laquo; D3.js and Play Framework: Getting Started</a>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-23T22:08:00+02:00" pubdate data-updated="true">04/23/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A couple of weeks back I was trying to wrap my head around <strong><a href="http://www.playframework.com/documentation/2.0.4/Iteratees">Iteratees</a></strong> so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing aggregating state over time. That did not seem right.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
       
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/19/hello-world/">Hello World</a></h1>
-    
-    
-      <p class="meta">
-        
+    </p>
+  </footer>
+</article>
 
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-19T21:19:00+02:00" pubdate data-updated="true">04/19/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>Who am I?</strong>
-My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/19/hello-world/">Read on &rarr;</a>
-    </footer>
-  
 
-
-    </article>
-  
-  <div class="pagination">
-    
-    <a href="/blog/archives">Blog Archives</a>
-    
-  </div>
-</div>
 <aside class="sidebar">
   
     
@@ -463,6 +274,7 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   
 </aside>
 
+
     </div>
   </div>
   <footer role="contentinfo"><p>
@@ -477,7 +289,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
       var disqus_shortname = 'matthiasnehlsen';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
