@@ -11,7 +11,7 @@ Some weeks ago when I started working on the **[BirdWatch](http://bit.ly/BirdWat
 
 My other application on GitHub, **[sse-perf](http://bit.ly/sse-perf)**, was quite useful in identifying where the scalability problem was. When getting as many as 1% of all Tweets from Twitter, which is the current limit for the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** without some extra agreement with Twitter (amounting to 3-4 million Tweets a day), server-side calculations for each client connection only allowed somewhere between ten and twenty concurrent connections whereas moving the calculations over to the client side now allows about 600 concurrent connections to a single server under the same load.
 
-With that problem out of the way, I also added interactive functionality where the words in the word cloud and in the bar chart are now clickable, allowing to drill into the data. Currently this works with a logical AND. Only previous and live Tweets are now shown that contain all of the search words. The queries are resources that can be bookmarked, with the query encoded in the URL, comparable to a Google search.
+With that problem out of the way, I also added interactive functionality where the words in the word cloud and in the bar chart are now clickable, allowing drilling into the data. Currently this works with a logical AND. Only previous and live Tweets are now shown that contain all of the search words. The queries are resources that can be bookmarked, with the query encoded in the URL, comparable to a Google search.
 
 Ok, this is becoming a little more interesting than the previous version where the observer did not have any influence over what was shown on the screen. I have used the current version of **[BirdWatch](http://bit.ly/BirdWatch)** for following Tweets about the Champions League final between Bayern München and Borussia Dortmund at Wembley stadium (besides the TV, of course): 
 
@@ -82,10 +82,10 @@ Initially I was playing around with image processing on the server side. But onc
 I wanted to move the Wordcount functionality into the client when I discovered that **[Play Framework](http://www.playframework.com)** comes with nice features for **[compiling CoffeeScript into JavaScript](http://www.playframework.com/documentation/2.1.1/AssetsCoffeeScript)**. I have done a little bit with **[CoffeeScript](http://coffeescript.org)** in the past and I remembered finding it pleasant enough to give it another try. But that will be the topic for a future article.
 
 ####Performance of the current version
-Right before the Champions League final, I measured the performance for the search words I had selected for the game. At that time I was receiving about 4 Tweets per second which I was then able to simultaneausly stream to 10,000 clients (using **[sse-perf](http://bit.ly/sse-perf)**). 
+Right before the Champions League final, I measured the performance for the search words I had selected for the game. At that time I was receiving about 4 Tweets per second, which I was then able to simultaneously stream to 10,000 clients (using **[sse-perf](http://bit.ly/sse-perf)**). 
 
 {% img left /images/champions_league_10k.png 'image' 'images' %}
 
-Not too bad, I'm very glad the **[Play Framework](http://www.playframework.com)** does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. I remains to be seen how much of a performance hit the matching algorithm will incur.
+Not too bad, I'm very glad the **[Play Framework](http://www.playframework.com)** does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. It remains to be seen how much of a performance hit the matching algorithm will incur.
 
 -Matthias
