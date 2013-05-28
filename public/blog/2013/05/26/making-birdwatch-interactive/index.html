@@ -101,24 +101,112 @@
   </header>
 
 
-<div class="entry-content"><p>Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more interested in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though as the server side reasoning did not scale well at all. I the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
+<div class="entry-content"><p>Some weeks ago when I started working on the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more excited in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though because the server side reasoning did not scale well at all. In the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
 
 <!-- more -->
 
 
-<p>My other application on GitHub, sse-perf, was quite useful in identifying where the scalability problem was. When getting as many as 1% of all Tweets from Twitter, which is the current limit for the Twitter Streaming API (3-4 million Tweets a day), server-side calculations for each client only allowed somewhere between ten and twenty concurrent connections whereas moving the calculations now allows about 600 concurrent connections under the same load.</p>
+<p>My other application on GitHub, <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>, was quite useful in identifying where the scalability problem was. When getting as many as 1% of all Tweets from Twitter, which is the current limit for the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> without some extra agreement with Twitter (amounting to 3-4 million Tweets a day), server-side calculations for each client connection only allowed somewhere between ten and twenty concurrent connections whereas moving the calculations over to the client side now allows about 600 concurrent connections to a single server under the same load.</p>
 
-<p>With that problem out of the way, I also added interactive functionality where the words in the word cloud and in the bar chart are now clickable, allowing to drill into the data. Currently this works with a logical AND. Only previous and live Tweets are now shown that contain all of the search words. The queries are now resources that can be bookmarked, with the query encoded in the URL, comparable to a Google search.</p>
+<p>With that problem out of the way, I also added interactive functionality where the words in the word cloud and in the bar chart are now clickable, allowing to drill into the data. Currently this works with a logical AND. Only previous and live Tweets are now shown that contain all of the search words. The queries are resources that can be bookmarked, with the query encoded in the URL, comparable to a Google search.</p>
 
-<p>Ok, this is becoming a little more interesting than the previous version where the observer did not have any influence over what was shown on the screen. But it is definitely not as useful as it could be. I have used the version you can find on GitHub for following Tweets about the Champions League final between Bayern München and Borussia Dortmund at Wembley stadium (besides the TV, of course). It was interesting to see a correlation between events in the game and the teams being mentioned in the Tweets. But that experience also showed me what is missing and could be addressed in a future version: a time component. I would find it interesting to track words and hashtags over time. That will be something for a future version.</p>
+<p>Ok, this is becoming a little more interesting than the previous version where the observer did not have any influence over what was shown on the screen. I have used the current version of <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> for following Tweets about the Champions League final between Bayern München and Borussia Dortmund at Wembley stadium (besides the TV, of course):</p>
+
+<p><img class="left" src="/images/champions_league.png" title="image" alt="images"></p>
+
+<p>It was interesting to see a correlation between events in the game and the teams being mentioned in the Tweets. But that experience also showed me what is missing and could be addressed in a future version: a time component. I would find it interesting to track words and hashtags over time. That will be much more interesting and shall come in a future version.</p>
 
 <p>Let&#8217;s look at a few implementation details in the current version:</p>
 
 <h4>Filter Enumeratee</h4>
 
-<p>Tweets from the TwitterClient are delivered to connected clients using a channel and enumerator provided by Concurrent.broadcast in the Play Iteratee API. The Tweets are from there fed into the EventSource object which acts as a simple Iteratee that does nothing more than generate a chunked HTTP response, with &#8220;data: &#8221; prepended to every piece of data (Tweets as JSON in this case). I already used a transforming Enumeratee before, for transforming Tweets in case class form into JSON. This Enumerator piping into an Enumeratee and then into the Iteratee made it very simple to put another Enumeratee into this chain for filtering only those Tweets that contain the desired search words.</p>
+<p>Tweets from the TwitterClient are delivered to connected clients using a channel and enumerator provided by Concurrent.broadcast in the Play Iteratee API.</p>
 
-<h4>REST endpoints for queries and streams</h4>
+<figure class='code'><figcaption><span>Tweet Enumerator</span><a href='https://github.com/matthiasn/BirdWatch/blob/74fbdfa568bbcc3f4c6c14de45b70a8bd6e828dc/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** system-wide channel / enumerator for attaching SSE streams to clients*/</span>
+</span><span class='line'>  <span class="k">val</span> <span class="o">(</span><span class="n">tweetsOut</span><span class="o">,</span> <span class="n">tweetChannel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The Tweets are from there fed into the EventSource object which acts as a simple Iteratee that does nothing more than generate a chunked HTTP response, with &#8220;data: &#8221; prepended to every piece of data (Tweets as <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> in this case), like this:</p>
+
+<figure class='code'><figcaption><span>One Tweet via SSE </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;tweet_id&quot;</span><span class="o">:</span><span class="mi">339406567420080130</span><span class="p">,</span><span class="s2">&quot;img_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://a0.twimg.com/profile_images/3669634376/302cdf34520f1ffd45395438da689c3f_normal.jpeg&quot;</span><span class="p">,</span><span class="s2">&quot;profile_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://twitter.com/muhammadmucin&quot;</span><span class="p">,</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;muhammadmucin&quot;</span><span class="p">,</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;RT @Milanello: Video: Nesta vs. Juventus (Champions League final in 2003): http://t.co/heGrklYXo6 #TempestaPerfettaNesta&quot;</span><span class="p">,</span><span class="s2">&quot;followers&quot;</span><span class="o">:</span><span class="mi">361</span><span class="p">,</span><span class="s2">&quot;words&quot;</span><span class="o">:</span><span class="mi">13</span><span class="p">,</span><span class="s2">&quot;chars&quot;</span><span class="o">:</span><span class="mi">120</span><span class="p">,</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="mi">1369755806000</span><span class="p">,</span><span class="s2">&quot;hashtags&quot;</span><span class="o">:</span><span class="p">[{</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;TempestaPerfettaNesta&quot;</span><span class="p">,</span><span class="s2">&quot;indices&quot;</span><span class="o">:</span><span class="p">[</span><span class="mi">98</span><span class="p">,</span><span class="mi">120</span><span class="p">]}],</span><span class="s2">&quot;user_mentions&quot;</span><span class="o">:</span><span class="p">[{</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;Milanello&quot;</span><span class="p">,</span><span class="s2">&quot;indices&quot;</span><span class="o">:</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">13</span><span class="p">]}],</span><span class="s2">&quot;urls&quot;</span><span class="o">:</span><span class="p">[{</span><span class="s2">&quot;url&quot;</span><span class="o">:</span><span class="s2">&quot;http://t.co/heGrklYXo6&quot;</span><span class="p">,</span><span class="s2">&quot;expanded_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://sulia.com/milanello/f/43a24f3c-54e5-48ba-9653-508476c3fbc0/&quot;</span><span class="p">,</span><span class="s2">&quot;display_url&quot;</span><span class="o">:</span><span class="s2">&quot;sulia.com/milanello/f/43â€¦&quot;</span><span class="p">}],</span><span class="s2">&quot;timeAgo&quot;</span><span class="o">:</span><span class="s2">&quot;367 ms ago&quot;</span><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I already used a transforming Enumeratee before, for transforming Tweets in case class form into <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>. It is very simple to put another Enumeratee into this chain for filtering only those Tweets that contain the desired search words:</p>
+
+<figure class='code'><figcaption><span>Enumerator | Enumeratees | Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/74fbdfa568bbcc3f4c6c14de45b70a8bd6e828dc/app/controllers/Twitter.scala'>Twitter.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** Enumeratee: Tweet to JsValue adapter */</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">tweetToJson</span><span class="k">:</span> <span class="kt">Enumeratee</span><span class="o">[</span><span class="kt">Tweet</span>, <span class="kt">JsValue</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">map</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">t</span> <span class="k">=&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">toJson</span><span class="o">(</span><span class="n">t</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Tests if all comma-separated words in q are contained in Tweet.text  */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">containsAll</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">tokens</span> <span class="k">=</span> <span class="n">q</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">&quot;,&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">matches</span> <span class="k">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="o">(</span><span class="n">acc</span><span class="o">,</span> <span class="n">token</span><span class="o">)</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="n">token</span><span class="o">)</span> <span class="k">=&gt;</span>  <span class="n">acc</span> <span class="o">+</span> <span class="mi">1</span>
+</span><span class='line'>      <span class="k">case</span> <span class="o">(</span><span class="n">acc</span><span class="o">,</span> <span class="n">token</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">acc</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="n">matches</span> <span class="o">==</span> <span class="n">tokens</span><span class="o">.</span><span class="n">length</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Filtering Enumeratee applying containsAll function*/</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">textFilter</span><span class="o">(</span><span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">filter</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span> <span class="o">=&gt;</span> <span class="n">containsAll</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">q</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Serves Tweets as Server Sent Events over HTTP connection */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">tweetFeed</span><span class="o">(</span><span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">req</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>      <span class="nc">RequestLogger</span><span class="o">.</span><span class="n">log</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="s">&quot;/tweetFeed&quot;</span><span class="o">,</span> <span class="mi">200</span><span class="o">)</span>
+</span><span class='line'>      <span class="nc">Ok</span><span class="o">.</span><span class="n">stream</span><span class="o">(</span><span class="nc">TwitterClient</span><span class="o">.</span><span class="n">tweetsOut</span>
+</span><span class='line'>        <span class="o">&amp;&gt;</span> <span class="n">textFilter</span><span class="o">(</span><span class="n">q</span><span class="o">)</span>
+</span><span class='line'>        <span class="o">&amp;&gt;</span> <span class="n">tweetToJson</span>
+</span><span class='line'>        <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The filtering Enumeratee above is nothing more than a convenient way to run a predicate function on every data item and pass data down the chain only when the predicate function evaluates to true.</p>
+
+<h4>Queries as bookmarkable resources</h4>
+
+<p>Queries against the system are now represented by a particular URL that encodes the query string. This URL represents the resource of that particular query within a stream of Tweets at the time of the request. Examples: <strong><a href="http://bit.ly/bw_dortmund_bayern">Dortmund AND Bayern</a></strong> or <strong><a href="http://bit.ly/wembley_soccer">Wembley AND soccer</a></strong>.</p>
 
 <h4>No more image processing</h4>
 
@@ -126,15 +214,15 @@
 
 <h4>Client-side Wordcount implementation in Coffeescript</h4>
 
-<p>I wanted to move the Wordcount functionality into the client when I discovered that Play comes with nice features for compiling Coffeescript into JavaScript. I have done a little bit with Coffeescript in the past and I remembered finding it pleasant enough to give it another try. But that will be the topic for a future article.</p>
+<p>I wanted to move the Wordcount functionality into the client when I discovered that <strong><a href="http://www.playframework.com">Play Framework</a></strong> comes with nice features for <strong><a href="http://www.playframework.com/documentation/2.1.1/AssetsCoffeeScript">compiling CoffeeScript into JavaScript</a></strong>. I have done a little bit with <strong><a href="http://coffeescript.org">CoffeeScript</a></strong> in the past and I remembered finding it pleasant enough to give it another try. But that will be the topic for a future article.</p>
 
 <h4>Performance of the current version</h4>
 
-<p>Right before the Champions League final, I measured the performance for the search words I had selected for the game. At that time I was receiving about 4 Tweets per second which I was then able to simultaneausly stream to 10,000 clients.</p>
+<p>Right before the Champions League final, I measured the performance for the search words I had selected for the game. At that time I was receiving about 4 Tweets per second which I was then able to simultaneausly stream to 10,000 clients (using <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>).</p>
 
 <p><img class="left" src="/images/champions_league_10k.png" title="image" alt="images"></p>
 
-<p>Not too bad, I&#8217;m really glad Play does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. I remains to be seen how much of a performance hit the matching algorithm will incur.</p>
+<p>Not too bad, I&#8217;m very glad the <strong><a href="http://www.playframework.com">Play Framework</a></strong> does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. I remains to be seen how much of a performance hit the matching algorithm will incur.</p>
 
 <p>-Matthias</p>
 </div>
