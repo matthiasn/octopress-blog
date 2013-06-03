@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the &hellip;">
+  <meta name="description" content="Let us assume for a second that my BirdWatch application needed to handle more load than a single server could handle. The current version could not &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-02T07:48:00+02:00" pubdate data-updated="true">06/02/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Let us assume for a second that my <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It owuld work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -388,6 +429,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/05/26/making-birdwatch-interactive/">Making BirdWatch Interactive</a>
       </li>
     
@@ -401,10 +446,6 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     
       <li class="post">
         <a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a>
       </li>
     
   </ul>
