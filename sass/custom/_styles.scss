@@ -39,3 +39,8 @@
     transition: background-color 0.15s ease-in-out;
     }
 }
+article {
+  ol, ul {
+    padding-left: 2em;
+  }
+}
