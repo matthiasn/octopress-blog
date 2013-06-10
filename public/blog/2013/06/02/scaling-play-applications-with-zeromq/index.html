@@ -94,7 +94,7 @@
   
 
 
-<time datetime="2013-06-02T07:48:00+02:00" pubdate data-updated="true">06/02/2013</time>
+<time datetime="2013-06-02T07:48:00-04:00" pubdate data-updated="true">06/02/2013</time>
         
       </p>
     
@@ -106,13 +106,13 @@
 <!-- more -->
 
 
-<p>One approach could be using an HTTP stream between the parts as well, basically using the TwitterClient application as a hub for delivering the Twitter stream to multiple instances as needed. While this works, it is not an elegant solution: how do we handle reconnects? Yeah, we&#8217;ll have to handle them ourselves. No thanks.</p>
+<p>One possible approach is using an HTTP stream between the parts as well, basically using the TwitterClient application as a hub for delivering the Twitter stream to multiple instances as needed. While this works, it is not an elegant solution: how do I handle reconnects? How do I even detect them? I&#8217;d rather not deal with this.</p>
 
-<p>We could use an Akka cluster for this. This approach seems more promising, as all the messaging elements we would need should already be there. But this does not offer the best possible flexibility, as it requires all participants to use Akka. Why would we want to limit ourselves to one technology stack if not absolutely necessary?</p>
+<p>An Akka cluster should work. This approach seems more promising, as all the messaging elements are already there. But this does not offer the best possible flexibility, as it requires all participants to use Akka / the JVM / the same version of Scala. I&#8217;d rather not limit myself to one technology stack if not absolutely necessary.</p>
 
 <p>I would prefer a solution that is completely agnostic of the technology each building block of the whole application uses. I might want to run statistics using <strong><a href="http://www.numpy.org">numpy</a></strong> in the future or whatever. This should be possible without much glue code. HTTP is obviously technology independent but it falls short due to the reconnect issues.</p>
 
-<p>Turns out there is a great solution for polyglot applications: <strong><a href="http://www.zeromq.org/">ZeroMQ</a></strong>, a socket toolbox offering bindings for <strong><a href="http://zguide.zeromq.org/page:all">30+ languages</a></strong>. Unlike broker-centered JMS or RabbitMQ, ZeroMQ is a messaging library, not a full messaging solution. There are no brokers; instead we get access to TCP sockets (fast) that we can use to build complex communication patterns. I cannot say it any better than Zed Shaw:</p>
+<p>Turns out there is a great solution for polyglot applications: <strong><a href="http://www.zeromq.org/">ZeroMQ</a></strong>, a socket toolbox offering bindings for <strong><a href="http://zguide.zeromq.org/page:all">30+ languages</a></strong>. Unlike broker-centered JMS or RabbitMQ, ZeroMQ is a messaging library, not a full messaging solution. There are no brokers; instead we get access to TCP sockets (fast) that we can use to build complex communication patterns. I cannot say it any better than this:</p>
 
 <blockquote><p>What ZeroMQ does is create an API that looks a lot like sockets, and feels the same, but gives you the messaging styles you actually want. By simply specifying the type of socket when you call zmq_socket you can have multicast, request/reply, and many other styles.</p><footer><strong>Zed Shaw on ZeroMQ</strong> <cite><a href='http://www.zeromq.org/intro:read-the-manual'>www.zeromq.org/&hellip;</a></cite></footer></blockquote>
 
@@ -208,11 +208,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This additional layer of indirection opens up a wide range of possibilities. Scaling becomes straightforward, we can attach as many of the client-facing controller application (once split up) to the Tweet publishing application, without even having to individually configure them. Have them all point to the same publishing socket, spread the load using for example <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> and you&#8217;re done.</p>
+<p>This additional layer of indirection opens up a wide range of possibilities. Scaling becomes straightforward, we can attach pretty much as many of the client-facing controller applications (once split up) to the Tweet publishing application, without even having to individually configure them. Have them all point to the same publishing socket, spread the load using for example <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> and you&#8217;re done.</p>
 
 <p><img class="left" src="/images/zeromq.png" title="image" alt="images"></p>
 
-<p>We can also swap individual parts of the application for better ones. I personally do not like the current approach to consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> as used in <strong><a href="https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala">TweetsPublisher.scala</a></strong> and I would like to replace it with the <strong><a href="https://dev.twitter.com/blog/the-hosebird-client-streaming-library">Twitter Hosebird Client (hbc)</a></strong>. If folks at Twitter have developed this for usage in their own projects, I have no doubt they can do this much better than my simple reconnect strategy possibly could. Last time I checked, hbc was not compatible with Scala version 2.10 used in Play 2.1 though, but thanks to ZeroMQ, the library can be run in its native habitat (Java application with whatever version of Scala it needs for some embedded library) and publish Tweets onto a ZeroMQ socket. The TweetsConsumer then would only have to point to another socket address. Oh good, looks like there is a way out of Scala version hell after all. Anyone experienced with using ZeroMQ in a Java application interested in writing this client?</p>
+<p>We can also swap individual parts of the application for better ones. I personally do not like the current approach to consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> as used in <strong><a href="https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala">TweetsPublisher.scala</a></strong> and I would like to replace it with the <strong><a href="https://dev.twitter.com/blog/the-hosebird-client-streaming-library">Twitter Hosebird Client (hbc)</a></strong>. If folks at Twitter have developed this for usage in their own projects, I have no doubt they can do this much better than my simple reconnect strategy possibly could. Last time I checked, hbc was not compatible with Scala version 2.10 used in Play 2.1 though, but thanks to ZeroMQ, the library can be run in its native habitat (Java application without having to worry about which version of Scala is used in some embedded library) and publish Tweets onto a ZeroMQ socket. The TweetsConsumer then would only have to point to another socket address. Anyone experienced with using ZeroMQ in a Java application interested in writing this client?</p>
 
 <p>-Matthias</p>
 </div>
@@ -237,7 +237,7 @@
   
 
 
-<time datetime="2013-06-02T07:48:00+02:00" pubdate data-updated="true">06/02/2013</time>
+<time datetime="2013-06-02T07:48:00-04:00" pubdate data-updated="true">06/02/2013</time>
       
 
 
@@ -260,6 +260,8 @@
       
         <a class="basic-alignment left" href="/blog/2013/05/26/making-birdwatch-interactive/" title="Previous Post: Making BirdWatch Interactive">&laquo; Making BirdWatch Interactive</a>
       
+      
+        <a class="basic-alignment right" href="/blog/2013/06/10/scala-days-2013/" title="Next Post: Scala Days 2013">Scala Days 2013 &raquo;</a>
       
     </p>
   </footer>
@@ -291,6 +293,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/06/10/scala-days-2013/">Scala Days 2013</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a>
       </li>
     
@@ -304,10 +310,6 @@
     
       <li class="post">
         <a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a>
       </li>
     
   </ul>

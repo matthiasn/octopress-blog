@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-06-03T14:50:55+02:00</updated>
+  <updated>2013-06-10T13:31:15-04:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,22 +14,105 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Scala Days 2013]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/"/>
+    <updated>2013-06-10T10:31:00-04:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013</id>
+    <content type="html"><![CDATA[<p><strong><a href="http://scaladays.org">Scala Days 2013</a></strong> are starting at Hudson Theater in New York City today, with a very promising lineup of presentations. Unfortunately I won&#8217;t get to see all of them live as there are three parallel tracks. So far this is my selection of presentations I want to attend.</p>
+
+<!-- more -->
+
+
+<h3>Monday, June 10th</h3>
+
+<p><strong><a href="https://twitter.com/odersky">Martin Odersky</a></strong> <br/>
+Keynote - Scala with Style <br/>
+Hudson Theater, 19:00 - 20:30</p>
+
+<h3>Tuesday, June 11th</h3>
+
+<p><strong><a href="https://twitter.com/etorreborre">Eric Torreborre</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room3/9:15-10:00/A-Walk-Down-the-Beach%2C-How-Kiama-Helps-Implementing-Distributed-Collections-on-Top-of-Hadoop">A Walk Down the Beach, How Kiama Helps Implementing Distributed Collections on Top of Hadoop</a> <br/>
+Metropolis, 09:15 - 10:00</p>
+
+<p><strong><a href="https://twitter.com/viktorklang">Viktor Klang</a></strong> &amp; <strong><a href="https://twitter.com/rolandkuhn">Roland Kuhn</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room1/10:15-11:00/Concurrency-%u2013-The-good%2C-the-bad%2C-the-ugly">Concurrency – The good, the bad, the ugly</a><br/>
+Room 4.11, 10:15 - 11:00</p>
+
+<p><strong><a href="https://twitter.com/ccsevers">Christopher Severs</a></strong> &amp; <strong><a href="https://twitter.com/BigDataSc">Vitaly Gordon</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room3/11:15-12:00/Scalable-and-Flexible-Machine-Learning-With-Scala">Scalable and Flexible Machine Learning With Scala</a><br/>
+Metropolis, 11:15 - 12:00</p>
+
+<p><strong><a href="https://twitter.com/kevin_j_brown">Kevin Brown</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room3/13:30-14:15/Big-Data-Analytics-with-Delite">Big Data Analytics with Delite</a><br/>
+Metropolis, 13:30 - 14:15</p>
+
+<p><strong><a href="https://twitter.com/matei_zaharia">Matei Zaharia</a></strong> &amp; <strong><a href="https://twitter.com/rxin">Reynold Xin</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room3/14:30-15:15/The-Spark-Stack%3A-Fast-and-Expressive-Big-Data-Analytics-in-Scala">The Spark Stack: Fast and Expressive Big Data Analytics in Scala</a><br/>
+Metropolis, 14:30 - 15:15</p>
+
+<p><strong><a href="https://twitter.com/josh_wills">Josh Wills</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room3/15:30-16:15/Scala-for-Data-Pipelines">Scala for Data Pipelines</a><br/>
+Metropolis, 15:30 - 16:15</p>
+
+<p><strong><a href="https://twitter.com/Sadache">Sadache Aldrobi</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-11/room1/16:30-17:15/Realtime-Web%2C-The-Urge-for-a-Programming-Model">Realtime Web, The Urge for a Programming Model</a><br/>
+Room 4.11, 16:30 - 17:15</p>
+
+<h3>Wednesday, June 12th</h3>
+
+<p><strong><a href="https://twitter.com/springrod">Rod Johnson</a></strong>: <br/>
+Keynote - Scala in 2018<br/>
+Hudson Theater, 08:45 - 10:00</p>
+
+<p><strong><a href="https://twitter.com/xeno_by">Eugene Burmako</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-12/room1/10:15-11:00/Half-a-Year-in-Macro-Paradise">Half a Year in Macro Paradise</a><br/>
+Room 4.11, 10:15 - 11:00</p>
+
+<p><strong><a href="https://twitter.com/andrey_cheptsov">Andrey Cheptsov</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-12/room3/11:15-12:00/Scala-Developer-Tools-in-IntelliJ-IDEA%3A-SBT%2C-Play-and-Scalate">Scala Developer Tools in IntelliJ IDEA: SBT, Play and Scalate</a> <br/>
+Metropolis, 11:15 - 12:00</p>
+
+<p><strong><a href="https://twitter.com/philippkhaller">Philipp Haller</a></strong> &amp;
+<strong><a href="https://twitter.com/retronym">Jason Zaugg</a></strong>: <br/>
+<a href="http://scaladays.org/#/june-12/room1/13:30-14:15/Scala-Async%3A-A-New-Way-to-Simplify-Asynchronous-Code-%28Make-the-Compiler-Do-It%21%29">Scala Async: A New Way to Simplify Asynchronous Code</a><br/>
+Room 4.11, 13:30 - 14:15</p>
+
+<p><strong><a href="https://twitter.com/tathadas">Tathagata Das</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-12/room2/14:30-15:15/Spark-Streaming%3A-Fast-Distributed-Stream-Processing-with-a-High-Level-API">Spark Streaming: Fast Distributed Stream Processing with a High-Level API</a><br/>
+Room 3.11, 14:30 - 15:15</p>
+
+<p><strong>Rex Kerr</strong>:<br/>
+<a href="http://scaladays.org/#/june-12/room2/15:30-16:15/Designing-for-performance">Designing for performance</a><br/>
+Room 3.11, 15:30 - 16:15</p>
+
+<p><strong><a href="https://twitter.com/sjrdoeraene">Sébastien Doeraene</a></strong>:<br/>
+<a href="http://scaladays.org/#/june-12/room2/16:30-17:15/Scala.js%3A-write-in-Scala-for-the-browser">Scala.js: write in Scala for the browser</a><br/>
+Room 3.11, 16:30 - 17:15</p>
+
+<p>In the next couple of days I will write about presentations and topics I found particularly inspiring.</p>
+
+<p>-Matthias</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Scaling Play applications with ZeroMQ]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/"/>
-    <updated>2013-06-02T07:48:00+02:00</updated>
+    <updated>2013-06-02T07:48:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq</id>
     <content type="html"><![CDATA[<p>Let us assume for a second that the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It would work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed. How do we connect these separate parts of the application though?</p>
 
 <!-- more -->
 
 
-<p>One approach could be using an HTTP stream between the parts as well, basically using the TwitterClient application as a hub for delivering the Twitter stream to multiple instances as needed. While this works, it is not an elegant solution: how do we handle reconnects? Yeah, we&#8217;ll have to handle them ourselves. No thanks.</p>
+<p>One possible approach is using an HTTP stream between the parts as well, basically using the TwitterClient application as a hub for delivering the Twitter stream to multiple instances as needed. While this works, it is not an elegant solution: how do I handle reconnects? How do I even detect them? I&#8217;d rather not deal with this.</p>
 
-<p>We could use an Akka cluster for this. This approach seems more promising, as all the messaging elements we would need should already be there. But this does not offer the best possible flexibility, as it requires all participants to use Akka. Why would we want to limit ourselves to one technology stack if not absolutely necessary?</p>
+<p>An Akka cluster should work. This approach seems more promising, as all the messaging elements are already there. But this does not offer the best possible flexibility, as it requires all participants to use Akka / the JVM / the same version of Scala. I&#8217;d rather not limit myself to one technology stack if not absolutely necessary.</p>
 
 <p>I would prefer a solution that is completely agnostic of the technology each building block of the whole application uses. I might want to run statistics using <strong><a href="http://www.numpy.org">numpy</a></strong> in the future or whatever. This should be possible without much glue code. HTTP is obviously technology independent but it falls short due to the reconnect issues.</p>
 
-<p>Turns out there is a great solution for polyglot applications: <strong><a href="http://www.zeromq.org/">ZeroMQ</a></strong>, a socket toolbox offering bindings for <strong><a href="http://zguide.zeromq.org/page:all">30+ languages</a></strong>. Unlike broker-centered JMS or RabbitMQ, ZeroMQ is a messaging library, not a full messaging solution. There are no brokers; instead we get access to TCP sockets (fast) that we can use to build complex communication patterns. I cannot say it any better than Zed Shaw:</p>
+<p>Turns out there is a great solution for polyglot applications: <strong><a href="http://www.zeromq.org/">ZeroMQ</a></strong>, a socket toolbox offering bindings for <strong><a href="http://zguide.zeromq.org/page:all">30+ languages</a></strong>. Unlike broker-centered JMS or RabbitMQ, ZeroMQ is a messaging library, not a full messaging solution. There are no brokers; instead we get access to TCP sockets (fast) that we can use to build complex communication patterns. I cannot say it any better than this:</p>
 
 <blockquote><p>What ZeroMQ does is create an API that looks a lot like sockets, and feels the same, but gives you the messaging styles you actually want. By simply specifying the type of socket when you call zmq_socket you can have multicast, request/reply, and many other styles.</p><footer><strong>Zed Shaw on ZeroMQ</strong> <cite><a href='http://www.zeromq.org/intro:read-the-manual'>www.zeromq.org/&hellip;</a></cite></footer></blockquote>
 
@@ -125,11 +208,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This additional layer of indirection opens up a wide range of possibilities. Scaling becomes straightforward, we can attach as many of the client-facing controller application (once split up) to the Tweet publishing application, without even having to individually configure them. Have them all point to the same publishing socket, spread the load using for example <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> and you&#8217;re done.</p>
+<p>This additional layer of indirection opens up a wide range of possibilities. Scaling becomes straightforward, we can attach pretty much as many of the client-facing controller applications (once split up) to the Tweet publishing application, without even having to individually configure them. Have them all point to the same publishing socket, spread the load using for example <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> and you&#8217;re done.</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/zeromq.png" title="image" alt="images"></p>
 
-<p>We can also swap individual parts of the application for better ones. I personally do not like the current approach to consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> as used in <strong><a href="https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala">TweetsPublisher.scala</a></strong> and I would like to replace it with the <strong><a href="https://dev.twitter.com/blog/the-hosebird-client-streaming-library">Twitter Hosebird Client (hbc)</a></strong>. If folks at Twitter have developed this for usage in their own projects, I have no doubt they can do this much better than my simple reconnect strategy possibly could. Last time I checked, hbc was not compatible with Scala version 2.10 used in Play 2.1 though, but thanks to ZeroMQ, the library can be run in its native habitat (Java application with whatever version of Scala it needs for some embedded library) and publish Tweets onto a ZeroMQ socket. The TweetsConsumer then would only have to point to another socket address. Oh good, looks like there is a way out of Scala version hell after all. Anyone experienced with using ZeroMQ in a Java application interested in writing this client?</p>
+<p>We can also swap individual parts of the application for better ones. I personally do not like the current approach to consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> as used in <strong><a href="https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala">TweetsPublisher.scala</a></strong> and I would like to replace it with the <strong><a href="https://dev.twitter.com/blog/the-hosebird-client-streaming-library">Twitter Hosebird Client (hbc)</a></strong>. If folks at Twitter have developed this for usage in their own projects, I have no doubt they can do this much better than my simple reconnect strategy possibly could. Last time I checked, hbc was not compatible with Scala version 2.10 used in Play 2.1 though, but thanks to ZeroMQ, the library can be run in its native habitat (Java application without having to worry about which version of Scala is used in some embedded library) and publish Tweets onto a ZeroMQ socket. The TweetsConsumer then would only have to point to another socket address. Anyone experienced with using ZeroMQ in a Java application interested in writing this client?</p>
 
 <p>-Matthias</p>
 ]]></content>
@@ -138,7 +221,7 @@
   <entry>
     <title type="html"><![CDATA[Making BirdWatch Interactive]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/"/>
-    <updated>2013-05-26T20:45:00+02:00</updated>
+    <updated>2013-05-26T20:45:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive</id>
     <content type="html"><![CDATA[<p>Some weeks ago when I started working on the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more excited in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though because the server side reasoning did not scale well at all. In the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
 
@@ -270,7 +353,7 @@
   <entry>
     <title type="html"><![CDATA[D3.js and Play Framework: Getting Started]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/"/>
-    <updated>2013-05-18T13:21:00+02:00</updated>
+    <updated>2013-05-18T13:21:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play</id>
     <content type="html"><![CDATA[<p>Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at noticing changes between spreadsheet cells or other text. That&#8217;s okay. I&#8217;m actually a big fan of that. Text does not usually threaten to run me over when I attempt to cross a street. So let&#8217;s create moving things with <strong><a href="http://d3js.org">D3.js</a></strong> and drive the animation reactively with data from a server written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
 
@@ -389,7 +472,7 @@
   <entry>
     <title type="html"><![CDATA[Load Testing Server Sent Event Streams]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/"/>
-    <updated>2013-05-11T22:07:00+02:00</updated>
+    <updated>2013-05-11T22:07:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams</id>
     <content type="html"><![CDATA[<p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
 
@@ -423,7 +506,7 @@
   <entry>
     <title type="html"><![CDATA[Server Sent Events vs. WebSockets]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/"/>
-    <updated>2013-05-01T14:59:00+02:00</updated>
+    <updated>2013-05-01T14:59:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets</id>
     <content type="html"><![CDATA[<p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>.</p>
 
@@ -605,7 +688,7 @@
   <entry>
     <title type="html"><![CDATA[ReactiveMongo 0.9 and Lossless Persistence]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/"/>
-    <updated>2013-04-26T13:48:00+02:00</updated>
+    <updated>2013-04-26T13:48:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade</id>
     <content type="html"><![CDATA[<p>Initially I parsed the Tweets in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application into instances of a Tweet case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> version 0.9 in the latest commits, storing each  observable fact coming from the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> in its entirety.</p>
 
@@ -915,7 +998,7 @@ This allows us to do something upon return of the collection size in a non-block
   <entry>
     <title type="html"><![CDATA[Iteratee: can I have that in a sentence?]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/"/>
-    <updated>2013-04-23T22:08:00+02:00</updated>
+    <updated>2013-04-23T22:08:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence</id>
     <content type="html"><![CDATA[<p>A couple of weeks back I was trying to wrap my head around <strong><a href="http://www.playframework.com/documentation/2.0.4/Iteratees">Iteratees</a></strong> so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing aggregating state over time. That did not seem right.</p>
 
@@ -1290,7 +1373,7 @@ This allows us to do something upon return of the collection size in a non-block
   <entry>
     <title type="html"><![CDATA[Hello World]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/19/hello-world/"/>
-    <updated>2013-04-19T21:19:00+02:00</updated>
+    <updated>2013-04-19T21:19:00-04:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/19/hello-world</id>
     <content type="html"><![CDATA[<p><strong>Who am I?</strong>
 My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>

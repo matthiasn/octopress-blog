@@ -2,52 +2,56 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/19/hello-world/</loc>
-        <lastmod>2013-05-14T23:16:03+02:00</lastmod>
+        <lastmod>2013-05-14T17:16:03-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/
         </loc>
-        <lastmod>2013-05-19T00:16:56+02:00</lastmod>
+        <lastmod>2013-05-18T18:16:56-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/</loc>
-        <lastmod>2013-05-02T23:06:47+02:00</lastmod>
+        <lastmod>2013-05-02T17:06:47-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/</loc>
-        <lastmod>2013-05-14T21:57:27+02:00</lastmod>
+        <lastmod>2013-05-14T15:57:27-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/
         </loc>
-        <lastmod>2013-05-15T00:34:39+02:00</lastmod>
+        <lastmod>2013-05-14T18:34:39-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/</loc>
-        <lastmod>2013-05-18T15:13:18+02:00</lastmod>
+        <lastmod>2013-05-18T09:13:18-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/</loc>
-        <lastmod>2013-05-28T18:20:09+02:00</lastmod>
+        <lastmod>2013-05-28T12:20:09-04:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/
         </loc>
-        <lastmod>2013-06-03T14:31:05+02:00</lastmod>
+        <lastmod>2013-06-05T13:11:25-04:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/</loc>
+        <lastmod>2013-06-10T13:31:14-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
-        <lastmod>2013-06-03T14:31:05+02:00</lastmod>
+        <lastmod>2013-06-10T13:31:14-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
-        <lastmod>2013-06-03T14:31:05+02:00</lastmod>
+        <lastmod>2013-06-10T13:31:14-04:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/robots.txt</loc>
-        <lastmod>2013-04-21T14:43:45+02:00</lastmod>
+        <lastmod>2013-04-21T08:43:45-04:00</lastmod>
     </url>
 </urlset>
