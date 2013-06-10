@@ -17,14 +17,18 @@
     .append("circle")
     .attr("cx", 10)
     .attr("cy", 10)
-    .attr("r", 3)
-    .attr("fill", "red");
+    .attr("r", 5)
+    .attr("fill", "red")
+    .on("click", function(){ 
+        if (heartbeat.attr("fill") === "red") heartbeat.attr("fill", "blue");
+        else heartbeat.attr("fill", "red");
+      });
   
   setInterval(function (){
-    heartbeat.transition().duration(500).attr("r", 7)
-      .transition().duration(500).attr("r", 3)
-      .transition().duration(500).attr("r", 6)
-      .transition().duration(500).attr("r", 3);
+    heartbeat.transition().duration(500).attr("r", 10)
+      .transition().duration(500).attr("r", 5)
+      .transition().duration(500).attr("r", 9)
+      .transition().duration(500).attr("r", 5);
     }, 2100);
 </script>
 </html>

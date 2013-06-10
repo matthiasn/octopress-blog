@@ -1,0 +1,81 @@
+---
+layout: post
+title: "Scala Days 2013"
+date: 2013-06-10 10:31
+comments: true
+categories: 
+---
+**[Scala Days 2013](http://scaladays.org)** are starting at Hudson Theater in New York City today, with a very promising lineup of presentations. Unfortunately I won't get to see all of them live as there are three parallel tracks. So far this is my selection of presentations I want to attend.
+
+<!-- more -->
+
+###Monday, June 10th
+**[Martin Odersky](https://twitter.com/odersky)**   
+Keynote - Scala with Style   
+Hudson Theater, 19:00 - 20:30
+
+###Tuesday, June 11th
+
+**[Eric Torreborre](https://twitter.com/etorreborre)**:  
+[A Walk Down the Beach, How Kiama Helps Implementing Distributed Collections on Top of Hadoop](http://scaladays.org/#/june-11/room3/9:15-10:00/A-Walk-Down-the-Beach%2C-How-Kiama-Helps-Implementing-Distributed-Collections-on-Top-of-Hadoop)   
+Metropolis, 09:15 - 10:00
+
+**[Viktor Klang](https://twitter.com/viktorklang)** & **[Roland Kuhn](https://twitter.com/rolandkuhn)**:  
+[Concurrency – The good, the bad, the ugly](http://scaladays.org/#/june-11/room1/10:15-11:00/Concurrency-%u2013-The-good%2C-the-bad%2C-the-ugly)  
+Room 4.11, 10:15 - 11:00
+
+**[Christopher Severs](https://twitter.com/ccsevers)** & **[Vitaly Gordon](https://twitter.com/BigDataSc)**:  
+[Scalable and Flexible Machine Learning With Scala](http://scaladays.org/#/june-11/room3/11:15-12:00/Scalable-and-Flexible-Machine-Learning-With-Scala)  
+Metropolis, 11:15 - 12:00
+
+**[Kevin Brown](https://twitter.com/kevin_j_brown)**:  
+[Big Data Analytics with Delite](http://scaladays.org/#/june-11/room3/13:30-14:15/Big-Data-Analytics-with-Delite)  
+Metropolis, 13:30 - 14:15
+
+**[Matei Zaharia](https://twitter.com/matei_zaharia)** & **[Reynold Xin](https://twitter.com/rxin)**:  
+[The Spark Stack: Fast and Expressive Big Data Analytics in Scala](http://scaladays.org/#/june-11/room3/14:30-15:15/The-Spark-Stack%3A-Fast-and-Expressive-Big-Data-Analytics-in-Scala)  
+Metropolis, 14:30 - 15:15
+
+**[Josh Wills](https://twitter.com/josh_wills)**:  
+[Scala for Data Pipelines](http://scaladays.org/#/june-11/room3/15:30-16:15/Scala-for-Data-Pipelines)  
+Metropolis, 15:30 - 16:15
+
+**[Sadache Aldrobi](https://twitter.com/Sadache)**:  
+[Realtime Web, The Urge for a Programming Model](http://scaladays.org/#/june-11/room1/16:30-17:15/Realtime-Web%2C-The-Urge-for-a-Programming-Model)  
+Room 4.11, 16:30 - 17:15
+
+
+###Wednesday, June 12th
+
+**[Rod Johnson](https://twitter.com/springrod)**:   
+Keynote - Scala in 2018  
+Hudson Theater, 08:45 - 10:00
+
+**[Eugene Burmako](https://twitter.com/xeno_by)**:  
+[Half a Year in Macro Paradise](http://scaladays.org/#/june-12/room1/10:15-11:00/Half-a-Year-in-Macro-Paradise)  
+Room 4.11, 10:15 - 11:00
+
+**[Andrey Cheptsov](https://twitter.com/andrey_cheptsov)**:  
+[Scala Developer Tools in IntelliJ IDEA: SBT, Play and Scalate](http://scaladays.org/#/june-12/room3/11:15-12:00/Scala-Developer-Tools-in-IntelliJ-IDEA%3A-SBT%2C-Play-and-Scalate)   
+Metropolis, 11:15 - 12:00
+
+**[Philipp Haller](https://twitter.com/philippkhaller)** & 
+**[Jason Zaugg](https://twitter.com/retronym)**:   
+[Scala Async: A New Way to Simplify Asynchronous Code](http://scaladays.org/#/june-12/room1/13:30-14:15/Scala-Async%3A-A-New-Way-to-Simplify-Asynchronous-Code-%28Make-the-Compiler-Do-It%21%29)  
+Room 4.11, 13:30 - 14:15
+
+**[Tathagata Das](https://twitter.com/tathadas)**:  
+[Spark Streaming: Fast Distributed Stream Processing with a High-Level API](http://scaladays.org/#/june-12/room2/14:30-15:15/Spark-Streaming%3A-Fast-Distributed-Stream-Processing-with-a-High-Level-API)  
+Room 3.11, 14:30 - 15:15
+
+**Rex Kerr**:  
+[Designing for performance](http://scaladays.org/#/june-12/room2/15:30-16:15/Designing-for-performance)  
+Room 3.11, 15:30 - 16:15
+
+**[Sébastien Doeraene](https://twitter.com/sjrdoeraene)**:  
+[Scala.js: write in Scala for the browser](http://scaladays.org/#/june-12/room2/16:30-17:15/Scala.js%3A-write-in-Scala-for-the-browser)  
+Room 3.11, 16:30 - 17:15
+
+In the next couple of days I will write about presentations and topics I found particularly inspiring.
+
+-Matthias
