@@ -101,7 +101,7 @@
   </header>
 
 
-<div class="entry-content"><p>I felt a sudden urge to write a chat application during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
+<div class="entry-content"><p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
 
 <p><img class="left" src="/images/sse-chat.png" title="image" alt="images"></p>
 
@@ -155,23 +155,25 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>What happens here is straightforward if you look at the drawing. The central information hub in this application is the <strong><a href="https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala">Concurrent object</a></strong> which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster">Broadcaster</a></strong>. The individual streaming connections then attach an Iteratee to the provided chatOut <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator">Enumerator</a></strong>.</p>
+<p>What happens here is fairly straightforward if you look at the drawing. The <strong><a href="https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala">Concurrent object</a></strong> is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster">Broadcaster</a></strong>. The individual streaming connections then attach an Iteratee to the provided chatOut <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator">Enumerator</a></strong>, with <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong>  in between.</p>
 
-<p>What is an <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee">Iteratee</a></strong>? An Iteratee is a function that represents a single step within an ongoing computation. Any state it might have is immutable; supplying input results in a new function / a new Iteratee. The way state is handled is somewhat comparable to a fold function that holds intermediate state in an accumulator using immutable data structures, with the difference that the computation can run over an infinite stream with the Iteratee. <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong> are wrapper functions for an Iteratee, the allow for example type transformation or filtering, as is the case here. Input is only used when the input matches the criteria, which here is the message being for the correct room for a particular stream. Otherwise the previous step is returned, without effects. Iteratees, potentially wrapped, are attached to Enumerators which hold a reference to the latest step of the compuation. That way the system overall always knows what the latest step of the computation is, despite the Iteratee function itself being immutable.</p>
+<p>What is an <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee">Iteratee</a></strong>? An Iteratee is a function that represents a single step of an ongoing computation. Any state it might have is immutable; supplying input results in a new function / a new Iteratee. This ongoing computation is driven by an Enumerator which keeps track of the latest step. The Enumerator calls the associated Iteratee function with new input when available and then stores that resulting Iteratee (and so on). The way state is handled is somewhat comparable to a fold function that holds intermediate state in an accumulator using an immutable data structure, with the difference here being that the computation can run over an infinite stream.</p>
 
-<p>We are not using much of what Iteratees are capable of doing here though. <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.EventSource$">EventSource</a></strong> is a mapping Enumerateen Iteratee, but only of the forEach variety. It does not hold intermediate state, it only does something for each input item, in this case wrap the input as a Server Sent Event and deliver it as a chunk to the client over the open HTTP connection.</p>
+<p><strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong> are adapters between Enumerators and Iteratees. They allow for example type transformation or filtering. The filter Enumeratee makes sure input is only used when the input matches the criteria, which here is the message being for the correct chat room for a particular stream / client connection. EventSource provides a transforming Enumeratee for wrapping chunks as Server Sent Events.</p>
+
+<p>In the <strong>chatFeed</strong> function we have a chain of Enumerator and two Enumeratees: <strong>chatOut &amp;> filter(room) &amp;> EventSource()</strong> which results in a composed Enumerator. We pass this composed Enumerator into Ok.stream, which internally connects the Enumerator with a simple Iteratee. This simple Iteratee does not hold intermediate state, it only does something for each input item: deliver it as a chunk of bytes to the client over the open HTTP connection.</p>
 
 <p>Let&#8217;s visualize this:</p>
 
 <p><img class="left" src="/images/sse-chat2.png" title="image" alt="images"></p>
 
-<p>A message is pushed into the chatChannel and distributed to all attached Iteratees (wrapped by the filter Enumeratee). The message is then sent to the client as a Server Sent Event, but only if the filter predicate evaluates to true.</p>
+<p>A message is pushed into the chatChannel and distributed to all attached Iteratees (wrapped by the filter Enumeratee and the EventSource). The message is then sent to the client as a Server Sent Event, but only if the filter predicate evaluates to true.</p>
 
 <h1>AngularJS Client</h1>
 
 <p>I wrote an <strong><a href="https://github.com/matthiasn/sse-chat/blob/0af191e628a450ca8fd4d41bcbff382011cd0a13/app/assets/javascripts/main.js">initial version</a></strong> using jQuery to manipulate the DOM. It worked fine, just getting there wasn&#8217;t really much fun at all. I would have liked the expressive greatness of <strong><a href="http://www.playframework.com/documentation/2.1.1/ScalaTemplates">templates in Play</a></strong>, but without having to reload the page every time the model changes.</p>
 
-<p>Last week I started learning AngularJS, so I wanted to see if it was more fun to use AngularJS. The resulting code is not only more than 30% smaller, it also also is a real pleasure to work with. Dynamic views are written in an extended HTML vocabulary which attaches elements on the page to the $scope, which can be seen as the ViewModel of the application. The views are then automatically updated when the associated data changes.</p>
+<p>Last week I started learning AngularJS, so I thought I&#8217;d give it a try. The resulting code is not only more than 30% smaller, it also also is a real pleasure to work with. Dynamic views are written in an extended HTML vocabulary which attaches elements on the page to the $scope, which can be seen as the ViewModel of the application. The views are then automatically updated when the associated data changes.</p>
 
 <figure class='code'><figcaption><span>AngularJS Chat View</span><a href='https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/views/index.scala.html'>index.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -195,10 +197,16 @@
 <span class='line-number'>20</span>
 <span class='line-number'>21</span>
 <span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
 </pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;ChatCtrl&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;header&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        Your Name: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;user&quot;</span> <span class="na">id=</span><span class="s">&quot;userField&quot;</span> <span class="na">value=</span><span class="s">&quot;John Doe&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;select</span> <span class="na">ng-model=</span><span class="s">&quot;currentRoom&quot;</span> <span class="na">ng-change=</span><span class="s">&quot;setCurrentRoom(currentRoom)&quot;</span> <span class="na">ng-options=</span><span class="s">&quot;r.name for r in rooms&quot;</span><span class="nt">&gt;&lt;/select&gt;</span>
+</span><span class='line'>        Your Name: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;user&quot;</span> <span class="na">id=</span><span class="s">&quot;userField&quot;</span> <span class="na">value=</span><span class="s">&quot;John Doe&quot;</span>
+</span><span class='line'>          <span class="na">ng-model=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;select</span> <span class="na">ng-model=</span><span class="s">&quot;currentRoom&quot;</span> <span class="na">ng-change=</span><span class="s">&quot;setCurrentRoom(currentRoom)&quot;</span>
+</span><span class='line'>          <span class="na">ng-options=</span><span class="s">&quot;r.name for r in rooms&quot;</span><span class="nt">&gt;&lt;/select&gt;</span>
 </span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
 </span><span class='line'>
 </span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;chat&quot;</span><span class="nt">&gt;</span>
@@ -212,8 +220,10 @@
 </span><span class='line'>
 </span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;footer&quot;</span><span class="nt">&gt;</span>
 </span><span class='line'>        <span class="nt">&lt;form</span> <span class="na">ng-submit=</span><span class="s">&quot;submitMsg()&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            Say something: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;chat&quot;</span> <span class="na">id=</span><span class="s">&quot;textField&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;inputText&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">id=</span><span class="s">&quot;saySomething&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;submitMsg()&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            Say something: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;chat&quot;</span> <span class="na">id=</span><span class="s">&quot;textField&quot;</span>
+</span><span class='line'>              <span class="na">ng-model=</span><span class="s">&quot;inputText&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">id=</span><span class="s">&quot;saySomething&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span>
+</span><span class='line'>              <span class="na">ng-click=</span><span class="s">&quot;submitMsg()&quot;</span> <span class="nt">/&gt;</span>
 </span><span class='line'>        <span class="nt">&lt;/form&gt;</span>
 </span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
 </span><span class='line'><span class="nt">&lt;/div&gt;</span>
@@ -297,7 +307,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The <strong>$scope</strong> is managed by <strong><a href="http://angularjs.org">AngularJS</a></strong> and we declare its properties inside the controller, for example <strong>$scope.msgs</strong> as an empty array. Whenever new messages come in, they are appended to the array. Note that manipulations to the data structure that are not triggered by AngularJS itself must be wrapped in an <strong>apply()</strong> call in order to update the UI. That was one of the valuable lessons I learned.</p>
+<p>The <strong>$scope</strong> is managed by <strong><a href="http://angularjs.org">AngularJS</a></strong> and we declare its properties inside the controller, for example <strong>$scope.msgs</strong> as an empty array. Whenever new messages come in, they are appended to the array, automagically updating the view. Note that manipulations to the data structure that are not triggered by AngularJS itself must be wrapped in an <strong>apply()</strong> call in order to update the UI. That was one of the valuable lessons I learned.</p>
 
 <p>I have to say I am really impressed by AngularJS, it is a great addition to my toolbox. I now feel that client side development will be as much fun as server side development already is with Play Framework. I will probably use this newly gained knowledge in the next version of the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application.</p>
 
@@ -417,7 +427,7 @@
     <li><a href="https://github.com/matthiasn/sse-chat">sse-perf</a>&nbsp;
       <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
-      <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code.</p>
+      <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code for the chat functionality.</p>
     </li>
   </ul>
 </section>
