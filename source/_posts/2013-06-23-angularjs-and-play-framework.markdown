@@ -131,6 +131,8 @@ The **$scope** is managed by **[AngularJS](http://angularjs.org)** and we declar
 
 I have to say I am really impressed by AngularJS, it is a great addition to my toolbox. I now feel that client side development will be as much fun as server side development already is with Play Framework. I will probably use this newly gained knowledge in the next version of the **[BirdWatch](http://bit.ly/BirdWatch)** application.
 
-Hope you find this useful. Let me know what you think about **[AngularJS](http://angularjs.org)** in combination with **[Play Framework](http://www.playframework.com)**.
- 
+If you enjoyed this post, then make sure you subscribe to my **<a href="http://eepurl.com/y0HWv" target="_blank">Newsletter</a>**. Oh and please leave a comment particularly if you find anything in this article to be unclear or imprecise.
+
+Thanks, until next time!
+
 -Matthias
