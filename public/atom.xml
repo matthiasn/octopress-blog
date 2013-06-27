@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-06-26T04:03:05+02:00</updated>
+  <updated>2013-06-27T04:56:26+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,14 +18,17 @@
     <link href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/"/>
     <updated>2013-06-23T14:36:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework</id>
-    <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
+    <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy. <strong>UPDATE 06/27/2013:</strong> Here is how it looks like. <strong><a href="https://github.com/matthiasn/sse-chat/">Deploy it yourself</a></strong> if you want full chat functionality.</p>
 
-<p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat.png" title="image" alt="images"></p>
+<iframe width="420" height="300" src="http://birdwatch.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
+
+
+
 
 <!-- more -->
 
 
-<p>Last month I was writing about <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a></strong> and decided to go with SSE for my <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application. In that case the information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.</p>
+<p>There are actors randomly reciting Romeo and Juliet in Room 1, but that&#8217;s not our problem right now. Last month I was writing about <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a></strong> and decided to go with SSE for my <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application. In that application information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.</p>
 
 <p>I challenged myself to write a chat server for this purpose, with 10 lines of code on the server side (or less). I knew this would be possible thanks to the awesome <strong><a href="http://www.playframework.com/documentation/2.1.1/Iteratees">Play Iteratee library</a></strong>:</p>
 
@@ -72,7 +75,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>What happens here is fairly straightforward if you look at the drawing. The <strong><a href="https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala">Concurrent object</a></strong> is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster">Broadcaster</a></strong>. The individual streaming connections then attach an Iteratee to the provided chatOut <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator">Enumerator</a></strong>, with <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong>  in between.</p>
+<p>What happens here is fairly straightforward once we look at the drawing:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat.png" title="image" alt="images"></p>
+
+<p>The <strong><a href="https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala">Concurrent object</a></strong> is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster">Broadcaster</a></strong>. The individual streaming connections then attach an Iteratee to the provided chatOut <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator">Enumerator</a></strong>, with <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong>  in between.</p>
 
 <p>What is an <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee">Iteratee</a></strong>? An Iteratee is a function that represents a single step of an ongoing computation. Any state it might have is immutable; supplying input results in a new function / a new Iteratee. This ongoing computation is driven by an Enumerator which keeps track of the latest step. The Enumerator calls the associated Iteratee function with new input when available and then stores that resulting Iteratee (and so on). The way state is handled is somewhat comparable to a fold function that holds intermediate state in an accumulator using an immutable data structure, with the difference here being that the computation can run over an infinite stream.</p>
 

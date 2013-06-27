@@ -5,13 +5,13 @@ date: 2013-06-23 14:36
 comments: true
 categories: 
 ---
-I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-github)** during **[Scala Days](http://scaladays.org)**. Writing the server side code in **[Scala](http://www.scala-lang.org)** was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to **[AngularJS](http://angularjs.org)** over the last couple of days allowed me to reclaim client side development joy.
+I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-github)** during **[Scala Days](http://scaladays.org)**. Writing the server side code in **[Scala](http://www.scala-lang.org)** was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to **[AngularJS](http://angularjs.org)** over the last couple of days allowed me to reclaim client side development joy. **UPDATE 06/27/2013:** Here is how it looks like. **[Deploy it yourself](https://github.com/matthiasn/sse-chat/)** if you want full chat functionality.
 
-{% img left /images/sse-chat.png 'image' 'images' %}
+<iframe width="420" height="300" src="http://birdwatch.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
 
 <!-- more -->
 
-Last month I was writing about **[Server Sent Events vs. WebSockets](http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/)** and decided to go with SSE for my **[BirdWatch](http://bit.ly/BirdWatch)** application. In that case the information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.
+There are actors randomly reciting Romeo and Juliet in Room 1, but that's not our problem right now. Last month I was writing about **[Server Sent Events vs. WebSockets](http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/)** and decided to go with SSE for my **[BirdWatch](http://bit.ly/BirdWatch)** application. In that application information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.
  
 I challenged myself to write a chat server for this purpose, with 10 lines of code on the server side (or less). I knew this would be possible thanks to the awesome **[Play Iteratee library](http://www.playframework.com/documentation/2.1.1/Iteratees)**:
 
@@ -38,7 +38,11 @@ object ChatApplication extends Controller {
 }
 {% endcodeblock %}
 
-What happens here is fairly straightforward if you look at the drawing. The **[Concurrent object](https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala)** is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel **[Broadcaster](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster)**. The individual streaming connections then attach an Iteratee to the provided chatOut **[Enumerator](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator)**, with **[Enumeratees](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee)**  in between.
+What happens here is fairly straightforward once we look at the drawing:
+
+{% img left /images/sse-chat.png 'image' 'images' %}
+
+The **[Concurrent object](https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala)** is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel **[Broadcaster](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster)**. The individual streaming connections then attach an Iteratee to the provided chatOut **[Enumerator](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator)**, with **[Enumeratees](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee)**  in between.
 
 What is an **[Iteratee](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee)**? An Iteratee is a function that represents a single step of an ongoing computation. Any state it might have is immutable; supplying input results in a new function / a new Iteratee. This ongoing computation is driven by an Enumerator which keeps track of the latest step. The Enumerator calls the associated Iteratee function with new input when available and then stores that resulting Iteratee (and so on). The way state is handled is somewhat comparable to a fold function that holds intermediate state in an accumulator using an immutable data structure, with the difference here being that the computation can run over an infinite stream. 
 
