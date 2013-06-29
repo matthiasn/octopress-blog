@@ -103,7 +103,7 @@
 
 <div class="entry-content"><p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy. <strong>UPDATE 06/27/2013:</strong> Here is how it looks like. <strong><a href="https://github.com/matthiasn/sse-chat/">Deploy it yourself</a></strong> if you want full chat functionality.</p>
 
-<iframe width="420" height="320" src="http://birdwatch.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
+<iframe width="420" height="400" src="http://birdwatch2.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
 
 
 
@@ -492,6 +492,22 @@
 
 </footer>
   
+  <script type="text/javascript">
+    (function() { 
+      var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
+      write_string += '&url='; 
+      write_string += encodeURIComponent(window.location); 
+      write_string += '&title=' + encodeURIComponent(document.title);
+      write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
+
+      var span = $(document.createElement("span"));
+      span.html(write_string);
+      $(".sharing").append(span);
+    })();
+  </script>
+
+
+
 
 <script type="text/javascript">
       var disqus_shortname = 'matthiasnehlsen';

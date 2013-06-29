@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-06-27T14:52:50+02:00</updated>
+  <updated>2013-06-30T00:43:21+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -20,7 +20,7 @@
     <id>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework</id>
     <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy. <strong>UPDATE 06/27/2013:</strong> Here is how it looks like. <strong><a href="https://github.com/matthiasn/sse-chat/">Deploy it yourself</a></strong> if you want full chat functionality.</p>
 
-<iframe width="420" height="320" src="http://birdwatch.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
+<iframe width="420" height="400" src="http://birdwatch2.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
 
 
 

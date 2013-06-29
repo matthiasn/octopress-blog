@@ -639,6 +639,22 @@
 
 </footer>
   
+  <script type="text/javascript">
+    (function() { 
+      var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
+      write_string += '&url='; 
+      write_string += encodeURIComponent(window.location); 
+      write_string += '&title=' + encodeURIComponent(document.title);
+      write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
+
+      var span = $(document.createElement("span"));
+      span.html(write_string);
+      $(".sharing").append(span);
+    })();
+  </script>
+
+
+
 
 <script type="text/javascript">
       var disqus_shortname = 'matthiasnehlsen';

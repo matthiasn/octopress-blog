@@ -72,6 +72,9 @@ twitter_tweet_button: true
 google_plus_one: true
 google_plus_one_size: medium
 
+# DZone
+dzone_button: true
+
 # Google Plus Profile
 # Hidden: No visible button, just add author information to search results
 googleplus_user: 100986586701798521209
