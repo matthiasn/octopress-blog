@@ -7,7 +7,7 @@ categories:
 ---
 I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-github)** during **[Scala Days](http://scaladays.org)**. Writing the server side code in **[Scala](http://www.scala-lang.org)** was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to **[AngularJS](http://angularjs.org)** over the last couple of days allowed me to reclaim client side development joy. **UPDATE 06/27/2013:** Here is how it looks like. **[Deploy it yourself](https://github.com/matthiasn/sse-chat/)** if you want full chat functionality.
 
-<iframe width="420" height="400" src="http://birdwatch2.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
+<iframe width="420" height="425" src="http://birdwatch2.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
 
 <!-- more -->
 
