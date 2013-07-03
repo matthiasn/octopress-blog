@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-07-01T16:45:18+02:00</updated>
+  <updated>2013-07-03T13:26:46+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -909,7 +909,7 @@ Room 3.11, 16:30 - 17:15</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The messaging between client and server should get really interesting, I am looking forward to exploring this more as the project develops. Check back for an article on that (and other things).</p>
+<p><strong>EDIT 07/03/2013:</strong> I am exploring the combination of Server Sent Events plus REST (for client to server communication) in <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>.</p>
 
 <p>-Matthias</p>
 ]]></content>

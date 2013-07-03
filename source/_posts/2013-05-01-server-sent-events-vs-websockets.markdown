@@ -112,6 +112,6 @@ http {
 }
 {% endcodeblock %}
 
-The messaging between client and server should get really interesting, I am looking forward to exploring this more as the project develops. Check back for an article on that (and other things).
+**EDIT 07/03/2013:** I am exploring the combination of Server Sent Events plus REST (for client to server communication) in **[this article](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**.
 
 -Matthias
