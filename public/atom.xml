@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-07-03T13:26:46+02:00</updated>
+  <updated>2013-07-06T02:43:59+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,111 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Follow-Up: AngularJS and Play Framework]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/"/>
+    <updated>2013-07-03T14:45:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance</id>
+    <content type="html"><![CDATA[<p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo and my ideas how to deal with comparable problems more efficiently in the future. I have not encountered AngularJS-related problems with the chat application so we won&#8217;t deal with AngularJS today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
+
+<!-- more -->
+
+
+<h3>So, what was the problem?</h3>
+
+<p>The article was online and the demo was running. Load on the server was not very high, I have seen up to 60 users connected at the same time, so really no substantial load that should be able to cause problems. Yet sometimes when I connected, the chat room would load but messages from the Shakespeare-reciting actors would not be delivered. I first suspected that the actors might have crashed and no proper supervision strategy was in place. But there was nothing in the logs. Most of the time, everything would work, and when things didn‘t, I just restarted the server, scratching my head as to what the problem could be. I couldn‘t reproduce the problem in my dev environment, so there was really only one option: debug the system running on the server. Thanks to <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>, restarting a server is not a big deal, the SSE connection will reconnect automatically. Sure, messages that occur between lost connection and reconnect would be lost, but that‘s not a problem for my demo, and nothing that couldn‘t be solved if needed.</p>
+
+<p>Still, it doesn‘t feel right to keep inserting logging code, recompiling and restarting an application in a &#8220;production&#8221; environment that has users connected to it. After experimenting with log levels and putting <strong>println</strong> statements into the code and then observing the shell, I eventually noticed a <strong>connection timeout</strong> error and afterwards a flood of message deliveries to all connected clients. What was going on here?</p>
+
+<p>There was really only one explanation that made any sense to me: occasionally one of the connected clients would not properly disconnect, maybe on a mobile connection, and then that connection would time out after a while. So far so good. But why would that hold up other clients? Could that <strong><a href="https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala">Concurrent.broadcast</a></strong> really come to a complete halt when any one of the attached <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratee</a></strong> / <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee">Iteratee</a></strong> chains took longer than usual? Turns out the answer is yes, unless extra steps are taken. Let‘s look at a simple example. I recommend you fire up the Play / Scala REPL using <strong>play console</strong> and copy &amp; paste the code below:</p>
+
+<figure class='code'><figcaption><span>No Buffer </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">play.api.libs.iteratee.</span><span class="o">{</span><span class="nc">Concurrent</span><span class="o">,</span> <span class="nc">Enumeratee</span><span class="o">,</span> <span class="nc">Iteratee</span><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">channel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span>
+</span><span class='line'><span class="k">val</span> <span class="n">iteratee1</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">i</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="nc">Thread</span><span class="o">.</span><span class="n">sleep</span><span class="o">(</span><span class="mi">5000</span><span class="o">)</span> <span class="o">};</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;iteratee1: &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'><span class="n">out</span> <span class="o">|&gt;&gt;</span> <span class="n">iteratee1</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">iteratee2</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;iteratee2: &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'><span class="n">out</span> <span class="o">|&gt;&gt;</span> <span class="n">iteratee2</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">x</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">50</span><span class="o">)</span> <span class="o">{</span> <span class="n">channel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above we create Enumerator and Channel through Concurrent.broadcast and attach two Iteratees, one of which occasionally puts its thread to sleep for 5 seconds. It holds up the other attached Iteratee as well. Not cool. How can we overcome this? By inserting a buffering Enumeratee:</p>
+
+<figure class='code'><figcaption><span>With Buffer </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">import</span> <span class="nn">play.api.libs.iteratee.</span><span class="o">{</span><span class="nc">Concurrent</span><span class="o">,</span> <span class="nc">Enumeratee</span><span class="o">,</span> <span class="nc">Iteratee</span><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="o">(</span><span class="n">out</span><span class="o">,</span> <span class="n">channel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">iteratee1</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">i</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">i</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span> <span class="nc">Thread</span><span class="o">.</span><span class="n">sleep</span><span class="o">(</span><span class="mi">5000</span><span class="o">)</span> <span class="o">};</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;iteratee1: &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'><span class="n">out</span> <span class="o">&amp;&gt;</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">buffer</span><span class="o">(</span><span class="mi">100</span><span class="o">)</span> <span class="o">|&gt;&gt;</span> <span class="n">iteratee1</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">val</span> <span class="n">iteratee2</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Int</span><span class="o">]</span> <span class="o">{</span> <span class="n">i</span> <span class="k">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="s">&quot;iteratee2: &quot;</span> <span class="o">+</span> <span class="n">i</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'><span class="n">out</span> <span class="o">&amp;&gt;</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">buffer</span><span class="o">(</span><span class="mi">100</span><span class="o">)</span> <span class="o">|&gt;&gt;</span> <span class="n">iteratee2</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">x</span> <span class="k">&lt;-</span> <span class="mi">1</span> <span class="n">to</span> <span class="mi">50</span><span class="o">)</span> <span class="o">{</span> <span class="n">channel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">x</span><span class="o">)</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now the application behaves more like I would expect; individual Iteratees do not hold up everything any longer. Instead the buffering Enumeratee receives the messages, buffers them and frees up Concurrent.broadcast to call the next Iteratee with the current message. It also drops them when the buffer is full. This is the behavior I expected in the first place.</p>
+
+<p>Now after adding the buffering Enumeratee to the chat application, everything works just fine, as long as the individual buffers are large enough.</p>
+
+<figure class='code'><figcaption><span>Chat Controller</span><a href='https://github.com/matthiasn/sse-chat/blob/678a02671a63fc50dc0da34ffe452b4f472e972e/app/controllers/ChatApplication.scala'>ChatApplication.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Controller action serving activity based on room */</span>
+</span><span class='line'><span class="k">def</span> <span class="n">chatFeed</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nc">Ok</span><span class="o">.</span><span class="n">stream</span><span class="o">(</span><span class="n">chatOut</span> <span class="o">&amp;&gt;</span> <span class="n">filter</span><span class="o">(</span><span class="n">room</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">&amp;&gt;</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">buffer</span><span class="o">(</span><span class="mi">20</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>How can I handle a problem like this better next time?</h3>
+
+<p>Unit testing would hardly have helped here, unless we tested for the scenario of an incorrectly closed the WS connection. Better knowledge about the timing of events through better logging would have helped immensely though. Logging to files is not extremely useful when trying to find anomalies like the aforementioned timeouts and spikes directly thereafter; at least my eyes are not good at detecting this in plain text.</p>
+
+<p><strong>EDIT 07/06/2013:</strong> what I would like to have instead is a fully searchable log in a webclient. I am thinking about something like <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong>. With graphs as shown in the demo, the problem would have been immediately obvious. Long streaks of smooth delivery and then all of a sudden no messages dispatched to clients for two minutes and then the system catching up with a big spike.</p>
+
+<p>I am looking into combining <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong> with a logging object in Play that receives all loggable events in the application and depending on the environment (dev or production) by default either processes them further or not, with further configuration of the defaults for each logging type when specified. The logging object could then also expose an endpoint that allows switching individual loggers on or off during execution, without restarting the application. That way we could easily peek into a running instance in a production environment and watch what is going on, right now. I have started working on this and I will present something on here soon. Having such a logging system available will be a great help for all projects going forward. I would like to shift my focus back to the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> project rather sooner than later, but first I want to have the right tools in place.</p>
+
+<p>-Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[AngularJS and Play Framework]]></title>
@@ -235,9 +340,9 @@
 
 <p>I have to say I am really impressed by AngularJS, it is a great addition to my toolbox. I now feel that client side development will be as much fun as server side development already is with Play Framework. I will probably use this newly gained knowledge in the next version of the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application.</p>
 
-<p>If you enjoyed this post, then make sure you subscribe to my <strong><a href="http://eepurl.com/y0HWv" target="_blank">Newsletter</a></strong>. Oh and please leave a comment particularly if you find anything in this article to be unclear or imprecise.</p>
+<p>If you enjoyed this post, then make sure you subscribe to my <strong><a href="http://eepurl.com/y0HWv" target="_blank">Newsletter</a></strong>.</p>
 
-<p>Thanks, until next time!</p>
+<p>There is a <strong><a href="http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/">follow-up article</a></strong> with the lessons learned, please check it out if you are interested in the server side problems I encountered while running the demo application.</p>
 
 <p>-Matthias</p>
 ]]></content>
