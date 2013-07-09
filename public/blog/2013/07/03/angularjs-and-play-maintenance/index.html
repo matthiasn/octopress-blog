@@ -48,7 +48,7 @@
   <header role="banner"><hgroup>
   <h1><a href="/">Matthias Nehlsen</a></h1>
   
-    <h2>Reactive Data Processing Blog</h2>
+    <h2>Software, Data and Stuff</h2>
     
 </hgroup>
 
@@ -101,14 +101,14 @@
   </header>
 
 
-<div class="entry-content"><p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo and my ideas how to deal with comparable problems more efficiently in the future. I have not encountered AngularJS-related problems with the chat application so we won&#8217;t deal with AngularJS today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
+<div class="entry-content"><p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo and my ideas how to deal with comparable problems more efficiently in the future. I have not encountered AngularJS-related problems with the chat application so we won&#8217;t deal with it today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
 
 <!-- more -->
 
 
 <h3>So, what was the problem?</h3>
 
-<p>The article was online and the demo was running. Load on the server was not very high, I have seen up to 60 users connected at the same time, so really no substantial load that should be able to cause problems. Yet sometimes when I connected, the chat room would load but messages from the Shakespeare-reciting actors would not be delivered. I first suspected that the actors might have crashed and no proper supervision strategy was in place. But there was nothing in the logs. Most of the time, everything would work, and when things didn‘t, I just restarted the server, scratching my head as to what the problem could be. I couldn‘t reproduce the problem in my dev environment, so there was really only one option: debug the system running on the server. Thanks to <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>, restarting a server is not a big deal, the SSE connection will reconnect automatically. Sure, messages that occur between lost connection and reconnect would be lost, but that‘s not a problem for my demo, and nothing that couldn‘t be solved if needed.</p>
+<p>The article was online and the demo was running. Load on the server was not very high, I have seen up to 60 users connected at the same time, so really no substantial load that should be able to cause problems. Yet sometimes when I connected, the chat room would load, but messages from the Shakespeare-reciting actors would not be delivered. I first suspected that the actors might have crashed and no proper supervision strategy was in place. But there was nothing in the logs. Most of the time, everything would work, and when things didn‘t, I just restarted the server, scratching my head as to what the problem could be. I couldn‘t reproduce the problem in my dev environment, so there was really only one option: debug the system running on the server. Thanks to <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>, restarting a server is not a big deal, the SSE connection will reconnect automatically. Sure, messages that occur between dropped connection and reconnect would be lost, but that‘s not a problem for my demo, and nothing that couldn‘t be solved if needed.</p>
 
 <p>Still, it doesn‘t feel right to keep inserting logging code, recompiling and restarting an application in a &#8220;production&#8221; environment that has users connected to it. After experimenting with log levels and putting <strong>println</strong> statements into the code and then observing the shell, I eventually noticed a <strong>connection timeout</strong> error and afterwards a flood of message deliveries to all connected clients. What was going on here?</p>
 
@@ -140,7 +140,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Above we create Enumerator and Channel through Concurrent.broadcast and attach two Iteratees, one of which occasionally puts its thread to sleep for 5 seconds. It holds up the other attached Iteratee as well. Not cool. How can we overcome this? By inserting a buffering Enumeratee:</p>
+<p>Above we create Enumerator and Channel through Concurrent.broadcast and attach two Iteratees, one of which occasionally puts its thread to sleep for 5 seconds. It holds up the other attached Iteratee as well. That&#8217;s not what I need here. How can we overcome this? By inserting a buffering Enumeratee:</p>
 
 <figure class='code'><figcaption><span>With Buffer </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -170,7 +170,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now the application behaves more like I would expect; individual Iteratees do not hold up everything any longer. Instead the buffering Enumeratee receives the messages, buffers them and frees up Concurrent.broadcast to call the next Iteratee with the current message. It also drops them when the buffer is full. This is the behavior I expected in the first place.</p>
+<p>Now the application behaves more like I would expect; individual Iteratees do not hold up everything any longer. Instead the buffering Enumeratee receives the messages, buffers them and frees up Concurrent.broadcast to call the next Iteratee with the current message. The buffer also drops messages when it is full.</p>
 
 <p>Now after adding the buffering Enumeratee to the chat application, everything works just fine, as long as the individual buffers are large enough.</p>
 
@@ -195,7 +195,7 @@
 
 <p><strong>EDIT 07/06/2013:</strong> what I would like to have instead is a fully searchable log in a webclient. I am thinking about something like <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong>. With graphs as shown in the demo, the problem would have been immediately obvious. Long streaks of smooth delivery and then all of a sudden no messages dispatched to clients for two minutes and then the system catching up with a big spike.</p>
 
-<p>I am looking into combining <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong> with a logging object in Play that receives all loggable events in the application and depending on the environment (dev or production) by default either processes them further or not, with further configuration of the defaults for each logging type when specified. The logging object could then also expose an endpoint that allows switching individual loggers on or off during execution, without restarting the application. That way we could easily peek into a running instance in a production environment and watch what is going on, right now. I have started working on this and I will present something on here soon. Having such a logging system available will be a great help for all projects going forward. I would like to shift my focus back to the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> project rather sooner than later, but first I want to have the right tools in place.</p>
+<p>I am looking into combining <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong> with a logging object in Play that receives all loggable events and depending on the environment (dev or production) by default either processes them further or not, with further configuration of the defaults for each logging type when specified. The logging object could then also expose an endpoint that allows switching individual loggers on or off during execution, without restarting the application. That way we could easily peek into a running instance in a production environment and watch what is going on, right now. I have started working on this and I will present something on here soon. Having such a logging system available will be a great help for all projects going forward. I would like to shift my focus back to the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> project rather sooner than later, but first I want to have the right tools in place.</p>
 
 <p>-Matthias</p>
 </div>
@@ -267,6 +267,8 @@
         <a class="basic-alignment left" href="/blog/2013/06/23/angularjs-and-play-framework/" title="Previous Post: AngularJS and Play Framework">&laquo; AngularJS and Play Framework</a>
       
       
+        <a class="basic-alignment right" href="/blog/2013/07/09/logging-made-delightful/" title="Next Post: Logging made delightful">Logging made delightful &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -297,6 +299,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/07/09/logging-made-delightful/">Logging made delightful</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/07/03/angularjs-and-play-maintenance/">Follow-Up: AngularJS and Play Framework</a>
       </li>
     
@@ -310,10 +316,6 @@
     
       <li class="post">
         <a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/05/26/making-birdwatch-interactive/">Making BirdWatch Interactive</a>
       </li>
     
   </ul>

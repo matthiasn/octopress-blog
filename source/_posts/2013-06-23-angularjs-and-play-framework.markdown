@@ -5,11 +5,13 @@ date: 2013-06-23 14:36
 comments: true
 categories: 
 ---
-I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-github)** during **[Scala Days](http://scaladays.org)**. Writing the server side code in **[Scala](http://www.scala-lang.org)** was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to **[AngularJS](http://angularjs.org)** over the last couple of days allowed me to reclaim client side development joy. **UPDATE 06/27/2013:** Here is how it looks like. **[Deploy it yourself](https://github.com/matthiasn/sse-chat/)** if you want full chat functionality.
-
-<iframe width="420" height="425" src="http://birdwatch2.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
+I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-github)** during **[Scala Days](http://scaladays.org)**. Writing the server side code in **[Scala](http://www.scala-lang.org)** was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to **[AngularJS](http://angularjs.org)** over the last couple of days allowed me to reclaim client side development joy. 
 
 <!-- more -->
+
+**UPDATE 06/27/2013:** Here is how it looks like. **[Deploy it yourself](https://github.com/matthiasn/sse-chat/)** if you want full chat functionality.
+
+<iframe width="420" height="425" src="http://birdwatch.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
 
 There should be actors randomly reciting Romeo and Juliet in Room 1 above if everything is working, but that's not our problem right now. Last month I was writing about **[Server Sent Events vs. WebSockets](http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/)** and decided to go with SSE for my **[BirdWatch](http://bit.ly/BirdWatch)** application. In that application information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.
  

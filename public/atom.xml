@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-07-06T02:43:59+02:00</updated>
+  <updated>2013-07-10T01:33:59+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,18 +14,157 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Logging made delightful]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2013/07/09/logging-made-delightful/"/>
+    <updated>2013-07-09T14:14:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/07/09/logging-made-delightful</id>
+    <content type="html"><![CDATA[<p>Initially I wanted to call this article &#8220;Logging on Steroids&#8221; but I decided against it. Not sure if this title is much better, but at least it does not imply back acne or shrunken, well, you know what. Anyhow. Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes the implemention of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong></p>
+
+<!-- more -->
+
+
+<h3>Part I: Mining log data with Kibana and ElasticSearch</h3>
+
+<p>I needed a way to filter events by event type and then visualize the events in a timeline, where vertical bars would indicate the number of items for a given time period. That would have made it immediately obvious that something was causing a delay in the delivery of messages to clients. I will be using <strong><a href="http://three.kibana.org">Kibana</a></strong> for this, a tool for analyzing <strong><a href="http://logstash.net">logstash</a></strong> data that is stored within <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>. Let me introduce these components quickly:</p>
+
+<ul>
+<li><p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> is a really powerful open-source search engine based on <strong><a href="http://lucene.apache.org/core/">Apache Lucene</a></strong>. I have used it before and I know from experience that it works really well.</p></li>
+<li><p><strong><a href="http://logstash.net">logstash</a></strong> is a tool that collects all your logs from any application and transfers them into ElasticSearch from where they can be searched and analyzed.</p></li>
+<li><p><strong><a href="http://three.kibana.org">Kibana</a></strong> is a data analysis tool that makes it super simple to create your own dashboards for analyzing logstash data. The latest version is written using <strong><a href="http://angularjs.org">AngularJS</a></strong>.</p></li>
+</ul>
+
+
+<p>While logstash is great for collecting and parsing logfiles and  storing them in a daily index in ElasticSearch, there is no good reason to dump the log data into a text file first and then have it parsed later. Instead we can generate JSON in the logstash format directly within the application and put it into ElasticSearch using the <strong><a href="http://www.elasticsearch.org/guide/reference/api/">REST API</a></strong>. It will then be immediately available for analysis within Kibana.</p>
+
+<p>Let&#8217;s look at this before going into details. I am using an updated version of <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong> for this and I am logging the start and end time of SSE streams plus the delivery of individual messages from Romeo and Juliet, more about that <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">here</a></strong>. The data is from actual visits. For privacy reasons I am only logging country and region, not the city and most importantly not the IP address. I do believe that will leave your privacy as a visitor uncompromised. But please let me know if you have other thoughts on the subject.</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/kibana.png" title="image" alt="images"></p>
+
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+
+<p>You can then open the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/" target="_blank">article with the chat demo</a></strong> in another window. Your visit should show up within the refresh interval, and then again once you either close the window or refresh it.</p>
+
+<p>Here is another dashboard, this one shows all the messages that have been delivered over SSE. This is the one that would have helped me finding the timing issues I have mentioned in the beginning:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/kibana2.png" title="image" alt="images"></p>
+
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+
+<p>Making this work is really simple. All you need to do is have your web application generate log data in the proper format and <strong><a href="http://en.wikipedia.org/wiki/POST_(HTTP">POST</a>)</strong> it into the ElasticSearch index for the current day. This is how your JSON log items need to look like if you want to use Kibana out of the box:</p>
+
+<figure class='code'><figcaption><span>JSON item for SSE disconnect </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>  <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;logstash-2013.07.07&quot;</span><span class="p">,</span>
+</span><span class='line'>   <span class="s2">&quot;_type&quot;</span> <span class="o">:</span> <span class="s2">&quot;play&quot;</span><span class="p">,</span>
+</span><span class='line'>   <span class="s2">&quot;_source&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;@source&quot;</span><span class="o">:</span><span class="s2">&quot;sse-chat&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@tags&quot;</span><span class="o">:</span><span class="p">[],</span>
+</span><span class='line'>      <span class="s2">&quot;@fields&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;instanceID&quot;</span><span class="o">:</span><span class="s2">&quot;sse-chat&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;request&quot;</span><span class="o">:</span><span class="s2">&quot;GET /chatFeed/room1&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;requestID&quot;</span><span class="o">:</span><span class="mi">64</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;user-agent&quot;</span><span class="o">:</span><span class="s2">&quot;Mozilla/5.0 […]&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;httpCode&quot;</span><span class="o">:</span><span class="mi">200</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;duration_ms&quot;</span><span class="o">:</span><span class="mi">2036</span><span class="p">},</span>
+</span><span class='line'>      <span class="s2">&quot;@timestamp&quot;</span><span class="o">:</span><span class="s2">&quot;2013-07-07T23:15:12.803Z&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@source_host&quot;</span><span class="o">:</span><span class="s2">&quot;mn.local&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@source_path&quot;</span><span class="o">:</span><span class="s2">&quot;GET /chatFeed/room1&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@message&quot;</span><span class="o">:</span><span class="s2">&quot;SSE disconnected&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@type&quot;</span><span class="o">:</span><span class="s2">&quot;INFO&quot;</span> <span class="p">}</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That should be fairly easy to generate, with any modern web framework. Logstash uses a daily index for log items. That makes it easy to archive or purge older entries. Kibana makes this transparent, it automatically pulls in the correct indices when a query spans multiple days. Field names starting with &#8216;@&#8217; are predefined by logstash. The predefined fields would be better than textfile-based logging on their own because of the full-text search capabilities within ElasticSearch. It becomes extremely handy once you start making use of &#8216;@fields&#8217;: you can store arbitrary JSON in here and use the fields in the Kibana dashboard later. For example I am storing the geolocation data in here, in addition to data about browser and OS. It can be anything. All of the fields will become available in within Kibana, no further work necessary.</p>
+
+<h3>Part II: Implementation using Play Framework and Scala</h3>
+
+<p>Let us implement this in Scala and Play using the sse-chat sample application. You may want to stop reading here if you are using a framework other than Play. However, you made it this far; you might as well have a look at an approach with Play Framework. You may find that Play is worth considering for your next project, who knows.</p>
+
+<p>So without further ado, here is the Logger object:</p>
+
+<figure class='code'><figcaption><span>Logger Object (partially) Controller</span><a href='https://github.com/matthiasn/sse-chat/blob/4f118e5e73b17036ab0168ba78faa2061074a259/app/utilities/Logger.scala'>Logger.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** LogStash-format logger, allows passing anything that can </span>
+</span><span class='line'><span class="cm"> * be expressed as a JsValue in addition to standard fields</span>
+</span><span class='line'><span class="cm"> * @param sourcePath  source path of event </span>
+</span><span class='line'><span class="cm"> * @param msg         event message   </span>
+</span><span class='line'><span class="cm"> * @param eventType   event type</span>
+</span><span class='line'><span class="cm"> * @param fields      arbitrary data as JsValue</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="k">def</span> <span class="n">log</span><span class="o">(</span><span class="n">sourcePath</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">msg</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">eventType</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">fields</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">now</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">DateTime</span><span class="o">(</span><span class="nc">DateTimeZone</span><span class="o">.</span><span class="nc">UTC</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">logItem</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span>
+</span><span class='line'>      <span class="s">&quot;@source&quot;</span> <span class="o">-&gt;</span> <span class="n">instanceID</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@tags&quot;</span> <span class="o">-&gt;</span> <span class="nc">JsArray</span><span class="o">(),</span>
+</span><span class='line'>      <span class="s">&quot;@fields&quot;</span> <span class="o">-&gt;</span> <span class="n">fields</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@timestamp&quot;</span> <span class="o">-&gt;</span> <span class="n">dtFormat</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">now</span><span class="o">),</span>
+</span><span class='line'>      <span class="s">&quot;@source_host&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;mn.local&quot;</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@source_path&quot;</span> <span class="o">-&gt;</span> <span class="n">sourcePath</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@message&quot;</span> <span class="o">-&gt;</span> <span class="n">msg</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@type&quot;</span> <span class="o">-&gt;</span> <span class="n">eventType</span>
+</span><span class='line'>    <span class="o">)</span>
+</span><span class='line'>    <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticURL</span> <span class="o">+</span> <span class="s">&quot;/logstash-&quot;</span> <span class="o">+</span> <span class="n">indexFmt</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">now</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot;/play&quot;</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="n">logItem</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above I am showing the basic logging functionality. All I am doing is to create a logstash-formatted JSON object and then POSTing it into the ElasticSearch index for the current day. Note that I am using UTC, this is more a personal preference than anything. Kibana will convert this to your local time if you so choose. The Geo-IP lookup is not the topic of this article, but have a look at the full source code, it should be pretty self-explanatory if you understand the code above. I&#8217;d be happy to add a section on this if there is demand.</p>
+
+<p>Eventually I&#8217;d like to make an independent module out of this. First I would like to collect some ideas as to what the functionality should be, though. One thing I want to add is a controller that allows switching individual log events on and off, no matter if the application is run in production or development mode. That would make it possible to peek into a production environment and have fine-grained controlled over which events are logged.</p>
+
+<p>So for now I have integrated the Logger object into a <strong><a href="https://github.com/matthiasn/sse-chat/tree/130707-kibana-demo">new branch of the sse-chat project</a></strong>. Copy and paste that into your own project as you see fit. And please let me know what other functionality you would like to see, I&#8217;ll be happy to integrate it into the planned module.</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Follow-Up: AngularJS and Play Framework]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/"/>
     <updated>2013-07-03T14:45:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance</id>
-    <content type="html"><![CDATA[<p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo and my ideas how to deal with comparable problems more efficiently in the future. I have not encountered AngularJS-related problems with the chat application so we won&#8217;t deal with AngularJS today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
+    <content type="html"><![CDATA[<p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo and my ideas how to deal with comparable problems more efficiently in the future. I have not encountered AngularJS-related problems with the chat application so we won&#8217;t deal with it today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
 
 <!-- more -->
 
 
 <h3>So, what was the problem?</h3>
 
-<p>The article was online and the demo was running. Load on the server was not very high, I have seen up to 60 users connected at the same time, so really no substantial load that should be able to cause problems. Yet sometimes when I connected, the chat room would load but messages from the Shakespeare-reciting actors would not be delivered. I first suspected that the actors might have crashed and no proper supervision strategy was in place. But there was nothing in the logs. Most of the time, everything would work, and when things didn‘t, I just restarted the server, scratching my head as to what the problem could be. I couldn‘t reproduce the problem in my dev environment, so there was really only one option: debug the system running on the server. Thanks to <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>, restarting a server is not a big deal, the SSE connection will reconnect automatically. Sure, messages that occur between lost connection and reconnect would be lost, but that‘s not a problem for my demo, and nothing that couldn‘t be solved if needed.</p>
+<p>The article was online and the demo was running. Load on the server was not very high, I have seen up to 60 users connected at the same time, so really no substantial load that should be able to cause problems. Yet sometimes when I connected, the chat room would load, but messages from the Shakespeare-reciting actors would not be delivered. I first suspected that the actors might have crashed and no proper supervision strategy was in place. But there was nothing in the logs. Most of the time, everything would work, and when things didn‘t, I just restarted the server, scratching my head as to what the problem could be. I couldn‘t reproduce the problem in my dev environment, so there was really only one option: debug the system running on the server. Thanks to <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>, restarting a server is not a big deal, the SSE connection will reconnect automatically. Sure, messages that occur between dropped connection and reconnect would be lost, but that‘s not a problem for my demo, and nothing that couldn‘t be solved if needed.</p>
 
 <p>Still, it doesn‘t feel right to keep inserting logging code, recompiling and restarting an application in a &#8220;production&#8221; environment that has users connected to it. After experimenting with log levels and putting <strong>println</strong> statements into the code and then observing the shell, I eventually noticed a <strong>connection timeout</strong> error and afterwards a flood of message deliveries to all connected clients. What was going on here?</p>
 
@@ -57,7 +196,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Above we create Enumerator and Channel through Concurrent.broadcast and attach two Iteratees, one of which occasionally puts its thread to sleep for 5 seconds. It holds up the other attached Iteratee as well. Not cool. How can we overcome this? By inserting a buffering Enumeratee:</p>
+<p>Above we create Enumerator and Channel through Concurrent.broadcast and attach two Iteratees, one of which occasionally puts its thread to sleep for 5 seconds. It holds up the other attached Iteratee as well. That&#8217;s not what I need here. How can we overcome this? By inserting a buffering Enumeratee:</p>
 
 <figure class='code'><figcaption><span>With Buffer </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -87,7 +226,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now the application behaves more like I would expect; individual Iteratees do not hold up everything any longer. Instead the buffering Enumeratee receives the messages, buffers them and frees up Concurrent.broadcast to call the next Iteratee with the current message. It also drops them when the buffer is full. This is the behavior I expected in the first place.</p>
+<p>Now the application behaves more like I would expect; individual Iteratees do not hold up everything any longer. Instead the buffering Enumeratee receives the messages, buffers them and frees up Concurrent.broadcast to call the next Iteratee with the current message. The buffer also drops messages when it is full.</p>
 
 <p>Now after adding the buffering Enumeratee to the chat application, everything works just fine, as long as the individual buffers are large enough.</p>
 
@@ -112,7 +251,7 @@
 
 <p><strong>EDIT 07/06/2013:</strong> what I would like to have instead is a fully searchable log in a webclient. I am thinking about something like <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong>. With graphs as shown in the demo, the problem would have been immediately obvious. Long streaks of smooth delivery and then all of a sudden no messages dispatched to clients for two minutes and then the system catching up with a big spike.</p>
 
-<p>I am looking into combining <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong> with a logging object in Play that receives all loggable events in the application and depending on the environment (dev or production) by default either processes them further or not, with further configuration of the defaults for each logging type when specified. The logging object could then also expose an endpoint that allows switching individual loggers on or off during execution, without restarting the application. That way we could easily peek into a running instance in a production environment and watch what is going on, right now. I have started working on this and I will present something on here soon. Having such a logging system available will be a great help for all projects going forward. I would like to shift my focus back to the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> project rather sooner than later, but first I want to have the right tools in place.</p>
+<p>I am looking into combining <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong> with a logging object in Play that receives all loggable events and depending on the environment (dev or production) by default either processes them further or not, with further configuration of the defaults for each logging type when specified. The logging object could then also expose an endpoint that allows switching individual loggers on or off during execution, without restarting the application. That way we could easily peek into a running instance in a production environment and watch what is going on, right now. I have started working on this and I will present something on here soon. Having such a logging system available will be a great help for all projects going forward. I would like to shift my focus back to the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> project rather sooner than later, but first I want to have the right tools in place.</p>
 
 <p>-Matthias</p>
 ]]></content>
@@ -123,14 +262,14 @@
     <link href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/"/>
     <updated>2013-06-23T14:36:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework</id>
-    <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy. <strong>UPDATE 06/27/2013:</strong> Here is how it looks like. <strong><a href="https://github.com/matthiasn/sse-chat/">Deploy it yourself</a></strong> if you want full chat functionality.</p>
-
-<iframe width="420" height="425" src="http://birdwatch2.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
-
-
-
+    <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
 
 <!-- more -->
+
+
+<p><strong>UPDATE 06/27/2013:</strong> Here is how it looks like. <strong><a href="https://github.com/matthiasn/sse-chat/">Deploy it yourself</a></strong> if you want full chat functionality.</p>
+
+<iframe width="420" height="425" src="http://birdwatch.matthiasnehlsen.com:9001/" frameborder="0" allowfullscreen></iframe>
 
 
 <p>There should be actors randomly reciting Romeo and Juliet in Room 1 above if everything is working, but that&#8217;s not our problem right now. Last month I was writing about <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a></strong> and decided to go with SSE for my <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application. In that application information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.</p>
