@@ -1,0 +1,488 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Transforming Log Events into Information - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="Initially I wanted to call this article &#8220;Logging on Steroids&#8221; but I decided against it. Not sure if this title is much better, but at &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Transforming Log Events into Information</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-09T14:14:00-04:00" pubdate data-updated="true">07/09/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Initially I wanted to call this article &#8220;Logging on Steroids&#8221; but I decided against it. Not sure if this title is much better, but at least it does not imply back acne or shrunken, well, you know what. Anyhow. Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implemention of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
+
+<!-- more -->
+
+
+<h3>Part I: Mining log data with Kibana and ElasticSearch</h3>
+
+<p>I needed a way to filter events by event type and then visualize the events in a timeline, where vertical bars would indicate the number of items for a given time period. That would have made it immediately obvious that something was causing a delay in the delivery of messages to web clients.</p>
+
+<p>I will be using <strong><a href="http://three.kibana.org">Kibana</a></strong> for this, a tool for analyzing <strong><a href="http://logstash.net">logstash</a></strong> data that is stored within <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>. Let me introduce these components quickly:</p>
+
+<ul>
+<li><p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> is a really powerful open-source search engine based on <strong><a href="http://lucene.apache.org/core/">Apache Lucene</a></strong>. I have used it before and I know from experience that it works really well.</p></li>
+<li><p><strong><a href="http://logstash.net">logstash</a></strong> is a tool that collects all your logs from any application and transfers them into ElasticSearch from where they can be searched and analyzed.</p></li>
+<li><p><strong><a href="http://three.kibana.org">Kibana</a></strong> is a data analysis tool that makes it super simple to create your own dashboards for analyzing logstash data. The latest version is written using <strong><a href="http://angularjs.org">AngularJS</a></strong>.</p></li>
+</ul>
+
+
+<p>While <strong><a href="http://logstash.net">logstash</a></strong> is great for collecting and parsing logfiles and  storing them in a daily index in <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>, there is no good reason to dump the log data into a text file first and then have it parsed later. Instead we can generate <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> in the logstash format directly within an application and put it into ElasticSearch using the <strong><a href="http://www.elasticsearch.org/guide/reference/api/">REST API</a></strong>. It will then be immediately available for analysis within <strong><a href="http://three.kibana.org">Kibana</a></strong>.</p>
+
+<p>Let&#8217;s look at this in action before going into details. We will be using a new branch of <strong><a href="https://github.com/matthiasn/sse-chat/tree/130707-kibana-demo">sse-chat</a></strong> for this. This simple chat application demo is logging the start and end time of SSE streams plus the delivery of individual messages from Romeo and Juliet, more about that <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">here</a></strong>. The data is from actual visits. For privacy reasons I am only logging country and region, not the city and most importantly not the IP address. I do believe that this will leave your privacy as a visitor uncompromised. But please let me know if you have other thoughts on the subject. You can have a look at the <strong><a href="https://github.com/matthiasn/sse-chat">source code</a></strong> if you are interested in what exactly is being logged.</p>
+
+<p><img class="left" src="/images/kibana.png" title="image" alt="images"></p>
+
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+
+<p>You can then open the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/" target="_blank">article with the chat demo</a></strong> in another window. Your visit should show up within the refresh interval, and then again once you either close the window or refresh it.</p>
+
+<p>Here is another dashboard, this one shows all the messages that have been delivered over SSE. This is the one that would have helped me finding the timing issues I have mentioned in the beginning:</p>
+
+<p><img class="left" src="/images/kibana2.png" title="image" alt="images"></p>
+
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+
+<p>Note that <strong><a href="http://three.kibana.org">Kibana</a></strong> comes with the tools to configure dashboards as you need them. This really only takes minutes for a simple dashboard and there is no coding involved.</p>
+
+<p>Making this logging approach to logging work is really simple. All you need to do is have your web application generate log data in the proper format and <strong><a href="http://tools.ietf.org/html/rfc2616#section-9.5">POST</a></strong> it into the ElasticSearch index for the current day. This is how your <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> log items could look like if you want to use Kibana out of the box:</p>
+
+<figure class='code'><figcaption><span>JSON item for SSE disconnect </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="p">{</span>  <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;logstash-2013.07.07&quot;</span><span class="p">,</span>
+</span><span class='line'>   <span class="s2">&quot;_type&quot;</span> <span class="o">:</span> <span class="s2">&quot;play&quot;</span><span class="p">,</span>
+</span><span class='line'>   <span class="s2">&quot;_source&quot;</span> <span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;@source&quot;</span><span class="o">:</span><span class="s2">&quot;sse-chat&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@tags&quot;</span><span class="o">:</span><span class="p">[],</span>
+</span><span class='line'>      <span class="s2">&quot;@fields&quot;</span><span class="o">:</span> <span class="p">{</span> <span class="s2">&quot;instanceID&quot;</span><span class="o">:</span><span class="s2">&quot;sse-chat&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;request&quot;</span><span class="o">:</span><span class="s2">&quot;GET /chatFeed/room1&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;requestID&quot;</span><span class="o">:</span><span class="mi">64</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;user-agent&quot;</span><span class="o">:</span><span class="s2">&quot;Mozilla/5.0 […]&quot;</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;httpCode&quot;</span><span class="o">:</span><span class="mi">200</span><span class="p">,</span>
+</span><span class='line'>         <span class="s2">&quot;duration_ms&quot;</span><span class="o">:</span><span class="mi">2036</span><span class="p">},</span>
+</span><span class='line'>      <span class="s2">&quot;@timestamp&quot;</span><span class="o">:</span><span class="s2">&quot;2013-07-07T23:15:12.803Z&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@source_host&quot;</span><span class="o">:</span><span class="s2">&quot;mn.local&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@source_path&quot;</span><span class="o">:</span><span class="s2">&quot;GET /chatFeed/room1&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@message&quot;</span><span class="o">:</span><span class="s2">&quot;SSE disconnected&quot;</span><span class="p">,</span>
+</span><span class='line'>      <span class="s2">&quot;@type&quot;</span><span class="o">:</span><span class="s2">&quot;INFO&quot;</span> <span class="p">}</span>
+</span><span class='line'> <span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That should be fairly easy to generate, with any modern web framework. Logstash uses a daily index for log items. That makes it easy to archive or purge older entries. Kibana makes this transparent, it automatically pulls in the correct indices when a query spans multiple days. Field names starting with &#8216;@&#8217; are predefined by logstash. The predefined fields would be better than textfile-based logging on their own because of the full-text search capabilities within ElasticSearch. It becomes extremely handy once you start making use of &#8216;@fields&#8217;: you can store arbitrary <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> in here and use the fields in the Kibana dashboard later. For example I am storing the geolocation data in here, in addition to data about browser and OS. It can be anything. All of the fields will become available in within Kibana, no further work necessary.</p>
+
+<p>A major advantage of the approach described above is that you can easily integrate all your other logs as well and search them in the same tool. Please refer to the <strong><a href="http://logstash.net/docs/1.1.13/">logstash</a></strong> documentation for that.</p>
+
+<h3>Part II: Implementation using Play Framework and Scala</h3>
+
+<p>Let us implement this in Scala and Play using the <strong><a href="https://github.com/matthiasn/sse-chat/tree/130707-kibana-demo">sse-chat sample application</a></strong>. You may want to stop reading here if you are using a framework other than Play. However, you made it this far; you might as well have a look at an approach with Play Framework. You may find it worth considering for your next project, who knows.</p>
+
+<p>So without further ado, here is the Logger object:</p>
+
+<figure class='code'><figcaption><span>Logger Object (partially) Controller</span><a href='https://github.com/matthiasn/sse-chat/blob/4f118e5e73b17036ab0168ba78faa2061074a259/app/utilities/Logger.scala'>Logger.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** LogStash-format logger, allows passing anything that can </span>
+</span><span class='line'><span class="cm"> * be expressed as a JsValue in addition to standard fields</span>
+</span><span class='line'><span class="cm"> * @param sourcePath  source path of event </span>
+</span><span class='line'><span class="cm"> * @param msg         event message   </span>
+</span><span class='line'><span class="cm"> * @param eventType   event type</span>
+</span><span class='line'><span class="cm"> * @param fields      arbitrary data as JsValue</span>
+</span><span class='line'><span class="cm"> **/</span>
+</span><span class='line'><span class="k">def</span> <span class="n">log</span><span class="o">(</span><span class="n">sourcePath</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">msg</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">eventType</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">fields</span><span class="k">:</span> <span class="kt">Option</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">])</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">now</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">DateTime</span><span class="o">(</span><span class="nc">DateTimeZone</span><span class="o">.</span><span class="nc">UTC</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">logItem</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span>
+</span><span class='line'>      <span class="s">&quot;@source&quot;</span> <span class="o">-&gt;</span> <span class="n">instanceID</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@tags&quot;</span> <span class="o">-&gt;</span> <span class="nc">JsArray</span><span class="o">(),</span>
+</span><span class='line'>      <span class="s">&quot;@fields&quot;</span> <span class="o">-&gt;</span> <span class="n">fields</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@timestamp&quot;</span> <span class="o">-&gt;</span> <span class="n">dtFormat</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">now</span><span class="o">),</span>
+</span><span class='line'>      <span class="s">&quot;@source_host&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;mn.local&quot;</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@source_path&quot;</span> <span class="o">-&gt;</span> <span class="n">sourcePath</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@message&quot;</span> <span class="o">-&gt;</span> <span class="n">msg</span><span class="o">,</span>
+</span><span class='line'>      <span class="s">&quot;@type&quot;</span> <span class="o">-&gt;</span> <span class="n">eventType</span>
+</span><span class='line'>    <span class="o">)</span>
+</span><span class='line'>    <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticURL</span> <span class="o">+</span> <span class="s">&quot;/logstash-&quot;</span> <span class="o">+</span> <span class="n">indexFmt</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="n">now</span><span class="o">)</span> <span class="o">+</span> <span class="s">&quot;/play&quot;</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="n">logItem</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above I am showing the basic logging functionality. All I am doing is to create a logstash-formatted <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> object and then POSTing it into the ElasticSearch index for the current day. Note that I am using UTC, this is more a personal preference than anything. Kibana will convert this to your local time if you so choose. The Geo-IP lookup is not the topic of this article, but have a look at the full source code, it should be pretty self-explanatory if you understand the code above. I&#8217;d be happy to add a section on this if there is demand.</p>
+
+<p>Eventually I&#8217;d like to make an independent module out of this. First I would like to collect some ideas as to what the functionality should be, though. One thing I want to add is a controller that allows switching individual log events on and off, no matter if the application is run in production or development mode. That would make it possible to peek into a production environment and have fine-grained controlled over which events are logged.</p>
+
+<p>So for now I have integrated the Logger object into a <strong><a href="https://github.com/matthiasn/sse-chat/tree/130707-kibana-demo">new branch of the sse-chat project</a></strong>. Copy and paste that into your own project as you see fit. And please let me know what other functionality you would like to see, I&#8217;ll be happy to integrate it into the planned module.</p>
+
+<p>Cheers,
+Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-09T14:14:00-04:00" pubdate data-updated="true">07/09/2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+    <script type="text/javascript">
+      (function() { 
+        var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
+        write_string += '&url='; 
+        write_string += encodeURIComponent(window.location); 
+        write_string += '&title=' + encodeURIComponent(document.title);
+        write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
+
+        var span = $(document.createElement("span"));
+        span.html(write_string);
+        $(".sharing").append(span);
+      })();
+    </script>
+  
+  
+  
+<script type="text/javascript" src="http://www.reddit.com/static/button/button1.js"></script>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/07/03/angularjs-and-play-maintenance/" title="Previous Post: Follow-Up: AngularJS and Play Framework">&laquo; Follow-Up: AngularJS and Play Framework</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/03/angularjs-and-play-maintenance/">Follow-Up: AngularJS and Play Framework</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/10/scala-days-2013/">Scala Days 2013</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="86" height="20"></iframe>
+      <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code for the chat functionality.</p>
+    </li>
+  </ul>
+</section>
+
+
+<section>
+    <h1>Subscribe</h1>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    <br />
+  </div>
+</section><section>
+  <a href="https://twitter.com/matthiasnehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<br />
+<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
+<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
+</a>
+
+</section>
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/100986586701798521209?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
