@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-07-10T18:49:25-04:00</updated>
+  <updated>2013-07-11T16:16:44+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -16,9 +16,9 @@
   <entry>
     <title type="html"><![CDATA[Transforming Log Events into Information]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/"/>
-    <updated>2013-07-09T14:14:00-04:00</updated>
+    <updated>2013-07-09T14:14:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information</id>
-    <content type="html"><![CDATA[<p>Initially I wanted to call this article &#8220;Logging on Steroids&#8221; but I decided against it. Not sure if this title is much better, but at least it does not imply back acne or shrunken, well, you know what. Anyhow. Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implemention of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
+    <content type="html"><![CDATA[<p>Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implementation of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
 
 <!-- more -->
 
@@ -42,7 +42,7 @@
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/kibana.png" title="image" alt="images"></p>
 
-<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">CLICK HERE</a></strong> to see a live version. The dashboard is interactive, so please play with it.</p>
 
 <p>You can then open the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/" target="_blank">article with the chat demo</a></strong> in another window. Your visit should show up within the refresh interval, and then again once you either close the window or refresh it.</p>
 
@@ -50,7 +50,7 @@
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/kibana2.png" title="image" alt="images"></p>
 
-<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">CLICK HERE</a></strong> to have a look for yourself.</p>
 
 <p>Note that <strong><a href="http://three.kibana.org">Kibana</a></strong> comes with the tools to configure dashboards as you need them. This really only takes minutes for a simple dashboard and there is no coding involved.</p>
 
@@ -161,7 +161,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Follow-Up: AngularJS and Play Framework]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/"/>
-    <updated>2013-07-03T14:45:00-04:00</updated>
+    <updated>2013-07-03T14:45:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance</id>
     <content type="html"><![CDATA[<p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo and my ideas how to deal with comparable problems more efficiently in the future. I have not encountered AngularJS-related problems with the chat application so we won&#8217;t deal with it today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
 
@@ -266,7 +266,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[AngularJS and Play Framework]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/"/>
-    <updated>2013-06-23T14:36:00-04:00</updated>
+    <updated>2013-06-23T14:36:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework</id>
     <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
 
@@ -496,7 +496,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Scala Days 2013]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/"/>
-    <updated>2013-06-10T10:31:00-04:00</updated>
+    <updated>2013-06-10T10:31:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013</id>
     <content type="html"><![CDATA[<p><strong><a href="http://scaladays.org">Scala Days 2013</a></strong> are starting at Hudson Theater in New York City today, with a very promising lineup of presentations. Unfortunately I won&#8217;t get to see all of them live as there are three parallel tracks. So far this is my selection of presentations I want to attend.</p>
 
@@ -579,7 +579,7 @@ Room 3.11, 16:30 - 17:15</p>
   <entry>
     <title type="html"><![CDATA[Scaling Play applications with ZeroMQ]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/"/>
-    <updated>2013-06-02T07:48:00-04:00</updated>
+    <updated>2013-06-02T07:48:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq</id>
     <content type="html"><![CDATA[<p>Let us assume for a second that the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It would work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed. How do we connect these separate parts of the application though?</p>
 
@@ -701,7 +701,7 @@ Room 3.11, 16:30 - 17:15</p>
   <entry>
     <title type="html"><![CDATA[Making BirdWatch Interactive]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/"/>
-    <updated>2013-05-26T20:45:00-04:00</updated>
+    <updated>2013-05-26T20:45:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive</id>
     <content type="html"><![CDATA[<p>Some weeks ago when I started working on the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more excited in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though because the server side reasoning did not scale well at all. In the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
 
@@ -833,7 +833,7 @@ Room 3.11, 16:30 - 17:15</p>
   <entry>
     <title type="html"><![CDATA[D3.js and Play Framework: Getting Started]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/"/>
-    <updated>2013-05-18T13:21:00-04:00</updated>
+    <updated>2013-05-18T13:21:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play</id>
     <content type="html"><![CDATA[<p>Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at noticing changes between spreadsheet cells or other text. That&#8217;s okay. I&#8217;m actually a big fan of that. Text does not usually threaten to run me over when I attempt to cross a street. So let&#8217;s create moving things with <strong><a href="http://d3js.org">D3.js</a></strong> and drive the animation reactively with data from a server written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
 
@@ -952,7 +952,7 @@ Room 3.11, 16:30 - 17:15</p>
   <entry>
     <title type="html"><![CDATA[Load Testing Server Sent Event Streams]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/"/>
-    <updated>2013-05-11T22:07:00-04:00</updated>
+    <updated>2013-05-11T22:07:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams</id>
     <content type="html"><![CDATA[<p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
 
@@ -986,7 +986,7 @@ Room 3.11, 16:30 - 17:15</p>
   <entry>
     <title type="html"><![CDATA[Server Sent Events vs. WebSockets]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/"/>
-    <updated>2013-05-01T14:59:00-04:00</updated>
+    <updated>2013-05-01T14:59:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets</id>
     <content type="html"><![CDATA[<p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>.</p>
 
@@ -1168,7 +1168,7 @@ Room 3.11, 16:30 - 17:15</p>
   <entry>
     <title type="html"><![CDATA[ReactiveMongo 0.9 and Lossless Persistence]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/"/>
-    <updated>2013-04-26T13:48:00-04:00</updated>
+    <updated>2013-04-26T13:48:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade</id>
     <content type="html"><![CDATA[<p>Initially I parsed the Tweets in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application into instances of a Tweet case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> version 0.9 in the latest commits, storing each  observable fact coming from the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> in its entirety.</p>
 
@@ -1478,7 +1478,7 @@ This allows us to do something upon return of the collection size in a non-block
   <entry>
     <title type="html"><![CDATA[Iteratee: can I have that in a sentence?]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/"/>
-    <updated>2013-04-23T22:08:00-04:00</updated>
+    <updated>2013-04-23T22:08:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence</id>
     <content type="html"><![CDATA[<p>A couple of weeks back I was trying to wrap my head around <strong><a href="http://www.playframework.com/documentation/2.0.4/Iteratees">Iteratees</a></strong> so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing aggregating state over time. That did not seem right.</p>
 
@@ -1853,7 +1853,7 @@ This allows us to do something upon return of the collection size in a non-block
   <entry>
     <title type="html"><![CDATA[Hello World]]></title>
     <link href="http://matthiasnehlsen.com/blog/2013/04/19/hello-world/"/>
-    <updated>2013-04-19T21:19:00-04:00</updated>
+    <updated>2013-04-19T21:19:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/04/19/hello-world</id>
     <content type="html"><![CDATA[<p><strong>Who am I?</strong>
 My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>

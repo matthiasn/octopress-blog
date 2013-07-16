@@ -2,68 +2,68 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/19/hello-world/</loc>
-        <lastmod>2013-05-14T17:16:03-04:00</lastmod>
+        <lastmod>2013-05-14T23:16:03+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/
         </loc>
-        <lastmod>2013-05-18T18:16:56-04:00</lastmod>
+        <lastmod>2013-05-19T00:16:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/</loc>
-        <lastmod>2013-05-02T17:06:47-04:00</lastmod>
+        <lastmod>2013-05-02T23:06:47+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/</loc>
-        <lastmod>2013-07-03T07:26:45-04:00</lastmod>
+        <lastmod>2013-07-03T13:26:45+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/
         </loc>
-        <lastmod>2013-05-14T18:34:39-04:00</lastmod>
+        <lastmod>2013-05-15T00:34:39+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/</loc>
-        <lastmod>2013-05-18T09:13:18-04:00</lastmod>
+        <lastmod>2013-05-18T15:13:18+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/</loc>
-        <lastmod>2013-05-28T12:20:09-04:00</lastmod>
+        <lastmod>2013-05-28T18:20:09+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/
         </loc>
-        <lastmod>2013-06-10T13:47:48-04:00</lastmod>
+        <lastmod>2013-06-10T19:47:48+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/</loc>
-        <lastmod>2013-06-10T13:47:48-04:00</lastmod>
+        <lastmod>2013-06-10T19:47:48+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/</loc>
-        <lastmod>2013-07-10T12:45:21-04:00</lastmod>
+        <lastmod>2013-07-10T18:45:21+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/</loc>
-        <lastmod>2013-07-06T21:34:38-04:00</lastmod>
+        <lastmod>2013-07-07T03:34:38+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/</loc>
-        <lastmod>2013-07-10T18:49:25-04:00</lastmod>
+        <lastmod>2013-07-11T16:16:43+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
-        <lastmod>2013-07-10T18:49:25-04:00</lastmod>
+        <lastmod>2013-07-11T16:16:43+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
-        <lastmod>2013-07-10T18:49:25-04:00</lastmod>
+        <lastmod>2013-07-11T16:16:43+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/robots.txt</loc>
-        <lastmod>2013-04-21T08:43:45-04:00</lastmod>
+        <lastmod>2013-04-21T14:43:45+02:00</lastmod>
     </url>
 </urlset>

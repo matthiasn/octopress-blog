@@ -5,7 +5,7 @@ date: 2013-07-09 14:14
 comments: true
 categories: 
 ---
-Initially I wanted to call this article "Logging on Steroids" but I decided against it. Not sure if this title is much better, but at least it does not imply back acne or shrunken, well, you know what. Anyhow. Last week I was dealing with an odd behavior of the chat application demo I was running for **[this article](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. **Part I** describes the general approach and applies to any application out there, no matter what language or framework you are using. **Part II** describes one possible implemention of this approach using **[Play Framework](http://www.playframework.com)**.
+Last week I was dealing with an odd behavior of the chat application demo I was running for **[this article](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. **Part I** describes the general approach and applies to any application out there, no matter what language or framework you are using. **Part II** describes one possible implementation of this approach using **[Play Framework](http://www.playframework.com)**.
 
 <!-- more -->
 
@@ -26,7 +26,7 @@ Let's look at this in action before going into details. We will be using a new b
 
 {% img left /images/kibana.png 'image' 'images' %}
 
-**<a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">Click here</a>** to have a look for yourself.
+**<a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">CLICK HERE</a>** to see a live version. The dashboard is interactive, so please play with it.
 
 You can then open the **<a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/" target="_blank">article with the chat demo</a>** in another window. Your visit should show up within the refresh interval, and then again once you either close the window or refresh it.
 
@@ -34,7 +34,7 @@ Here is another dashboard, this one shows all the messages that have been delive
 
 {% img left /images/kibana2.png 'image' 'images' %}
 
-**<a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">Click here</a>** to have a look for yourself.
+**<a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">CLICK HERE</a>** to have a look for yourself.
 
 Note that **[Kibana](http://three.kibana.org)** comes with the tools to configure dashboards as you need them. This really only takes minutes for a simple dashboard and there is no coding involved.
 
@@ -62,7 +62,6 @@ Making this logging approach to logging work is really simple. All you need to d
 That should be fairly easy to generate, with any modern web framework. Logstash uses a daily index for log items. That makes it easy to archive or purge older entries. Kibana makes this transparent, it automatically pulls in the correct indices when a query spans multiple days. Field names starting with '@' are predefined by logstash. The predefined fields would be better than textfile-based logging on their own because of the full-text search capabilities within ElasticSearch. It becomes extremely handy once you start making use of '@fields': you can store arbitrary **[JSON](http://tools.ietf.org/html/rfc4627)** in here and use the fields in the Kibana dashboard later. For example I am storing the geolocation data in here, in addition to data about browser and OS. It can be anything. All of the fields will become available in within Kibana, no further work necessary.
 
 A major advantage of the approach described above is that you can easily integrate all your other logs as well and search them in the same tool. Please refer to the **[logstash](http://logstash.net/docs/1.1.13/)** documentation for that.
-
 
 ###Part II: Implementation using Play Framework and Scala
 Let us implement this in Scala and Play using the **[sse-chat sample application](https://github.com/matthiasn/sse-chat/tree/130707-kibana-demo)**. You may want to stop reading here if you are using a framework other than Play. However, you made it this far; you might as well have a look at an approach with Play Framework. You may find it worth considering for your next project, who knows.  

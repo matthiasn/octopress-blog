@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Initially I wanted to call this article &#8220;Logging on Steroids&#8221; but I decided against it. Not sure if this title is much better, but at &hellip;">
+  <meta name="description" content="Last week I was dealing with an odd behavior of the chat application demo I was running for this article. The issue was timing-related and there were &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -94,14 +94,14 @@
   
 
 
-<time datetime="2013-07-09T14:14:00-04:00" pubdate data-updated="true">07/09/2013</time>
+<time datetime="2013-07-09T14:14:00+02:00" pubdate data-updated="true">07/09/2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>Initially I wanted to call this article &#8220;Logging on Steroids&#8221; but I decided against it. Not sure if this title is much better, but at least it does not imply back acne or shrunken, well, you know what. Anyhow. Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implemention of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
+<div class="entry-content"><p>Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implementation of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
 
 <!-- more -->
 
@@ -125,7 +125,7 @@
 
 <p><img class="left" src="/images/kibana.png" title="image" alt="images"></p>
 
-<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat" target="_blank">CLICK HERE</a></strong> to see a live version. The dashboard is interactive, so please play with it.</p>
 
 <p>You can then open the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/" target="_blank">article with the chat demo</a></strong> in another window. Your visit should show up within the refresh interval, and then again once you either close the window or refresh it.</p>
 
@@ -133,7 +133,7 @@
 
 <p><img class="left" src="/images/kibana2.png" title="image" alt="images"></p>
 
-<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">Click here</a></strong> to have a look for yourself.</p>
+<p><strong><a href="http://kibana.matthiasnehlsen.com/#/dashboard/elasticsearch/sse-chat2" target="_blank">CLICK HERE</a></strong> to have a look for yourself.</p>
 
 <p>Note that <strong><a href="http://three.kibana.org">Kibana</a></strong> comes with the tools to configure dashboards as you need them. This really only takes minutes for a simple dashboard and there is no coding involved.</p>
 
@@ -260,7 +260,7 @@ Matthias</p>
   
 
 
-<time datetime="2013-07-09T14:14:00-04:00" pubdate data-updated="true">07/09/2013</time>
+<time datetime="2013-07-09T14:14:00+02:00" pubdate data-updated="true">07/09/2013</time>
       
 
 
