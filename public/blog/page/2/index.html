@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="A couple of weeks back I was trying to wrap my head around Iteratees so I read what I could find on Google. Afterwards, I had a very high level idea &hellip;">
+  <meta name="description" content="So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings. WebSocket communication &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,88 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-01T14:59:00+02:00" pubdate data-updated="true">05/01/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>So far I have been using a <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connection to push data to the client in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, with mixed feelings. <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> communication is a separate communication protocol from <strong><a href="http://tools.ietf.org/html/rfc2616">HTTP</a></strong>, introducing new problems in the network layer, as I should soon find out. But there is an alternative: <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/05/01/server-sent-events-vs-websockets/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-26T13:48:00+02:00" pubdate data-updated="true">04/26/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Initially I parsed the Tweets in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application into instances of a Tweet case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> version 0.9 in the latest commits, storing each  observable fact coming from the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> in its entirety.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/26/data-model-upgrade/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -185,6 +267,14 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/09/01/birdwatch-explained/">BirdWatch explained</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
       </li>
     
@@ -194,14 +284,6 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     
       <li class="post">
         <a href="/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/10/scala-days-2013/">Scala Days 2013</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a>
       </li>
     
   </ul>

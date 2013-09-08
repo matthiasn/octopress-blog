@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Scala Days 2013 - Matthias Nehlsen</title>
+  <title>BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Scala Days 2013 are starting at Hudson Theater in New York City today, with a very promising lineup of presentations. Unfortunately I won&#8217;t get &hellip;">
+  <meta name="description" content="I am happy to get a huge update of the BirdWatch application out of the way. The changes are much more than what I would normally want to work on for &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -78,7 +78,7 @@
   
   <header>
     
-      <h1 class="entry-title">Scala Days 2013</h1>
+      <h1 class="entry-title">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</h1>
     
     
       <p class="meta">
@@ -94,88 +94,46 @@
   
 
 
-<time datetime="2013-06-10T10:31:00+02:00" pubdate data-updated="true">06/10/2013</time>
+<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><strong><a href="http://scaladays.org">Scala Days 2013</a></strong> are starting at Hudson Theater in New York City today, with a very promising lineup of presentations. Unfortunately I won&#8217;t get to see all of them live as there are three parallel tracks. So far this is my selection of presentations I want to attend.</p>
+<div class="entry-content"><p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are much more than what I would normally want to work on for a single article, but then again there is enough interesting stuff going on in this new version for multiple blog articles to come. Initially this application was only meant to be an exercise in streaming information to web clients. But in the meantime I have noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
 
 <!-- more -->
 
 
-<h3>Monday, June 10th</h3>
+<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest. I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> of this for software engineering related tweets. The application subscribes to all Tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped to one percent of all Tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
 
-<p><strong><a href="https://twitter.com/odersky">Martin Odersky</a></strong> <br/>
-Keynote - Scala with Style <br/>
-Hudson Theater, 19:00 - 20:30</p>
+<p>Here is how it looks like:</p>
 
-<h3>Tuesday, June 11th</h3>
+<p><img class="left" src="/images/130812-screenshot.png" title="image" alt="images"></p>
 
-<p><strong><a href="https://twitter.com/etorreborre">Eric Torreborre</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/9:15-10:00/A-Walk-Down-the-Beach%2C-How-Kiama-Helps-Implementing-Distributed-Collections-on-Top-of-Hadoop">A Walk Down the Beach, How Kiama Helps Implementing Distributed Collections on Top of Hadoop</a> <br/>
-Metropolis, 09:15 - 10:00</p>
+<p>As you can see above, there is now a search bar which allows to narrow down the selection tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time of opening the link, not at the time of bookmarking it. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
 
-<p><strong><a href="https://twitter.com/viktorklang">Viktor Klang</a></strong> &amp; <strong><a href="https://twitter.com/rolandkuhn">Roland Kuhn</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room1/10:15-11:00/Concurrency-%u2013-The-good%2C-the-bad%2C-the-ugly">Concurrency – The good, the bad, the ugly</a><br/>
-Room 4.11, 10:15 - 11:00</p>
+<p>Here are some examples.</p>
 
-<p><strong><a href="https://twitter.com/ccsevers">Christopher Severs</a></strong> &amp; <strong><a href="https://twitter.com/BigDataSc">Vitaly Gordon</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/11:15-12:00/Scalable-and-Flexible-Machine-Learning-With-Scala">Scalable and Flexible Machine Learning With Scala</a><br/>
-Metropolis, 11:15 - 12:00</p>
+<p>You&#8217;re a Java developer and you&#8217;re looking for a new job? Try this search: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring)</strong></a></p>
 
-<p><strong><a href="https://twitter.com/kevin_j_brown">Kevin Brown</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/13:30-14:15/Big-Data-Analytics-with-Delite">Big Data Analytics with Delite</a><br/>
-Metropolis, 13:30 - 14:15</p>
+<p>You want to limit your job search to London? No problem. Here you go: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring) london</strong></a></p>
 
-<p><strong><a href="https://twitter.com/matei_zaharia">Matei Zaharia</a></strong> &amp; <strong><a href="https://twitter.com/rxin">Reynold Xin</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/14:30-15:15/The-Spark-Stack%3A-Fast-and-Expressive-Big-Data-Analytics-in-Scala">The Spark Stack: Fast and Expressive Big Data Analytics in Scala</a><br/>
-Metropolis, 14:30 - 15:15</p>
+<p>You&#8217;re interested in tweets about Python the language but not about <a target="_blank" href="http://www.youtube.com/watch?v=kQFKtI6gn9Y&list=TLbNXOyfwTL14"><strong>Monty Python</strong></a>: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/python%20-monty"><strong>python -monty</strong></a></p>
 
-<p><strong><a href="https://twitter.com/josh_wills">Josh Wills</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/15:30-16:15/Scala-for-Data-Pipelines">Scala for Data Pipelines</a><br/>
-Metropolis, 15:30 - 16:15</p>
+<p>Well, you get the idea. <strong>AND</strong> is the standard operator, it is applied unless <strong>OR</strong> is specifically used between two terms.</p>
 
-<p><strong><a href="https://twitter.com/Sadache">Sadache Aldrobi</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room1/16:30-17:15/Realtime-Web%2C-The-Urge-for-a-Programming-Model">Realtime Web, The Urge for a Programming Model</a><br/>
-Room 4.11, 16:30 - 17:15</p>
+<p>You can download the application and run it for a different area of your choosing. For myself I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I might run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
 
-<h3>Wednesday, June 12th</h3>
+<p>So how can this be improved in the future? A stream of Tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at one glance which newspaper articles and other links are most talked about. This analysis could even be weighed by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be a visualization about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? The other way around? Get involved, there are plenty of options on how to work with the data.</p>
 
-<p><strong><a href="https://twitter.com/springrod">Rod Johnson</a></strong>: <br/>
-Keynote - Scala in 2018<br/>
-Hudson Theater, 08:45 - 10:00</p>
+<p>You can find a brief overview of the technology in the project description on <a target="_blank" href="https://github.com/matthiasn/BirdWatch"><strong>Github</strong></a>.</p>
 
-<p><strong><a href="https://twitter.com/xeno_by">Eugene Burmako</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room1/10:15-11:00/Half-a-Year-in-Macro-Paradise">Half a Year in Macro Paradise</a><br/>
-Room 4.11, 10:15 - 11:00</p>
+<p>In the future I will probably write some articles further explaining different parts of the application. Let me know what you are particularly interested in.</p>
 
-<p><strong><a href="https://twitter.com/andrey_cheptsov">Andrey Cheptsov</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room3/11:15-12:00/Scala-Developer-Tools-in-IntelliJ-IDEA%3A-SBT%2C-Play-and-Scalate">Scala Developer Tools in IntelliJ IDEA: SBT, Play and Scalate</a> <br/>
-Metropolis, 11:15 - 12:00</p>
-
-<p><strong><a href="https://twitter.com/philippkhaller">Philipp Haller</a></strong> &amp;
-<strong><a href="https://twitter.com/retronym">Jason Zaugg</a></strong>: <br/>
-<a href="http://scaladays.org/#/june-12/room1/13:30-14:15/Scala-Async%3A-A-New-Way-to-Simplify-Asynchronous-Code-%28Make-the-Compiler-Do-It%21%29">Scala Async: A New Way to Simplify Asynchronous Code</a><br/>
-Room 4.11, 13:30 - 14:15</p>
-
-<p><strong><a href="https://twitter.com/tathadas">Tathagata Das</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room2/14:30-15:15/Spark-Streaming%3A-Fast-Distributed-Stream-Processing-with-a-High-Level-API">Spark Streaming: Fast Distributed Stream Processing with a High-Level API</a><br/>
-Room 3.11, 14:30 - 15:15</p>
-
-<p><strong>Rex Kerr</strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room2/15:30-16:15/Designing-for-performance">Designing for performance</a><br/>
-Room 3.11, 15:30 - 16:15</p>
-
-<p><strong><a href="https://twitter.com/sjrdoeraene">Sébastien Doeraene</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room2/16:30-17:15/Scala.js%3A-write-in-Scala-for-the-browser">Scala.js: write in Scala for the browser</a><br/>
-Room 3.11, 16:30 - 17:15</p>
-
-<p>In the next couple of days I will write about presentations and topics I found particularly inspiring.</p>
-
-<p>-Matthias</p>
+<p>Alright, this is it for today. Until next time.
+Matthias</p>
 </div>
 
 
@@ -198,7 +156,7 @@ Room 3.11, 16:30 - 17:15</p>
   
 
 
-<time datetime="2013-06-10T10:31:00+02:00" pubdate data-updated="true">06/10/2013</time>
+<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
       
 
 
@@ -206,7 +164,7 @@ Room 3.11, 16:30 - 17:15</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" >Tweet</a>
   
 
   
@@ -242,10 +200,10 @@ Room 3.11, 16:30 - 17:15</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/06/02/scaling-play-applications-with-zeromq/" title="Previous Post: Scaling Play applications with ZeroMQ">&laquo; Scaling Play applications with ZeroMQ</a>
+        <a class="basic-alignment left" href="/blog/2013/07/09/transforming-logs-into-information/" title="Previous Post: Transforming Log Events into Information">&laquo; Transforming Log Events into Information</a>
       
       
-        <a class="basic-alignment right" href="/blog/2013/06/23/angularjs-and-play-framework/" title="Next Post: AngularJS and Play Framework">AngularJS and Play Framework &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2013/09/01/birdwatch-explained/" title="Next Post: BirdWatch explained">BirdWatch explained &raquo;</a>
       
     </p>
   </footer>
@@ -376,8 +334,8 @@ Room 3.11, 16:30 - 17:15</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
         var disqus_script = 'embed.js';
       
     (function () {
