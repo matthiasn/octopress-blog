@@ -9,7 +9,7 @@ Data without visualization is dull. This is particularly true for changing data.
 
 <!-- more -->
 
-In the **[last article](http://bit.ly/sse_load_testing)** I have introduced **[sse-perf](http://bit.ly/sse-perf)**, a load testing tool for **[Server Sent Event (SSE)](http://dev.w3.org/html5/eventsource/)** streams. With that tool I gather data that I want to present in the browser using animated barcharts, as you can see live **[here](http://bit.ly/sse-perf-live)**. 
+In the **[last article](http://bit.ly/sse_load_testing)** I have introduced **[sse-perf](http://bit.ly/sse-perf)**, a load testing tool for **[Server Sent Event (SSE)](http://dev.w3.org/html5/eventsource/)** streams. With that tool I gather data that I want to present in the browser using animated barcharts: 
 
 {% img left /images/sse-perf-screenshot.png 'image' 'images' %}
 

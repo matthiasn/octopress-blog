@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-09-08T23:52:04+02:00</updated>
+  <updated>2013-09-11T01:09:33+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,38 +18,87 @@
     <link href="http://matthiasnehlsen.com/blog/2013/09/01/birdwatch-explained/"/>
     <updated>2013-09-01T16:54:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2013/09/01/birdwatch-explained</id>
-    <content type="html"><![CDATA[<p>This article is supposed to explain all aspects of the BirdWatch application. Now that will be a longer undertaking and I don&#8217;t want to have to wait weeks until I can publish the next article. At the same time I prefer reading stuff in one place as opposed to a series of articles coming out every so many weeks, if ever.</p>
+    <content type="html"><![CDATA[<p>This article is supposed to explain all aspects of the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. Now this will be a longer undertaking and I don&#8217;t want to wait weeks until I can publish the next article. At the same time I prefer reading stuff in one place as opposed to a series of articles coming out every so many weeks, if ever.</p>
 
-<p>So what I&#8217;ll do is publish this article as I write it. I have found it quite enjoyable over the last couple of years to read books as they were written in some kind of early access programs. So why not try that for a blog article. Just know that whatever you read may or may not be there the next time you stop by. And feel free to give feedback as the article gets written. You can sign up to the mailing list for updates on the article.</p>
+<p>So what I&#8217;ll do is publish this article as I write it. I have found it quite enjoyable over the last couple of years to read books as they are written. So why not try that for a blog article. Just know that whatever you read may or may not be there the next time you stop by. And feel free to give feedback throughout the process.</p>
 
-<p>UNDER CONSTRUCTION</p>
+<!-- more -->
 
-<p>BirdWatch is a reactive web application for consuming the Twitter Streaming API for a selection of terms. It processes tweets in a server side application making use of Play Framework. The tweets are then stored inside ElasticSearch, making them available for complex full-text searches.
-On the client side, a Single Page Application using AngularJS allows the user to search within the body of Tweets and visualizes some basic statistics, besides showing a paginated list of the query matches.
-Searches work in realtime thanks to Percolation queries inside ElasticSearch. Every search, besides being used for retrieving previous matches, is also registered with ElasticSearch and new tweets are then matched against existing queries and delivered to the client using Server Sent Events. The client side visualizations are then updated with new query results as they are tweeted.</p>
 
-<p>Here is an attempt to draw this:</p>
+<p><strong>UNDER CONSTRUCTION</strong></p>
 
-<p><img class="left" src="http://matthiasnehlsen.com/images/" title="image" alt="images"></p>
+<p><strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> is a reactive web application for consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> for a selection of terms. It processes tweets in a server side application making use of <strong><a href="http://www.playframework.com">Play Framework</a></strong>. The tweets are then stored inside <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>, making them available for complex full-text searches.
+On the client side, a Single Page Application using <strong><a href="http://angularjs.org">AngularJS</a></strong> allows the user to search within the body of Tweets and visualizes some basic statistics, besides showing a paginated list of the query matches.
+Searches work in realtime thanks to <strong><a href="http://www.elasticsearch.org/guide/reference/api/percolate/">Percolation queries</a></strong> inside ElasticSearch. Every search, besides being used for retrieving previous matches, is also registered with ElasticSearch and new tweets are then matched against existing queries and delivered to the client using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. The client side visualizations based on <strong><a href="http://d3js.org">D3.js</a></strong> are then updated with new query results as they are tweeted.</p>
 
-<p>Architecture and Message Flow</p>
+<p>Here is an attempt to draw this, with a focus on the <strong><a href="https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala">Twitter client</a></strong>. More detail on the controller interactions and other parts of the application will follow.</p>
 
-<hr />
+<p><img class="left" src="http://matthiasnehlsen.com/images/birdwatch2.png" title="image" alt="images"></p>
 
-<h2>TwitterClient Actor</h2>
+<h3>TwitterClient Actor</h3>
 
-<p>This component of the server side application establishes the communication with Twitter and then monitors the connection using a supervisor. It can happen that the connection gets interrupted, in which case the connection actor gets restarted by the supervisor.</p>
+<p>This component of the server side application establishes the communication with Twitter and then monitors the connection using a supervisor. It can happen that the connection gets interrupted, in which case a new connection gets started by the supervisor actor.</p>
 
 <p>So what is an Actor?</p>
 
 <blockquote><p>Actors are very lightweight concurrent entities. They process messages asynchronously using an event-driven receive loop. Pattern matching against messages is a convenient way to express an actor&#8217;s behavior. They raise the abstraction level and make it much easier to write, test, understand and maintain concurrent and/or distributed systems. You focus on workflow—how the messages flow in the system—instead of low level primitives like threads, locks and socket IO.</p><footer><strong>Akka Actors</strong> <cite><a href='http://akka.io'>http://akka.io</a></cite></footer></blockquote>
 
 
-<p>Let&#8217;s walk through the source code. The TwitterClient establishes a connection to Twitter using the WS library provided by Play Framework.</p>
+<p>Let&#8217;s walk through the source code. The TwitterClient establishes a connection to the Twitter streaming endpoint using the <strong><a href="http://www.playframework.com/documentation/2.1.3/ScalaWS">Play WS API</a></strong>. This connection stays open indefinitely. The remote side then delivers new Tweets in chunks whenever any match for the set of topics is found. This set of topics is passed in via a query string (see start() function). The URL for starting a streaming API client has this format:</p>
 
-<p>A tweet is received by the TwitterClient actor and inserted into the ElasticSearch index using a WS client, which is an asynchronous HTTP client provided by Play Framework.</p>
+<p><small><strong>https://stream.twitter.com/1.1/statuses/filter.json?track=angularjs,playframework,elasticsearch</strong></small></p>
 
-<p>It is then also POSTed to the percolation query endpoint of ElasticSearch, which matches it against existing queries and returns a list of the matched query IDs. The query IDs are hashes of the query string itself. This has the advantage that every query will only be inserted once instead of again and again for every client. A TweetMatches object is then posted to the internal message bus, containing the original tweet and also a List of all the matches that were found.</p>
+<figure class='code'><figcaption><span>WS Connection</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** Starts new WS connection to Twitter Streaming API. Twitter disconnects the previous one automatically. */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">start</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Starting client for topics &quot;</span> <span class="o">+</span> <span class="n">topics</span><span class="o">)</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="n">twitterURL</span> <span class="o">+</span> <span class="n">topics</span><span class="o">.</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;%2C&quot;</span><span class="o">).</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">,</span> <span class="s">&quot;%20&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="n">withTimeout</span><span class="o">(-</span><span class="mi">1</span><span class="o">).</span><span class="n">sign</span><span class="o">(</span><span class="nc">OAuthCalculator</span><span class="o">(</span><span class="nc">Conf</span><span class="o">.</span><span class="n">consumerKey</span><span class="o">,</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">accessToken</span><span class="o">)).</span><span class="n">get</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="n">tweetIteratee</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The supervisor monitors the connection by receiving a message for each received tweet and accounting for when the last one was received. It then gets sent CheckStatus messages from time to time, upon which it will check the time of the last tweet it received. If that was too long ago it will consider the connection dead and start a new one.</p>
+
+<figure class='code'><figcaption><span>Connection Supervisor</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** Actor taking care of monitoring the WS connection */</span>
+</span><span class='line'>  <span class="k">class</span> <span class="nc">Supervisor</span><span class="o">(</span><span class="n">eventStream</span><span class="k">:</span> <span class="kt">akka.event.EventStream</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">lastTweetReceived</span> <span class="k">=</span> <span class="mi">0L</span>
+</span><span class='line'>    <span class="k">var</span> <span class="n">lastBackOff</span> <span class="k">=</span> <span class="mi">0L</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Receives control messages for starting / restarting supervised client and adding or removing topics */</span>
+</span><span class='line'>    <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">AddTopic</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="n">topics</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">RemoveTopic</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">topics</span><span class="o">.</span><span class="n">remove</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">Start</span> <span class="k">=&gt;</span> <span class="n">start</span><span class="o">()</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">CheckStatus</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">lastTweetReceived</span> <span class="o">&gt;</span> <span class="n">retryInterval</span> <span class="o">&amp;&amp;</span> <span class="n">now</span> <span class="o">-</span> <span class="n">lastBackOff</span> <span class="o">&gt;</span> <span class="n">backOffInterval</span><span class="o">)</span> <span class="n">start</span><span class="o">()</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">BackOff</span> <span class="k">=&gt;</span> <span class="n">lastBackOff</span> <span class="k">=</span> <span class="n">now</span>
+</span><span class='line'>      <span class="k">case</span> <span class="nc">TweetReceived</span> <span class="k">=&gt;</span> <span class="n">lastTweetReceived</span> <span class="k">=</span> <span class="n">now</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Tweets are received as Byte array chunk by the WS client and passed into the TweetIteratee function.</p>
 
 <figure class='code'><figcaption><span>Tweet Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -86,61 +135,7 @@ Searches work in realtime thanks to Percolation queries inside ElasticSearch. Ev
 </span></code></pre></td></tr></table></div></figure>
 
 
-
-
-<figure class='code'><figcaption><span>WS Connection</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** Starts new WS connection to Twitter Streaming API. Twitter disconnects the previous one automatically.</span>
-</span><span class='line'><span class="cm">    * Can this be ended explicitly from here though, without resetting the whole underlying client? */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">start</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Starting client for topics &quot;</span> <span class="o">+</span> <span class="n">topics</span><span class="o">)</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="n">twitterURL</span> <span class="o">+</span> <span class="n">topics</span><span class="o">.</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;%2C&quot;</span><span class="o">).</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">,</span> <span class="s">&quot;%20&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="n">withTimeout</span><span class="o">(-</span><span class="mi">1</span><span class="o">).</span><span class="n">sign</span><span class="o">(</span><span class="nc">OAuthCalculator</span><span class="o">(</span><span class="nc">Conf</span><span class="o">.</span><span class="n">consumerKey</span><span class="o">,</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">accessToken</span><span class="o">)).</span><span class="n">get</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="n">tweetIteratee</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>Connection Supervisor</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** Actor taking care of monitoring the WS connection */</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Supervisor</span><span class="o">(</span><span class="n">eventStream</span><span class="k">:</span> <span class="kt">akka.event.EventStream</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">var</span> <span class="n">lastTweetReceived</span> <span class="k">=</span> <span class="mi">0L</span>
-</span><span class='line'>    <span class="k">var</span> <span class="n">lastBackOff</span> <span class="k">=</span> <span class="mi">0L</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Receives control messages for starting / restarting supervised client and adding or removing topics */</span>
-</span><span class='line'>    <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">AddTopic</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="n">topics</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">RemoveTopic</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">topics</span><span class="o">.</span><span class="n">remove</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">Start</span> <span class="k">=&gt;</span> <span class="n">start</span><span class="o">()</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">CheckStatus</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">lastTweetReceived</span> <span class="o">&gt;</span> <span class="n">retryInterval</span> <span class="o">&amp;&amp;</span> <span class="n">now</span> <span class="o">-</span> <span class="n">lastBackOff</span> <span class="o">&gt;</span> <span class="n">backOffInterval</span><span class="o">)</span> <span class="n">start</span><span class="o">()</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">BackOff</span> <span class="k">=&gt;</span> <span class="n">lastBackOff</span> <span class="k">=</span> <span class="n">now</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">TweetReceived</span> <span class="k">=&gt;</span> <span class="n">lastTweetReceived</span> <span class="k">=</span> <span class="n">now</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
+<p>The TweetIteratee function takes care of inserting the tweet into the ElasticSearch index, once again using an asynchronous WS client. Then it calls matchAndPush with the <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> representation of a tweet.</p>
 
 <figure class='code'><figcaption><span>Matching Tweets with Queries</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -167,184 +162,27 @@ Searches work in realtime thanks to Percolation queries inside ElasticSearch. Ev
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>MatchAndPush then matches the tweet with pre-registered queries by POSTing it to the tweet to the percolation query endpoint of ElasticSearch, which returns a list of the matched query IDs. The query IDs are hashes of the query string itself. This has the advantage that every query will only be inserted once instead of again and again for every client in the case of popular queries. The tweet then gets combined with the query IDs and pushed into the tweets channel of Concurrent.broadcast. Connections to the controller will then receive these tweets and determine if they are supposed to be relayed to the web client depending on the hash of the search string.</p>
 
+<h3>Controller</h3>
 
-<figure class='code'><figcaption><span>Twitter Streaming API Client</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala'>TwitterClient TwitterClient </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-<span class='line-number'>67</span>
-<span class='line-number'>68</span>
-<span class='line-number'>69</span>
-<span class='line-number'>70</span>
-<span class='line-number'>71</span>
-<span class='line-number'>72</span>
-<span class='line-number'>73</span>
-<span class='line-number'>74</span>
-<span class='line-number'>75</span>
-<span class='line-number'>76</span>
-<span class='line-number'>77</span>
-<span class='line-number'>78</span>
-<span class='line-number'>79</span>
-<span class='line-number'>80</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">TwitterClient</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">twitterURL</span> <span class="k">=</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;twitter.URL&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">elasticTweetURL</span> <span class="k">=</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;elastic.TweetURL&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">elasticPercolatorURL</span> <span class="k">=</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="s">&quot;elastic.PercolatorURL&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">backOffInterval</span> <span class="k">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">15</span> <span class="o">*</span> <span class="mi">1000</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">retryInterval</span> <span class="k">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">1000</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">now</span> <span class="k">=</span> <span class="nc">DateTime</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">getMillis</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Protocol for Twitter Client actors */</span>
-</span><span class='line'>  <span class="k">case</span> <span class="k">class</span> <span class="nc">AddTopic</span><span class="o">(</span><span class="n">topic</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">case</span> <span class="k">class</span> <span class="nc">RemoveTopic</span><span class="o">(</span><span class="n">topic</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">case</span> <span class="k">object</span> <span class="nc">CheckStatus</span>
-</span><span class='line'>  <span class="k">case</span> <span class="k">object</span> <span class="nc">TweetReceived</span>
-</span><span class='line'>  <span class="k">case</span> <span class="k">object</span> <span class="nc">Start</span>
-</span><span class='line'>  <span class="k">case</span> <span class="k">object</span> <span class="nc">BackOff</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** BirdWatch actor system, supervisor, timer*/</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">system</span> <span class="k">=</span> <span class="nc">ActorSystem</span><span class="o">(</span><span class="s">&quot;BirdWatch&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">supervisor</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">(</span><span class="k">new</span> <span class="nc">Supervisor</span><span class="o">(</span><span class="n">system</span><span class="o">.</span><span class="n">eventStream</span><span class="o">)),</span> <span class="s">&quot;TweetSupervisor&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="n">system</span><span class="o">.</span><span class="n">scheduler</span><span class="o">.</span><span class="n">schedule</span><span class="o">(</span><span class="mi">60</span> <span class="n">seconds</span><span class="o">,</span> <span class="mi">60</span> <span class="n">seconds</span><span class="o">,</span> <span class="n">supervisor</span><span class="o">,</span> <span class="nc">CheckStatus</span> <span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** system-wide channels / enumerators for attaching SSE streams to clients*/</span>
-</span><span class='line'>  <span class="k">val</span> <span class="o">(</span><span class="n">jsonTweetsOut</span><span class="o">,</span> <span class="n">jsonTweetsChannel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">Matches</span><span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Subscription topics stored in this MUTABLE collection */</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">topics</span><span class="k">:</span> <span class="kt">scala.collection.mutable.HashSet</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="k">=</span> <span class="k">new</span> <span class="n">scala</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">mutable</span><span class="o">.</span><span class="nc">HashSet</span><span class="o">[</span><span class="kt">String</span><span class="o">]()</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Iteratee for processing each chunk from Twitter stream of Tweets. Parses Json chunks </span>
-</span><span class='line'><span class="cm">    * as Tweet instances and publishes them to eventStream. */</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">tweetIteratee</span> <span class="k">=</span> <span class="nc">Iteratee</span><span class="o">.</span><span class="n">foreach</span><span class="o">[</span><span class="kt">Array</span><span class="o">[</span><span class="kt">Byte</span><span class="o">]]</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">chunk</span> <span class="k">=&gt;</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">val</span> <span class="n">chunkString</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">chunk</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">)</span>
-</span><span class='line'>      <span class="n">supervisor</span> <span class="o">!</span> <span class="nc">TweetReceived</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">chunkString</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="s">&quot;Easy there, Turbo. Too many requests recently. Enhance your calm.&quot;</span><span class="o">))</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">supervisor</span> <span class="o">!</span> <span class="nc">BackOff</span>
-</span><span class='line'>        <span class="n">println</span><span class="o">(</span><span class="s">&quot;\n&quot;</span> <span class="o">+</span> <span class="n">chunkString</span> <span class="o">+</span> <span class="s">&quot;\n&quot;</span><span class="o">)</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="k">val</span> <span class="n">json</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
-</span><span class='line'>      <span class="o">(</span><span class="n">json</span> <span class="o">\</span> <span class="s">&quot;id_str&quot;</span><span class="o">).</span><span class="n">asOpt</span><span class="o">[</span><span class="kt">String</span><span class="o">].</span><span class="n">map</span> <span class="o">{</span> <span class="n">id</span> <span class="k">=&gt;</span> <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticTweetURL</span> <span class="o">+</span> <span class="n">id</span><span class="o">).</span><span class="n">put</span><span class="o">(</span><span class="n">json</span><span class="o">)</span> <span class="o">}</span>
-</span><span class='line'>      <span class="n">matchAndPush</span><span class="o">(</span><span class="n">json</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Starts new WS connection to Twitter Streaming API. */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">start</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">println</span><span class="o">(</span><span class="s">&quot;Starting client for topics &quot;</span> <span class="o">+</span> <span class="n">topics</span><span class="o">)</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="n">twitterURL</span> <span class="o">+</span> <span class="n">topics</span><span class="o">.</span><span class="n">mkString</span><span class="o">(</span><span class="s">&quot;%2C&quot;</span><span class="o">).</span><span class="n">replace</span><span class="o">(</span><span class="s">&quot; &quot;</span><span class="o">,</span> <span class="s">&quot;%20&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="n">withTimeout</span><span class="o">(-</span><span class="mi">1</span><span class="o">).</span><span class="n">sign</span><span class="o">(</span><span class="nc">OAuthCalculator</span><span class="o">(</span><span class="nc">Conf</span><span class="o">.</span><span class="n">consumerKey</span><span class="o">,</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">accessToken</span><span class="o">)).</span><span class="n">get</span><span class="o">(</span><span class="k">_</span> <span class="k">=&gt;</span> <span class="n">tweetIteratee</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Actor taking care of monitoring the WS connection */</span>
-</span><span class='line'>  <span class="k">class</span> <span class="nc">Supervisor</span><span class="o">(</span><span class="n">eventStream</span><span class="k">:</span> <span class="kt">akka.event.EventStream</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">var</span> <span class="n">lastTweetReceived</span> <span class="k">=</span> <span class="mi">0L</span>
-</span><span class='line'>    <span class="k">var</span> <span class="n">lastBackOff</span> <span class="k">=</span> <span class="mi">0L</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** Receives control messages for starting / restarting supervised client and adding or removing topics */</span>
-</span><span class='line'>    <span class="k">def</span> <span class="n">receive</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">AddTopic</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>  <span class="k">=&gt;</span> <span class="n">topics</span><span class="o">.</span><span class="n">add</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">RemoveTopic</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">topics</span><span class="o">.</span><span class="n">remove</span><span class="o">(</span><span class="n">topic</span><span class="o">)</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">Start</span> <span class="k">=&gt;</span> <span class="n">start</span><span class="o">()</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">CheckStatus</span> <span class="k">=&gt;</span> <span class="k">if</span> <span class="o">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">lastTweetReceived</span> <span class="o">&gt;</span> <span class="n">retryInterval</span> <span class="o">&amp;&amp;</span> <span class="n">now</span> <span class="o">-</span> <span class="n">lastBackOff</span> <span class="o">&gt;</span> <span class="n">backOffInterval</span><span class="o">)</span> <span class="n">start</span><span class="o">()</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">BackOff</span> <span class="k">=&gt;</span> <span class="n">lastBackOff</span> <span class="k">=</span> <span class="n">now</span>
-</span><span class='line'>      <span class="k">case</span> <span class="nc">TweetReceived</span> <span class="k">=&gt;</span> <span class="n">lastTweetReceived</span> <span class="k">=</span> <span class="n">now</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Takes JSON and matches it with percolation queries in ElasticSearch</span>
-</span><span class='line'><span class="cm">    * @param json JsValue to match against </span>
-</span><span class='line'><span class="cm">    */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">matchAndPush</span><span class="o">(</span><span class="n">json</span><span class="k">:</span> <span class="kt">JsValue</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticPercolatorURL</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;doc&quot;</span> <span class="o">-&gt;</span> <span class="n">json</span><span class="o">)).</span><span class="n">map</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">res</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">res</span><span class="o">.</span><span class="n">body</span><span class="o">)</span> <span class="o">\</span> <span class="s">&quot;matches&quot;</span><span class="o">).</span><span class="n">asOpt</span><span class="o">[</span><span class="kt">Seq</span><span class="o">[</span><span class="kt">String</span><span class="o">]].</span><span class="n">map</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">m</span> <span class="k">=&gt;</span> <span class="n">jsonTweetsChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">Matches</span><span class="o">(</span><span class="n">json</span><span class="o">,</span> <span class="nc">HashSet</span><span class="o">.</span><span class="n">empty</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">++</span> <span class="n">m</span><span class="o">))</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
+<p>The other part of the Play application, delivering tweets matching user searches to web clients&#8230;</p>
 
+<h3>AngularJS client</h3>
 
-<p>So the client actor establishes a WS connection to the Twitter URL, which is an HTTP connection to the Twitter streaming endpoint that stays open indefinitely. The remote side then delivers new Tweets in chunks whenever any match for the set of topics is found. This set of topics is passed in via a query string (see start() function). The URL for starting a streaming API client has this format:</p>
+<p>Responsible for handling interaction and receiving tweets…</p>
 
-<p>https://stream.twitter.com/1.1/statuses/filter.json?track=angularjs,playframework,elasticsearch</p>
+<h3>Visualizations using D3.js</h3>
 
-<p>Looking at the code above now, I find it to be on the long side, considering what it is doing. I&#8217;d be interested in suggestions on making it more concise. No time to do it myself at the moment.</p>
+<p>The one area I am going to focus on next, once this article is done. Can&#8217;t wait to put more effort into this part&#8230;</p>
 
-<h2>Controller</h2>
+<h3>ElasticSearch</h3>
 
-<h2>AngularJS client</h2>
+<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> stores tweets and offers full-text search. It also allows the registration of real-time queries&#8230;</p>
 
-<h2>ElasticSearch</h2>
+<h3>nginx proxy</h3>
 
-<h2>nginx proxy</h2>
+<p><strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> faces the outside world, all traffic goes through it in the deployed version&#8230;</p>
 
 <p>Please come back, this articles evolves over time. For updates please sign up to the mailing list.</p>
 
@@ -1221,7 +1059,7 @@ Room 3.11, 16:30 - 17:15</p>
 <!-- more -->
 
 
-<p>In the <strong><a href="http://bit.ly/sse_load_testing">last article</a></strong> I have introduced <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>, a load testing tool for <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Event (SSE)</a></strong> streams. With that tool I gather data that I want to present in the browser using animated barcharts, as you can see live <strong><a href="http://bit.ly/sse-perf-live">here</a></strong>.</p>
+<p>In the <strong><a href="http://bit.ly/sse_load_testing">last article</a></strong> I have introduced <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>, a load testing tool for <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Event (SSE)</a></strong> streams. With that tool I gather data that I want to present in the browser using animated barcharts:</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/sse-perf-screenshot.png" title="image" alt="images"></p>
 
