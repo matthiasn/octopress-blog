@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-09-11T01:09:33+02:00</updated>
+  <updated>2013-09-11T10:19:22+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[BirdWatch explained]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/09/01/birdwatch-explained/"/>
-    <updated>2013-09-01T16:54:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/09/01/birdwatch-explained</id>
+    <link href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/"/>
+    <updated>2013-09-10T22:54:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained</id>
     <content type="html"><![CDATA[<p>This article is supposed to explain all aspects of the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. Now this will be a longer undertaking and I don&#8217;t want to wait weeks until I can publish the next article. At the same time I prefer reading stuff in one place as opposed to a series of articles coming out every so many weeks, if ever.</p>
 
 <p>So what I&#8217;ll do is publish this article as I write it. I have found it quite enjoyable over the last couple of years to read books as they are written. So why not try that for a blog article. Just know that whatever you read may or may not be there the next time you stop by. And feel free to give feedback throughout the process.</p>
