@@ -1,3 +1,14 @@
+octopress-blog
+==============
+
+This is the octopress project that generates this **[blog](http:matthiasnehlsen.com)**. Use 
+
+    rake preview
+    
+to run it locally. Check out earlier commits if you want to see how the website looked like at an earlier point in time. This way all edits can be tracked without having to rely on a poorly maintained changelog. Below you find the original README from the octopress project. Check it out, it's great. Thanks, **[Brandon Mathis](https://twitter.com/imathis)**!
+
+---
+
 ## What is Octopress?
 
 Octopress is [Jekyll](https://github.com/mojombo/jekyll) blogging at its finest.
