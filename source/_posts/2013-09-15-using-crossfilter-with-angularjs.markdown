@@ -111,7 +111,7 @@ _.throttle(function() {                       // throttle because every insertio
 
 By the way, you can now increase the number of pre-loaded tweets to up to 20,000 under **settings**. That might slow the application down though. Many things aren't optimized yet, but overall it seems to be working fine.
 
-Anyhow, I will go into more detail later. My **[previous article](http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/)** is the place to go for an explanation of the overall architecture of the application. It is a work in progress and I will get back to it in the next couple of days. For now I just wanted to give you a quick update you on what I have been up to this weekend. 
+Anyhow, I will go into more detail later. My **[previous article](http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/)** is the place to go for an explanation of the overall architecture of the application. It is a work in progress and I will get back to it in the next couple of days. For now I just wanted to give you a quick update on what I have been up to this weekend. 
 
 Until next time, 
 Matthias
