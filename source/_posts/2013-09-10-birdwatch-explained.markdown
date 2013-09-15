@@ -105,6 +105,10 @@ The TweetIteratee function takes care of inserting the tweet into the ElasticSea
 MatchAndPush then matches the tweet with pre-registered queries by POSTing it to the tweet to the percolation query endpoint of ElasticSearch, which returns a list of the matched query IDs. The query IDs are hashes of the query string itself. This has the advantage that every query will only be inserted once instead of again and again for every client in the case of popular queries. The tweet then gets combined with the query IDs and pushed into the tweets channel of Concurrent.broadcast. Connections to the controller will then receive these tweets and determine if they are supposed to be relayed to the web client depending on the hash of the search string.
 
 ###Controller
+Now let's have a look at the controller which serves the main page, previous tweets that match a search and also a **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** stream with future matches for the query.
+
+Serving the main page is straight forward. A controller action action is called when the route "/" is requested. A
+ 
 The other part of the Play application, delivering tweets matching user searches to web clients...
 
 ###AngularJS client
