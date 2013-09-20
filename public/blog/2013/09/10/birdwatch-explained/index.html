@@ -245,15 +245,187 @@ Searches work in realtime thanks to <strong><a href="http://www.elasticsearch.or
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>MatchAndPush then matches the tweet with pre-registered queries by POSTing it to the tweet to the percolation query endpoint of ElasticSearch, which returns a list of the matched query IDs. The query IDs are hashes of the query string itself. This has the advantage that every query will only be inserted once instead of again and again for every client in the case of popular queries. The tweet then gets combined with the query IDs and pushed into the tweets channel of Concurrent.broadcast. Connections to the controller will then receive these tweets and determine if they are supposed to be relayed to the web client depending on the hash of the search string.</p>
+<p>MatchAndPush then matches the tweet with pre-registered queries by POSTing it to the tweet to the percolation query endpoint of ElasticSearch, which returns a list of the matched query IDs. The query IDs are hashes of the query string itself. This has the advantage that every query will only be inserted once instead of again and again for every client in the case of popular queries. The tweet then gets combined with the query IDs and pushed into the tweets channel of Concurrent.broadcast. The controller action responsible for streaming tweets to web clients will then attach an Emuratee / Iteratee chain which determines if the tweet is supposed to be relayed to a particular client or not, depending on the hash of the search string.</p>
 
 <h3>Controller</h3>
 
-<p>Now let&#8217;s have a look at the controller which serves the main page, previous tweets that match a search and also a <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> stream with future matches for the query.</p>
+<p>Now let&#8217;s have a look at the controller of the application which serves:</p>
 
-<p>Serving the main page is straight forward. A controller action action is called when the route &#8220;/&#8221; is requested. A</p>
+<ul>
+<li>the main page</li>
+<li>previous tweets that match a search</li>
+<li>a <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> stream with future matches for the query.</li>
+</ul>
 
-<p>The other part of the Play application, delivering tweets matching user searches to web clients&#8230;</p>
+
+<p>The endpoints for these actions are defined in the routes file:</p>
+
+<figure class='code'><figcaption><span>Application Routes</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/conf/routes'>routes </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>GET        /                     controllers.BirdWatch.index
+</span><span class='line'>GET        /tweetFeed            controllers.BirdWatch.tweetFeed(q: String ?= &quot;*&quot;)
+</span><span class='line'>POST       /tweets/search        controllers.BirdWatch.search
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s have a look at the code that will be called when a client accesses the routes above. Serving the main page is straight forward. A controller action action is called when the route &#8220;/&#8221; is requested, where the HTML comes from a rendered view, which in this case is almost entirely plain HTML, except that the title of the page is inserted through a parameter. But more sophisticated data structures could be inserted here is necessary. Imagine for example localized strings depending on the reported language of the client browser. That kind of information is available to the action through the request, which we&#8217;ll see used with the other actions later on.</p>
+
+<figure class='code'><figcaption><span>Index Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'> <span class="cm">/** Controller action serving single page application */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span> <span class="nc">Ok</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">index</span><span class="o">(</span><span class="s">&quot;Birdwatch&quot;</span><span class="o">))</span> <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next action serves search results from <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>. The search itself is POSTed as <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> and directly passed through. The WS client is used for making the request to a local instance of <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>. The future response of this request is then mapped into the response of the controller action. This controller action is really only a proxy for development purposes. My <strong><a href="http://birdwatch.matthiasnehlsen.com">deployed instance</a></strong> of the application has <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> running in front of it, which for this route directly talks to ElasticSearch instead of keeping the <strong><a href="http://en.wikipedia.org/wiki/Garbage_collection">garbage collection</a></strong> mechanism of the <strong><a href="http://en.wikipedia.org/wiki/Java_virtual_machine">JVM</a></strong> busy with unprocessed data. We will have a look at <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> configuration further down in this article.</p>
+
+<figure class='code'><figcaption><span>Search Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Controller for serving main BirdWatch page including the SSE connection */</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">BirdWatch</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="o">{</span>
+</span><span class='line'>  <span class="cm">/** Controller Action serving Tweets as JSON going backwards in time. Query passed in as JSON */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">search</span> <span class="k">=</span>  <span class="nc">Action</span><span class="o">(</span><span class="n">parse</span><span class="o">.</span><span class="n">json</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">req</span> <span class="k">=&gt;</span> <span class="nc">Async</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">url</span> <span class="k">=</span>  <span class="n">elasticTweetURL</span> <span class="o">+</span> <span class="s">&quot;_search&quot;</span>
+</span><span class='line'>      <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">url</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span> <span class="n">res</span> <span class="k">=&gt;</span> <span class="nc">Ok</span><span class="o">(</span><span class="n">res</span><span class="o">.</span><span class="n">body</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now on to the most complicated part, serving the stream, which makes use of the <strong><a href="http://www.playframework.com/documentation/2.1.3/Iteratees">Iteratee</a></strong> librrary from Play Framework. I wrote an <strong><a href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">article about Iteratees</a></strong> a while back. Haven&#8217;t read it in a while, it may need some revision but you might still find it useful. It is rather long, but then again I&#8217;m not exactly going for the short form with this article either.</p>
+
+<p>The client establishes a connection to the streaming action, which then delivers the result not at once but in chunks whenever new data is available for this request. This data originates from the Enumerator from the concurrent.broadcast object which we covered above. Iteratees can attach to this Enumerator, allowing to define what to do with each new piece of information. Enumeratees are transformer functions that can be placed in between Enumerator as the source and the Iteratee as the final sink of this information. In the case of the streaming action, the Ok.feed itself represents the Iteratee, doing nothing more than delivering each chunk to the connected client.</p>
+
+<p>Enumeratees are then placed between source and sink, as a processing chain. This is the most interesting part of the code:</p>
+
+<figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'>      <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticPercolatorURL</span> <span class="o">+</span> <span class="n">queryID</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="n">query</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">res</span> <span class="k">=&gt;</span> <span class="nc">Ok</span><span class="o">.</span><span class="n">feed</span><span class="o">(</span><span class="nc">TwitterClient</span><span class="o">.</span><span class="n">jsonTweetsOut</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="n">matchesFilter</span><span class="o">(</span><span class="n">queryID</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">buffer</span><span class="o">(</span><span class="mi">100</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="n">matchesToJson</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="n">connDeathWatch</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="k">new</span> <span class="nc">DateTime</span><span class="o">(</span><span class="nc">DateTimeZone</span><span class="o">.</span><span class="nc">UTC</span><span class="o">)</span>  <span class="o">)</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query. The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID inside ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the follwing processing chain:</p>
+
+<ul>
+<li>Tweets with matched query IDs originate from the TwitterClient.jsonTweetsOut Enumerator.</li>
+<li>The matchesFilter Enumeratee checks if the query hash is contained in the matches set. If not no further actions take place.</li>
+<li>A buffer takes care of not holding up the application when the sink is too slow, for example when the connection to the client is too slow. Tweets will be dropped when the buffer is full, which is not much of an issue, if your connection is so slow you probably don&#8217;t want to use this application in the first place.</li>
+<li>Matches are converted to JSON</li>
+<li>The connection uptime is monitored. In this Enumeratee the duration of the connection will be logged.</li>
+<li>The data is converted to comply with the Server Sent Event specifications.</li>
+</ul>
+
+
+<p>Here is the entire code for the action. The Enumeratees should be fairly self-explanatory.</p>
+
+<figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Controller for serving main BirdWatch page including the SSE connection */</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">BirdWatch</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="o">{</span>
+</span><span class='line'>  <span class="cm">/** calculates milliseconds between passed in DateTime and time of function call */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">duration</span><span class="o">(</span><span class="n">since</span><span class="k">:</span> <span class="kt">DateTime</span><span class="o">)</span> <span class="k">=</span> <span class="nc">DateTime</span><span class="o">.</span><span class="n">now</span><span class="o">.</span><span class="n">getMillis</span> <span class="o">-</span> <span class="n">since</span><span class="o">.</span><span class="n">getMillis</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Enumeratee for detecting disconnect of SSE stream */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">connDeathWatch</span><span class="o">(</span><span class="n">req</span><span class="k">:</span> <span class="kt">Request</span><span class="o">[</span><span class="kt">AnyContent</span><span class="o">],</span> <span class="n">since</span><span class="k">:</span> <span class="kt">DateTime</span><span class="o">)</span><span class="k">:</span> <span class="kt">Enumeratee</span><span class="o">[</span><span class="kt">JsValue</span>, <span class="kt">JsValue</span><span class="o">]</span> <span class="k">=</span>
+</span><span class='line'>    <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">onIterateeDone</span> <span class="o">{</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="nc">Logger</span><span class="o">.</span><span class="n">logRequest</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="s">&quot;SSE disconnected&quot;</span><span class="o">,</span> <span class="mi">200</span><span class="o">,</span> <span class="n">duration</span><span class="o">(</span><span class="n">since</span><span class="o">))}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Filtering Enumeratee applying containsAll function */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">matchesFilter</span><span class="o">(</span><span class="n">qID</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">filter</span><span class="o">[</span><span class="kt">Matches</span><span class="o">]</span> <span class="o">{</span> <span class="n">pm</span> <span class="k">=&gt;</span> <span class="n">pm</span><span class="o">.</span><span class="n">matches</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="n">qID</span><span class="o">)</span> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Enumeratee: TweetMatches to Tweet adapter */</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">matchesToJson</span><span class="k">:</span> <span class="kt">Enumeratee</span><span class="o">[</span><span class="kt">Matches</span>, <span class="kt">JsValue</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">map</span><span class="o">[</span><span class="kt">Matches</span><span class="o">]</span> <span class="o">{</span> <span class="n">pm</span> <span class="k">=&gt;</span> <span class="n">pm</span><span class="o">.</span><span class="n">json</span> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Serves Tweets as Server Sent Events over HTTP connection TODO: change to POST */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">tweetFeed</span><span class="o">(</span><span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">implicit</span> <span class="n">req</span> <span class="k">=&gt;</span> <span class="nc">Async</span> <span class="o">{</span>
+</span><span class='line'>      <span class="nc">Logger</span><span class="o">.</span><span class="n">logRequest</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="s">&quot;/tweetFeed?q=&quot;</span> <span class="o">+</span> <span class="n">q</span><span class="o">,</span> <span class="mi">200</span><span class="o">,</span> <span class="mi">0</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">val</span> <span class="n">query</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span>
+</span><span class='line'>        <span class="s">&quot;query&quot;</span> <span class="o">-&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;query_string&quot;</span> <span class="o">-&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;default_field&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;text&quot;</span><span class="o">,</span>
+</span><span class='line'>          <span class="s">&quot;default_operator&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;AND&quot;</span><span class="o">,</span> <span class="s">&quot;query&quot;</span> <span class="o">-&gt;</span> <span class="o">(</span><span class="s">&quot;(&quot;</span> <span class="o">+</span> <span class="n">q</span> <span class="o">+</span> <span class="s">&quot;) AND lang:en&quot;</span><span class="o">))),</span>
+</span><span class='line'>        <span class="s">&quot;timestamp&quot;</span> <span class="o">-&gt;</span> <span class="n">dtFormat</span><span class="o">.</span><span class="n">print</span><span class="o">(</span><span class="k">new</span> <span class="nc">DateTime</span><span class="o">(</span><span class="nc">DateTimeZone</span><span class="o">.</span><span class="nc">UTC</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="cm">/** identify queries by hash, only store unique queries once */</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">md</span> <span class="k">=</span> <span class="nc">MessageDigest</span><span class="o">.</span><span class="n">getInstance</span><span class="o">(</span><span class="s">&quot;SHA-256&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">queryID</span> <span class="k">=</span> <span class="n">md</span><span class="o">.</span><span class="n">digest</span><span class="o">(</span><span class="n">q</span><span class="o">.</span><span class="n">getBytes</span><span class="o">).</span><span class="n">map</span><span class="o">(</span><span class="s">&quot;%02x&quot;</span><span class="o">.</span><span class="n">format</span><span class="o">(</span><span class="k">_</span><span class="o">)).</span><span class="n">mkString</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticPercolatorURL</span> <span class="o">+</span> <span class="n">queryID</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="n">query</span><span class="o">).</span><span class="n">map</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">res</span> <span class="k">=&gt;</span> <span class="nc">Ok</span><span class="o">.</span><span class="n">feed</span><span class="o">(</span><span class="nc">TwitterClient</span><span class="o">.</span><span class="n">jsonTweetsOut</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="n">matchesFilter</span><span class="o">(</span><span class="n">queryID</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">buffer</span><span class="o">(</span><span class="mi">100</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="n">matchesToJson</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="n">connDeathWatch</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="k">new</span> <span class="nc">DateTime</span><span class="o">(</span><span class="nc">DateTimeZone</span><span class="o">.</span><span class="nc">UTC</span><span class="o">)</span>  <span class="o">)</span>
+</span><span class='line'>          <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To be continued. Drawing will follow.</p>
 
 <h3>AngularJS client</h3>
 
