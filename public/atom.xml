@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2013-09-20T16:03:53+02:00</updated>
+  <updated>2013-09-22T17:17:25+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,15 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Five Months Anniversary]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2013/09/20/five-months-anniversary/"/>
+    <updated>2013-09-20T16:23:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2013/09/20/five-months-anniversary</id>
+    <content type="html"><![CDATA[
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Using Crossfilter with AngularJS]]></title>
@@ -376,6 +385,10 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Here is an overview of the controller actions:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/controller.png" title="image" alt="images"></p>
+
 <p>Let&#8217;s start with code for the <strong>index</strong> action which serves the main page. The HTML comes from a rendered view, which in this case is almost entirely plain HTML, except that the title of the page is inserted through a parameter. But more sophisticated data structures could be inserted here as necessary. For example, imagine localized strings that depend on the language of the client browser. That kind of information is available to the action through the request (which we can make available to the action as seen in the controller actions below).</p>
 
 <figure class='code'><figcaption><span>Index Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -433,7 +446,7 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query. The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID within ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the follwing processing chain:</p>
+<p>Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query. The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID within ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the following processing chain:</p>
 
 <ul>
 <li>Tweets with matched query IDs originate from the TwitterClient.jsonTweetsOut Enumerator.</li>
@@ -445,7 +458,7 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </ul>
 
 
-<p>Below, you&#8217;ll find the entire code for the action. The Enumeratees should be fairly self-explanatory.</p>
+<p>Below, you&#8217;ll find the entire code for the action. The Enumeratees are adapters between the Enumerator from the TwitterClient where the Tweets originate and the chunked response we pass back to the client. They can either transform elements passing through the chain from one type to another, filter them based on a predicate function or buffer them.</p>
 
 <figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -532,8 +545,6 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>To be continued. Drawing will follow.</p>
-
 <h3>AngularJS Client</h3>
 
 <p>Responsible for handling interaction and receiving tweets…</p>
@@ -548,7 +559,26 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 
 <h3>nginx Proxy</h3>
 
-<p><strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> faces the outside world, all traffic goes through it in the deployed version&#8230;</p>
+<p>In a production environment it might make sense to not expose applications to the outside world directly but instead have a reverse proxy in between which responds to all requests and routes the requests internally to the proper IP-address / port internally.</p>
+
+<p>This can be useful for the following reasons:</p>
+
+<ul>
+<li>Load Balancing. The reverse proxy can talk to multiple server backends and distribute the load among them.</li>
+<li>Static file serving. Some implementations can serve static files much faster with less overhead than a solution based on the JVM.</li>
+<li>SSL encryption. Not all application servers support SSL themselved, but all we need then is a proxy that does.</li>
+</ul>
+
+
+<p>I am using <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> as a reverse proxy for my deployed version of the application and I have found it to be rock solid and very fast.</p>
+
+<p>Here is the configuration file:</p>
+
+<figure class='code'><figcaption><span>nginx config  nginx.conf </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>This articles will evolve over time. Hope you will find it useful so far. For updates please sign up to the mailing list.</p>
 

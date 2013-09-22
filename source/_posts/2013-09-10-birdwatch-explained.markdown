@@ -119,6 +119,10 @@ GET        /tweetFeed            controllers.BirdWatch.tweetFeed(q: String ?= "*
 POST       /tweets/search        controllers.BirdWatch.search
 {% endcodeblock %}
 
+Here is an overview of the controller actions:
+
+{% img left /images/controller.png 'image' 'images'%}
+
 Let's start with code for the **index** action which serves the main page. The HTML comes from a rendered view, which in this case is almost entirely plain HTML, except that the title of the page is inserted through a parameter. But more sophisticated data structures could be inserted here as necessary. For example, imagine localized strings that depend on the language of the client browser. That kind of information is available to the action through the request (which we can make available to the action as seen in the controller actions below).
 
 {% codeblock Index Action lang:scala https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala BirdWatch.scala %}
@@ -157,7 +161,7 @@ Enumeratees are then placed between the source and the sink, forming a processin
       }
 {% endcodeblock %}
 
-Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query. The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID within ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the follwing processing chain:
+Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query. The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID within ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the following processing chain:
 
 * Tweets with matched query IDs originate from the TwitterClient.jsonTweetsOut Enumerator.
 * The matchesFilter Enumeratee checks if the matches set contains the query hash. If not, no further actions will take place.
@@ -166,7 +170,7 @@ Inside the action we establish a connection to ElasticSearch by posting the quer
 * The connection uptime is monitored. In this Enumeratee the duration of the connection will be logged.
 * The data is converted to comply with the **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** specifications.
 
-Below, you'll find the entire code for the action. The Enumeratees should be fairly self-explanatory.
+Below, you'll find the entire code for the action. The Enumeratees are adapters between the Enumerator from the TwitterClient where the Tweets originate and the chunked response we pass back to the client. They can either transform elements passing through the chain from one type to another, filter them based on a predicate function or buffer them.
 
 {% codeblock Streaming Action and Iteratee lang:scala https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala BirdWatch.scala %}
 /** Controller for serving main BirdWatch page including the SSE connection */
@@ -212,8 +216,6 @@ object BirdWatch extends Controller {
 }
 {% endcodeblock %} 
 
-To be continued. Drawing will follow.
- 
 ###AngularJS Client
 Responsible for handling interaction and receiving tweets…
 
@@ -224,8 +226,60 @@ This is one of the areas I am going to focus on next, once this article is done.
 **[ElasticSearch](http://www.elasticsearch.org)** stores tweets and offers full-text search. It also allows the registration of real-time queries...
 
 ###nginx Proxy
-**[nginx](http://wiki.nginx.org/Main)** faces the outside world, all traffic goes through it in the deployed version...
+In a production environment it might make sense to not expose applications to the outside world directly but instead have a reverse proxy in between which responds to all requests and routes the requests internally to the proper IP-address / port internally.
 
+This can be useful for the following reasons:
+
+* Load Balancing. The reverse proxy can talk to multiple server backends and distribute the load among them.
+* Static file serving. Some implementations can serve static files much faster with less overhead than a solution based on the JVM.
+* SSL encryption. Not all application servers support SSL themselved, but all we need then is a proxy that does.
+* Using multiple server backend that run on different ports.
+
+I am using **[nginx](http://wiki.nginx.org/Main)** as a reverse proxy for my **[deployed version](http://birdwatch.matthiasnehlsen.com)** of the application and I have found it to be rock solid and very fast.
+
+Here is the configuration file:
+
+{% codeblock nginx config lang:text nginx.conf %}
+user www-data;
+worker_processes 4;
+pid /var/run/nginx.pid;
+
+events {
+  worker_connections 15000;
+  # multi_accept on;
+}
+
+http {
+  proxy_buffering    off;
+  proxy_set_header   X-Real-IP $remote_addr;
+  proxy_set_header   X-Scheme $scheme;
+  proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+  proxy_set_header   Host $http_host;
+
+  upstream play {
+    server 127.0.0.1:9000;
+  }
+
+  upstream elastic {
+    server 127.0.0.1:9200;
+  }
+
+  server {
+    listen               80;
+    keepalive_timeout    70;
+    server_name birdwatch2.matthiasnehlsen.com birdwatch.matthiasnehlsen.com;
+
+    location /tweets/search {
+      proxy_pass  http://elastic/birdwatch_tech/tweets/_search;
+    }
+
+    location / {
+      proxy_pass  http://play;
+    }
+  }
+}
+
+{% endcodeblock %} 
 
 This articles will evolve over time. Hope you will find it useful so far. For updates please sign up to the mailing list.
 
