@@ -429,17 +429,17 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>AngularJS Client</h3>
+<h3>AngularJS Client [incomplete]</h3>
 
-<p>Responsible for handling interaction and receiving tweets…</p>
+<p>AngularJS brings the fun back to developing Single Page applications. Seriously.</p>
 
-<h3>Visualizations using D3.js</h3>
+<h3>Visualizations using D3.js [incomplete]</h3>
 
-<p>This is one of the areas I am going to focus on next, once this article is done&#8230;</p>
+<p>D3.js is a JavaScript library for data-driven visualizations that renders SVG in the browser.</p>
 
-<h3>ElasticSearch</h3>
+<h3>ElasticSearch [incomplete]</h3>
 
-<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> stores tweets and offers full-text search. It also allows the registration of real-time queries&#8230;</p>
+<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> is an open source search engine. Tweets are stored and searched for in an ElasticSearch index. Percolation queries allow the real-time search capabilities of this application.</p>
 
 <h3>nginx Proxy</h3>
 
@@ -451,16 +451,91 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 <li>Load Balancing. The reverse proxy can talk to multiple server backends and distribute the load among them.</li>
 <li>Static file serving. Some implementations can serve static files much faster with less overhead than a solution based on the JVM.</li>
 <li>SSL encryption. Not all application servers support SSL themselved, but all we need then is a proxy that does.</li>
+<li>Using multiple server backend that run on different ports.</li>
 </ul>
 
 
-<p>I am using <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> as a reverse proxy for my deployed version of the application and I have found it to be rock solid and very fast.</p>
+<p>I am using <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> as a reverse proxy for my <strong><a href="http://birdwatch.matthiasnehlsen.com">deployed version</a></strong> of the application and I have found it to be rock solid and very fast.</p>
 
 <p>Here is the configuration file:</p>
 
-<figure class='code'><figcaption><span>nginx config  nginx.conf </span></figcaption>
+<figure class='code'><figcaption><span>nginx config nginx.conf </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>user www-data;
+</span><span class='line'>worker_processes 4;
+</span><span class='line'>pid /var/run/nginx.pid;
+</span><span class='line'>
+</span><span class='line'>events {
+</span><span class='line'>  worker_connections 15000;
+</span><span class='line'>  # multi_accept on;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>http {
+</span><span class='line'>  proxy_buffering    off;
+</span><span class='line'>  proxy_set_header   X-Real-IP $remote_addr;
+</span><span class='line'>  proxy_set_header   X-Scheme $scheme;
+</span><span class='line'>  proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+</span><span class='line'>  proxy_set_header   Host $http_host;
+</span><span class='line'>
+</span><span class='line'>  upstream play {
+</span><span class='line'>    server 127.0.0.1:9000;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  upstream elastic {
+</span><span class='line'>    server 127.0.0.1:9200;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  server {
+</span><span class='line'>    listen               80;
+</span><span class='line'>    keepalive_timeout    70;
+</span><span class='line'>    server_name birdwatch2.matthiasnehlsen.com birdwatch.matthiasnehlsen.com;
+</span><span class='line'>
+</span><span class='line'>    location /tweets/search {
+</span><span class='line'>      proxy_pass  http://elastic/birdwatch_tech/tweets/_search;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    location / {
+</span><span class='line'>      proxy_pass  http://play;
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>}
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -569,10 +644,6 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2013/09/20/five-months-anniversary/">Five Months Anniversary</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2013/09/15/using-crossfilter-with-angularjs/">Using Crossfilter with AngularJS</a>
       </li>
     
@@ -586,6 +657,10 @@ Matthias</p>
     
       <li class="post">
         <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/03/angularjs-and-play-maintenance/">Follow-Up: AngularJS and Play Framework</a>
       </li>
     
   </ul>

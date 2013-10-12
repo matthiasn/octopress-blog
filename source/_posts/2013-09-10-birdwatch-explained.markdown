@@ -216,14 +216,14 @@ object BirdWatch extends Controller {
 }
 {% endcodeblock %} 
 
-###AngularJS Client
-Responsible for handling interaction and receiving tweets…
+###AngularJS Client [incomplete]
+AngularJS brings the fun back to developing Single Page applications. Seriously.
 
-###Visualizations using D3.js
-This is one of the areas I am going to focus on next, once this article is done...
+###Visualizations using D3.js [incomplete]
+D3.js is a JavaScript library for data-driven visualizations that renders SVG in the browser. 
 
-###ElasticSearch
-**[ElasticSearch](http://www.elasticsearch.org)** stores tweets and offers full-text search. It also allows the registration of real-time queries...
+###ElasticSearch [incomplete]
+**[ElasticSearch](http://www.elasticsearch.org)** is an open source search engine. Tweets are stored and searched for in an ElasticSearch index. Percolation queries allow the real-time search capabilities of this application.
 
 ###nginx Proxy
 In a production environment it might make sense to not expose applications to the outside world directly but instead have a reverse proxy in between which responds to all requests and routes the requests internally to the proper IP-address / port internally.
