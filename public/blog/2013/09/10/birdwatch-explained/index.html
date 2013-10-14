@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="This article attempts to explain all aspects of the BirdWatch application. This will be quite a lengthy undertaking, but I don&#8217;t want to wait &hellip;">
+  <meta name="description" content="BirdWatch is an open-source reactive web application that consumes the Twitter Streaming API for a selection of terms. It processes those matching &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -101,22 +101,19 @@
   </header>
 
 
-<div class="entry-content"><p>This article attempts to explain all aspects of the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. This will be quite a lengthy undertaking, but I don&#8217;t want to wait for weeks until I can publish the next article. Also, I prefer reading stuff at one go rather than facing a series of articles that come out every few weeks, if ever.</p>
-
-<p>So what I&#8217;ll do is publish this article while I am writing it. In the last couple of years I found it quite enjoyable to read books while they were being written. So I thought “Why not try that for a blog article.” Just bear in mind that whatever you read may have changed the next time you stop by. There is a <strong><a href="https://github.com/matthiasn/octopress-blog">changelog</a></strong> though. Please feel free to give your feedback throughout the process.</p>
+<div class="entry-content"><p><strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> is an <strong><a href="https://github.com/matthiasn/BirdWatch">open-source</a></strong> reactive web application that consumes the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> for a selection of terms. It processes those matching tweets in a server side application that is based on <strong><a href="http://www.playframework.com">Play Framework</a></strong>. The tweets are then stored inside <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>, where they are available for complex full-text searches.
+On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> based on <strong><a href="http://angularjs.org">AngularJS</a></strong> allows the user to perform a live search for tweets with certain keywords and to do some analysis on them, such as word count statistics, activity over time and sorting results by followers and retweet counts.</p>
 
 <!-- more -->
 
 
-<p><strong>UNDER CONSTRUCTION</strong></p>
+<p>Searches are conducted in real time thanks to so called <strong><a href="http://www.elasticsearch.org/guide/reference/api/percolate/">Percolation queries</a></strong> within ElasticSearch. Besides being used to retrieve previous matches, each search is also registered with ElasticSearch. New tweets are then matched against existing queries and delivered to the client via <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. This will be explained in more detail in the ElasticSearch section towards the end of this article. The client side visualizations based on <strong><a href="http://d3js.org">D3.js</a></strong> are then updated with those new search results.</p>
 
-<p><strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> is a reactive web application that consumes the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> for a selection of terms. It processes tweets in a server side application that is based on <strong><a href="http://www.playframework.com">Play Framework</a></strong>. The tweets are then stored inside <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>, where they are available for complex full-text searches.
-On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> based on <strong><a href="http://angularjs.org">AngularJS</a></strong> allows the user to search within the entire body of stored tweets and visualize some basic statistics as well as display a paginated list of the search results.
-Searches are conducted in real time thanks to so called <strong><a href="http://www.elasticsearch.org/guide/reference/api/percolate/">Percolation queries</a></strong> within ElasticSearch. Besides being used to retrieve previous matches, each search is also registered with ElasticSearch. New tweets are then matched against existing queries and delivered to the client via <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. The client side visualizations based on <strong><a href="http://d3js.org">D3.js</a></strong> are then updated with new query results while they are being tweeted.</p>
+<p><img class="left" src="/images/bw_expl_beer.png" title="image" alt="images"></p>
 
-<p>Here is my attempt at illustrating the above in a drawing with a focus on the <strong><a href="https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala">Twitter client</a></strong>. More details on the controller interactions and other parts of the application will follow.</p>
+<p>Here is an architectural overview with a focus on the <strong><a href="https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/actors/TwitterClient.scala">Twitter client</a></strong>:</p>
 
-<p><img class="left" src="/images/birdwatch2.png" title="image" alt="images"></p>
+<p><img class="left" src="/images/bw_expl_anim.gif" title="image" alt="images"></p>
 
 <h3>TwitterClient Actor</h3>
 
@@ -126,6 +123,8 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 
 <blockquote><p>Actors are very lightweight concurrent entities. They process messages asynchronously using an event-driven receive loop. Pattern matching against messages is a convenient way to express an actor&#8217;s behavior. They raise the abstraction level and make it much easier to write, test, understand and maintain concurrent and/or distributed systems. You focus on workflow—how the messages flow in the system—instead of low level primitives like threads, locks and socket IO.</p><footer><strong>Akka Actors</strong> <cite><a href='http://akka.io'>http://akka.io</a></cite></footer></blockquote>
 
+
+<p>The underlying Actor Model as a model of concurrent computation was first described in a 1973 paper by Carl Hewitt, Peter Bishop and Richard Steiger. I can recommend this <strong><a href="http://channel9.msdn.com/Shows/Going+Deep/Hewitt-Meijer-and-Szyperski-The-Actor-Model-everything-you-wanted-to-know-but-were-afraid-to-ask">video</a></strong> in which Carl Hewitt explains the Actor Model 39 years after its initial inception. Be warned of Erik Meijers vibrant shirt, you may want to dial down the color saturation of your screen ;-) Other than that, I found this video really helpful in getting a better understanding of the subject.</p>
 
 <p>Let&#8217;s have a look at the source code. The Twitter client establishes a connection to the Twitter streaming endpoint using the <strong><a href="http://www.playframework.com/documentation/2.1.3/ScalaWS">Play WS API</a></strong>. This connection stays open indefinitely. The remote side then delivers new tweets in byte array chunks whenever a match for the specified set of topics has been tweeted. This set of topics is passed in via a query string parameter (see <strong>start()</strong> function). The URL for starting a streaming API client has the following format:</p>
 
@@ -273,18 +272,22 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 
 <p><img class="left" src="/images/controller.png" title="image" alt="images"></p>
 
-<p>Let&#8217;s start with code for the <strong>index</strong> action which serves the main page. The HTML comes from a rendered view, which in this case is almost entirely plain HTML, except that the title of the page is inserted through a parameter. But more sophisticated data structures could be inserted here as necessary. For example, imagine localized strings that depend on the language of the client browser. That kind of information is available to the action through the request (which we can make available to the action as seen in the controller actions below).</p>
+<p>Let&#8217;s start with code for the <strong>index</strong> action which serves the main page. The HTML comes from a rendered view, which in this case is almost entirely plain HTML, except that the some configuration parameters for Google Analytics are inserted here. This has the advantage that the instance specific configuration can be kept in the application.conf file.</p>
 
-<figure class='code'><figcaption><span>Index Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Index Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/f23ff20638d180ed7aecf36a1071bf1d2bce2e69/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'> <span class="cm">/** Controller action serving single page application */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span> <span class="nc">Ok</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">index</span><span class="o">(</span><span class="s">&quot;Birdwatch&quot;</span><span class="o">))</span> <span class="o">}</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Controller action serving single page application */</span>
+</span><span class='line'><span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nc">Ok</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">index</span><span class="o">(</span><span class="nc">Conf</span><span class="o">.</span><span class="n">getOrEmpty</span><span class="o">(</span><span class="s">&quot;ga.hostname&quot;</span><span class="o">),</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">getOrEmpty</span><span class="o">(</span><span class="s">&quot;ga.domain&quot;</span><span class="o">),</span> <span class="nc">Conf</span><span class="o">.</span><span class="n">getOrEmpty</span><span class="o">(</span><span class="s">&quot;ga.id&quot;</span><span class="o">)))</span>
+</span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
 <p>The <strong>search</strong> action serves search results from <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>. The search itself is POSTed in <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> format and passed straight through to ElasticSearch. The WS client is used to make a request to a local instance of <strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong>. The future response to this request is then mapped into the response of the search action. The <strong>search</strong> controller action is really only a proxy for development purposes. My <strong><a href="http://birdwatch.matthiasnehlsen.com">deployed instance</a></strong> of the application has <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> running in front of it, which for this route directly talks to ElasticSearch instead of keeping the <strong><a href="http://en.wikipedia.org/wiki/Garbage_collection">garbage collection</a></strong> mechanism of the <strong><a href="http://en.wikipedia.org/wiki/Java_virtual_machine">JVM</a></strong> busy with unprocessed data. We will have a look at <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> configuration further down in this article.</p>
 
-<figure class='code'><figcaption><span>Search Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Search Action</span><a href='https://github.com/matthiasn/BirdWatch/blob/f23ff20638d180ed7aecf36a1071bf1d2bce2e69/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -305,13 +308,13 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now we&#8217;ll get to the most complicated part: serving the live stream for a search in the <strong>tweetFeed</strong> action. This controller makes use of <strong><a href="http://www.playframework.com/documentation/2.1.3/Iteratees">Iteratee</a></strong> library from Play Framework. I wrote an <strong><a href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">article about Iteratees</a></strong> a while back. I haven&#8217;t read it in a while, it may need some revision but you might still find it useful. It’s rather long, but then this article isn’t exactly what you would call short either.</p>
+<p>Now we&#8217;ll get to the most complicated part: serving the live stream for a search in the <strong>tweetFeed</strong> action. This controller makes use of the <strong><a href="http://www.playframework.com/documentation/2.1.3/Iteratees">Iteratee</a></strong> library from Play Framework. I wrote an <strong><a href="http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">article about Iteratees</a></strong> a while back. I haven&#8217;t read it in a while, it may need some revision but you might still find it useful. It’s rather long, but then this article isn’t exactly what you would call short either.</p>
 
-<p>The client establishes a connection to the streaming endpoint served by the <strong>tweetFeed</strong> action, which then delivers the results - not all at once, but in chunks whenever new data is available for this request. This data originates from the Enumerator from the <strong>Concurrent.broadcast</strong> object which we have seen above. Iteratees can attach to this Enumerator. In essence they are functions that define what do do with each new piece of information. Enumeratees are transformer functions that can be placed in between the Enumerator as the source and the Iteratee as the final sink of this information. As to the streaming action, the <strong>Ok.feed</strong> itself represents the Iteratee, doing nothing more than delivering each chunk to the connected client. Iteratees can also hold an accumulator for the current state of an ongoing computation, but that feature of Iteratees is not used in this use case.</p>
+<p>The client establishes a connection to the streaming endpoint served by the <strong>tweetFeed</strong> action, which then delivers the results - not all at once, but in chunks whenever new data is available for this request. This data originates from the <strong><a href="http://www.playframework.com/documentation/2.2.0/api/scala/index.html#play.api.libs.iteratee.Enumerator">Enumerator</a></strong> from the <strong><a href="http://www.playframework.com/documentation/2.2.0/api/scala/index.html#play.api.libs.iteratee.Concurrent$">Concurrent.broadcast</a></strong> object (provided by Play Framework) which we have seen above. <strong><a href="http://www.playframework.com/documentation/2.2.0/api/scala/index.html#play.api.libs.iteratee.Iteratee">Iteratees</a></strong> can attach to this Enumerator. In essence, Iteratees are functions that define what to do with each new piece of information. Enumeratees are transformer functions that can be placed in between the Enumerator as the source and the Iteratee as the final sink of this information. As to the streaming action, the <strong>Ok.feed</strong> itself represents the Iteratee, doing nothing more than delivering each chunk to the connected client. Iteratees can also hold an accumulator for the current state of an ongoing computation, in which case the individual Iteratee becomes the representation of a step of an ongoing computation, but that feature of Iteratees is not used in this use case.</p>
 
 <p>Enumeratees are then placed between the source and the sink, forming a processing chain. This is the most interesting part of the code:</p>
 
-<figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/f23ff20638d180ed7aecf36a1071bf1d2bce2e69/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -330,7 +333,7 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query. The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID within ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the following processing chain:</p>
+<p>Inside the action we establish a connection to ElasticSearch by posting the query as a percolation query (see <strong>ElasticSearch section</strong> below). The ID of the query is determined by hashing the entire query using SHA-256. That way repeated queries always have the same ID within ElasticSearch. Once that request is complete, we respond to the client with a feed that contains the following processing chain:</p>
 
 <ul>
 <li>Tweets with matched query IDs originate from the TwitterClient.jsonTweetsOut Enumerator.</li>
@@ -342,9 +345,9 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </ul>
 
 
-<p>Below, you&#8217;ll find the entire code for the action. The Enumeratees are adapters between the Enumerator from the TwitterClient where the Tweets originate and the chunked response we pass back to the client. They can either transform elements passing through the chain from one type to another, filter them based on a predicate function or buffer them.</p>
+<p>Below, you&#8217;ll find the entire code related to the streaming endpoint. The Enumeratees are adapters between the Enumerator from the TwitterClient where the Tweets originate and the chunked response we pass back to the client. They can either transform elements passing through the chain from one type to another, filter them based on a predicate function or buffer them.</p>
 
-<figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/22f8e3f90a11690eda5e36a339a116821dc1b2ff/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Streaming Action and Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/f23ff20638d180ed7aecf36a1071bf1d2bce2e69/app/controllers/BirdWatch.scala'>BirdWatch.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -429,21 +432,536 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span></code></pre></td></tr></table></div></figure>
 
 
-<h3>AngularJS Client [incomplete]</h3>
+<h3>AngularJS Client</h3>
 
-<p>AngularJS brings the fun back to developing Single Page applications. Seriously.</p>
+<p><strong><a href="http://angularjs.org">AngularJS</a></strong> is a modern approach to <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Applications</a></strong>. It is said to teach the browser new tricks. It also brings the <strong>fun</strong> back to developing Single Page applications. <strong>Seriously</strong>. So what is so special about it? It&#8217;s approach is a declarative one. This means that we declare how UI elements are supposed to look like depending on the application state, but we do not have to concern ourselves with how exactly this is achieved. This might not sound like much at first, but it really does make all the difference. No more direct DOM manipulation with jQuery or the like. Instead we create new elements as so called directives that know how to lay themselves out on the page. These elements are then used in the page markup, as if they existed all along in HTML. We will look at that in more detail for the TweetCard directive, which shows a simple custom directive.</p>
 
-<h3>Visualizations using D3.js [incomplete]</h3>
+<p>Here&#8217;s the overall architecture of the AngularJS application:</p>
 
-<p>D3.js is a JavaScript library for data-driven visualizations that renders SVG in the browser.</p>
+<p><img class="left" src="/images/bw_expl_angular1.png" title="image" alt="images"></p>
 
-<h3>ElasticSearch [incomplete]</h3>
+<p>There are singleton services in the application that only get instantiated once for the lifecycle of the application. First there is the tweets service which takes care of the communication with the server side. It pre-loads existing tweets and also establishes a <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> connection for future search results. This service allows the registration of a callback function which is called with search results, no matter if from previous tweets or from the SSE connection.</p>
 
-<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> is an open source search engine. Tweets are stored and searched for in an ElasticSearch index. Percolation queries allow the real-time search capabilities of this application.</p>
+<figure class='code'><figcaption><span>Tweets Service in AngularJS</span><a href='https://github.com/matthiasn/BirdWatch/blob/c52a8e2a2f465fdeeb12b929e1732c962f3ec834/app/assets/javascripts/services/tweets.js'>tweets.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** tweets service, load previous tweets and receives subsequent live tweets for given query */</span>
+</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;birdwatch.services&#39;</span><span class="p">).</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;tweets&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$http</span><span class="p">,</span> <span class="nx">utils</span><span class="p">,</span> <span class="nx">$location</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">tweetFeed</span><span class="p">;</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">tweetsCache</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** callback function to perform when new tweet(s) arrive */</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">onNewTweets</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{};</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">registerCallback</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">callback</span><span class="p">)</span> <span class="p">{</span> <span class="nx">onNewTweets</span> <span class="o">=</span> <span class="nx">callback</span><span class="p">;</span> <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Load previous Tweets, paginated. Recursive function, calls itself with the next chunk to load until</span>
+</span><span class='line'><span class="cm">     *  eventually n, the remaining tweets to load, is not larger than 0 any longer. guarantees at least n hits</span>
+</span><span class='line'><span class="cm">     *  if available, potentially more if (n % chunkSize != 0) */</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">loadPrev</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">searchString</span><span class="p">,</span> <span class="nx">n</span><span class="p">,</span> <span class="nx">chunkSize</span><span class="p">,</span> <span class="nx">offset</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">$http</span><span class="p">({</span><span class="nx">method</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">utils</span><span class="p">.</span><span class="nx">buildQuery</span><span class="p">(</span><span class="nx">searchString</span><span class="p">,</span> <span class="nx">chunkSize</span><span class="p">,</span> <span class="nx">offset</span><span class="p">),</span> <span class="nx">url</span><span class="o">:</span> <span class="s2">&quot;/tweets/search&quot;</span><span class="p">})</span>
+</span><span class='line'>                <span class="p">.</span><span class="nx">success</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>                    <span class="nx">onNewTweets</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">hits</span><span class="p">.</span><span class="nx">hits</span><span class="p">.</span><span class="nx">reverse</span><span class="p">().</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">_source</span><span class="p">;</span> <span class="p">}).</span><span class="nx">map</span><span class="p">(</span><span class="nx">utils</span><span class="p">.</span><span class="nx">formatTweet</span><span class="p">));</span>
+</span><span class='line'>                    <span class="nx">loadPrev</span><span class="p">(</span><span class="nx">searchString</span><span class="p">,</span> <span class="nx">n</span> <span class="o">-</span> <span class="nx">chunkSize</span><span class="p">,</span> <span class="nx">chunkSize</span><span class="p">,</span> <span class="nx">offset</span> <span class="o">+</span> <span class="nx">chunkSize</span><span class="p">);</span>
+</span><span class='line'>                <span class="p">}).</span><span class="nx">error</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">status</span><span class="p">,</span> <span class="nx">headers</span><span class="p">,</span> <span class="nx">config</span><span class="p">)</span> <span class="p">{</span> <span class="p">});</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** Start Listening for Tweets with given query */</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">search</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">queryString</span><span class="p">,</span> <span class="nx">prevSize</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">tweetFeed</span> <span class="o">===</span> <span class="s1">&#39;object&#39;</span><span class="p">)</span> <span class="p">{</span> <span class="nx">tweetFeed</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">searchString</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">;</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">queryString</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">searchString</span> <span class="o">=</span> <span class="nx">queryString</span><span class="p">;</span>
+</span><span class='line'>            <span class="nx">$location</span><span class="p">.</span><span class="nx">path</span><span class="p">(</span><span class="nx">searchString</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span> <span class="nx">$location</span><span class="p">.</span><span class="nx">path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/** handle incoming tweets: add to tweetsCache array, run callback at most every second */</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">cachedCallback</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">tweetsCache</span> <span class="o">=</span> <span class="nx">tweetsCache</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">utils</span><span class="p">.</span><span class="nx">formatTweet</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">)));</span>
+</span><span class='line'>            <span class="nx">_</span><span class="p">.</span><span class="nx">throttle</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>        <span class="c1">// throttle because insertion too expensive on high traffic searches</span>
+</span><span class='line'>                <span class="nx">onNewTweets</span><span class="p">(</span><span class="nx">tweetsCache</span><span class="p">);</span>  <span class="c1">// run callback with all items in cache</span>
+</span><span class='line'>                <span class="nx">tweetsCache</span> <span class="o">=</span> <span class="p">[];</span>          <span class="c1">// then empty cache.</span>
+</span><span class='line'>            <span class="p">},</span> <span class="mi">1000</span><span class="p">)();</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">tweetFeed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/tweetFeed?q=&quot;</span> <span class="o">+</span> <span class="nx">searchString</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">tweetFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="nx">cachedCallback</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="nx">loadPrev</span><span class="p">(</span><span class="nx">searchString</span><span class="p">,</span> <span class="nx">prevSize</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span> <span class="c1">// load previous tweets in chunks of size 500</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="p">{</span> <span class="nx">search</span><span class="o">:</span> <span class="nx">search</span><span class="p">,</span> <span class="nx">registerCallback</span><span class="o">:</span> <span class="nx">registerCallback</span><span class="p">};</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The only other components that knows anything about this service is controller which provides the callback function that specifies what needs to happen with each new tweet / array of tweets. This allows for a proper decoupling of the services.</p>
+
+<figure class='code'><figcaption><span>AngularJS Controller</span><a href='https://github.com/matthiasn/BirdWatch/blob/c52a8e2a2f465fdeeb12b929e1732c962f3ec834/app/assets/javascripts/controllers.js'>controllers.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** Controllers */</span>
+</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;birdwatch.controllers&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;birdwatch.services&#39;</span><span class="p">,</span> <span class="s1">&#39;charts.barchart&#39;</span><span class="p">,</span> <span class="s1">&#39;charts.wordcloud&#39;</span><span class="p">,</span> <span class="s1">&#39;ui.bootstrap&#39;</span><span class="p">]).</span>
+</span><span class='line'>    <span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;BirdWatchCtrl&#39;</span><span class="p">,</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$location</span><span class="p">,</span> <span class="nx">utils</span><span class="p">,</span> <span class="nx">barchart</span><span class="p">,</span> <span class="nx">wordcloud</span><span class="p">,</span> <span class="nx">$timeout</span><span class="p">,</span> <span class="nx">wordCount</span><span class="p">,</span> <span class="nx">cf</span><span class="p">,</span> <span class="nx">tweets</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">prevSizeOpts</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;100&#39;</span><span class="p">,</span> <span class="s1">&#39;500&#39;</span><span class="p">,</span> <span class="s1">&#39;1000&#39;</span><span class="p">,</span> <span class="s1">&#39;2000&#39;</span><span class="p">,</span> <span class="s1">&#39;5000&#39;</span><span class="p">,</span> <span class="s1">&#39;10000&#39;</span><span class="p">,</span> <span class="s1">&#39;20000&#39;</span><span class="p">];</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">prevSize</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">prevSizeOpts</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">pageSizeOpts</span> <span class="o">=</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">];</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">pageSize</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">pageSizeOpts</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">live</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">toggleLive</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>                             <span class="c1">// freezes view when switched off by having the</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">live</span><span class="p">)</span> <span class="p">{</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">freeze</span><span class="p">();</span> <span class="p">}</span> <span class="k">else</span> <span class="p">{</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">unfreeze</span><span class="p">();</span> <span class="p">}</span> <span class="c1">// crossfilter limit results to tweets older</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">live</span> <span class="o">=</span> <span class="o">!</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">live</span><span class="p">;</span>                               <span class="c1">// than the latest at the time of calling freeze()</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">currentPage</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">searchText</span> <span class="o">=</span> <span class="nx">$location</span><span class="p">.</span><span class="nx">path</span><span class="p">().</span><span class="nx">substr</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">legalStuff</span> <span class="o">=</span> <span class="nx">utils</span><span class="p">.</span><span class="nx">legalStuff</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">cf</span> <span class="o">=</span> <span class="nx">cf</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">sortModel</span> <span class="o">=</span> <span class="s1">&#39;latest&#39;</span><span class="p">;</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">words</span> <span class="o">=</span> <span class="p">[];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/** Add a string to the search bar when for example clicking on a chart element */</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">addSearchString</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">searchString</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">searchText</span><span class="p">.</span><span class="nx">length</span> <span class="o">===</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">searchText</span> <span class="o">=</span> <span class="nx">searchString</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>            <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">searchText</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="nx">searchString</span><span class="p">)</span> <span class="o">===</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">{</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">searchText</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="nx">searchString</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">$apply</span><span class="p">();</span>  <span class="c1">// Term should appear immediately, not only after search returns</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">search</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/** update UI every ten seconds to keep time ago for tweets accurate */</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">onTimeout</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">updateTimeout</span> <span class="o">=</span> <span class="nx">$timeout</span><span class="p">(</span><span class="nx">onTimeout</span><span class="p">,</span> <span class="mi">10000</span><span class="p">);</span> <span class="p">};</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">updateTimeout</span> <span class="o">=</span> <span class="nx">onTimeout</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/** actions to perform when new tweets are available through the streaming connection */</span>
+</span><span class='line'>        <span class="nx">tweets</span><span class="p">.</span><span class="nx">registerCallback</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">wordCount</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">words</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">wordCount</span><span class="p">.</span><span class="nx">getWords</span><span class="p">();</span>
+</span><span class='line'>            <span class="nx">cf</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="cm">/** Search for Tweets with given query, run on startup */</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">search</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">wordCount</span> <span class="o">=</span> <span class="nx">wordCount</span><span class="p">.</span><span class="nx">wordCount</span><span class="p">();</span>
+</span><span class='line'>            <span class="nx">tweets</span><span class="p">.</span><span class="nx">search</span><span class="p">(</span><span class="nx">$scope</span><span class="p">.</span><span class="nx">searchText</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">prevSize</span><span class="p">);</span>
+</span><span class='line'>            <span class="nx">cf</span><span class="p">.</span><span class="nx">clear</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">};</span>
+</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">search</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The controller provides the $scope for the associated view, which is written as HTML, with some custom AngularJS code. The $scope variables are fairly straighforward, AngularJS two-way binds items in the view to the $scope so that when the value in either changes, the other updates as well. An example of this two-way data binding is the search text field. The binding to $scope.searchText is defined in the view:</p>
+
+<figure class='code'><figcaption><span>Main View</span><a href='https://github.com/matthiasn/BirdWatch/blob/c52a8e2a2f465fdeeb12b929e1732c962f3ec834/app/views/index.scala.html'>index.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>    <span class="c">&lt;!-- Search field in NavBar --&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;navbar-form pull-left col-lg-6 input-group&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;form</span> <span class="na">ng-submit=</span><span class="s">&quot;search()&quot;</span> <span class="na">class=</span><span class="s">&quot;input-group&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">class=</span><span class="s">&quot;form-control&quot;</span> <span class="na">ng-model=</span><span class="s">&quot;searchText&quot;</span>
+</span><span class='line'>                    <span class="na">placeholder=</span><span class="s">&quot;Example search: java (job OR jobs OR hiring)&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;input-group-btn&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;btn btn-primary&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">ng-click=</span><span class="s">&quot;search()&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>                        <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;glyphicon glyphicon-search&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
+</span><span class='line'>                    <span class="nt">&lt;/button&gt;</span>
+</span><span class='line'>                <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;/form&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now with this binding in place, modifying the content of the search field mutates $scope.searchText and vice versa. Changing the $scope.searchText programmatically would update the content of the search field as well. There is no need to concern ourselves with complicated ways of manipulating the DOM directly. This is probably the main reason why code in AngularJS tends to be much shorter than in more traditional approaches.</p>
+
+<p>We briefly talked about directives above. Let&#8217;s have a look at one simple directive to get a better understanding, the TweetCard directive. A directive can either be an entirely new element or apply to a class. In this case we are using the class approach. Any element on the page that has class of <strong>tweetCard</strong> will be rendered by AngularJS according to the code in the directive. In this particular case the code is very simple:</p>
+
+<figure class='code'><figcaption><span>TweetCard Directive</span><a href='https://github.com/matthiasn/BirdWatch/blob/c52a8e2a2f465fdeeb12b929e1732c962f3ec834/app/assets/javascripts/directives.js'>directives.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;birdwatch.directives&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;charts.barchart&#39;</span><span class="p">,</span> <span class="s1">&#39;charts.wordcloud&#39;</span><span class="p">])</span>
+</span><span class='line'>    <span class="cm">/** Tweet Card Layout (with external template)*/</span>
+</span><span class='line'>    <span class="p">.</span><span class="nx">directive</span><span class="p">(</span><span class="s1">&#39;tweetCard&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">restrict</span><span class="o">:</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span>
+</span><span class='line'>            <span class="nx">scope</span><span class="o">:</span> <span class="p">{</span> <span class="nx">tweet</span><span class="o">:</span> <span class="s2">&quot;=tweet&quot;</span> <span class="p">},</span>
+</span><span class='line'>            <span class="nx">templateUrl</span><span class="o">:</span> <span class="s2">&quot;/assets/templates/tweetCard.tpl.html&quot;</span>
+</span><span class='line'>        <span class="p">}</span>
+</span><span class='line'>    <span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>All that happens here is a $scope variable named tweet is assigned, which becomes available for two-way data binding inside the template code:</p>
+
+<figure class='code'><figcaption><span>TweetCard Template Markup</span><a href='http://github.com/matthiasn/BirdWatch/blob/f23ff20638d180ed7aecf36a1071bf1d2bce2e69/public/templates/tweetCard.tpl.html'>tweetCard.tpl.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tweet&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;span&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;a</span> <span class="na">href=</span><span class="s">&quot;http://www.twitter.com/&quot;</span> <span class="na">target=</span><span class="s">&quot;_blank&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;img</span> <span class="na">class=</span><span class="s">&quot;thumbnail&quot;</span> <span class="na">src=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/span&gt;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nt">&lt;a</span> <span class="na">tooltip-placement=</span><span class="s">&quot;bottom&quot;</span> <span class="na">tooltip=</span><span class="s">&quot;click to visit Twitter profile&quot;</span>
+</span><span class='line'>       <span class="na">href=</span><span class="s">&quot;http://www.twitter.com/&quot;</span> <span class="na">target=</span><span class="s">&quot;_blank&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;username&quot;</span> <span class="na">ng-bind=</span><span class="s">&quot;tweet.user.name&quot;</span><span class="nt">&gt;&lt;/span&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/a&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">&quot;username_screen&quot;</span><span class="nt">&gt;</span><span class="ni">&amp;#64;</span><span class="nt">&lt;/span&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;pull-right timeInterval&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tweettext&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;div</span> <span class="na">ng-bind-html-unsafe=</span><span class="s">&quot;tweet.htmlText&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;pull-left timeInterval&quot;</span><span class="nt">&gt;</span> followers<span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;div</span> <span class="na">ng-show=</span><span class="s">&quot;tweet.retweeted_status.retweet_count&quot;</span> <span class="na">class=</span><span class="s">&quot;pull-right timeInterval&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>             retweets<span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;div</span> <span class="na">ng-show=</span><span class="s">&quot;tweet.retweet_count&quot;</span> <span class="na">class=</span><span class="s">&quot;pull-right timeInterval&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>             retweets<span class="nt">&lt;/div&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now whenever the underlying data representation in the model changes, the rendering of the tweetCard changes as well thanks to two-way data binding. The more complicated markup of the tweetCard is encapsulated in the template, using the directive from the view becomes simple and concise:</p>
+
+<figure class='code'><figcaption><span>Repeated Tweet Directive in View</span><a href='https://github.com/matthiasn/BirdWatch/blob/c52a8e2a2f465fdeeb12b929e1732c962f3ec834/app/views/index.scala.html'>index.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'>
+</span><span class='line'><span class="c">&lt;!-- Tweet Cards inside frame --&gt;</span>
+</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;col-lg-4&quot;</span> <span class="na">id=</span><span class="s">&quot;tweet-frame&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tweetCard&quot;</span> <span class="na">data-ng-repeat=</span><span class="s">&quot;tweet in cf.tweetPage(currentPage, pageSize, sortModel)&quot;</span>
+</span><span class='line'>        <span class="na">data-tweet=</span><span class="s">&quot;tweet&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
+</span><span class='line'><span class="nt">&lt;/div&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above a div of class tweetCard is declared with data-ng-repeat, which means that the element is repeated for each element in the result of the cf.tweetPage function. For each individual item (for <strong>tweet</strong> in cf.tweetPage), data-tweet is assigned with the item. It could also have been data-ng-repeat=&#8221;item in …&#8221; data-tweet=&#8221;item&#8221;, the names correspond here.</p>
+
+<p>Here&#8217;s how the $scope of an individual tweetCard element looks like:</p>
+
+<p><img class="left" src="/images/bw_expl_tweetcard_scope.png" title="image" alt="images"></p>
+
+<p>Above we can see that the $scope of the TweetCard contains the previously assigned tweet object which becomes available to the template code for two-way data binding. The two-way data binding can be seen in action here when sorting the tweets by retweet count. For popular tweets that get retweeted a lot we can grab some popcorn and watch the visual representation of the tweet change in the browser based on data model changes.</p>
+
+<h3>Visualizations using D3.js</h3>
+
+<p><strong><a href="http://d3js.org">D3.js</a></strong> is a JavaScript library for data-driven visualizations that render SVG in the browser. There are excellent tutorials out there, the project homepage is a great place to start. I won&#8217;t go into much detail here, but for a better understanding of what is happening, here is some D3.js code from this application together with the resulting SVG in the DOM:</p>
+
+<p><img class="left" src="/images/bw_expl_d3js1.png" title="image" alt="images"></p>
+
+<p>What we see above on the left side is that <strong>rect</strong>s (rectangles) get rendered depending on the data that is provided to the D3 code on the right side. This is why the library is said to be data-driven, the data drives what gets rendered on the page.</p>
+
+<h3>Data Analysis using crossfilter.js</h3>
+
+<p><strong><a href="http://square.github.io/crossfilter/">Crossfilter</a></strong> is a JavaScript library for exploring large datasets in the browser. This is achieved by defining dimensions on which to dissect the data. A dimension is a kind of sorted index where the indexing function is provided in the dimension constructor:</p>
+
+<figure class='code'><figcaption><span>Crossfilter Service</span><a href='https://github.com/matthiasn/BirdWatch/blob/c52a8e2a2f465fdeeb12b929e1732c962f3ec834/app/assets/javascripts/services/crossfilter.js'>crossfilter.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+<span class='line-number'>63</span>
+<span class='line-number'>64</span>
+<span class='line-number'>65</span>
+<span class='line-number'>66</span>
+<span class='line-number'>67</span>
+<span class='line-number'>68</span>
+<span class='line-number'>69</span>
+<span class='line-number'>70</span>
+<span class='line-number'>71</span>
+<span class='line-number'>72</span>
+<span class='line-number'>73</span>
+<span class='line-number'>74</span>
+<span class='line-number'>75</span>
+<span class='line-number'>76</span>
+<span class='line-number'>77</span>
+<span class='line-number'>78</span>
+<span class='line-number'>79</span>
+<span class='line-number'>80</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// crossfilter service</span>
+</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;birdwatch.services&#39;</span><span class="p">).</span><span class="nx">factory</span><span class="p">(</span><span class="s1">&#39;cf&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">utils</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">exports</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// crossfilter object: browser side analytics library, holds array type data (w/incremental updates).</span>
+</span><span class='line'>    <span class="c1">// dimensions are fast queries on data, e.g. view sorted by followers_count or retweet_count of the original message</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">cf</span> <span class="o">=</span> <span class="nx">crossfilter</span><span class="p">([]);</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">tweetIdDim</span>   <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span> <span class="p">});</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">followersDim</span> <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">followers_count</span><span class="p">;</span> <span class="p">});</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">retweetsDim</span>  <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s2">&quot;retweeted_status&quot;</span><span class="p">))</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">originalIdDim</span>  <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s2">&quot;retweeted_status&quot;</span><span class="p">))</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span> <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// Higher-order function, returns a function that rounds time down. Interval s is specified in seconds.</span>
+</span><span class='line'>    <span class="c1">// Example: returned function makes Jan 1, 2012, 16:45:00 out of Jan 1, 2012, 16:45:55 when interval is 60s</span>
+</span><span class='line'>    <span class="kd">function</span> <span class="nx">dateRound</span><span class="p">(</span><span class="nx">s</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">s</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nb">Date</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">created_at</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nx">s</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span> <span class="p">};</span> <span class="p">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">byMinGrp</span>   <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="nx">dateRound</span><span class="p">(</span>      <span class="mi">60</span><span class="p">)).</span><span class="nx">group</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">by15MinGrp</span> <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="nx">dateRound</span><span class="p">(</span>   <span class="mi">15</span><span class="o">*</span><span class="mi">60</span><span class="p">)).</span><span class="nx">group</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">byHourGrp</span>  <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="nx">dateRound</span><span class="p">(</span>   <span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)).</span><span class="nx">group</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">by6HourGrp</span> <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="nx">dateRound</span><span class="p">(</span> <span class="mi">6</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)).</span><span class="nx">group</span><span class="p">();</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">byDayGrp</span>   <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="nx">dateRound</span><span class="p">(</span><span class="mi">24</span><span class="o">*</span><span class="mi">60</span><span class="o">*</span><span class="mi">60</span><span class="p">)).</span><span class="nx">group</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">timeseries</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>             <span class="k">if</span> <span class="p">(</span><span class="nx">byMinGrp</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">60</span><span class="p">)</span>   <span class="p">{</span> <span class="k">return</span> <span class="nx">byMinGrp</span><span class="p">.</span><span class="nx">all</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">by15MinGrp</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">48</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">by15MinGrp</span><span class="p">.</span><span class="nx">all</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">byHourGrp</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">96</span><span class="p">)</span>  <span class="p">{</span> <span class="k">return</span> <span class="nx">byHourGrp</span><span class="p">.</span><span class="nx">all</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">by6HourGrp</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">40</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">by6HourGrp</span><span class="p">.</span><span class="nx">all</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>        <span class="k">else</span>                             <span class="p">{</span> <span class="k">return</span> <span class="nx">byDayGrp</span><span class="p">.</span><span class="nx">all</span><span class="p">();</span> <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// freeze imposes filter on crossfilter that only shows anything older than and including the latest</span>
+</span><span class='line'>    <span class="c1">// tweet at the time of calling freeze. Accordingly unfreeze clears the filter</span>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">freeze</span>    <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">filter</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">]);</span> <span class="p">};</span>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">unfreeze</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">filterAll</span><span class="p">();</span> <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">add</span>       <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>     <span class="p">{</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span> <span class="p">};</span>                            <span class="c1">// add new items, as array</span>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">clear</span>     <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>         <span class="p">{</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span> <span class="p">};</span>                             <span class="c1">// reset crossfilter</span>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">noItems</span>   <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>         <span class="p">{</span> <span class="k">return</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">size</span><span class="p">();</span> <span class="p">};</span>                        <span class="c1">// crossfilter size total</span>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">numPages</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">cf</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">/</span> <span class="nx">pageSize</span><span class="p">);</span> <span class="p">};</span>  <span class="c1">// number of pages</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// predicates</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">retweeted</span>     <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s2">&quot;retweeted_status&quot;</span><span class="p">);</span> <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// mapper functions</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">originalTweet</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">utils</span><span class="p">.</span><span class="nx">formatTweet</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">);</span> <span class="p">};</span>   <span class="c1">// returns original tweet</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">tweetId</span>       <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span> <span class="p">};</span>                                    <span class="c1">// returns tweet id</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">retweetCount</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="nx">retweeted</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">;</span> <span class="p">}</span> <span class="k">else</span> <span class="k">return</span> <span class="mi">0</span> <span class="p">};</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">maxRetweets</span>   <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">t</span><span class="p">.</span><span class="nx">retweet_count</span> <span class="o">=</span> <span class="nx">retweetCount</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">originalIdDim</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">top</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span>
+</span><span class='line'>            <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">;</span> <span class="p">}));</span>
+</span><span class='line'>        <span class="nx">originalIdDim</span><span class="p">.</span><span class="nx">filterAll</span><span class="p">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">t</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// deliver tweets for current page. fetches all tweets up to the current page,</span>
+</span><span class='line'>    <span class="c1">// throws tweets for previous pages away.</span>
+</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">tweetPage</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">currentPage</span><span class="p">,</span> <span class="nx">pageSize</span><span class="p">,</span> <span class="nx">order</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">rest</span><span class="p">(</span><span class="nx">fetchTweets</span><span class="p">(</span><span class="nx">currentPage</span> <span class="o">*</span> <span class="nx">pageSize</span><span class="p">,</span> <span class="nx">order</span><span class="p">),</span> <span class="p">(</span><span class="nx">currentPage</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">pageSize</span><span class="p">);</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="c1">// fetch tweets from crossfilter dimension associated with particular sort order up to the current page,</span>
+</span><span class='line'>    <span class="c1">// potentially mapped and filtered</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">fetchTweets</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">,</span> <span class="nx">order</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>      <span class="k">if</span>      <span class="p">(</span><span class="nx">order</span> <span class="o">===</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>    <span class="p">{</span> <span class="k">return</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">);</span> <span class="p">}</span>    <span class="c1">// latest: desc order of tweets by ID</span>
+</span><span class='line'>      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">order</span> <span class="o">===</span> <span class="s2">&quot;followers&quot;</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">followersDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">maxRetweets</span><span class="p">);</span> <span class="p">}</span> <span class="c1">// desc order of tweets by followers</span>
+</span><span class='line'>      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">order</span> <span class="o">===</span> <span class="s2">&quot;retweets&quot;</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">// descending order of tweets by total retweets of original message</span>
+</span><span class='line'>          <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span>               <span class="c1">// filtered to be unique, would appear for each retweet in window otherwise</span>
+</span><span class='line'>              <span class="nx">_</span><span class="p">.</span><span class="nx">uniq</span><span class="p">(</span><span class="nx">retweetsDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="nx">cf</span><span class="p">.</span><span class="nx">size</span><span class="p">()).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">retweeted</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">originalTweet</span><span class="p">),</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">tweetId</span><span class="p">),</span> <span class="nx">pageSize</span><span class="p">);</span>
+</span><span class='line'>      <span class="p">}</span>
+</span><span class='line'>      <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[];</span> <span class="p">}</span>
+</span><span class='line'>    <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="nx">exports</span><span class="p">;</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A simple example is the <strong>followersDim</strong> dimension. The function provided does nothing but return the number of followers of the author of the Tweet. The dimension then provides access to the data set sorted by the followers count.</p>
+
+<p>Dimensions can also be grouped, as can be seen with the different timing dimensions. In order to get all Tweets for a particular time span of say the hour between 4pm and 5pm of a particular day, the creation time for each Tweet is rounded down to the nearest hour and then the dimension is grouped by the hours. This powers the &#8216;Activity by Time Unit&#8217; chart in which the number of Tweets for the current search is broken down into time units of varying length, depending on the total time span.</p>
+
+<h3>ElasticSearch</h3>
+
+<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> is a distributed open source search engine. The more obvious feature is that it provides full-text search over our entire dataset, which by the time of the writing of this article consists of about ten million tweets.</p>
+
+<p><img class="left" src="/images/bw_expl_elastic1.png" title="image" alt="images"></p>
+
+<p>The less obvious but very useful feature is that of the so called <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html">Percolation Queries</a></strong>. These are kind of reverse searches that allow the registration of an observing real-time search in the percolation index. Each new tweet is then presented to the percolation endpoint of ElasticSearch to determine which of the registered searches match on the new item. This allows us to notify the web clients on each new match for the current search (also see the controller description on the server side above). The IDs of the queries could be generated randomly. I have chosen a different approach here and use SHA-256 hashes of the search text instead. That way each unique query (e.g. &#8220;shutdown beer&#8221;) only ever gets inserted (and matched against) once.</p>
 
 <h3>nginx Proxy</h3>
 
-<p>In a production environment it might make sense to not expose applications to the outside world directly but instead have a reverse proxy in between which responds to all requests and routes the requests internally to the proper IP-address / port internally.</p>
+<p>In a production environment it might make sense to not expose applications to the outside world directly but instead have a reverse proxy in between which responds to all requests and routes the requests to the proper IP-address / port internally.</p>
 
 <p>This can be useful for the following reasons:</p>
 
@@ -452,10 +970,11 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 <li>Static file serving. Some implementations can serve static files much faster with less overhead than a solution based on the JVM.</li>
 <li>SSL encryption. Not all application servers support SSL themselved, but all we need then is a proxy that does.</li>
 <li>Using multiple server backend that run on different ports.</li>
+<li>Serving multiple domain names.</li>
 </ul>
 
 
-<p>I am using <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> as a reverse proxy for my <strong><a href="http://birdwatch.matthiasnehlsen.com">deployed version</a></strong> of the application and I have found it to be rock solid and very fast.</p>
+<p>I am using <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> as a reverse proxy for two instances of the application on the same server, one for tech-related stuff <strong><a href="http://birdwatch.matthiasnehlsen.com">birdwatch.matthiasnehlsen.com</a></strong> and the other for things related to US politics <strong><a href="http://beltway.matthiasnehlsen.com">beltway.matthiasnehlsen.com</a></strong>. That works really well, I have found nginx to be rock solid and very fast.</p>
 
 <p>Here is the configuration file:</p>
 
@@ -498,13 +1017,21 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 <span class='line-number'>36</span>
 <span class='line-number'>37</span>
 <span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
 </pre></td><td class='code'><pre><code class='text'><span class='line'>user www-data;
 </span><span class='line'>worker_processes 4;
 </span><span class='line'>pid /var/run/nginx.pid;
 </span><span class='line'>
 </span><span class='line'>events {
 </span><span class='line'>  worker_connections 15000;
-</span><span class='line'>  # multi_accept on;
 </span><span class='line'>}
 </span><span class='line'>
 </span><span class='line'>http {
@@ -514,10 +1041,6 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span><span class='line'>  proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
 </span><span class='line'>  proxy_set_header   Host $http_host;
 </span><span class='line'>
-</span><span class='line'>  upstream play {
-</span><span class='line'>    server 127.0.0.1:9000;
-</span><span class='line'>  }
-</span><span class='line'>
 </span><span class='line'>  upstream elastic {
 </span><span class='line'>    server 127.0.0.1:9200;
 </span><span class='line'>  }
@@ -525,21 +1048,37 @@ Searches are conducted in real time thanks to so called <strong><a href="http://
 </span><span class='line'>  server {
 </span><span class='line'>    listen               80;
 </span><span class='line'>    keepalive_timeout    70;
-</span><span class='line'>    server_name birdwatch2.matthiasnehlsen.com birdwatch.matthiasnehlsen.com;
+</span><span class='line'>    server_name birdwatch.matthiasnehlsen.com;
 </span><span class='line'>
 </span><span class='line'>    location /tweets/search {
 </span><span class='line'>      proxy_pass  http://elastic/birdwatch_tech/tweets/_search;
 </span><span class='line'>    }
 </span><span class='line'>
 </span><span class='line'>    location / {
-</span><span class='line'>      proxy_pass  http://play;
+</span><span class='line'>      proxy_pass  http://127.0.0.1:9000;
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  server {
+</span><span class='line'>    listen               80;
+</span><span class='line'>    keepalive_timeout    70;
+</span><span class='line'>    server_name beltway.matthiasnehlsen.com;
+</span><span class='line'>
+</span><span class='line'>    location /tweets/search {
+</span><span class='line'>      proxy_pass  http://elastic/birdwatch_beltway/tweets/_search;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    location / {
+</span><span class='line'>      proxy_pass  http://127.0.0.1:9001;
 </span><span class='line'>    }
 </span><span class='line'>  }
 </span><span class='line'>}
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This articles will evolve over time. Hope you will find it useful so far. For updates please sign up to the mailing list.</p>
+<p>Note the two server blocks in the configuration above for the two separate domains, each of which maps to one backend Play application. It would also be possible to have multiple backends for the same domain name and then let nginx balance the load between the multiple backends. There is only one shared ElasticSearch backend for the two domains, but /tweets/search maps to different indices depending on the domain name. In a development configuration this endpoint would be handled directly by the Play application, but for production I let nginx handle this transparently.</p>
+
+<p>Okay, this concludes the explanation of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> toy project. Hope you enjoyed this rather long article. Please let me know if there is any need for clarification.</p>
 
 <p>Cheers,
 Matthias</p>
