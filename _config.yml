@@ -62,7 +62,7 @@ default_asides: [custom/asides/gravatar.html, custom/asides/about.html, asides/r
 github_user: matthiasn
 github_repo_count: 1
 github_show_profile_link: true
-github_skip_forks: true
+github_skip_forks: false
 
 # Twitter
 twitter_user: matthiasnehlsen
