@@ -1,0 +1,448 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>HTML5 Template with Live Reload and 100/100 PageSpeed - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="A few weeks ago I started working on the follow-up to my BirdWatch project. This new project is another single page application based on AngularJS, &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+
+<script src="//use.typekit.net/rco1jij.js"></script>
+<script>try{Typekit.load();} catch (e){}</script>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">HTML5 Template with Live Reload and 100/100 PageSpeed</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-23T18:36:00+01:00" pubdate data-updated="true">11/23/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>A few weeks ago I started working on the follow-up to my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> project. This new project is another single page application based on <strong><a href="http://angularjs.org">AngularJS</a></strong>, but that is not part of the story I am going to tell you today at all. Instead, today I will talk about <strong>speed</strong>. As in, how long does it take for a web page to load, on a mobile device? I was doing some research by opening different websites under suboptimal conditions, such as 3G with only two to three bars, or even worse the dreaded <strong>E</strong> with four to five bars. Not terribly difficult to simulate, I only need to disable the Wifi and walk into different corners of my apartment for that. Opening my own blog made me sad: with the bad 3G connection it took like <strong>10 seconds</strong> for the index page to show anything at all. No way I would ever wait that long for any page to load. And I would quite likely not even try again. So I went on a quest to make this better. The result is of course on <strong><a href="https://github.com/matthiasn/live-html5">GitHub</a></strong>.</p>
+
+<!-- more -->
+
+
+<p>So what happens when the browser loads a page? First a DNS lookup takes place, translating the human-readable domain name into an IP address. Then that domain is contacted using an HTTP GET request for the particular URL. If no specific file is given in the request, a server will usually try to return a file named <strong>index.html</strong> inside the folder that maps to the request URL. This <strong>index.html</strong> then typically contains multiple links to stylesheets and scripts, all of which trigger the same cascade (minus the DNS lookup if subsequent requests point to the same domain). Many of the resources are blocking; the page will only display after they are loaded.</p>
+
+<p>We can examine the request behavior by looking at a timeline chart, like this one for the index page of this blog:</p>
+
+<p><img class="left" src="/images/gtmetrix-blog.png" title="image" alt="gtmetrix result for matthiasnehlsen.com"></p>
+
+<p>You will notice that the <strong>DOM loaded</strong> event fired after more than an entire second (the blue line), or a little less than 200ms after the blocking screen.css has finished loading.</p>
+
+<p>I have used <strong><a href="http://gtmetrix.com">GTmetrix</a></strong> for generating the charts. The numbers are comparable to what I can measure in Chrome Developer Tools, with a decent DSL subscription. So presumably they are much better than what a suboptimal mobile connection would yield.</p>
+
+<p>Now pre-LTE mobile networks have much longer network round-trip times than copper or fiber-based tethered networks, even under ideal conditions. And things of course do not degrade gracefully when the signal deteriorates.</p>
+
+<p>I wanted to know how much worse network round-trip times actually are on mobile networks, so I measured a <strong><a href="http://en.wikipedia.org/wiki/Ping_(networking_utility)">ping</a></strong> to the domain of this blog with a free iPhone app called <strong><a href="https://itunes.apple.com/us/app/network-ping-lite/id289967115">Ping Lite</a></strong>.</p>
+
+<p>As a baseline measurement, I did the ping over Wi-Fi + DSL and got around 55ms on average:</p>
+
+<p><img class="left" src="/images/iphone_ping_wlan.png" title="image" alt="iPhone ping wifi"></p>
+
+<p>Interestingly this is about 25ms slower than what I got with the command line ping on my Mac on the same network. I have no idea where this delay comes from, could be something in iOS or in the Ping Lite app. But it doesn&#8217;t really matter; a 25ms delay is not near as noticeable as the delay introduced by switching to a mobile network. Using 3G under ideal conditions (five bars) I consistently got a little less than 500ms:</p>
+
+<p><img class="left" src="/images/iphone_ping_3g.png" title="image" alt="iPhone ping 3G"></p>
+
+<p>That is much worse than the Wi-Fi connection indeed, particularly when multiple files need to be loaded; then these times really add up. Not a big surprise that the Edge connection is even worse, particularly in terms of consistency:</p>
+
+<p><img class="left" src="/images/iphone_ping_edge.png" title="image" alt="iPhone ping EDGE"></p>
+
+<p>Thinking about the timeline, it is not hard to imagine what influence the higher round-trip times will have on the <strong>DOM loaded</strong> event when potentially multiple blocking requests have to be completed before the browser renders the page.</p>
+
+<p>So what can be improved here? Three things came to my mind:</p>
+
+<ul>
+<li>Loading external stylesheets takes additional round trips. These are blocking and the page will only render when all the requests are completed. Stylesheets could in theory be loaded asynchronously, but a flash of unstyled content (FOUC) would then occur. Frankly, I&#8217;d rather not have the page load at all than subjecting anyone to that. But why not <strong>inline</strong> all of the CSS in the index.html file in the first place?</li>
+<li>No compression was used so far; that alone should cut down the time until <strong>DOM loaded</strong> by substantially shortening the gray portion of the timeline bars.</li>
+<li>The CSS seems fairly <strong>large</strong>; there is no way that 37.8KB of styling are necessary for what is rendered on the page. Add up the computed styles of every single element of the page and you will end up with a few Kilobytes at most. Everything else is dead weight.</li>
+</ul>
+
+
+<p>So I decided to try inlining custom CSS in the HTML file and then compressing the file using gzip. I was also interested in the fairly new CSS3 <strong><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Flexible_boxes">Flexbox Layout</a></strong>, so I decided to write the CSS based on flexbox by hand instead of using <strong><a href="http://getbootstrap.com">Bootstrap</a></strong>. That way I should be able to avoid loading tens of unnecessary stylesheet Kilobytes. You can find out more about flexbox in this great <strong><a href="http://css-tricks.com/snippets/css/a-guide-to-flexbox/">tutorial</a></strong>.</p>
+
+<p>I set up a build system based on <strong><a href="http://gruntjs.com">grunt</a></strong> and started trying out flexbox. It turned out that my frustration tolerance for reloading the page on my mobile devices was so low that I shortly thereafter found myself working on a live <strong>CSS reload</strong> feature. After covering <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> more than once on this blog, I thought I might as well utilize SSE for notifying the browser about file system changes. Detecting file system changes is a solved problem, so all it took was transmitting the events to the browser and have a script on the client side initiate a page reload / refresh. To my surprise, SSE support has only <strong><a href="http://caniuse.com/eventsource">recently come to Android</a></strong>, requiring either the KitKat built-in browser, or Chrome for Android version 30. Things worked well with Chrome 30 on Jelly Bean and with mobile Safari on iOS 6 and 7. I cannot say anything about older versions or other browsers. Please report if things fail in your browser, or better submit a fix.</p>
+
+<p>For the CSS authoring I have chosen <strong><a href="http://lesscss.org">LESS</a></strong> because it makes the whole CSS authoring process a lot smoother. LESS mixins really help in getting rid of a lot of repetition. During the authoring of the page I am using browser-side LESS>>CSS compilation using <strong><a href="http://lesscss.org">less.js</a></strong>. That turned out to be an excellent choice. I stumbled upon the <strong>less.refresh()</strong> function, which has the awesome feature of refreshing the style <strong>without</strong> triggering an entire page reload.</p>
+
+<p>The refresh function combined with the file system refresh messages sent over the SSE connection
+ With that feature, I could really focus on minute changes to the CSS without the page jumping at all, even on the mobile device. The video below will illustrate this nicely.</p>
+
+<p>Have a look what this means in practice:</p>
+
+<iframe width="770" height="433" src="//www.youtube.com/embed/mNxFQva-Shw" frameborder="0" allowfullscreen></iframe>
+
+
+<p>Things look decent for flexbox in terms of <strong><a href="http://caniuse.com/flexbox">compatibility</a></strong>. In the mobile world, flexbox has been supported since Android 2.1 and iOS 3.1, and by now it is supported on at least the latest browser version on each platform, which should cover the vast majority of mobile devices out there. On the desktop side of things, flexbox has also been supported for a while on different platforms, even on IE since version 10. This is in contrast to SSE, which Microsoft apparently does not want to support at all. But there is one <strong>caveat</strong>: Flexbox exists in different versions, with the old ones prefixed. For -webkit, even different prefixed versions exist. In itself that is not a huge problem, particularly if you use <strong><a href="http://lesscss.org/#-mixins">LESS mixins</a></strong> so you do not have to continuously repeat yourself. But it is still a quite annoying because it means optimizing for different browser versions. Well, nothing new in the world of browser compatibility issues.</p>
+
+<p>I spent some time with the flexbox CSS and the layout of the sample index.html in the <strong><a href="https://github.com/matthiasn/live-html5">live-html5</a></strong> project looks fine to me when viewed with the latest versions of all major browsers, but I have not had the time to even out edges in older versions, particularly in Firefox and IE. If you see a problem there, please fix it and submit a pull request. Old browsers have not been the focus of my experiments much. No reason why they shouldn&#8217;t be supported by the template as well as possible though. Thanks!</p>
+
+<p>Anyways, so all that worked nicely, with a responsive layout with an <strong>aside</strong> element on the right side if the media query detects a wide browser page (e.g. desktop or iPad in landscape orientation) and a stacked layout otherwise. You have seen it in the video above, it is simple and seems to work fine. It is also <strong><a href="http://validator.w3.org/check?uri=http%3A%2F%2Fmatthiasn.github.io%2Flive-html5%2F&amp;charset=%28detect+automatically%29&amp;doctype=Inline&amp;group=0">valid HTML5</a></strong>.</p>
+
+<p>Finally, when I revisited the page speed issue, I implemented automatic CSS inlining, minification and compression. Grunt is great for that, unless you actually like mindless and repetitive tasks. Have a look at the <strong><a href="http://matthiasn.github.io/live-html5/">project description</a></strong> and <strong><a href="https://github.com/matthiasn/live-html5">code</a></strong> to find out more about the build task.</p>
+
+<p>Here is the final result of Google PageSpeed Insights after all the automated optimizations:</p>
+
+<p><img class="left" src="/images/pagespeed-100.png" title="image" alt="pagespeed 100 result"></p>
+
+<p>Great, this is what I wanted to see. Let us have a look at timeline chart for the sample page now. Arguably the complexity of this page is higher than the blog index page, so I think this is a fair comparison:</p>
+
+<p><img class="left" src="/images/gtmetrix-blog.png" title="image" alt="gtmetrix result for optimized live-html5 page"></p>
+
+<p>The <strong>DOM loaded</strong> event now occurs after 86ms, which is more than 12 times faster than what we saw for the index page of the blog initially. It also happens after loading only 7.7KB. That will load much faster over a suboptimal mobile connection for sure. Note that the remaining two resources are not important for the perceived speed. All that matters is the HTML and the embedded styles. The picture is at the bottom of the page on a small screen anyways, and I bet no visitor will give up because a <strong><a href="http://fontawesome.io">font-awesome symbol</a></strong> renders with some delay.</p>
+
+<p>This concludes the quest for speed. The sample page loads as I wanted it to, with nothing less than a 100/100 score on Google PageSpeed Insights. Flexbox seems to work fine particularly for a mobile audience. Finally, the build system removes the pain of optimizing things by hand.</p>
+
+<p>I find the presented solutions particularly sweet as they work together. But you might find individual parts useful as well. I am particularly thinking about the live reload server / client pattern; it will work equally well in a project that uses Bootstrap or whatever. You are not even bound to LESS. You can still use less.js for loading and refreshing CSS without a page refresh. The refreshed CSS could equally well be generated by a <strong><a href="http://sass-lang.com">SASS</a></strong> based CSS build system watching file folders. Or you just edit plain old CSS by hand if that makes you feel good.</p>
+
+<p>In fact I have made the page refresh feature work with <strong><a href="http://www.playframework.com">Play Framework</a></strong>. For that the server.js will need to be started in whichever folder you want to watch and the script snippet needs do be loaded during development. The script would by default not be allowed to contact the <strong><a href="https://github.com/matthiasn/live-html5/blob/master/scripts/server.js">server.js</a></strong> backend because it runs on a different port. The <strong><a href="http://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a></strong> of the browser prohibits this. But an instance of nginx can run in front of both server and serve all resources on the same port, including the Server Sent Event stream. You can find the <strong><a href="https://github.com/matthiasn/live-html5/blob/master/conf/nginx.conf">nginx configuration file</a></strong> in the <strong>conf</strong> folder of the project. This even works with the partial CSS reload feature by loading the CSS file(s) as LESS and embedding the <strong><a href="http://lesscss.org">less.js</a></strong> script. I&#8217;d be happy to write an article about this, should the demand present itself.</p>
+
+<h2>Contributions</h2>
+
+<p>I am using this particular project to learn more about the technologies involved. Please submit pull requests wherever you see potential for improvements.</p>
+
+<h2>Outlook</h2>
+
+<p>In this article I have talked about some implementation details for an optimized delivery of a static page to mobile devices. Along the way I have also presented a convenience feature, the smooth live reload particularly for CSS but also for other resources.</p>
+
+<p>I can report that this kind of build system and the live reload feature are also useful when building a single page application. In my new project which I have mentioned in the beginning I am taking the reload feature further by also using it for updating the data model. With that, page refreshes based on  data model changes become equally smooth as the CSS refreshes presented here. But more on that in future articles. As usual, you can find the code on <strong><a href="https://github.com/matthiasn/live-html5">GitHub</a></strong>.</p>
+
+<p>Cheers,
+Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-23T18:36:00+01:00" pubdate data-updated="true">11/23/2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+    <script type="text/javascript">
+      (function() { 
+        var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
+        write_string += '&url='; 
+        write_string += encodeURIComponent(window.location); 
+        write_string += '&title=' + encodeURIComponent(document.title);
+        write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
+
+        var span = $(document.createElement("span"));
+        span.html(write_string);
+        $(".sharing").append(span);
+      })();
+    </script>
+  
+  
+  
+<script type="text/javascript" src="http://www.reddit.com/static/button/button1.js"></script>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2013/09/15/using-crossfilter-with-angularjs/" title="Previous Post: Using Crossfilter with AngularJS">&laquo; Using Crossfilter with AngularJS</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/15/using-crossfilter-with-angularjs/">Using Crossfilter with AngularJS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/10/birdwatch-explained/">BirdWatch explained</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code for the chat functionality.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/live-html5">live-html5</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=live-html5&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>A speed-optimized, mobile-first HTML5 template with grunt build system and live preview during authoring.</p>
+    </li>
+  </ul>
+</section><section>
+    <h1>Subscribe</h1>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    <br />
+  </div>
+</section><section>
+  <a href="https://twitter.com/matthiasnehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
+  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+<br />
+<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
+<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
+</a>
+
+</section>
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/100986586701798521209?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

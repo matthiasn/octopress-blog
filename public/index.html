@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="So far I found my BirdWatch application nice to look at but not terribly useful as an original way of finding information. Let&#8217;s face it, the &hellip;">
+  <meta name="description" content="A few weeks ago I started working on the follow-up to my BirdWatch project. This new project is another single page application based on AngularJS, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -28,6 +28,9 @@
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+
+<script src="//use.typekit.net/rco1jij.js"></script>
+<script>try{Typekit.load();} catch (e){}</script>
   
   <script type="text/javascript">
     var _gaq = _gaq || [];
@@ -75,6 +78,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-11-23T18:36:00+01:00" pubdate data-updated="true">11/23/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A few weeks ago I started working on the follow-up to my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> project. This new project is another single page application based on <strong><a href="http://angularjs.org">AngularJS</a></strong>, but that is not part of the story I am going to tell you today at all. Instead, today I will talk about <strong>speed</strong>. As in, how long does it take for a web page to load, on a mobile device? I was doing some research by opening different websites under suboptimal conditions, such as 3G with only two to three bars, or even worse the dreaded <strong>E</strong> with four to five bars. Not terribly difficult to simulate, I only need to disable the Wifi and walk into different corners of my apartment for that. Opening my own blog made me sad: with the bad 3G connection it took like <strong>10 seconds</strong> for the index page to show anything at all. No way I would ever wait that long for any page to load. And I would quite likely not even try again. So I went on a quest to make this better. The result is of course on <strong><a href="https://github.com/matthiasn/live-html5">GitHub</a></strong>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/11/23/live-page-reload-on-any-device/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -446,47 +490,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/18/using-d3js-with-play/">D3.js and Play Framework: Getting Started</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-18T13:21:00+02:00" pubdate data-updated="true">05/18/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at noticing changes between spreadsheet cells or other text. That&#8217;s okay. I&#8217;m actually a big fan of that. Text does not usually threaten to run me over when I attempt to cross a street. So let&#8217;s create moving things with <strong><a href="http://d3js.org">D3.js</a></strong> and drive the animation reactively with data from a server written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/18/using-d3js-with-play/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -513,6 +516,10 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/09/15/using-crossfilter-with-angularjs/">Using Crossfilter with AngularJS</a>
       </li>
     
@@ -526,10 +533,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     
       <li class="post">
         <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/03/angularjs-and-play-maintenance/">Follow-Up: AngularJS and Play Framework</a>
       </li>
     
   </ul>
@@ -552,10 +555,10 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
         allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
       <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code for the chat functionality.</p>
     </li>
-    <li><a href="https://github.com/matthiasn/octopress-blog">octopress-blog</a>&nbsp;
-      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=octopress-blog&type=watch&count=true"
+    <li><a href="https://github.com/matthiasn/live-html5">live-html5</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=live-html5&type=watch&count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>The <a href="http://octopress.org">octopress</a> project that generates this blog.</p>
+      <p>A speed-optimized, mobile-first HTML5 template with grunt build system and live preview during authoring.</p>
     </li>
   </ul>
 </section><section>
