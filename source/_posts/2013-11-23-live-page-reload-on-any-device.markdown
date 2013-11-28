@@ -54,7 +54,9 @@ The refresh function combined with the file system refresh messages sent over th
 
 Have a look what this means in practice:
 
-<iframe width="770" height="433" src="//www.youtube.com/embed/mNxFQva-Shw" frameborder="0" allowfullscreen></iframe>
+<div class="video-container">
+    <iframe width="320" height="180" src="//www.youtube.com/embed/mNxFQva-Shw"></iframe>
+</div>
 
 Things look decent for flexbox in terms of **[compatibility](http://caniuse.com/flexbox)**. In the mobile world, flexbox has been supported since Android 2.1 and iOS 3.1, and by now it is supported on at least the latest browser version on each platform, which should cover the vast majority of mobile devices out there. On the desktop side of things, flexbox has also been supported for a while on different platforms, even on IE since version 10. This is in contrast to SSE, which Microsoft apparently does not want to support at all. But there is one **caveat**: Flexbox exists in different versions, with the old ones prefixed. For -webkit, even different prefixed versions exist. In itself that is not a huge problem, particularly if you use **[LESS mixins](http://lesscss.org/#-mixins)** so you do not have to continuously repeat yourself. But it is still a quite annoying because it means optimizing for different browser versions. Well, nothing new in the world of browser compatibility issues. 
 
