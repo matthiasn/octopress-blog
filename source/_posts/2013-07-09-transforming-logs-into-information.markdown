@@ -101,3 +101,5 @@ So for now I have integrated the Logger object into a **[new branch of the sse-c
 
 Cheers,
 Matthias
+
+*You should follow me on Twitter <a href="https://twitter.com/matthiasnehlsen" target="_blank">here</a>.*

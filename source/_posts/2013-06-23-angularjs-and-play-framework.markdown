@@ -141,4 +141,6 @@ If you enjoyed this post, then make sure you subscribe to my **<a href="http://e
 
 There is a **[follow-up article](http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/)** with the lessons learned, please check it out if you are interested in the server side problems I encountered while running the demo application.
 
--Matthias
+Cheers, Matthias
+
+*You should follow me on Twitter <a href="https://twitter.com/matthiasnehlsen" target="_blank">here</a>.*

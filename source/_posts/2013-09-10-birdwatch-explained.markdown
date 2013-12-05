@@ -583,3 +583,5 @@ Okay, this concludes the explanation of my **[BirdWatch](https://github.com/matt
 
 Cheers,
 Matthias
+
+*You should follow me on Twitter <a href="https://twitter.com/matthiasnehlsen" target="_blank">here</a>.*

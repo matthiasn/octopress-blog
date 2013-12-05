@@ -115,3 +115,5 @@ Anyhow, I will go into more detail later. The source code for the entire applica
 
 Until next time, 
 Matthias
+
+*You should follow me on Twitter <a href="https://twitter.com/matthiasnehlsen" target="_blank">here</a>.*

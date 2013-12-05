@@ -218,6 +218,8 @@
 <p>We can also swap individual parts of the application for better ones. I personally do not like the current approach to consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> as used in <strong><a href="https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala">TweetsPublisher.scala</a></strong> and I would like to replace it with the <strong><a href="https://dev.twitter.com/blog/the-hosebird-client-streaming-library">Twitter Hosebird Client (hbc)</a></strong>. If folks at Twitter have developed this for usage in their own projects, I have no doubt they can do this much better than my simple reconnect strategy possibly could. Last time I checked, hbc was not compatible with Scala version 2.10 used in Play 2.1 though, but thanks to ZeroMQ, the library can be run in its native habitat (Java application without having to worry about which version of Scala is used in some embedded library) and publish Tweets onto a ZeroMQ socket. The TweetsConsumer then would only have to point to another socket address. Anyone experienced with using ZeroMQ in a Java application interested in writing this client?</p>
 
 <p>-Matthias</p>
+
+<p><em>You should follow me on Twitter <a href="https://twitter.com/matthiasnehlsen" target="_blank">here</a>.</em></p>
 </div>
 
 
