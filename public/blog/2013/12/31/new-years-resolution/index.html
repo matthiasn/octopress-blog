@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework - Matthias Nehlsen</title>
+  <title>New Year's Resolution - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I am happy to get a huge update of the BirdWatch application out of the way. The changes are much more than what I would normally want to work on for &hellip;">
+  <meta name="description" content="I never really thought much of New Year’s Resolutions because I could never live up to them. 2013 was different though. One year ago my resolution &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</h1>
+      <h1 class="entry-title">New Year's Resolution</h1>
     
     
       <p class="meta">
@@ -97,45 +97,47 @@
   
 
 
-<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
+<time datetime="2013-12-31T19:40:00+01:00" pubdate data-updated="true">12/31/2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are much more than what I would normally want to work on for a single article, but then again there is enough interesting stuff going on in this new version for multiple blog articles to come. Initially this application was only meant to be an exercise in streaming information to web clients. But in the meantime I have noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
+<div class="entry-content"><p>I never really thought much of New Year’s Resolutions because I could never live up to them. 2013 was different though. One year ago my resolution was to start writing a blog and to create one or more open source projects, just for the fun of it. And this time I actually succeeded. So I thought I continue with this resolution thing.</p>
 
 <!-- more -->
 
 
-<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest. I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> of this for software engineering related tweets. The application subscribes to all Tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped to one percent of all Tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
+<p>2013 has been pretty good for me, for the most part. Well, except for my beloved bike being stolen from inside the apartment building two days ago, thanks to modern battery technology allowing for cordless angle grinders. But I digress. Usually I am a fan of powerful batteries. In terms of learning more about software, it has been great. I have started writing this blog and I have created my first ever open source project, <strong><a href="http://birdwatch.matthiasnehlsen.com/">BirdWatch</a></strong>, and it has been cool to build it and to improve it. Along the way it has also been great to learn more about <strong><a href="http://www.scala-lang.org">Scala</a></strong>, <strong><a href="http://www.playframework.com">Play Framework</a></strong>, <strong><a href="http://angularjs.org">AngularJS</a></strong> and JavaScript in general.</p>
 
-<p>Here is how it looks like:</p>
+<p>I have also written a few articles that I really like. Not all of them, of course, but there are a few. I find this particularly rewarding to see after a good friend of mine, a journalist and professional writer, had set somewhat different expectations. I asked him early on how long it took him until he was completely satisfied with his output on a regular basis, like looking at an article the next day and not wanting to rewrite it for the umptieth time. He said that that had taken about seven years of writing professionally, full time. So I can either consider myself lucky that I am happy with a good share of the articles, or maybe I just have low standards, or both.</p>
 
-<p><img class="left" src="/images/130812-screenshot.png" title="image" alt="images"></p>
+<p>I have also recently started working on an AngularJS based blogging engine, which I have not published yet. It offers live preview and also animated code blocks, among other things. It is pretty much production ready, I find, I am just lacking the time to actually bring it to the point that I want to see published. Or maybe I should just embrace the imperfection and publish it as is. Maybe someone else already finds it useful and wants to put some effort in it. You should be embarrassed of your first release anyways, right?</p>
 
-<p>As you can see above, there is now a search bar which allows to narrow down the selection tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time of opening the link, not at the time of bookmarking it. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
+<p>Recently I have started asking myself if me working on a blogging engine might be some elaborate procrastination strategy on my part, in order to have an excuse to not actually write. Octopress works reasonably well, after all. On the other hand, I do not actually like the authoring process all that much, particularly when it comes to embedding source code, which I find quite unsatisfying.</p>
 
-<p>Here are some examples.</p>
+<p>I have also finally started working on a book about three months ago, after having been approached by editors a few times who had read one or more of the articles that I also like. I will talk more about the content of the book in due course. Writing a book is an interesting endeavor and quite different again from writing a blog.</p>
 
-<p>You&#8217;re a Java developer and you&#8217;re looking for a new job? Try this search: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring)</strong></a></p>
+<p>So what do I want to do differently in 2014 when it comes to the blog, book writing and authoring fun open source toy projects?</p>
 
-<p>You want to limit your job search to London? No problem. Here you go: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring) london</strong></a></p>
+<ul>
+<li><p>More frequent blog posts. I would like to publish stuff more often, even if that means shorter articles. I bet some readers will be happy with that; I know that my articles so far have not exactly been short. I am aiming for two fixed publications per month, maybe around the 5th and the 20th of each month, give or take. I am aware that this puts additional pressure on myself, but I think it will be better to get into a good rhythm there.</p></li>
+<li><p>Morning pages. I have been introduced to this concept by the <strong><a href="http://pragprog.com/book/ahptl/pragmatic-thinking-and-learning">Pragmatic Programmer</a></strong> series and I have found it to be great to do an unfiltered first-thing-in-the-morning brain dump. I just don’t do it regularly enough yet. One point where I don’t agree with the concept as introduced in the book is that it needs to be on paper, not on screen. I find that restrictions to be somewhat pointless because it ends up with me not ever looking at the output again. And I find that typing does not hinder me from getting whatever idea out of my brain, into a form that is full-text searchable.</p></li>
+<li><p>Quite the contrary, I want the thoughts I write down not only to be searchable but also be tagged by subject and also people. That way I feel I could bundle thoughts better, particularly about ideas that are not concrete enough yet to have found their way into a to-do list. I would like to write a tool for doing so, maybe with an AngularJS frontend and backed by ElasticSearch. Could be another project on github, this time something I am actually using on a daily basis. But then again this might just be one of these procrastination strategies. Time will tell.</p></li>
+<li><p>I want to check github my own github profile less often. It is really to cool to see when your projects receive stars from other developers who find something useful or otherwise cool. But it can become quite addictive to check the github app on my smartphone to see if anything has changed, particularly when something has just changed recently. So less of that. Once a day or so is plenty.</p></li>
+<li><p>I need to become better at leaving work at work. As interesting as the engineering problems there might be, I should not think about them at all outside of work. I have plenty of other areas I want to focus on, like this blog, the book or one of my next toy projects.</p></li>
+<li><p>I need to make more time for physical exercise. I really perform better in all areas and I feel better when I have worked out three or four times per week. So I need to get back into that habit.</p></li>
+<li><p>I want to do more in <strong><a href="http://clojure.org">Clojure</a></strong>. I have spent some time with the language and it resonates really well with the way I am thinking.</p></li>
+<li><p>I want to <strong><a href="http://learnyouahaskell.com">learn me a Haskell for great good</a></strong>, just for the fun of it.</p></li>
+</ul>
 
-<p>You&#8217;re interested in tweets about Python the language but not about <a target="_blank" href="http://www.youtube.com/watch?v=kQFKtI6gn9Y&list=TLbNXOyfwTL14"><strong>Monty Python</strong></a>: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/python%20-monty"><strong>python -monty</strong></a></p>
 
-<p>Well, you get the idea. <strong>AND</strong> is the standard operator, it is applied unless <strong>OR</strong> is specifically used between two terms.</p>
+<p>Well, this is it for now. Let’s see how many of these I can actually put in practice. So many interesting things to explore, so little time.</p>
 
-<p>You can download the application and run it for a different area of your choosing. For myself I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I might run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
+<p>Have a great 2014, everyone.</p>
 
-<p>So how can this be improved in the future? A stream of Tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at one glance which newspaper articles and other links are most talked about. This analysis could even be weighed by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be a visualization about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? The other way around? Get involved, there are plenty of options on how to work with the data.</p>
-
-<p>You can find a brief overview of the technology in the project description on <a target="_blank" href="https://github.com/matthiasn/BirdWatch"><strong>Github</strong></a>.</p>
-
-<p>In the future I will probably write some articles further explaining different parts of the application. Let me know what you are particularly interested in.</p>
-
-<p>Alright, this is it for today. Until next time.
+<p>Cheers,
 Matthias</p>
 </div>
 
@@ -159,7 +161,7 @@ Matthias</p>
   
 
 
-<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
+<time datetime="2013-12-31T19:40:00+01:00" pubdate data-updated="true">12/31/2013</time>
       
 
 
@@ -167,7 +169,7 @@ Matthias</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/" >Tweet</a>
   
 
   
@@ -203,10 +205,10 @@ Matthias</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/07/09/transforming-logs-into-information/" title="Previous Post: Transforming Log Events into Information">&laquo; Transforming Log Events into Information</a>
+        <a class="basic-alignment left" href="/blog/2013/11/23/live-page-reload-on-any-device/" title="Previous Post: HTML5 Template with Live Reload and 100/100 PageSpeed">&laquo; HTML5 Template with Live Reload and 100/100 PageSpeed</a>
       
       
-        <a class="basic-alignment right" href="/blog/2013/09/10/birdwatch-explained/" title="Next Post: BirdWatch explained">BirdWatch explained &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2014/01/05/play-framework-and-facebooks-react-library/" title="Next Post: Play Framework and Facebook's React library">Play Framework and Facebook's React library &raquo;</a>
       
     </p>
   </footer>
@@ -314,8 +316,8 @@ Matthias</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -9,7 +9,7 @@ I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-gith
 
 <!-- more -->
 
-**UPDATE 06/27/2013:** Here is how it looks like. **[Deploy it yourself](https://github.com/matthiasn/sse-chat/)** if you want full chat functionality.
+**UPDATE 06/27/2013:** Here is how it looks like. **[The source is on GitHub](https://github.com/matthiasn/sse-chat/)**.
 
 <iframe width="420" height="425" src="http://sse-chat.matthiasnehlsen.com/" frameborder="0" allowfullscreen></iframe>
 

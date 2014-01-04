@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="A few weeks ago I started working on the follow-up to my BirdWatch project. This new project is another single page application based on AngularJS, &hellip;">
+  <meta name="description" content="Over the holidays I have discovered Facebook&#8217;s React, an interesting library for generating reactive user interfaces. I wanted to try it out in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,90 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/01/05/play-framework-and-facebooks-react-library/">Play Framework and Facebook&#8217;s React library</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-05T23:30:00+01:00" pubdate data-updated="true">01/05/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Over the holidays I have discovered Facebook&#8217;s <strong><a href="http://facebook.github.io">React</a></strong>, an interesting library for generating reactive user interfaces. I wanted to try it out in a real-world application, which reminded of one I still had running as a demo: <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, a little chat application I wrote last summer for learning how to make <strong><a href="http://www.playframework.com/">Play Framework</a></strong> and <strong><a href="http://angularjs.org/">AngularJS</a></strong> cooperate in a very basic way. So I thought, why not rewrite the client side using <strong><a href="http://facebook.github.io">React</a></strong>, offering the exact same functionality as the <strong><a href="http://angularjs.org/">AngularJS</a></strong> version. Both are available at the same time in the new version, with no changes to the backend code, except for the added route as both versions can be accessed in parallel.</p>
+
+<p>The contraint of making it behave exactly like the AngularJS version was a great exercise and it really only took an afternoon to complete.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/01/05/play-framework-and-facebooks-react-library/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/12/31/new-years-resolution/">New Year&#8217;s Resolution</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-12-31T19:40:00+01:00" pubdate data-updated="true">12/31/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I never really thought much of New Year’s Resolutions because I could never live up to them. 2013 was different though. One year ago my resolution was to start writing a blog and to create one or more open source projects, just for the fun of it. And this time I actually succeeded. So I thought I continue with this resolution thing.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/12/31/new-years-resolution/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -408,88 +492,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-06-02T07:48:00+02:00" pubdate data-updated="true">06/02/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Let us assume for a second that the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It would work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed. How do we connect these separate parts of the application though?</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/05/26/making-birdwatch-interactive/">Making BirdWatch Interactive</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-05-26T20:45:00+02:00" pubdate data-updated="true">05/26/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Some weeks ago when I started working on the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more excited in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though because the server side reasoning did not scale well at all. In the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/05/26/making-birdwatch-interactive/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -516,6 +518,14 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/01/05/play-framework-and-facebooks-react-library/">Play Framework and Facebook&#8217;s React library</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/31/new-years-resolution/">New Year&#8217;s Resolution</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
       </li>
     
@@ -527,14 +537,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
         <a href="/blog/2013/09/10/birdwatch-explained/">BirdWatch explained</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
-      </li>
-    
   </ul>
 </section>
 <section>
@@ -543,22 +545,17 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
       <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>Reactive web application using Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
     </li>
     <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
       <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
       <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
-    </li>
-    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
-      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
-        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code for the chat functionality.</p>
-    </li>
-    <li><a href="https://github.com/matthiasn/live-html5">live-html5</a>&nbsp;
-      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=live-html5&type=watch&count=true"
-        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>A speed-optimized, mobile-first HTML5 template with grunt build system and live preview during authoring.</p>
     </li>
   </ul>
 </section><section>
@@ -577,34 +574,14 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     </form>
     <br />
   </div>
-</section><section>
-  <a href="https://twitter.com/matthiasnehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
-  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-<br />
-<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
-<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
-</a>
-
 </section>
-
-<section class="googleplus">
-  <h1>
-    <a href="https://plus.google.com/100986586701798521209?rel=author">
-      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
-      Google+
-    </a>
-  </h1>
-</section>
-
-
-
   
 </aside>
 
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Matthias Nehlsen -
+  Copyright &copy; 2014 - Matthias Nehlsen -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 

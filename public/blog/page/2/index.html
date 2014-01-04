@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at &hellip;">
+  <meta name="description" content="Let us assume for a second that the BirdWatch application needed to handle more load than a single server could handle. The current version could not &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,88 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-02T07:48:00+02:00" pubdate data-updated="true">06/02/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Let us assume for a second that the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It would work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed. How do we connect these separate parts of the application though?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/26/making-birdwatch-interactive/">Making BirdWatch Interactive</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-26T20:45:00+02:00" pubdate data-updated="true">05/26/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Some weeks ago when I started working on the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more excited in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though because the server side reasoning did not scale well at all. In the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/05/26/making-birdwatch-interactive/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -352,6 +434,14 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/01/05/play-framework-and-facebooks-react-library/">Play Framework and Facebook&#8217;s React library</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/31/new-years-resolution/">New Year&#8217;s Resolution</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
       </li>
     
@@ -363,14 +453,6 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
         <a href="/blog/2013/09/10/birdwatch-explained/">BirdWatch explained</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a>
-      </li>
-    
   </ul>
 </section>
 <section>
@@ -379,22 +461,17 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
       <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>Reactive web application using Play Framework 2.1 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
     </li>
     <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
       <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
         allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
       <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
-    </li>
-    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
-      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
-        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>Chat example app using Server Sent Events plus REST calls. Less than 10 lines of Scala code for the chat functionality.</p>
-    </li>
-    <li><a href="https://github.com/matthiasn/live-html5">live-html5</a>&nbsp;
-      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=live-html5&type=watch&count=true"
-        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
-      <p>A speed-optimized, mobile-first HTML5 template with grunt build system and live preview during authoring.</p>
     </li>
   </ul>
 </section><section>
@@ -413,34 +490,14 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     </form>
     <br />
   </div>
-</section><section>
-  <a href="https://twitter.com/matthiasnehlsen" class="twitter-follow-button" data-show-count="false" data-size="small">Follow @_MNehlsen</a>
-  <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-<br />
-<a href="http://de.linkedin.com/pub/matthias-nehlsen/24/a5b/9b5">
-<img src="http://www.linkedin.com/img/webpromo/btn_viewmy_160x25.png" width="160" height="25" style="border:0 none" alt="View Matthias Nehlsen's profile on LinkedIn">
-</a>
-
 </section>
-
-<section class="googleplus">
-  <h1>
-    <a href="https://plus.google.com/100986586701798521209?rel=author">
-      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
-      Google+
-    </a>
-  </h1>
-</section>
-
-
-
   
 </aside>
 
     </div>
   </div>
   <footer role="contentinfo"><p>
-  Copyright &copy; 2013 - Matthias Nehlsen -
+  Copyright &copy; 2014 - Matthias Nehlsen -
   <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
 </p>
 
