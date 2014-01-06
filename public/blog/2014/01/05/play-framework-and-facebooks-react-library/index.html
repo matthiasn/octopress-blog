@@ -106,7 +106,7 @@
 
 <div class="entry-content"><p>Over the holidays I have discovered Facebook&#8217;s <strong><a href="http://facebook.github.io">React</a></strong>, an interesting library for generating reactive user interfaces. I wanted to try it out in a real-world application, which reminded of one I still had running as a demo: <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, a little chat application I wrote last summer for learning how to make <strong><a href="http://www.playframework.com/">Play Framework</a></strong> and <strong><a href="http://angularjs.org/">AngularJS</a></strong> cooperate in a very basic way. So I thought, why not rewrite the client side using <strong><a href="http://facebook.github.io">React</a></strong>, offering the exact same functionality as the <strong><a href="http://angularjs.org/">AngularJS</a></strong> version. Both are available at the same time in the new version, with no changes to the backend code, except for the added route as both versions can be accessed in parallel.</p>
 
-<p>The contraint of making it behave exactly like the AngularJS version was a great exercise and it really only took an afternoon to complete.</p>
+<p>The contraint of making it behave exactly like the AngularJS version was a great exercise and it really only took an afternoon to complete. Touching the existing demo version also had me notice that the live version of it had been up for like 4 months or so, without any trouble. I have the same experience with my <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">BirdWatch</a></strong> application. Kudos to the Play Framework developers for that, and same for Akka, which provides the supervised Actor architecture presumably enabling such reliable server systems.</p>
 
 <!-- more -->
 
@@ -116,7 +116,7 @@
 <iframe width="420" height="475" src="http://sse-chat.matthiasnehlsen.com/react" frameborder="0"></iframe>
 
 
-<p>You can open the AngularJS version demo inside the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">article from last summer</a></strong> in another browser and communicate between the two, they share the same backend. Romeo and Juliet are having a chat in room 1, but hey, why not. Better than you just chatting with yourself. You can learn more about the server side in the previous article. In this article we will look exclusively at the web client. Here&#8217;s an overview of the architecture with React:</p>
+<p>You can open the AngularJS version of the demo inside the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">article from last summer</a></strong> in another browser and communicate between the two, they share the same backend. Romeo and Juliet are having a chat in room 1, but hey, why not. Better than you just chatting with yourself. You can learn more about the server side in the previous article. In this article we will look exclusively at the web client. Here&#8217;s an overview of the architecture with React:</p>
 
 <p><img class="left" src="/images/react-sse-chat.png" title="image" alt="images"></p>
 
