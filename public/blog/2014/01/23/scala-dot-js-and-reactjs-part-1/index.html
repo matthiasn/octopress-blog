@@ -1,0 +1,788 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Scala.js and ReactJS - Part 1 - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="In this article I will present my attempt at writing a reactive web application using Scala.js and ReactJS on the client side. It is based on sse- &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+
+<script src="//use.typekit.net/rco1jij.js"></script>
+<script>try{Typekit.load();} catch (e){}</script>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Scala.js and ReactJS - Part 1</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-23T12:45:00+01:00" pubdate data-updated="true">01/23/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this article I will present my attempt at writing a reactive web application using <strong><a href="http://www.scala-js.org">Scala.js</a></strong> and <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side. It is based on <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, an application I initially wrote for demonstrating the usage of <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS with Play Framework</a></strong>. I then rewrote the client for an article about <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">using ReactJS on the client side</a></strong>. In the latest version now, there is an additional client that connects to the same server and uses utilizes Scala.js for building the web client. I recently gave a talk about this at Ping Conference in Budapest, <strong><a href="http://m.ustream.tv/recorded/42780242">check it out</a></strong> if you&#8217;re interested. I discovered ReactJS through <strong><a href="http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/">David Nolen&#8217;s blog</a></strong> and his excellent <strong><a href="https://github.com/swannodette/om">OM library</a></strong>, which combines ReactJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong>. His <strong><a href="http://swannodette.github.io/2013/12/31/time-travel/">second article on Om</a></strong> also inspired me to try out an undo functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the <strong><a href="http://facebook.github.io/react/docs/tutorial.html">tutorial</a></strong> and also reading my last <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">blog post</a></strong>.</p>
+
+<!-- more -->
+
+
+<h1>Why would someone want Scala on the client in the first place?</h1>
+
+<p>Great question, I am glad you asked. A couple of things come to my mind:</p>
+
+<ul>
+<li><p>If you work with Scala on the server side, you will be familiar with its powerful collection library. You will be able to use it instead of wrapping your head around stuff like <strong><a href="http://underscorejs.org">underscore</a></strong>. Nothing wrong with underscore, it just adds to the things we have to think about when writing an application.</p></li>
+<li><p>JavaScript, while being very powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you could avoid context switches that would inevitably occur when going back and forth between Scala and JavaScript.</p></li>
+<li><p>Immutable data structures are a powerful thing that make reasoning about an application much more straightforward. Implementing an an undo functionality becomes almost trivial with this approach, as I will try to show you in this article.</p></li>
+</ul>
+
+
+<p>Here is how the client looks like in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such), whereas <strong>undo all</strong> will very quickly go through all steps until the beginning of time.</p>
+
+<iframe width="420" height="550" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
+
+
+
+
+<br />
+
+
+<br />
+
+
+<h1>Architectural Overview</h1>
+
+<p>The server side has remained the same with all different clients (AngularJS, ReactJS, ReactJS and Scala.js) and all clients co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their name, they can select the chat room and they can submit messages into the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
+
+<p><img class="left" src="/images/sse-chat-scalajs.png"></p>
+
+<p>Application state is modeled through a Scala case class that holds the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a Stack. Every time some information changes, a copy of the head of the stack is made and a new version of the application state with the desired change pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">stack</a></strong> is a LIFO (last-in-first-out) data strucure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala peek is called head as a more general abstraction for getting the first element of a collection.</p>
+
+<p>Application state, in its current version / incarnation, is passed to ReactJS for full render every single time somthing changes. This might sound like a lot of overhead if React completely and potentially expensively re-rendered the DOM every single time. Luckily, it does not do that. Instead it has a fast virtual DOM, which it uses for diffing versions of the (virtual) DOM and only manipulates the actual browser DOM where changes have occured. This is really fast. If you let the chat app demo above run for a while (or interact with it multiple times) so that the stack contains sufficiently many elements, you should see changes in the browser at a full 60 frames per second. There are optimization that can still be made in terms of React&#8217;s rendering performance, but this runs fine at 60 fps without. Please note that for simplicity I am running the JSX to JavaScript in your browser. You don&#8217;t want to do that in a production system.</p>
+
+<h1>Source Code</h1>
+
+<p>So without further ado, let us have a look at the code I have come up with so far for implementing the client side chat functionality. I am very certain it is far from ideal at this point but you may find it interesting nonetheless.</p>
+
+<figure class='code'><figcaption><span>Main Application</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/SseChat.scala'>SseChat.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** current version of application state modeled as immutable case class */</span>
+</span><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">AppState</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">msgs</span><span class="k">:</span> <span class="kt">Vector</span><span class="o">[</span><span class="kt">ChatMsgTrait</span><span class="o">])</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">App</span> <span class="o">{</span>
+</span><span class='line'>  <span class="cm">/** Application state history modeled as stack. New versions of state get pushed onto stack.</span>
+</span><span class='line'><span class="cm">   *  Previous states are available with a combination of pop and peek (called head in Scala implementation) */</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">stack</span> <span class="k">=</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">AppState</span><span class="o">](</span><span class="nc">InterOp</span><span class="o">.</span><span class="n">triggerReact</span><span class="o">)</span>
+</span><span class='line'>  <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">Utils</span><span class="o">.</span><span class="n">getInitialState</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** undo state change by popping stack and trigger rendering (which reads the head) */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">undo</span><span class="o">(</span><span class="n">all</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="k">if</span> <span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** perform undo repeatedly until only initial element left, with interval duration between steps */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">undo</span><span class="o">()</span>
+</span><span class='line'>      <span class="nc">InterOp</span><span class="o">.</span><span class="n">setTimeout</span><span class="o">(</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="o">),</span> <span class="n">interval</span><span class="o">)</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** functions generating new version of state which are then pushed onto stack using updateState() */</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setUser</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">user</span> <span class="k">=</span> <span class="n">name</span><span class="o">))</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">addMsg</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span> <span class="k">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">msgs</span> <span class="k">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">msgs</span><span class="o">.</span><span class="n">takeRight</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span> <span class="o">:+</span> <span class="n">msg</span><span class="o">))</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setRoom</span><span class="o">(</span><span class="n">newRoom</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">room</span> <span class="k">=</span> <span class="n">newRoom</span><span class="o">))</span>
+</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">listen</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">room</span><span class="o">,</span> <span class="nc">InterOp</span><span class="o">.</span><span class="n">addMsg</span> <span class="k">_</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">main</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">listen</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">room</span><span class="o">,</span> <span class="nc">InterOp</span><span class="o">.</span><span class="n">addMsg</span> <span class="k">_</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>InterOp</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/InterOp.scala'>InterOp.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.scalajs.js</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">js.Dynamic.</span><span class="o">{</span> <span class="n">global</span> <span class="k">=&gt;</span> <span class="n">g</span> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">trait</span> <span class="nc">ChatMsgTrait</span> <span class="k">extends</span> <span class="n">js</span><span class="o">.</span><span class="nc">Object</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">var</span> <span class="n">text</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">var</span> <span class="n">user</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">var</span> <span class="n">time</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">var</span> <span class="n">room</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** Scala representation of SseChatApp JavaScript object holding the JS side of the app */</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">SseChatApp</span> <span class="k">extends</span> <span class="n">js</span><span class="o">.</span><span class="nc">Object</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">submitMessage</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">listen</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">handler</span><span class="k">:</span> <span class="kt">js.Function1</span><span class="o">[</span><span class="kt">ChatMsgTrait</span>, <span class="kt">Unit</span><span class="o">])</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setUserProps</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setRoomProps</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setMsgsProps</span><span class="o">(</span><span class="n">msgs</span><span class="k">:</span> <span class="kt">js.Array</span><span class="o">[</span><span class="kt">ChatMsgTrait</span><span class="o">])</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setStackSizeProps</span><span class="o">(</span><span class="n">stackSize</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setApp</span><span class="o">(</span><span class="n">interOp</span><span class="k">:</span> <span class="kt">InterOp.</span><span class="k">type</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** methods of this object are individually exported in startup.js (to avoid having the closure compiler rename them) */</span>
+</span><span class='line'><span class="k">object</span> <span class="nc">InterOp</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">addMsg</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">addMsg</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">triggerReact</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">state</span> <span class="k">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span>
+</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setUserProps</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="n">user</span><span class="o">)</span>
+</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setRoomProps</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="n">room</span><span class="o">)</span>
+</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setMsgsProps</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="n">msgs</span><span class="o">.</span><span class="n">toArray</span><span class="o">[</span><span class="kt">ChatMsgTrait</span><span class="o">])</span>
+</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setStackSizeProps</span><span class="o">(</span><span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">toString</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setUser</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">setUser</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">toString</span><span class="o">)</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setRoom</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">setRoom</span><span class="o">(</span><span class="n">room</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">submitMsg</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">msg</span><span class="o">.</span><span class="n">room</span> <span class="k">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">room</span>
+</span><span class='line'>    <span class="n">msg</span><span class="o">.</span><span class="n">user</span> <span class="k">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">user</span>
+</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">submitMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">undo</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">undo</span><span class="o">()</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="o">.</span><span class="n">toInt</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">setTimeout</span><span class="o">(</span><span class="n">fn</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">,</span> <span class="n">millis</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">setTimeout</span><span class="o">(</span><span class="n">fn</span><span class="o">,</span> <span class="n">millis</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Stack implementation</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/ChangeAwareStack.scala'>ChangeAwareStack.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="nn">scala.collection.mutable.Stack</span>
+</span><span class='line'><span class="c1">// custom stack implementation based on mutable Stack for any type T</span>
+</span><span class='line'><span class="c1">// takes callback function argument, which it will call on changes with the current head after the change</span>
+</span><span class='line'><span class="k">class</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Stack</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">push</span><span class="o">(</span><span class="n">elem</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="k">super</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">elem</span><span class="o">)</span>
+</span><span class='line'>    <span class="n">onChange</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">res</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">pop</span><span class="o">()</span> <span class="k">=</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="k">super</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">onChange</span><span class="o">()</span>
+</span><span class='line'>    <span class="n">res</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">def</span> <span class="n">peek</span> <span class="k">=</span> <span class="k">super</span><span class="o">.</span><span class="n">head</span>  <span class="c1">// convenience method since stack implementation does not implement peek()</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">ChangeAwareStack</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Exported Functions</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/js/startup.js'>startup.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ScalaJS</span><span class="p">.</span><span class="nx">modules</span><span class="p">.</span><span class="nx">com_matthiasnehlsen_sseChat_App</span><span class="p">().</span><span class="nx">main</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">ScalaApp</span> <span class="o">=</span> <span class="p">{};</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span> <span class="o">=</span> <span class="nx">ScalaJS</span><span class="p">.</span><span class="nx">modules</span><span class="p">.</span><span class="nx">com_matthiasnehlsen_sseChat_InterOp</span><span class="p">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;setUser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">setUser__T__V</span><span class="p">;</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;setRoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">setRoom__T__V</span><span class="p">;</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;undo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">undo__V</span><span class="p">;</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;undoAll&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">undoAll__T__V</span><span class="p">;</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;submitMsg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">addMsg__Lcom_matthiasnehlsen_sseChat_ChatMsgTrait__V</span><span class="p">;</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;triggerReact&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">triggerReact__V</span><span class="p">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">window</span><span class="p">[</span><span class="s1">&#39;ScalaApp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>ReactJS application (excerpt)</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-app-scalajs.js'>react-app-scalajs.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** undo component*/</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">UndoBox</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">handleUndo</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">handleUndoAll</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">undoAll</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;undo&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;button&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;btn&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Undo&quot;</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleUndo</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;button&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;btn&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Undo All&quot;</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleUndoAll</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span> <span class="nx">Stack</span> <span class="nx">size</span><span class="o">:</span>  <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">undoSize</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>     <span class="p">);}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** ChatApp is the main component in this application, it holds all state, which is passed down to child components</span>
+</span><span class='line'><span class="cm"> *  only as immutable props */</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">ChatApp</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">handleNameChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">setUser</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">handleRoomChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">setRoom</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">UndoBox</span> <span class="nx">scalaApp</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">}</span> <span class="nx">undoSize</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">stackSize</span><span class="p">}</span><span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">NameRoomBox</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span> <span class="nx">handleNameChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleNameChange</span><span class="p">}</span>
+</span><span class='line'>            <span class="nx">room</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">room</span><span class="p">}</span> <span class="nx">handleRoomChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleRoomChange</span><span class="p">}</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">MsgList</span> <span class="nx">data</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">msgs</span><span class="p">}</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">SaySomethingBox</span> <span class="nx">scalaApp</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">}</span><span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
+</span><span class='line'>    <span class="p">);}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** render top-level ChatApp component */</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">tlComp</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">ChatApp</span> <span class="nx">scalaApp</span><span class="o">=</span><span class="p">{</span><span class="nx">ScalaApp</span><span class="p">}</span><span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;chat-app&#39;</span><span class="p">));</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** pass props to top level component */</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span> <span class="nx">tlComp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span> <span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** application ready, call initial trigger so that name and room get loaded without receiving message */</span>
+</span><span class='line'><span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">triggerReact</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>ReactJS application (excerpt)</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-interop.js'>react-interop.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">SseChatApp</span> <span class="o">=</span> <span class="nx">SseChatApp</span> <span class="o">||</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">listen</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="kd">var</span> <span class="nx">chatFeed</span><span class="p">;</span> <span class="c1">// holds SSE streaming connection for chat messages for current room</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">room</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// returns function that takes room as argument</span>
+</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">chatFeed</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">chatFeed</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
+</span><span class='line'>        <span class="p">}</span> <span class="c1">// if initialized, close before starting new connection</span>
+</span><span class='line'>        <span class="nx">chatFeed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/chatFeed/&quot;</span> <span class="o">+</span> <span class="nx">room</span><span class="p">);</span> <span class="c1">// (re-)initializes connection</span>
+</span><span class='line'>        <span class="nx">chatFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">handler</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">));</span>
+</span><span class='line'>        <span class="p">},</span> <span class="kc">false</span><span class="p">);</span> <span class="c1">// attach addMsg event handler</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">}();</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** POST chat message */</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">submitMessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="s2">&quot;/chat&quot;</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msg</span><span class="p">),</span>
+</span><span class='line'>        <span class="nx">contentType</span><span class="o">:</span> <span class="s2">&quot;application/json; charset=utf-8&quot;</span><span class="p">,</span> <span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;json&quot;</span> <span class="p">});</span>
+</span><span class='line'><span class="p">};</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/** placeholder until replaced with real implementation upon compiling / initializing JSX */</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{};</span>
+</span><span class='line'>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * individual setProps because otherwise the closure compiler renamed function names on application state</span>
+</span><span class='line'><span class="cm"> * case class object (would be more elegant with a single case class object)</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setUserProps</span>      <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">user</span><span class="o">:</span> <span class="nx">user</span> <span class="p">});</span> <span class="p">};</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setRoomProps</span>      <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">room</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">room</span><span class="o">:</span> <span class="nx">room</span> <span class="p">});</span> <span class="p">};</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setMsgsProps</span>      <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msgs</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">msgs</span><span class="o">:</span> <span class="nx">msgs</span> <span class="p">});</span> <span class="p">};</span>
+</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setStackSizeProps</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">stackSize</span><span class="p">)</span> <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">stackSize</span><span class="o">:</span> <span class="nx">stackSize</span> <span class="p">});</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>Conclusion</h1>
+
+<p>Scala.js is an interesting approach for client side development for sure and certainly a technology to watch. It is still in experimental phase, so I probably wouldn&#8217;t have the Next Big Thing depend on it, but it might get there if there is enough interest from the community.</p>
+
+<p><strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> is something I would already fully recommend. Working with it has been a breeze and it took much less time to feel familiar with what it can do in comparison to <strong><a href="http://angularjs.org/">AngularJS</a></strong>. It&#8217;s approach to immutable data feels very natural for a functional programmer.
+It is great to only have to think about components and then be able to build your application around it the way you like, instead of much more being forced into a precribed way of doing things.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-23T12:45:00+01:00" pubdate data-updated="true">01/23/2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+    <script type="text/javascript">
+      (function() { 
+        var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
+        write_string += '&url='; 
+        write_string += encodeURIComponent(window.location); 
+        write_string += '&title=' + encodeURIComponent(document.title);
+        write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
+
+        var span = $(document.createElement("span"));
+        span.html(write_string);
+        $(".sharing").append(span);
+      })();
+    </script>
+  
+  
+  
+<script type="text/javascript" src="http://www.reddit.com/static/button/button1.js"></script>
+  
+  
+  
+    <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/01/05/play-framework-and-facebooks-react-library/" title="Previous Post: Play Framework and Facebook's React library">&laquo; Play Framework and Facebook's React library</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/01/23/scala-dot-js-and-reactjs-part-1/">Scala.js and ReactJS - Part 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/05/play-framework-and-facebooks-react-library/">Play Framework and Facebook's React library</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/12/31/new-years-resolution/">New Year's Resolution</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/15/using-crossfilter-with-angularjs/">Using Crossfilter with AngularJS</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+    </li>
+  </ul>
+</section><section>
+    <h1>Subscribe</h1>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    <br />
+  </div>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
