@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-01-27T02:00:13+01:00</updated>
+  <updated>2014-01-27T03:50:34+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,11 +14,11 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Scala.js and ReactJS - Part 1]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1/"/>
-    <updated>2014-01-23T12:45:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/01/23/scala-dot-js-and-reactjs-part-1</id>
-    <content type="html"><![CDATA[<p>In this article I will present my attempt at writing a reactive web application using <strong><a href="http://www.scala-js.org">Scala.js</a></strong> and <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side. It is based on <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, an application I initially wrote for demonstrating the usage of <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS with Play Framework</a></strong>. I then rewrote the client for an article about <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">using ReactJS on the client side</a></strong>. In the latest version now, there is an additional client that connects to the same server and uses utilizes Scala.js for building the web client. I recently gave a talk about this at Ping Conference in Budapest, <strong><a href="http://m.ustream.tv/recorded/42780242">check it out</a></strong> if you&#8217;re interested. I discovered ReactJS through <strong><a href="http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/">David Nolen&#8217;s blog</a></strong> and his excellent <strong><a href="https://github.com/swannodette/om">OM library</a></strong>, which combines ReactJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong>. His <strong><a href="http://swannodette.github.io/2013/12/31/time-travel/">second article on Om</a></strong> also inspired me to try out an undo functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the <strong><a href="http://facebook.github.io/react/docs/tutorial.html">tutorial</a></strong> and also reading my last <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">blog post</a></strong>.</p>
+    <title type="html"><![CDATA[Scala.js and ReactJS]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/"/>
+    <updated>2014-01-24T12:45:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs</id>
+    <content type="html"><![CDATA[<p>In this article I will present a simple reactive web application using <strong><a href="http://www.scala-js.org">Scala.js</a></strong> and <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side. It is based on <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, an application I initially wrote for demonstrating the usage of <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS with Play Framework</a></strong>. I then rewrote the client for an article about <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">using ReactJS on the client side</a></strong>. In the latest version now, there is an additional client that connects to the same server and utilizes Scala.js for building the web client. I recently gave a talk about this at Ping Conference in Budapest, <strong><a href="http://m.ustream.tv/recorded/42780242">check it out</a></strong> if you&#8217;re interested. I discovered ReactJS through <strong><a href="http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/">David Nolen&#8217;s blog</a></strong> and his excellent <strong><a href="https://github.com/swannodette/om">OM library</a></strong>, which combines ReactJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong>. His <strong><a href="http://swannodette.github.io/2013/12/31/time-travel/">second article on Om</a></strong> also inspired me to try out an undo functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the <strong><a href="http://facebook.github.io/react/docs/tutorial.html">tutorial</a></strong> and also reading my last <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">blog post</a></strong>.</p>
 
 <!-- more -->
 
@@ -30,13 +30,13 @@
 <ul>
 <li><p>If you work with Scala on the server side, you will be familiar with its powerful collection library. You will be able to use it instead of wrapping your head around stuff like <strong><a href="http://underscorejs.org">underscore</a></strong>. Nothing wrong with underscore, it just adds to the things we have to think about when writing an application.</p></li>
 <li><p>JavaScript, while being very powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you could avoid context switches that would inevitably occur when going back and forth between Scala and JavaScript.</p></li>
-<li><p>Immutable data structures are a powerful thing that make reasoning about an application much more straightforward. Implementing an an undo functionality becomes almost trivial with this approach, as I will try to show you in this article.</p></li>
+<li><p>Immutable data structures are very powerful and make reasoning about an application much more straightforward. Implementing an <strong>undo</strong> functionality becomes almost trivial with this approach, as I will try to show you in this article.</p></li>
 </ul>
 
 
-<p>Here is how the client looks like in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such), whereas <strong>undo all</strong> will very quickly go through all steps until the beginning of time.</p>
+<p>Here is the new client in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such), whereas <strong>undo all</strong> will very quickly go through all steps until the beginning of time.</p>
 
-<iframe width="420" height="550" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
+<iframe width="420" height="600" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
 
 
 
@@ -49,17 +49,23 @@
 
 <h1>Architectural Overview</h1>
 
-<p>The server side has remained the same with all different clients (AngularJS, ReactJS, ReactJS and Scala.js) and all clients co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their name, they can select the chat room and they can submit messages into the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
+<p>The server side has stayed the same with the different clients (AngularJS, ReactJS, ReactJS and Scala.js) and all clients co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their name, they can select the chat room and they can submit messages into the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat-scalajs.png"></p>
 
-<p>Application state is modeled through a Scala case class that holds the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a Stack. Every time some information changes, a copy of the head of the stack is made and a new version of the application state with the desired change pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">stack</a></strong> is a LIFO (last-in-first-out) data strucure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala peek is called head as a more general abstraction for getting the first element of a collection.</p>
+<p>Application state is modeled through a Scala <strong><a href="http://www.scala-lang.org/old/node/107">Case Class</a></strong> that holds the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a <strong>Stack</strong>. Every time some information changes, a copy of the head of the stack is made and a new version of the application state with the desired change pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">Stack</a></strong> is a <strong>LIFO</strong> (last-in-first-out) data structure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala&#8217;s stack <em>peek</em> is called <em>head</em> as a more general abstraction for getting the first element of a collection.</p>
 
-<p>Application state, in its current version / incarnation, is passed to ReactJS for full render every single time somthing changes. This might sound like a lot of overhead if React completely and potentially expensively re-rendered the DOM every single time. Luckily, it does not do that. Instead it has a fast virtual DOM, which it uses for diffing versions of the (virtual) DOM and only manipulates the actual browser DOM where changes have occured. This is really fast. If you let the chat app demo above run for a while (or interact with it multiple times) so that the stack contains sufficiently many elements, you should see changes in the browser at a full 60 frames per second. There are optimization that can still be made in terms of React&#8217;s rendering performance, but this runs fine at 60 fps without. Please note that for simplicity I am running the JSX to JavaScript in your browser. You don&#8217;t want to do that in a production system.</p>
+<p>Application state, in its current version, is passed to ReactJS for full render every single time something changes. This might sound like a lot of overhead if React completely and potentially expensively re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast <strong><a href="http://facebook.github.io/react/index.html">Virtual DOM</a></strong>. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occured. This is really fast. If you let the chat app demo above run for a while (or interact with it multiple times) so that the stack contains sufficiently many elements (hundreds), you should see changes in the browser at a full <strong>60 frames per second</strong>.</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/undo-all-60fps.png" title="images" alt="images"></p>
+
+<p>There are optimization that can still be made in terms of React&#8217;s rendering performance, but this runs fine at 60 fps without any of those. <strong>Tip: you want 60fps at all times</strong> in your application, otherwise the user might experience jerky and overall unpleasant scrolling when anything that happens takes longer than the time between each frame. For 60fps that means every action must be finished within 16ms, preferably less.</p>
 
 <h1>Source Code</h1>
 
-<p>So without further ado, let us have a look at the code I have come up with so far for implementing the client side chat functionality. I am very certain it is far from ideal at this point but you may find it interesting nonetheless.</p>
+<p>So without further ado, let us have a look at implementing the client side chat functionality. What I suggest here is probably far from ideal, but it&#8217;s a start. Please let me know about improvements you think should be made, ideally as a pull request.</p>
+
+<p>First we will look at the main application logic:</p>
 
 <figure class='code'><figcaption><span>Main Application</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/SseChat.scala'>SseChat.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -130,7 +136,19 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Above the following things are going on:</p>
 
+<ul>
+<li><p>There ís a case class for capturing each individual step of the application state.</p></li>
+<li><p>A stack takes care of managing a history of application states. This stack is aware of changes. When such a change occurs, it calls the function specified upon initialization, in this case <em>InterOp.triggerReact</em>.</p></li>
+<li><p>Undo pops the application state representation on top of the stack, causing <em>triggerReact</em> with the previous state.</p></li>
+<li><p><em>UndoAll</em> steps through the entire history until application startup.</p></li>
+<li><p>Setters obtain the top of the stack, copy and modify it and push the result on top of the stack (again causing a re-render).</p></li>
+<li><p>Finally, in <em>main</em>  the application is initialized by starting the SSE connection.</p></li>
+</ul>
+
+
+<p>Next there is the <strong>InterOp</strong> file:</p>
 
 <figure class='code'><figcaption><span>InterOp</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/InterOp.scala'>InterOp.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -233,7 +251,16 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Let us go through this file step by step:</p>
 
+<ul>
+<li><p><strong>ChatMsgTrait</strong> represents an individual message.</p></li>
+<li><p>The <strong>SseChatApp</strong> object represents a JavaScript object outside the Scala.js application. This makes the specified functions available from Scala.js code.</p></li>
+<li><p>The <strong>InterOp</strong> object itself contains functions that are exported so that they are accesible from the outside world. We will look at the export mechanism below. As an example of such an exported function, <em>setUser</em> allows the ReactJS application to call the App.setRoom function.</p></li>
+</ul>
+
+
+<p>Next we have the change-aware stack implementation:</p>
 
 <figure class='code'><figcaption><span>Stack implementation</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/ChangeAwareStack.scala'>ChangeAwareStack.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -260,7 +287,6 @@
 <span class='line-number'>23</span>
 <span class='line-number'>24</span>
 <span class='line-number'>25</span>
-<span class='line-number'>26</span>
 </pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
 </span><span class='line'>
 </span><span class='line'><span class="k">import</span> <span class="nn">scala.collection.mutable.Stack</span>
@@ -285,12 +311,21 @@
 </span><span class='line'>
 </span><span class='line'><span class="k">object</span> <span class="nc">ChangeAwareStack</span> <span class="o">{</span>
 </span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="o">)</span>
-</span><span class='line'>
 </span><span class='line'><span class="o">}</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>This implementation is straightforward:</p>
 
+<ul>
+<li><p><strong>ChangeAwareStack[T]</strong> extends <strong>scala.collection.mutable.Stack[T]</strong> and takes a function that is called when the data on the stack changes.</p></li>
+<li><p><em>push</em> and <em>pop</em> are overridden, calling the function each overrides plus additionally calling the onChange fucntions.</p></li>
+<li><p><em>peek</em> is just another name for <em>head</em>.</p></li>
+<li><p>Finally a companion object allows instantiation without uisng <strong>new</strong>.</p></li>
+</ul>
+
+
+<p>Functions from the <strong>InterOp</strong> object are then exported with specified names; this is in order to protect their respective names. Otherwise, the <strong><a href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a></strong> would rename them. Without exporting the functions, they would also not be publically accessible at all after the closure compiler optimization phase.</p>
 
 <figure class='code'><figcaption><span>Exported Functions</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/js/startup.js'>startup.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -321,7 +356,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<p>Besides naming the exported functions by putting them in an object on the global scope, there is also a call to the <em>main</em> method of the Scala.js application. I am personally not terribly happy with putting anything at all on the global scope. Right now I have two global objects, one for the React side of things and one for the exported functions from the Scala.js application. This could quite easily be brought down to one by exporting the functions as properties of the same object used by the ReactJS application. I am just too lazy to do this right now. Please let me know if you have ideas on how to reduce this to zero objects on the global scope.</p>
 
+<p>Now let&#8217;s have a look at an excerpt of the ReactJS application, written in JSX. Please note that for simplicity I am running the JSX to JavaScript in your browser. You don&#8217;t want to do that in a production system.</p>
 
 <figure class='code'><figcaption><span>ReactJS application (excerpt)</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-app-scalajs.js'>react-app-scalajs.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -400,7 +437,16 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<ul>
+<li><p><strong>UndoBox</strong> is one of the application&#8217;s components, handling the undo functionility described above. All it does is assign handlers to the buttons, in which the functions passed in as props are called.</p></li>
+<li><p><strong>ChatApp</strong> is the main component of the application, it wires together the individual components and passes through the individual props.</p></li>
+<li><p><strong>tlComp</strong> is the rendered top level component. In this call, we specify where to render the component and we also pass in the handler functions as props.</p></li>
+<li><p><em>SseChat.setProps</em> is the function that passes props to the top level component. Once the JSX is compiled and initialized, this replaces the placeholder function inside react-interop.js.</p></li>
+<li><p>At the end of the file, <em>ScalaApp.triggerReact</em> is called. This is only so that the initial state (with a random name) is rendered, independent of a message from the server being received. It just makes the initial rendering a bit smoother, other than that it is superfluous.</p></li>
+</ul>
 
+
+<p>Finally, we have some JavaScript code for interoperability and communication with the server side:</p>
 
 <figure class='code'><figcaption><span>ReactJS application (excerpt)</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-interop.js'>react-interop.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -469,12 +515,24 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<ul>
+<li><p><em>listen</em> is a function that is called for establishing a Server Sent Event connection to the server. Upon file loading, a self calling function closes over the ChatFeed variable so that it becomes accessible (and cancellable) on subsequent calls. This self-call then returns the actual function that allows establishing (and replacing) a connection to the stream for a particular room.</p></li>
+<li><p><em>submitMsg</em> <strong>POST</strong>s a message to the server.</p></li>
+<li><p>There are multiple functions setting props in the top level ReactJS component, such as <em>SseChatApp.setMsgsProps</em>. <em>SseChatApp.setProps</em> is a placeholder, it gets replaced once the JSX compiler has run and the ReactJS application has been loaded (see above).</p></li>
+</ul>
+
+
 <h1>Conclusion</h1>
 
-<p>Scala.js is an interesting approach for client side development for sure and certainly a technology to watch. It is still in experimental phase, so I probably wouldn&#8217;t have the Next Big Thing depend on it, but it might get there if there is enough interest from the community.</p>
+<p>Scala.js is an interesting approach for client side development and certainly a technology to watch, particularly when you are working with <strong><a href="http://www.scala-lang.org/">Scala</a></strong> on the server side anyways. It is still in experimental phase, so I probably wouldn&#8217;t have the Next Big Thing depend on it, but it might get there if there is enough interest from the community.</p>
 
-<p><strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> is something I would already fully recommend. Working with it has been a breeze and it took much less time to feel familiar with what it can do in comparison to <strong><a href="http://angularjs.org/">AngularJS</a></strong>. It&#8217;s approach to immutable data feels very natural for a functional programmer.
+<p><strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> is something I would already fully recommend. Working with it has been a breeze so far and it took much less time to feel familiar with its features in comparison to <strong><a href="http://angularjs.org/">AngularJS</a></strong>. It&#8217;s approach to immutable data feels very natural for a functional programmer.
 It is great to only have to think about components and then be able to build your application around it the way you like, instead of much more being forced into a precribed way of doing things.</p>
+
+<p>I hope you found this useful, as always let me know what you think.</p>
+
+<p>Until next time,
+Matthias</p>
 ]]></content>
   </entry>
   
