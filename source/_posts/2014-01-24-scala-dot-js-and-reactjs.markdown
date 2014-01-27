@@ -5,7 +5,7 @@ date: 2014-01-24 12:45
 comments: true
 categories: 
 ---
-In this article I will present a simple reactive web application using **[Scala.js](http://www.scala-js.org)** and **[ReactJS](http://facebook.github.io/react/)** on the client side. It is based on **[sse-chat](https://github.com/matthiasn/sse-chat)**, an application I initially wrote for demonstrating the usage of **[AngularJS with Play Framework](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. I then rewrote the client for an article about **[using ReactJS on the client side](http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/)**. In the latest version now, there is an additional client that connects to the same server and utilizes Scala.js for building the web client. I recently gave a talk about this at Ping Conference in Budapest, **[check it out](http://m.ustream.tv/recorded/42780242)** if you're interested. I discovered ReactJS through **[David Nolen's blog](http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/)** and his excellent **[OM library](https://github.com/swannodette/om)**, which combines ReactJS with **[ClojureScript](https://github.com/clojure/clojurescript)**. His **[second article on Om](http://swannodette.github.io/2013/12/31/time-travel/)** also inspired me to try out an undo functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the **[tutorial](http://facebook.github.io/react/docs/tutorial.html)** and also reading my last **[blog post](http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/)**. 
+In this article I will present a simple reactive web application using **[Scala.js](http://www.scala-js.org)** and **[ReactJS](http://facebook.github.io/react/)** on the client side. It is based on **[sse-chat](https://github.com/matthiasn/sse-chat)**, an application I initially wrote for demonstrating the usage of **[AngularJS with Play Framework](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**. I then rewrote the client for an article about **[using ReactJS on the client side](http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/)**. In the latest version now, there is an additional client that connects to the same server and utilizes Scala.js for building the web client. I recently gave a talk about this at Ping Conference in Budapest, **[check it out](http://m.ustream.tv/recorded/42780242)** if you're interested. I discovered ReactJS through **[David Nolen's blog](http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/)** and his excellent **[OM library](https://github.com/swannodette/om)**, which combines ReactJS with **[ClojureScript](https://github.com/clojure/clojurescript)**. His **[second article on Om](http://swannodette.github.io/2013/12/31/time-travel/)** also inspired me to try out an **undo** functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the **[tutorial](http://facebook.github.io/react/docs/tutorial.html)** and also reading my last **[blog post](http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/)**. 
 
 <!-- more -->
 
@@ -32,11 +32,11 @@ The server side has stayed the same with the different clients (AngularJS, React
 
 Application state is modeled through a Scala **[Case Class](http://www.scala-lang.org/old/node/107)** that holds the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a **Stack**. Every time some information changes, a copy of the head of the stack is made and a new version of the application state with the desired change pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a **[Stack](http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues)** is a **LIFO** (last-in-first-out) data structure that typically offers *push* for putting a new item on top of a stack, *pop* for removing the top element (with potentially consuming it) and *peek* or *top* for accessing the top element without removing it. In Scala's stack *peek* is called *head* as a more general abstraction for getting the first element of a collection.
 
-Application state, in its current version, is passed to ReactJS for full render every single time something changes. This might sound like a lot of overhead if React completely and potentially expensively re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast **[Virtual DOM](http://facebook.github.io/react/index.html)**. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occured. This is really fast. If you let the chat app demo above run for a while (or interact with it multiple times) so that the stack contains sufficiently many elements (hundreds), you should see changes in the browser at a full **60 frames per second**. 
+Application state, in its current version, is passed to ReactJS for full render every single time something changes. This might sound like a lot of overhead if React completely and potentially expensively re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast **[Virtual DOM](http://facebook.github.io/react/index.html)**. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occurred. This is really fast. If you let the chat app demo above run for a while (or interact with it multiple times) so that the stack contains sufficiently many elements (hundreds), you should see changes in the browser at a full **60 frames per second**. 
 
 {% img left /images/undo-all-60fps.png 'images' 'images'%}
 
-There are optimization that can still be made in terms of React's rendering performance, but this runs fine at 60 fps without any of those. **Tip: you want 60fps at all times** in your application, otherwise the user might experience jerky and overall unpleasant scrolling when anything that happens takes longer than the time between each frame. For 60fps that means every action must be finished within 16ms, preferably less.
+There are optimizations that can still be made in terms of React's rendering performance, but this runs fine at 60 fps without any of those. **Tip: you want 60fps at all times** in your application, otherwise the user might experience jerky and overall unpleasant scrolling when anything that happens takes longer than the time between each frame. For 60fps that means every action must be finished within 16ms, preferably less.
 
 # Source Code
 So without further ado, let us have a look at implementing the client side chat functionality. What I suggest here is probably far from ideal, but it's a start. Please let me know about improvements you think should be made, ideally as a pull request.
@@ -81,7 +81,7 @@ object App {
 
 Above the following things are going on:
 
-+ There ís a case class for capturing each individual step of the application state.
++ There is a case class for capturing each individual step of the application state.
 
 + A stack takes care of managing a history of application states. This stack is aware of changes. When such a change occurs, it calls the function specified upon initialization, in this case *InterOp.triggerReact*.
 
@@ -153,7 +153,7 @@ Let us go through this file step by step:
 
 + The **SseChatApp** object represents a JavaScript object outside the Scala.js application. This makes the specified functions available from Scala.js code.
 
-+ The **InterOp** object itself contains functions that are exported so that they are accesible from the outside world. We will look at the export mechanism below. As an example of such an exported function, *setUser* allows the ReactJS application to call the App.setRoom function. 
++ The **InterOp** object itself contains functions that are exported so that they are accessible from the outside world. We will look at the export mechanism below. As an example of such an exported function, *setUser* allows the ReactJS application to call the App.setRoom function. 
 
 Next we have the change-aware stack implementation: 
 
@@ -189,11 +189,11 @@ This implementation is straightforward:
 
 + **ChangeAwareStack[T]** extends **scala.collection.mutable.Stack[T]** and takes a function that is called when the data on the stack changes.
 
-+ *push* and *pop* are overridden, calling the function each overrides plus additionally calling the onChange fucntions.
++ *push* and *pop* are overridden, calling the function each overrides plus additionally calling the onChange functions.
 
 + *peek* is just another name for *head*.
 
-+ Finally a companion object allows instantiation without uisng **new**.
++ Finally a companion object allows instantiation without using **new**.
 
 Functions from the **InterOp** object are then exported with specified names; this is in order to protect their respective names. Otherwise, the **[Google Closure Compiler](https://developers.google.com/closure/compiler/)** would rename them. Without exporting the functions, they would also not be publically accessible at all after the closure compiler optimization phase.
 
@@ -257,7 +257,7 @@ SseChatApp.setProps = function (props) { tlComp.setProps(props); };
 ScalaApp.triggerReact();
 {% endcodeblock %}
 
-+ **UndoBox** is one of the application's components, handling the undo functionility described above. All it does is assign handlers to the buttons, in which the functions passed in as props are called.
++ **UndoBox** is one of the application's components, handling the undo functionality described above. All it does is assign handlers to the buttons, in which the functions passed in as props are called.
 
 + **ChatApp** is the main component of the application, it wires together the individual components and passes through the individual props.
 
@@ -310,12 +310,11 @@ SseChatApp.setStackSizeProps = function (stackSize) { SseChatApp.setProps({ stac
 
 + There are multiple functions setting props in the top level ReactJS component, such as *SseChatApp.setMsgsProps*. *SseChatApp.setProps* is a placeholder, it gets replaced once the JSX compiler has run and the ReactJS application has been loaded (see above).
 
-
 # Conclusion
-Scala.js is an interesting approach for client side development and certainly a technology to watch, particularly when you are working with **[Scala](http://www.scala-lang.org/)** on the server side anyways. It is still in experimental phase, so I probably wouldn't have the Next Big Thing depend on it, but it might get there if there is enough interest from the community. 
+Scala.js is an interesting approach for client side development and certainly a technology to watch, particularly when you are working with **[Scala](http://www.scala-lang.org/)** on the server side anyways. It is still in experimental phase, so I probably wouldn't have the Next Big Thing depend on it yet, but it might get there if there is enough interest from the community. 
 
-**[ReactJS](http://facebook.github.io/react/)** is something I would already fully recommend. Working with it has been a breeze so far and it took much less time to feel familiar with its features in comparison to **[AngularJS](http://angularjs.org/)**. It's approach to immutable data feels very natural for a functional programmer. 
-It is great to only have to think about components and then be able to build your application around it the way you like, instead of much more being forced into a precribed way of doing things. 
+**[ReactJS](http://facebook.github.io/react/)** is a library I already fully recommend. Working with it has been a breeze so far and it took much less time to feel familiar with its features in comparison to **[AngularJS](http://angularjs.org/)**. It's approach to immutable data feels very natural for a functional programmer. 
+It is great to only have to think about components and then be able to build your application around that in the way you like, instead of much more being forced into a prescribed way of doing things. 
 
 I hope you found this useful, as always let me know what you think.
 
