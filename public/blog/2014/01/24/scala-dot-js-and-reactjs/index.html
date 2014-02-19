@@ -115,12 +115,12 @@
 
 <ul>
 <li><p>If you work with Scala on the server side, you will be familiar with its powerful collection library. You will be able to use it instead of wrapping your head around stuff like <strong><a href="http://underscorejs.org">underscore</a></strong>. Nothing wrong with underscore, it just adds to the things we have to think about when writing an application.</p></li>
-<li><p>JavaScript, while being very powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you could avoid context switches that would inevitably occur when going back and forth between Scala and JavaScript.</p></li>
-<li><p>Immutable data structures are very powerful and make reasoning about an application much more straightforward. Implementing an <strong>undo</strong> functionality becomes almost trivial with this approach, as I will try to show you in this article.</p></li>
+<li><p>JavaScript, while being powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you can avoid context switches. These inevitably occur when going back and forth between Scala and JavaScript.</p></li>
+<li><p>Immutable data structures are powerful and make reasoning about an application much more straightforward. Implementing an <strong>undo</strong> functionality becomes almost trivial with this approach.</p></li>
 </ul>
 
 
-<p>Here is the new client in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such), whereas <strong>undo all</strong> will very quickly go through all steps until the beginning of time.</p>
+<p>Here is the new client in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such). <strong>Undo all</strong> will go through all steps until the beginning of time at a fast pace.</p>
 
 <iframe width="420" height="600" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
 
@@ -135,11 +135,11 @@
 
 <h1>Architectural Overview</h1>
 
-<p>The server side has stayed the same with the different clients (AngularJS, ReactJS, ReactJS and Scala.js) and all clients co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their names, they can select the chat room and they can submit messages to the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
+<p>The server side has stayed the same with the different clients. All clients (AngularJS, ReactJS, ReactJS and Scala.js) co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their names, they can select the chat room and they can submit messages to the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
 
 <p><img class="left" src="/images/sse-chat-scalajs.png"></p>
 
-<p>Application state is modelled through a Scala <strong><a href="http://www.scala-lang.org/old/node/107">Case Class</a></strong> that stores the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a <strong>Stack</strong>. Each time information changes, a copy of the head of the stack is made and a new version of the application state with the desired change is pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">Stack</a></strong> is a <strong>LIFO</strong> (last-in-first-out) data structure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala&#8217;s stack <em>peek</em> is called <em>head</em> as a more general abstract term to get the first element of a collection.</p>
+<p>Application state is represented by a Scala <strong><a href="http://www.scala-lang.org/old/node/107">Case Class</a></strong>. A case class object stores the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a <strong>Stack</strong>. Each time information changes, a copy of the head of the stack is made and a new version of the application state with the desired change is pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">Stack</a></strong> is a <strong>LIFO</strong> (last-in-first-out) data structure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala&#8217;s stack <em>peek</em> is called <em>head</em> as a more general abstract term to get the first element of a collection.</p>
 
 <p>Application state, in its current version, is passed to ReactJS for full render every single time something changes. This may sound like a lot of overhead if React completely re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast <strong><a href="http://facebook.github.io/react/index.html">Virtual DOM</a></strong>. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occurred. This is really fast. If you run the chat app demo above for a while (or interact with it multiple times) so that the stack contains sufficient elements (hundreds), you should see changes in the browser at a full <strong>60 frames per second</strong>.</p>
 
@@ -690,6 +690,8 @@ Matthias</p>
         <a class="basic-alignment left" href="/blog/2014/01/05/play-framework-and-facebooks-react-library/" title="Previous Post: Play Framework and Facebook's React library">&laquo; Play Framework and Facebook's React library</a>
       
       
+        <a class="basic-alignment right" href="/blog/2014/02/16/elasticsearch-v1-breaking-changes/" title="Next Post: ElasticSearch 1.0.0 - Breaking Changes">ElasticSearch 1.0.0 - Breaking Changes &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -720,6 +722,10 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/16/elasticsearch-v1-breaking-changes/">ElasticSearch 1.0.0 - Breaking Changes</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/01/24/scala-dot-js-and-reactjs/">Scala.js and ReactJS</a>
       </li>
     
@@ -733,10 +739,6 @@ Matthias</p>
     
       <li class="post">
         <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/15/using-crossfilter-with-angularjs/">Using Crossfilter with AngularJS</a>
       </li>
     
   </ul>

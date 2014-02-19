@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="In this article I will present a simple reactive web application using Scala.js and ReactJS on the client side. It is based on sse-chat, an &hellip;">
+  <meta name="description" content="ElasticSearch 1.0.0 is out, hooray! Great stuff, congrats. Not that I had any complaints about v0.9, but still, v1 is a great achievement. One of the &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/02/16/elasticsearch-v1-breaking-changes/">ElasticSearch 1.0.0 - Breaking Changes</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-16T18:50:00+01:00" pubdate data-updated="true">02/16/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> 1.0.0 is out, hooray! Great stuff, congrats. Not that I had any complaints about v0.9, but still, v1 is a great achievement. One of the changes is some <strong><a href="http://www.elasticsearch.org/blog/percolator-redesign-blog-post/">major rework</a></strong> on the <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/search-percolate.html">Percolation Query API</a></strong>, making it much more powerful than before (it seems). Unfortunately, the update to v1.0.0 broke the percolation query mechanism in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. But the fix wasn&#8217;t very hard. So in today&#8217;s article, I will revisit the topic of Percolation Queries by explaining what they are, how the new version of ElasticSearch has become more powerful and describing the changes needed to fix the application. Please refer to this <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article</a></strong> when you want to know more about the overall architecture of the application.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/02/16/elasticsearch-v1-breaking-changes/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -449,47 +490,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-06-23T14:36:00+02:00" pubdate data-updated="true">06/23/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/06/23/angularjs-and-play-framework/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -516,6 +516,10 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/16/elasticsearch-v1-breaking-changes/">ElasticSearch 1.0.0 - Breaking Changes</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/01/24/scala-dot-js-and-reactjs/">Scala.js and ReactJS</a>
       </li>
     
@@ -529,10 +533,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     
       <li class="post">
         <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/09/15/using-crossfilter-with-angularjs/">Using Crossfilter with AngularJS</a>
       </li>
     
   </ul>

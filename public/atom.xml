@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-02-12T21:54:33+01:00</updated>
+  <updated>2014-02-19T13:31:37+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,87 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[ElasticSearch 1.0.0 - Breaking Changes]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/02/16/elasticsearch-v1-breaking-changes/"/>
+    <updated>2014-02-16T18:50:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/02/16/elasticsearch-v1-breaking-changes</id>
+    <content type="html"><![CDATA[<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> 1.0.0 is out, hooray! Great stuff, congrats. Not that I had any complaints about v0.9, but still, v1 is a great achievement. One of the changes is some <strong><a href="http://www.elasticsearch.org/blog/percolator-redesign-blog-post/">major rework</a></strong> on the <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/search-percolate.html">Percolation Query API</a></strong>, making it much more powerful than before (it seems). Unfortunately, the update to v1.0.0 broke the percolation query mechanism in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. But the fix wasn&#8217;t very hard. So in today&#8217;s article, I will revisit the topic of Percolation Queries by explaining what they are, how the new version of ElasticSearch has become more powerful and describing the changes needed to fix the application. Please refer to this <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article</a></strong> when you want to know more about the overall architecture of the application.</p>
+
+<!-- more -->
+
+
+<p>After running <code>brew update</code> and <code>brew upgrade</code> I noticed that my new client wasn&#8217;t working any longer in terms of streaming updates. Pressing <em>F5</em> did show new intermittent Tweets though, so the system did not appear completely broken. Luckily the &#8216;old&#8217; client based on AngularJS still existed and showed the same problem. A look into the ElasticSearch changelog quickly revealed that they did some major rework on the Percolation API.</p>
+
+<h1>So what is this percolation query thing?</h1>
+
+<p>A percolation query is a query like any other, with one difference: the query is not run against existing data but against future data, item by item as the data is inserted into an index. For that the query itself is stored in ElasticSearch and then each item (Tweet in this case) that is stored is also presented to the percolator to find the queries that have this item as a result. This resulting query ID is then used to find the streaming connection that is interested in maches to this query and stream the matched Tweet to the connected client immediately. This might sound a little abstract, so let me provide an example:</p>
+
+<p>You are interested in Tweets that have the words <strong>Scala</strong> and <strong>Akka</strong> in them. Your query then looks like this: &#8220;scala AND akka&#8221;. Well, there is a little more to it it, like which fields to use as a default, but for this example the simplification should suffice. First the query is run against exisiting data, for example returning the last 5000 items that match. But you are also interested in live data, not only in the past. So then the query is registered in the percolation query index, using the SHA-256 hash as the ID. Now when a Tweet comes along that has these words in them, it is presented to the percolator, which returns the ID of the query, potentially among others that match. This query ID is then used to find the streaming connection to your web client so that the Tweet can be streamed to you immediately.</p>
+
+<p>Internally ElasticSearch stores all the percolation queries in memory. It then creates a temporary index for each document that is to be matched against all the queries and then runs all these queries against that index in order to determine matching queries.</p>
+
+<h1>Changes in ElasticSearch</h1>
+
+<p>In previous versions of Elasticsearch there was a single, specialized index for percolation among cluster of nodes. The problem with that was that it did not scale particularly well. This limitation has been removed in the latest version now. Instead the percolation queries can be distributed over any number of shards, all of which will then be asked to percolate a document against the stored queries. With the change, now the percolation query mechanism should scale nicely, whereas before the performance would degrade relatively soon when there was a large number of queries to run against a new document.</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/bw_expl_elastic1.png" title="image" alt="images"></p>
+
+<h1>Changes to the BirdWatch code</h1>
+
+<p>I had to make changes in three different places, in the application.conf for the URLs and in the controller and the twitter client actor.</p>
+
+<h2>URL changes</h2>
+
+<p>The</p>
+
+<figure class='code'><figcaption><span>Percolation URLs</span><a href='https://github.com/matthiasn/BirdWatch/blob/0ce1b15c27eb1ec9cbf29d9e95953cca68404cc0/conf/application.conf'>application.conf </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>elastic.PercolatorURL=&quot;http://localhost:9200/persistent_searches/tweets/_percolate/&quot;
+</span><span class='line'>elastic.PercolationQueryURL=&quot;http://localhost:9200/persistent_searches/.percolator/&quot;
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In the configuration file above, only the endpoints for the percolation queries have changed. Another thing to note is that percolation queries are now stored in a regular index that behaves like any other (because it is a standard index). This also means that the index is dynamically created when first addressed, so we do not need the initialization step for creating the index (using curl on the command line) before successfully running the application for the first time. That&#8217;s great as I&#8217;ve had a few users run into that problem before.</p>
+
+<figure class='code'><figcaption><span>Twitter Client</span><a href='https://github.com/matthiasn/BirdWatch/blob/0ce1b15c27eb1ec9cbf29d9e95953cca68404cc0/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Takes JSON and matches it with percolation queries in ElasticSearch</span>
+</span><span class='line'><span class="cm">  * @param json JsValue to match against </span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'><span class="k">def</span> <span class="n">matchAndPush</span><span class="o">(</span><span class="n">json</span><span class="k">:</span> <span class="kt">JsValue</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
+</span><span class='line'>  <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticPercolatorURL</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;doc&quot;</span> <span class="o">-&gt;</span> <span class="n">json</span><span class="o">)).</span><span class="n">map</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">res</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">res</span><span class="o">.</span><span class="n">body</span><span class="o">)</span> <span class="o">\</span> <span class="s">&quot;matches&quot;</span><span class="o">).</span><span class="n">asOpt</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">]].</span><span class="n">map</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">matches</span> <span class="k">=&gt;</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">val</span> <span class="n">items</span> <span class="k">=</span> <span class="n">matches</span><span class="o">.</span><span class="n">map</span> <span class="o">{</span> <span class="n">m</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">m</span> <span class="o">\</span> <span class="s">&quot;_id&quot;</span><span class="o">).</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">}</span>
+</span><span class='line'>        <span class="n">jsonTweetsChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">Matches</span><span class="o">(</span><span class="n">json</span><span class="o">,</span> <span class="nc">HashSet</span><span class="o">.</span><span class="n">empty</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">++</span> <span class="n">items</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, we are still POSTing every tweet to the percolation endpoint as we did before, however now the returned result is different.</p>
+
+<p>Okay, that&#8217;s all for this article. Initially I wanted this one to be about replacing AngularJS with ReactJS, but then I did not have enough time left before my vacation. So that article is next, probably some time next week.</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Scala.js and ReactJS]]></title>
@@ -29,12 +110,12 @@
 
 <ul>
 <li><p>If you work with Scala on the server side, you will be familiar with its powerful collection library. You will be able to use it instead of wrapping your head around stuff like <strong><a href="http://underscorejs.org">underscore</a></strong>. Nothing wrong with underscore, it just adds to the things we have to think about when writing an application.</p></li>
-<li><p>JavaScript, while being very powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you could avoid context switches that would inevitably occur when going back and forth between Scala and JavaScript.</p></li>
-<li><p>Immutable data structures are very powerful and make reasoning about an application much more straightforward. Implementing an <strong>undo</strong> functionality becomes almost trivial with this approach, as I will try to show you in this article.</p></li>
+<li><p>JavaScript, while being powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you can avoid context switches. These inevitably occur when going back and forth between Scala and JavaScript.</p></li>
+<li><p>Immutable data structures are powerful and make reasoning about an application much more straightforward. Implementing an <strong>undo</strong> functionality becomes almost trivial with this approach.</p></li>
 </ul>
 
 
-<p>Here is the new client in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such), whereas <strong>undo all</strong> will very quickly go through all steps until the beginning of time.</p>
+<p>Here is the new client in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such). <strong>Undo all</strong> will go through all steps until the beginning of time at a fast pace.</p>
 
 <iframe width="420" height="600" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
 
@@ -49,11 +130,11 @@
 
 <h1>Architectural Overview</h1>
 
-<p>The server side has stayed the same with the different clients (AngularJS, ReactJS, ReactJS and Scala.js) and all clients co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their names, they can select the chat room and they can submit messages to the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
+<p>The server side has stayed the same with the different clients. All clients (AngularJS, ReactJS, ReactJS and Scala.js) co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their names, they can select the chat room and they can submit messages to the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat-scalajs.png"></p>
 
-<p>Application state is modelled through a Scala <strong><a href="http://www.scala-lang.org/old/node/107">Case Class</a></strong> that stores the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a <strong>Stack</strong>. Each time information changes, a copy of the head of the stack is made and a new version of the application state with the desired change is pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">Stack</a></strong> is a <strong>LIFO</strong> (last-in-first-out) data structure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala&#8217;s stack <em>peek</em> is called <em>head</em> as a more general abstract term to get the first element of a collection.</p>
+<p>Application state is represented by a Scala <strong><a href="http://www.scala-lang.org/old/node/107">Case Class</a></strong>. A case class object stores the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a <strong>Stack</strong>. Each time information changes, a copy of the head of the stack is made and a new version of the application state with the desired change is pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">Stack</a></strong> is a <strong>LIFO</strong> (last-in-first-out) data structure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala&#8217;s stack <em>peek</em> is called <em>head</em> as a more general abstract term to get the first element of a collection.</p>
 
 <p>Application state, in its current version, is passed to ReactJS for full render every single time something changes. This may sound like a lot of overhead if React completely re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast <strong><a href="http://facebook.github.io/react/index.html">Virtual DOM</a></strong>. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occurred. This is really fast. If you run the chat app demo above for a while (or interact with it multiple times) so that the stack contains sufficient elements (hundreds), you should see changes in the browser at a full <strong>60 frames per second</strong>.</p>
 
