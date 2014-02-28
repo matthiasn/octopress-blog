@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Over the holidays I have discovered Facebook&#8217;s React, an interesting library for generating reactive user interfaces. I wanted to try it out in &hellip;">
+  <meta name="description" content="Over the holidays I discovered Facebook&#8217;s React, an interesting library for generating reactive user interfaces. I wanted to try it out in a &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -104,12 +104,12 @@
   </header>
 
 
-<div class="entry-content"><p>Over the holidays I have discovered Facebook&#8217;s <strong><a href="http://facebook.github.io/react">React</a></strong>, an interesting library for generating reactive user interfaces. I wanted to try it out in a real-world application, which reminded of one I still had running as a demo: <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, a little chat application I wrote last summer for learning how to make <strong><a href="http://www.playframework.com/">Play Framework</a></strong> and <strong><a href="http://angularjs.org/">AngularJS</a></strong> cooperate in a very basic way. So I thought, why not rewrite the client side using <strong><a href="http://facebook.github.io/react">React</a></strong>, offering the exact same functionality as the <strong><a href="http://angularjs.org/">AngularJS</a></strong> version. Both are available at the same time in the new version, with no changes to the backend code, except for the added route as both versions can be accessed in parallel.</p>
+<div class="entry-content"><p>Over the holidays I discovered Facebook&#8217;s <strong><a href="http://facebook.github.io/react">React</a></strong>, an interesting library for generating reactive user interfaces. I wanted to try it out in a real-world application, and I thought of one such application I still had running as a demo: <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, a little chat application I wrote last summer to learn how to make <strong><a href="http://www.playframework.com/">Play Framework</a></strong> and <strong><a href="http://angularjs.org/">AngularJS</a></strong> cooperate in a very basic way. So I thought, why not rewrite the client side using <strong><a href="http://facebook.github.io/react">React</a></strong>, offering the exact same functionality as the <strong><a href="http://angularjs.org/">AngularJS</a></strong> version. Both are also available in the new version with no changes to the backend code except for the added route, as both versions can be accessed in parallel.</p>
 
 <!-- more -->
 
 
-<p>The contraint of making it behave exactly like the AngularJS version was a great exercise and it really only took an afternoon to complete. Touching the existing demo version also had me notice that the live version of it had been up for like 4 months or so, without any trouble. I have the same experience with my <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">BirdWatch</a></strong> application. Kudos to the Play Framework developers for that, and same for Akka, which provides the supervised Actor architecture presumably enabling such reliable server systems.</p>
+<p>The constraint of making it behave exactly like the AngularJS version was a great practice and it actually only took me an afternoon to complete. Touching the existing demo version also had me notice that the live version of it had been up for like 4 months or so, without any trouble. I have the same experience with my <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">BirdWatch</a></strong> application. Kudos to the Play Framework and Akka developers for enabling such reliable server systems.</p>
 
 <p>Here&#8217;s the new version using <strong>React</strong> instead of <strong>AngularJS</strong>:</p>
 
@@ -129,22 +129,22 @@
 <li>React <strong>prefers immutable</strong> props over mutable state wherever possible, making state changes much easier to reason about.</li>
 <li>Each component knows how to <strong>render itself</strong>.</li>
 <li>Components can have other components as children. They can pass their own state or props to these as immutable props.</li>
-<li>The entire DOM is rendered into a (fast) <strong>virtual DOM</strong> on every change. Changes can either come from mutated state or from parent elements as immutable props.</li>
-<li>This virtual DOM is then <strong>diffed</strong> against a representation of the current DOM, with the actual DOM only manipulated where new and old versions differ.</li>
-<li>Data coming from business logic outside is not touched, React can work with <strong>immutable data</strong> all along.</li>
+<li>The entire DOM is rendered into a (fast) <strong>virtual DOM</strong> with every change made. Changes can either come from mutated state or from parent elements as immutable props.</li>
+<li>This virtual DOM is then <strong>diffed</strong> against a representation of the current DOM, with the actual DOM only being manipulated where new and old versions differ.</li>
+<li>Data coming from business logic outside will not be touched; React can work with <strong>immutable data</strong> thoughout.</li>
 <li>Hierarchical components, props, state, handlers. That&#8217;s pretty much it, no more rather unintuitive concepts to understand.</li>
 </ul>
 
 
 <h2>How is it different from AngularJS?</h2>
 
-<p>What I find most intriguing here is how React can work with immutable data, unlike AngularJS, which needs to modify data that is used in <strong>$scope</strong> in order to keep track of changes.</p>
+<p>What I find most intriguing here is how React can work with immutable data. AngularJS, on the other hand needs to modify data that is used in <strong>$scope</strong> in order to keep track of changes.</p>
 
-<p>I have tried to use AngularJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> a few months back and I ran into a problem with <strong><a href="http://stackoverflow.com/questions/19863873/angularjs-infinite-digest-loop-when-no-scope-changes">infinite digest loops (StackOverflow)</a></strong>, something I quite honestly didn&#8217;t want to know about. So the problem seemed to be, and please correct me if I&#8217;m wrong, that ClojureScript was handing a shiny new data structure to AngularJS over and over again in order to guarantee immutability internally, just like Underscore generated a new data structure on every call to filter (see the StackOverflow discussion cited above). Angular needs to modify data in order to keep track of updates though, resulting in an inifinite cycle that it fortunately is clever enough to stop after a few iterations. Let&#8217;s have a quick look at what Angular does with data. It needs to mark individual elements in a collection with a <strong>hashKey</strong> property in order to keep track of their changes:</p>
+<p>I tried to use AngularJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> a few months back and I ran into a problem with <strong><a href="http://stackoverflow.com/questions/19863873/angularjs-infinite-digest-loop-when-no-scope-changes">infinite digest loops (StackOverflow)</a></strong>, something I quite honestly didn&#8217;t want to know about. So the problem seemed to be, and please correct me if I&#8217;m wrong, that ClojureScript was handing a shiny new data structure to AngularJS over and over again in order to guarantee immutability internally, just like Underscore generated a new data structure on every call to filter (see the StackOverflow discussion cited above). Angular needs to modify data in order to keep track of updates though, resulting in an infinite cycle that it fortunately is clever enough to stop after a few iterations. Let&#8217;s have a quick look at what Angular does with data. It needs to mark individual elements in a collection with a <strong>hashKey</strong> property in order to keep track of their changes:</p>
 
 <p><img class="left" src="/images/ng-hash-key.png" title="image" alt="images"></p>
 
-<p>Now that&#8217;s a problem when the data is considered immutable. I assume ClojureScript delivered fresh JavaScript objects from the ClojureScript data structures at the edge of the application where I called a function from Angular, with the result being that on subsequent calls the hashKey would always be missing, making Angular upset. Let&#8217;s emulate this behavior by getting the data for the ng-repeat from a function call that is guaranteed to deliver an array consisting of shiny new objects on every call:</p>
+<p>Now that&#8217;s a problem when the data is considered immutable. I assume ClojureScript delivered fresh JavaScript objects from the ClojureScript data structures at the edge of the application where I called a function from Angular, with the result being that on subsequent calls the hashKey was always missing, making Angular upset. Let&#8217;s emulate this behavior by getting the data for the ng-repeat from a function call that is guaranteed to deliver an array consisting of shiny new objects on every call:</p>
 
 <figure class='code'><figcaption><span>Causing an Infinite Digest Loop in Angular</span><a href='https://github.com/matthiasn/sse-chat/blob/e0b55172eede0f265cedf03cde46ae6b39639e82/app/assets/javascripts/controllers.js'>controllers.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -163,13 +163,13 @@
 
 <p>Note that the error output in the browser console is 23KB in size, even when using the minified production version of Angular, so I can only assume this is real problem.</p>
 
-<p>Now in my daytime job I am mostly writing Scala code and I really like the peace of mind that immutability can give us, so I&#8217;d rather not have to depend on letting the UI part of the web application modify the data model just to keep track of changes. I do want to explore immutability in the browser further, for example by using ClojureScript or the younger <strong><a href="http://www.scala-js.org/">Scala.js</a></strong>, which also allows working with immutable data structures. I have only played around a little bit with the latter, but it certainly is an interesting approach.</p>
+<p>Now in my daytime job I mostly write Scala code and I really like the peace of mind that immutability can give us, so I&#8217;d rather not have to depend on letting the UI part of the web application modify the data model just to keep track of changes. I want to further explore immutability in the browser, for example by using ClojureScript or the younger <strong><a href="http://www.scala-js.org/">Scala.js</a></strong>, which also allows working with immutable data structures. I have only played around a little bit with the latter, but it certainly is an interesting approach.</p>
 
-<p>A nice example of working with immutable data (from ClojureScript) and React is David Nolen&#8217;s great <strong><a href="https://github.com/swannodette/om">Om library</a></strong>. Immutability allows for amazing features like a simple undo functionality, even saving the entire history of state mutation during the lifecycle of the application. It shouldn&#8217;t be terribly difficult to achieve the same in Scala.js, for example by modeling application state as an immutable data structure and then pushing each version into an array that is then used as a stack. Pop the last state and render what you can peek at, undo done. Conceptually this is really simple to think about iff your UI rendering code requires no state of its own and simply renders an immutable data structure, which React is capable of.</p>
+<p>A nice example of working with immutable data (from ClojureScript) and React is David Nolen&#8217;s great <strong><a href="https://github.com/swannodette/om">Om library</a></strong>. Immutability allows for amazing features like a simple undo functionality, even saving the entire history of state mutation during the lifecycle of the application. It shouldn&#8217;t be too difficult to achieve the same in Scala.js, for example by modelling the application state as an immutable data structure and then pushing each version into an array that is then used as a stack. Pop the last state and render what you can peek at, undo done. Conceptually this is really simple to think about iff (if and only if) your UI rendering code requires no state of its own and simply renders an immutable data structure, which React is capable of.</p>
 
 <h2>Source code time</h2>
 
-<p>Let us now have a look at the actual source code of the new React based client written in JavaScript and <strong><a href="http://facebook.github.io/react/docs/jsx-in-depth.html">JSX</a></strong>. JSX is a JavaScript XML syntax, which is transformed into plain old JavaScript using a preprocessor. It makes writing DOM elements simpler, however there is no need to use it, we can write a React application in (somewhat clunkier) JavaScript code directly instead. It is recommended to do the conversion on the server side, for example in a grunt task, but there is a client-side script for development as well. I chose to ignore the recommendation in this demo for simplicity; your browser will handle the conversion just fine. However for a commercial product I would certainly follow the recommendation to make the client side loading experience as smooth as possible.</p>
+<p>Let&#8217;s now have a look at the actual source code of the new React based client written in JavaScript and <strong><a href="http://facebook.github.io/react/docs/jsx-in-depth.html">JSX</a></strong>. JSX is a JavaScript XML syntax, which is transformed into plain old JavaScript using a preprocessor. It makes writing DOM elements simpler, however there is no need to use it; instead we can write a React application in (somewhat clunkier) JavaScript code directly instead. It is recommended to do the conversion on the server side, for example in a grunt task, but there is a client-side script for development as well. I chose to ignore the recommendation in this demo for simplicity; your browser will handle the conversion just fine. However for a commercial product I would certainly follow the recommendation to make the client side loading experience as smooth as possible.</p>
 
 <p>The HTML for our app becomes very simple. In this application it is called react.scala.html, but that&#8217;s really only because it made the hookup to a route easier, otherwise there is no good reason to use a play/scala template here:</p>
 
@@ -279,11 +279,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The ChatApp component is where most of the application logic lives in this simple example. I would probably prefer if it lived somewhere completely outside of React in more complex applications, for example in ClojureScript or Scala.js code, or in well-organized JavaScript code using underscore. Then not even the top element of the React application would need to have state at all. But for this simple example it should suffice to keep everything together in the top-level React component. So what goes in said component?</p>
+<p>In this simple example, the ChatApp component is where most of the application logic lives in. I would probably prefer if it lived somewhere completely outside of React in more complex applications, for example in ClojureScript or Scala.js code, or in well-organized JavaScript code using underscore. Then not even the top element of the React application would need to have state at all. But in this simple example it should suffice to keep everything together in the top-level React component. So what goes on in said component?</p>
 
 <ul>
 <li>Inside the <strong><em>getInitialState function</em></strong>, the <strong>initial state</strong> is provided.</li>
-<li>The <strong><em>listen</em></strong> function initiates the SSE connection for the current chat room, potentially closing an already established connection. It is organized as an enclosing function that is immediately called upon initialization of the component. That initial call sets up a chatFeed var and returns another function that henceforth lives inside the <strong><em>listen</em></strong> property of the component. This function can then be called when an open connection tot the SSE stream with the chat messages for the current room is desired. Let me know if the above paragraph doesn&#8217;t make complete sense to you, I&#8217;m happy to try again.</li>
+<li>The <strong><em>listen</em></strong> function initiates the SSE connection for the current chat room, potentially closing an already established connection. It is organized as an enclosing function that is immediately called upon initialization of the component. That initial call sets up a chatFeed var and returns another function that henceforth lives inside the <strong><em>listen</em></strong> property of the component. This function can then be called when an open connection to the SSE stream for the current room is desired.</li>
 <li>The <strong><em>addMsg</em></strong> function mutates component state by calling <strong>this.setState</strong>.</li>
 <li>The <strong><em>handleRoomChange</em></strong> and <strong>handleNameChange</strong> functions modify <strong>room</strong> and <strong>name</strong> state. <strong><em>handleRoomChange</em></strong> also calls listen again to re-establish the SSE stream for the new room.</li>
 <li>The <strong><em>componentWillMount</em></strong> function establishes the SSE connection by calling <strong><em>listen(room)</em></strong>, once, upon initialization of the component.</li>
@@ -321,11 +321,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>In the <strong>NameRoomBox</strong> component, really only two things happen:</p>
+<p>In the <strong>NameRoomBox</strong> component, only two things actually happen:</p>
 
 <ul>
 <li>The <strong>roomOpts</strong> property is initialized with a list of all 5 room <option> elements. The JSX transpiler thankfully does this for us.</li>
-<li>The <strong><em>render</em></strong> function returns a <code>&lt;div&gt;</code> with an <code>&lt;input&gt;</code> for the name and a <code>&lt;select&gt;</code> for the room inside, using the <code>&lt;option&gt;</code>elements created in the first step. It also attaches the handler functions provided inside <strong>props</strong> for reacting on user input.</li>
+<li>The <strong><em>render</em></strong> function returns a <code>&lt;div&gt;</code> with an <code>&lt;input&gt;</code> for the name and a <code>&lt;select&gt;</code> for the room inside, using the <code>&lt;option&gt;</code>elements created in the first step. It also attaches the handler functions provided inside <strong>props</strong> to respond to user input.</li>
 </ul>
 
 
@@ -422,7 +422,7 @@
 
 <p>In the <strong>SaySomethingBox</strong> component, two things happen:
 + The <strong><em>render</em></strong> function renders the UI and attaches the <strong><em>handleSubmit</em></strong> function to the events fired by either submitting the form by pressing enter inside the <code>&lt;input&gt;</code> element or clicking the submit button.
-+ The <strong><em>handleSubmit</em></strong> function POSTs the text in the <code>&lt;input&gt;</code> field to the server using jQuery&#8217;s <code>$.ajax</code> function. It uses <strong>name</strong> and <strong>room</strong> from <strong>props</strong> to construct the JSON message. The message POSTing logic could just as well live inside the top level component, maybe it should, but I don&#8217;t feel like changing it right now.</p>
++ The <strong><em>handleSubmit</em></strong> function POSTs the text in the <code>&lt;input&gt;</code> field to the server using jQuery&#8217;s <code>$.ajax</code> function. It uses the <strong>name</strong> and <strong>room</strong> from <strong>props</strong> to construct the JSON message. The message POSTing logic could just as well live inside the top level component, maybe it should, but I don&#8217;t feel like changing it right now.</p>
 
 <p>That&#8217;s pretty much it, with one last function call to get the whole application started:</p>
 
@@ -435,9 +435,9 @@
 
 <h2>Conclusion</h2>
 
-<p><strong><a href="http://facebook.github.io/react">React</a></strong> offers an intriguing way of rendering potentially immutable data into a virtual DOM on every single change of the data. This virtual DOM will then be diffed against the current DOM (or probably rather the previous version of the virtual DOM, but just guessing there) and then only the changes are performed on the real DOM, limiting the supposedly slow DOM manipulations to an absolute minimum. I have yet to convince myself about this, but reportedly this whole process is very fast, allowing for 60 FPS even in a mobile WebView, with much worse JavaScript performance than would be available in &#8220;real&#8221; browsers such as Mobile Safari, Mobile Chrome and any recent Desktop browser. React is also conceptually very simple, there are not a lot of things to understand. However I do feel that I need to develop better ideas on how to structure a larger application.</p>
+<p><strong><a href="http://facebook.github.io/react">React</a></strong> offers an intriguing way of rendering potentially immutable data into a virtual DOM with every single change of the data. This virtual DOM will then be diffed against the current DOM (or, more likely, the previous version of the virtual DOM, but just guessing there) and then only the changes are performed on the real DOM, limiting the supposedly slow DOM manipulations to an absolute minimum. I have yet to convince myself about this, but reportedly this whole process is very fast, allowing for 60 FPS even in a mobile WebView, with JavaScript performaning a lot worse than in &#8220;real&#8221; browsers such as Mobile Safari, Mobile Chrome and any recent Desktop browser. React is also conceptually very simple; there are not a lot of things to understand. However I do feel that I need to develop better ideas on how to structure a larger application.</p>
 
-<p>So far all this might sound like a lot of praise for React, but let me emphasize where <strong>AngularJS</strong> really has the edge at this point:</p>
+<p>So far all this may sound like a lot of praise for React, but let me emphasize where <strong>AngularJS</strong> really has the edge at this point:</p>
 
 <ul>
 <li>Workable best practices for organizing large applications.</li>
@@ -446,7 +446,7 @@
 </ul>
 
 
-<p>So, will I continue to use AngularJS? <strong>Yes</strong>. Am I curious about doing more with React? <strong>Also yes</strong>. I need a larger project in order to experince React in a more complex setting. Oh, there&#8217;s one project that comes to mind, but that&#8217;s a story for another day. Before I forget: you can find the source code for the application on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>.</p>
+<p>So, will I continue using AngularJS? <strong>Yes</strong>. Am I curious about doing more with React? <strong>Another yes</strong>. I need a larger project in order to experience React in a more complex setting. Oh, there&#8217;s one project that comes to mind, but that&#8217;s a story for another day. Before I forget: you can find the source code for the application on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>.</p>
 
 <p>Cheers,
 Matthias</p>
@@ -490,28 +490,16 @@ Matthias</p>
   
 
   
-    <script type="text/javascript">
-      (function() { 
-        var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
-        write_string += '&url='; 
-        write_string += encodeURIComponent(window.location); 
-        write_string += '&title=' + encodeURIComponent(document.title);
-        write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
-
-        var span = $(document.createElement("span"));
-        span.html(write_string);
-        $(".sharing").append(span);
-      })();
-    </script>
   
   
   
-<script type="text/javascript" src="http://www.reddit.com/static/button/button1.js"></script>
-  
+  <br />
   
   
     <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
   
+  
+  <br />
   
 </div>
 

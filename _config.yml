@@ -74,10 +74,10 @@ google_plus_one: true
 google_plus_one_size: medium
 
 # DZone
-dzone_button: true
+dzone_button: false
 
 # reddit
-reddit_button: true
+reddit_button: false
 
 # Google Plus Profile
 # Hidden: No visible button, just add author information to search results

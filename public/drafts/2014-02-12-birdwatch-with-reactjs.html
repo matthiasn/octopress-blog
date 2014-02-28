@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>New Year's Resolution - Matthias Nehlsen</title>
+  <title>BirdWatch with ReactJS - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I never really thought much of New Year’s resolutions because I could never live up to them. 2013 was different though. One year ago my resolution &hellip;">
+  <meta name="description" content="Summary: in this article I will dicuss how to replace AngularJS with ReactJS in the BirdWatch project. If this doesn&#8217;t concern you, you might &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution">
+  <link rel="canonical" href="http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">New Year's Resolution</h1>
+      <h1 class="entry-title">BirdWatch with ReactJS</h1>
     
     
       <p class="meta">
@@ -97,48 +97,22 @@
   
 
 
-<time datetime="2013-12-31T19:40:00+01:00" pubdate data-updated="true">12/31/2013</time>
+<time datetime="2014-02-12T22:21:00+01:00" pubdate data-updated="true">02/12/2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I never really thought much of New Year’s resolutions because I could never live up to them. 2013 was different though. One year ago my resolution was to start writing a blog and to create one or more open source projects, just for the fun of it. And this time I actually succeeded. So I thought I might continue with this resolution thing.</p>
+<div class="entry-content"><p><strong>Summary:</strong> in this article I will dicuss how to replace AngularJS with ReactJS in the BirdWatch project. If this doesn&#8217;t concern you, you might as well take the time to go get some fresh air, read something else or even talk to your spouse.</p>
 
-<!-- more -->
+<p>That being said, let me dive right into why I felt like I wanted to replace AngularJS with ReactJS. Fear not if you prefer AngularJS, I will not kick it out, I am just writing a new version of the client side application. In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the service. Instead I want control on when the client UI is rendered. In other words, I want to take the priviledge of the client to ask for data away and instead decide in my application logic when the UI should update. This could be done in AngularJS as well by keeping a cached version of the last UI state, but I&#8217;d rather not waste any memory for that, particularly not on mobile.Instead I want my business logic to call the UI renderer exactly once whenever it wants to render data. No more, no less.</p>
 
+<p>ReactJS is a good fit for that. It does not impose any structure on my application, all it does is render the UI, and it does that really well by maintaining a virtual DOM that is used for diffing so that the DOM is only touched where changes have indeed happened. Check out my previous articles where I have explored this in more depth if you&#8217;re curious.</p>
 
-<p>2013 has been pretty good for me, for the most part at least, except for the fact that my beloved bike was stolen from inside the apartment building two days ago, thanks to modern battery technology allowing for cordless angle grinders. But I am digressing. Usually I am a fan of powerful batteries. In terms of learning more about software, it has been great. I have started writing this blog and I have created my first ever open source project, <strong><a href="http://birdwatch.matthiasnehlsen.com/">BirdWatch</a></strong>, and it has been cool to build it and improve it. Along the way it has also been great to learn more about <strong><a href="http://www.scala-lang.org">Scala</a></strong>, <strong><a href="http://www.playframework.com">Play Framework</a></strong>, <strong><a href="http://angularjs.org">AngularJS</a></strong> and JavaScript in general.</p>
+<h1>Conclusion</h1>
 
-<p>I have also written a few articles that I really like. Not all of them, of course, but there are a few. I find this particularly rewarding to watch after a good friend of mine, a journalist and professional writer, had set somewhat different expectations. I asked him early on how long it had taken him until he was completely satisfied with his output on a regular basis, like looking at an article the next day and not wanting to rewrite it for the umpteenth time. He said that it had taken him about seven years of writing professionally, full time. So I can either consider myself lucky that I am happy with a decent share of the articles, or maybe I just have low standards, or both.</p>
-
-<p>I also recently started working on an AngularJS based blogging engine, which I have not published yet. It offers live preview and animated code blocks, among other things. It is pretty much production ready, I find, I am just lacking the time to actually bring it to the point that I want to see it published. Or maybe I should just embrace the imperfection and publish it as is. Maybe there is someone who already finds it useful and wants to put some effort in it. One should be embarrassed of one&#8217;s first release anyways, right?</p>
-
-<p>Recently I started asking myself if working on a blogging engine may be some elaborate procrastination strategy on my part, in order to have an excuse to not actually write. Octopress works reasonably well, after all. On the other hand, I do not really like the authoring process all that much, particularly when it comes to embedding source code, which I find quite unsatisfying.</p>
-
-<p>I also finally started working on a book about three months ago, after having been approached by editors a few times who had read one or more of the articles that I also like. I will talk more about the content of the book in due course. Writing a book is an interesting endeavor and quite different from writing a blog.</p>
-
-<p>So what do I want to do differently in 2014 when it comes to the blog, book writing and authoring fun, open source toy projects?</p>
-
-<ul>
-<li><p>More frequent blog posts. I would like to publish stuff more often, even if that means shorter articles. I bet some readers will be happy with that; I know that my articles so far have not exactly been short. I am aiming for two fixed publications per month, maybe around the 5th and the 20th of each month, give or take. I am aware that this puts additional pressure on me, but I think it will be better to get into a good rhythm there.</p></li>
-<li><p>Morning pages. I have been introduced to this concept by the <strong><a href="http://pragprog.com/book/ahptl/pragmatic-thinking-and-learning">Pragmatic Programmer</a></strong> series and I have found it to be great to do an unfiltered first-thing-in-the-morning brain dump. I just don’t do it regularly enough yet. One point where I don’t agree with the concept as introduced in the book is that it needs to be on paper, not on screen. I find that restriction to be somewhat pointless because it ends up with me not ever looking at the output again. And I find that typing does not keep me from getting whatever idea out of my brain, into a form that is full-text searchable.</p></li>
-<li><p>Quite the contrary, I want the thoughts I write down not only to be searchable but also be tagged by both subject and people. That way I feel I could bundle thoughts better, particularly about ideas that are not concrete enough yet to have found their way into a to-do list. I would like to write a tool for doing so, maybe with an AngularJS frontend and backed by ElasticSearch. Could be another project on github, this time something I am actually using on a daily basis. But then again, this may just be one of these procrastination strategies. Time will tell.</p></li>
-<li><p>I want to check my own github profile less often. It is really cool to watch your projects receiving stars from other developers who find something useful or otherwise cool. But it can become quite addictive to check the github app on my smartphone to see if anything has changed, in particular when something has changed only recently. So less of that. Once a day or so is plenty.</p></li>
-<li><p>I need to become better at leaving work at work. As interesting as the engineering problems there might be, I should not think about them at all outside of work. I have plenty of other areas I want to focus on, like this blog, the book or one of my next toy projects.</p></li>
-<li><p>I need to make more time for physical exercise. I really perform better in all areas and I feel better when I have worked out three or four times per week. So I need to get back into that habit.</p></li>
-<li><p>I want to do more in <strong><a href="http://clojure.org">Clojure</a></strong>. I have spent some time with the language and it resonates really well with the way I am thinking.</p></li>
-<li><p>I want to <strong><a href="http://learnyouahaskell.com">learn me a Haskell for great good</a></strong>, just for the fun of it.</p></li>
-</ul>
-
-
-<p>Well, this is it for now. Let’s see how many of these I can actually put into practice. So many interesting things to explore, so little time.</p>
-
-<p>Have a great 2014, everyone.</p>
-
-<p>Cheers,
-Matthias</p>
+<p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really nothing more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes.</p>
 </div>
 
 
@@ -161,7 +135,7 @@ Matthias</p>
   
 
 
-<time datetime="2013-12-31T19:40:00+01:00" pubdate data-updated="true">12/31/2013</time>
+<time datetime="2014-02-12T22:21:00+01:00" pubdate data-updated="true">02/12/2014</time>
       
 
 
@@ -169,7 +143,7 @@ Matthias</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html" >Tweet</a>
   
 
   
@@ -193,10 +167,6 @@ Matthias</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/11/23/live-page-reload-on-any-device/" title="Previous Post: HTML5 Template with Live Reload and 100/100 PageSpeed">&laquo; HTML5 Template with Live Reload and 100/100 PageSpeed</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2014/01/05/play-framework-and-facebooks-react-library/" title="Next Post: Play Framework and Facebook's React library">Play Framework and Facebook's React library &raquo;</a>
       
     </p>
   </footer>
@@ -307,8 +277,8 @@ Matthias</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html';
+        var disqus_url = 'http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html';
         var disqus_script = 'embed.js';
       
     (function () {

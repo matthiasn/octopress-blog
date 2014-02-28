@@ -13,7 +13,7 @@ I felt a sudden urge to write a **[chat application](http://bit.ly/sse-chat-gith
 
 <iframe width="420" height="425" src="http://sse-chat.matthiasnehlsen.com/" frameborder="0" allowfullscreen></iframe>
 
-There should be actors randomly reciting Romeo and Juliet in Room 1 above if everything is working, but that's not our problem right now. Last month I was writing about **[Server Sent Events vs. WebSockets](http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/)** and decided to go with SSE for my **[BirdWatch](http://bit.ly/BirdWatch)** application. In that application information only flows from server to the client though so I wanted a proof of concept that REST style calls are an appropiate way to communicate back with the server.
+There should be actors randomly reciting Romeo and Juliet in Room 1 above if everything worked, but that's not our problem right now. Last month I wrote about **[Server Sent Events vs. WebSockets](http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/)** and decided to go with SSE for my **[BirdWatch](http://bit.ly/BirdWatch)** application. In that application information only flows from server to the client, though, so I wanted proof of the concept that REST style calls are an appropriate way to communicate back with the server.
  
 I challenged myself to write a chat server for this purpose, with 10 lines of code on the server side (or less). I knew this would be possible thanks to the awesome **[Play Iteratee library](http://www.playframework.com/documentation/2.1.1/Iteratees)**:
 
@@ -48,9 +48,9 @@ The **[Concurrent object](https://github.com/playframework/Play20/tree/2.1.0/fra
 
 What is an **[Iteratee](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee)**? An Iteratee is a function that represents a single step of an ongoing computation. Any state it might have is immutable; supplying input results in a new function / a new Iteratee. This ongoing computation is driven by an Enumerator which keeps track of the latest step. The Enumerator calls the associated Iteratee function with new input when available and then stores that resulting Iteratee (and so on). The way state is handled is somewhat comparable to a fold function that holds intermediate state in an accumulator using an immutable data structure, with the difference here being that the computation can run over an infinite stream. 
 
-**[Enumeratees](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee)** are adapters between Enumerators and Iteratees. They allow for example type transformation or filtering. The filter Enumeratee makes sure input is only used when the input matches the criteria, which here is the message being for the correct chat room for a particular stream / client connection. EventSource provides a transforming Enumeratee for wrapping chunks as Server Sent Events.
+**[Enumeratees](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee)** are adapters between Enumerators and Iteratees. They allow, for example, type transformation or filtering. The filter Enumeratee makes sure input will only be used when the input matches the criteria, which in this case is the message for the correct chat room for a particular stream / client connection. EventSource provides a transforming Enumeratee for wrapping chunks as Server Sent Events.
 
-In the **chatFeed** function we have a chain of Enumerator and two Enumeratees: **chatOut &> filter(room) &> EventSource()** which results in a composed Enumerator. We pass this composed Enumerator into Ok.stream, which internally connects the Enumerator with a simple Iteratee. This simple Iteratee does not hold intermediate state, it only does something for each input item: deliver it as a chunk of bytes to the client over the open HTTP connection.
+In the **chatFeed** function we have a chain of Enumerator and two Enumeratees: **chatOut &> filter(room) &> EventSource()**, which results in a composed Enumerator. We pass this composed Enumerator into Ok.stream, which internally connects the Enumerator with a simple Iteratee. This simple Iteratee does not hold intermediate state; it only does something for each input item: deliver it as a chunk of bytes to the client over the open HTTP connection.
 
 Let's visualize this:
 
@@ -59,9 +59,9 @@ Let's visualize this:
 A message is pushed into the chatChannel and distributed to all attached Iteratees (wrapped by the filter Enumeratee and the EventSource). The message is then sent to the client as a Server Sent Event, but only if the filter predicate evaluates to true.
 
 #AngularJS Client
-I wrote an **[initial version](https://github.com/matthiasn/sse-chat/blob/0af191e628a450ca8fd4d41bcbff382011cd0a13/app/assets/javascripts/main.js)** using jQuery to manipulate the DOM. It worked fine, just getting there wasn't really much fun at all. I would have liked the expressive greatness of **[templates in Play](http://www.playframework.com/documentation/2.1.1/ScalaTemplates)**, but without having to reload the page every time the model changes.
+I wrote an **[initial version](https://github.com/matthiasn/sse-chat/blob/0af191e628a450ca8fd4d41bcbff382011cd0a13/app/assets/javascripts/main.js)** using jQuery to manipulate the DOM. It worked fine, just getting there wasn't really that much fun. I would have liked the expressive greatness of **[templates in Play](http://www.playframework.com/documentation/2.1.1/ScalaTemplates)**, but without having to reload the page every time the model changes.
 
-Last week I started learning AngularJS, so I thought I'd give it a try. The resulting code is not only more than 30% smaller, it also also is a real pleasure to work with. Dynamic views are written in an extended HTML vocabulary which attaches elements on the page to the $scope, which can be seen as the ViewModel of the application. The views are then automatically updated when the associated data changes. 
+Last week I started learning AngularJS, so I thought I'd give it a try. Not only is the resulting code more than 30% smaller, it also is a real pleasure to work with. Dynamic views are written in an extended HTML vocabulary which attaches elements on the page to the $scope, which can be seen as the ViewModel of the application. The views are then automatically updated when the associated data changes. 
 
 {% codeblock AngularJS Chat View lang:html https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/views/index.scala.html index.scala.html %}
 <div ng-controller="ChatCtrl">
@@ -92,7 +92,7 @@ Last week I started learning AngularJS, so I thought I'd give it a try. The resu
 </div>        
 {% endcodeblock %}
 
-The latest 10 items within **$scope.msgs** are rendered into the "chat" div above. The color of each div is also defined in the view by testing if the current user is the sender of the message and adding css class 'others' if not. No more direct DOM manipulation. Very nice.
+The latest 10 items within **$scope.msgs** are rendered into the "chat" div above. The color of each div is also defined in the view by testing if the current user is the sender of the message or by adding CSS class 'others' if not. No more direct DOM manipulation. Very nice.
 
 {% codeblock AngularJS Chat Controller lang:javascript https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/assets/javascripts/controllers.js controllers.js %}
 /** Controllers */
@@ -133,11 +133,11 @@ angular.module('sseChat.controllers', ['sseChat.services']).
     });
 {% endcodeblock %}
 
-The **$scope** is managed by **[AngularJS](http://angularjs.org)** and we declare its properties inside the controller, for example **$scope.msgs** as an empty array. Whenever new messages come in, they are appended to the array, automagically updating the view. Note that manipulations to the data structure that are not triggered by AngularJS itself must be wrapped in an **apply()** call in order to update the UI. That was one of the valuable lessons I learned.
+The **$scope** is managed by **[AngularJS](http://angularjs.org)** and we define its properties inside the controller, for example **$scope.msgs**, as an empty array. Whenever new messages come in, they are appended to the array, automagically updating the view. Note that manipulations to the data structure that are not triggered by AngularJS itself must be wrapped in an **apply()** call in order to update the UI. That was one of the valuable lessons I learned.
 
 I have to say I am really impressed by AngularJS, it is a great addition to my toolbox. I now feel that client side development will be as much fun as server side development already is with Play Framework. I will probably use this newly gained knowledge in the next version of the **[BirdWatch](http://bit.ly/BirdWatch)** application.
 
-If you enjoyed this post, then make sure you subscribe to my **<a href="http://eepurl.com/y0HWv" target="_blank">Newsletter</a>**. 
+If you enjoyed this post, then make sure you'll subscribe to my **<a href="http://eepurl.com/y0HWv" target="_blank">Newsletter</a>**. 
 
 There is a **[follow-up article](http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/)** with the lessons learned, please check it out if you are interested in the server side problems I encountered while running the demo application.
 

@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I am happy to get a huge update of the BirdWatch application out of the way. The changes are much more than what I would normally want to work on for &hellip;">
+  <meta name="description" content="I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -104,18 +104,18 @@
   </header>
 
 
-<div class="entry-content"><p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are much more than what I would normally want to work on for a single article, but then again there is enough interesting stuff going on in this new version for multiple blog articles to come. Initially this application was only meant to be an exercise in streaming information to web clients. But in the meantime I have noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
+<div class="entry-content"><p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to work in for a single article, but then again there is enough interesting stuff going on in this new version that calls for multiple blog articles. Initially this application was only meant to be an exercise in streaming information to web clients. But along the way I noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
 
 <!-- more -->
 
 
-<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest. I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> of this for software engineering related tweets. The application subscribes to all Tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped to one percent of all Tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
+<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest, and  I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> for software engineering related tweets. The application subscribes to all tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped at one percent of all tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
 
 <p>Here is how it looks like:</p>
 
 <p><img class="left" src="/images/130812-screenshot.png" title="image" alt="images"></p>
 
-<p>As you can see above, there is now a search bar which allows to narrow down the selection tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time of opening the link, not at the time of bookmarking it. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
+<p>As you can see above, there is now a search bar which allows you to narrow down the selection of tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time the link is opened, not at the time it is bookmarked. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
 
 <p>Here are some examples.</p>
 
@@ -127,13 +127,13 @@
 
 <p>Well, you get the idea. <strong>AND</strong> is the standard operator, it is applied unless <strong>OR</strong> is specifically used between two terms.</p>
 
-<p>You can download the application and run it for a different area of your choosing. For myself I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I might run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
+<p>You can download the application and run it for a different area of your choosing. Personally, I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I may decide to run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
 
-<p>So how can this be improved in the future? A stream of Tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at one glance which newspaper articles and other links are most talked about. This analysis could even be weighed by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be a visualization about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? The other way around? Get involved, there are plenty of options on how to work with the data.</p>
+<p>So how can this be improved in the future? A stream of tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at a glance, which newspaper articles and other links are most talked about. This analysis could even be weighted by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be some visualizations about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? Or is it the other way around? Get involved, there are plenty of options on how to work with the data.</p>
 
 <p>You can find a brief overview of the technology in the project description on <a target="_blank" href="https://github.com/matthiasn/BirdWatch"><strong>Github</strong></a>.</p>
 
-<p>In the future I will probably write some articles further explaining different parts of the application. Let me know what you are particularly interested in.</p>
+<p>In the future I will probably write some articles that further explain different parts of the application. Let me know what you are particularly interested in.</p>
 
 <p>Alright, this is it for today. Until next time.
 Matthias</p>
@@ -175,28 +175,16 @@ Matthias</p>
   
 
   
-    <script type="text/javascript">
-      (function() { 
-        var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
-        write_string += '&url='; 
-        write_string += encodeURIComponent(window.location); 
-        write_string += '&title=' + encodeURIComponent(document.title);
-        write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
-
-        var span = $(document.createElement("span"));
-        span.html(write_string);
-        $(".sharing").append(span);
-      })();
-    </script>
   
   
   
-<script type="text/javascript" src="http://www.reddit.com/static/button/button1.js"></script>
-  
+  <br />
   
   
     <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
   
+  
+  <br />
   
 </div>
 

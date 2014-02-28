@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="So far I found my BirdWatch application nice to look at but not terribly useful as an original way of finding information. Let&#8217;s face it, the &hellip;">
+  <meta name="description" content="So far I have found my BirdWatch application nice to look at but not terribly useful as an original way of finding information. Let&#8217;s face it &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -104,22 +104,22 @@
   </header>
 
 
-<div class="entry-content"><p>So far I found my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application nice to look at but not terribly useful as an original way of finding information. Let&#8217;s face it, the vast majority of tweets is not terribly useful. But there are some in there that are highly relevant. What are the characteristics of these? At the most basic level, they come from people with huge numbers of followers and / or have been retweeted a lot. These tweets have a large audience, not the ones from users with low follower counts. The latter make up the majority of the chatter though. How do we find these more relevant tweets within an observation period though?</p>
+<div class="entry-content"><p>So far I have found my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application nice to look at but not terribly useful as an original way of finding information. Let&#8217;s face it - the vast majority of tweets are not terribly useful. But there are some in there that are highly relevant. What are their characteristics? At the most basic level, they come from people with huge numbers of followers and / or have been re-tweeted a lot. It&#8217;s these tweets that have a large audience, not the ones from users with low follower counts. The latter make up the majority of the chatter, though. How do we find these more relevant tweets within an observation period?</p>
 
 <!-- more -->
 
 
-<p>In my private instance of the application which is listening to tweets on US politics I have been increasingly annoyed by an overwhelming amount of irrelevancy. I&#8217;d search for &#8220;Obama Syria&#8221; and get shiploads of tweets from crazies; finding the relevant stuff was next to impossible when only having the result set sorted by time.</p>
+<p>I am running a private instance of this application which is listening to tweets on US politics. In this instance of the application I have been increasingly annoyed by an overwhelming amount of irrelevancy. I&#8217;d search for &#8220;Obama Syria&#8221; and get shiploads of tweets from crazies; finding the relevant stuff was next to impossible when I only had the result set sorted by time.</p>
 
-<p><strong><a href="http://square.github.io/crossfilter/">Crossfilter</a></strong> to the rescue. Over the weekend I have finally had time to integrate it into the project. Now you are able to sort tweets not only in natural order (by time) but also by the number of followers of the author</p>
+<p><strong><a href="http://square.github.io/crossfilter/">Crossfilter</a></strong> to the rescue. Over the weekend I finally had time to integrate it into the project. Now you will be able to sort tweets not only in natural order (by time) but also by the number of followers of the author</p>
 
 <p><img class="left" src="/images/cf_followers.png" title="image" alt="images"></p>
 
-<p>or the number of times a particular tweet has been retweeted. As per usual you can <strong><a href="http://birdwatch.matthiasnehlsen.com">try this out</a></strong>.</p>
+<p>or the number of times a particular tweet has been retweeted. As usual you can <strong><a href="http://birdwatch.matthiasnehlsen.com">try this out</a></strong>.</p>
 
 <p> <img class="left" src="/images/cf_retweets.png" title="image" alt="images"></p>
 
-<p>The retweets sort order currently evaluates the number of total retweets during the entire lifecycle of the tweet, which makes this sort order somewhat biased towards older tweets that were retweeted a lot in the past but not necessarily proportionately often during the observation time, which is the time span between now (whenever looking at the page as searches are live) and the oldest tweet in the data set. One additional metric could be the number of retweets of a tweet during the observation period, not total. That should not be all that difficult using crossfilter.</p>
+<p>The re-tweets sort order currently evaluates the number of total re-tweets during the entire lifecycle of the tweet, which makes this sort order somewhat biased towards older tweets that were re-tweeted a lot in the past but not necessarily proportionately often during the observation time, which is the time span between now (whenever looking at the page as searches are live) and the oldest tweet in the data set. One additional metric could be the number of retweets of a tweet during the observation period, not the total number. That should not be all that difficult using crossfilter.</p>
 
 <p>Let&#8217;s have a look at the source code. The <strong><a href="http://square.github.io/crossfilter/">Crossfilter</a></strong> object lives in an <strong><a href="http://angularjs.org">AngularJS</a></strong> service, which is a singleton within the application. The functionality is then exposed through exported functions for adding data, clearing the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> and retrieving items for the paginated tweets page.</p>
 
@@ -258,14 +258,14 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Depending on the selected sort order different dimensions are used for generating the paginated tweets list. Sorting by time of tweeting is achieved with a dimension sorting by tweet IDs (which are in chronological order). Another dimension sorts tweets by the follower count of the tweet author. In this case, maxRetweets (mapper function) looks up all retweets within the data set in memory and sets the retweet count to the highest value found. The tweets with the highest number of retweets are found using the retweets dimension. Within this dimension multiple versions of the same original tweet are returned when the tweet has been retweeted multiple times during the observation period. The _.uniq function from <strong><a href="http://underscorejs.org/">underscore.js</a></strong> is used to filter out those duplicate entries. The descending order of retweet_count in the returned array from the dimension guarantees that the version of a retweet with the highest retweet count is found first and retained.</p>
+<p>Depending on the selected sort order different dimensions are used to generate the paginated tweets list. Sorting by time of tweeting is achieved with a dimension sorting by tweet IDs (which are in chronological order). Another dimension sorts tweets by the follower count of the tweet author. In this case, maxRetweets (mapper function) looks up all retweets within the data set in memory and sets the retweet count to the highest value found. The tweets with the highest number of retweets are found using the retweets dimension. Within this dimension multiple versions of the same original tweet are returned when the tweet has been retweeted multiple times during the observation period. The _.uniq function from <strong><a href="http://underscorejs.org/">underscore.js</a></strong> is used to filter out those duplicate entries. The descending order of retweet_count in the returned array from the dimension guarantees that the version of a retweet with the highest re-tweet count is found first and retained.</p>
 
-<p>The paginated data is generated by retrieving all items from the selected dimension up to the current page. The _.rest function from <strong><a href="http://underscorejs.org/">underscore.js</a></strong> then drops the items for all pages before the current page.</p>
+<p>The paginated data is generated by retrieving all items from the selected dimension up to the current page. The _.rest function from <strong><a href="http://underscorejs.org/">underscore.js</a></strong> then drops the items for all pages that come before the current page.</p>
 
 <p><strong><a href="http://angularjs.org">AngularJS</a></strong> then takes care of rendering a view by calling the tweetPage function from the crossfilter service every time the UI is updated. This means that the visual representation of the data is always up to date, with automatic updates for example when a tweet in the followers order is retweeted again. All that without having to manipulate the DOM directly, thanks to
 <strong><a href="http://angularjs.org">AngularJS</a></strong>.</p>
 
-<p>Evaluating the crossfilter dimension functions again and again can be problematic when tens of individual tweets per second are arriving through the <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> connection with the server though. In order to avoid evaluating the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> functions multiple times per second I am using _.throttle in the registerCallback function in controllers.js:</p>
+<p>Evaluating the crossfilter dimension functions again and again can be problematic when tens of individual tweets per second arrive through the <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> connection with the server, though. In order to avoid evaluating the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> functions multiple times per second I use _.throttle in the registerCallback function in controllers.js:</p>
 
 <figure class='code'><figcaption><span>Insertion Cache inside Controller</span><a href='https://github.com/matthiasn/BirdWatch/blob/ff861aa0df86c0c0ea2a078a0c3af50a6bc877b1/app/assets/javascripts/controllers.js'>controllers.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -280,7 +280,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>By the way, you can now increase the number of pre-loaded tweets to up to 20,000 under <strong>settings</strong>. That might slow the application down though. Many things aren&#8217;t optimized yet, but overall it seems to be working fine.</p>
+<p>By the way, you can now increase the number of pre-loaded tweets to up to 20,000 under <strong>settings</strong>. That may slow the application down, though. A lot of things aren&#8217;t perfect yet, but overall it seems to be working fine.</p>
 
 <p>Anyhow, I will go into more detail later. The source code for the entire application can be found on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>. My <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">previous article</a></strong> is the place to go for an explanation of the overall architecture of the application. It is a work in progress and I will get back to it in the next couple of days. For now I just wanted to give you a quick update on what I have been up to this weekend.</p>
 
@@ -326,28 +326,16 @@ Matthias</p>
   
 
   
-    <script type="text/javascript">
-      (function() { 
-        var write_string = '<iframe src="http://widgets.dzone.com/links/widgets/zoneit.html?t=2';
-        write_string += '&url='; 
-        write_string += encodeURIComponent(window.location); 
-        write_string += '&title=' + encodeURIComponent(document.title);
-        write_string += '" height="25" width="155" scrolling="no" frameborder="0"></iframe>'; 
-
-        var span = $(document.createElement("span"));
-        span.html(write_string);
-        $(".sharing").append(span);
-      })();
-    </script>
   
   
   
-<script type="text/javascript" src="http://www.reddit.com/static/button/button1.js"></script>
-  
+  <br />
   
   
     <div class="fb-like" data-send="true" data-width="450" data-show-faces="false"></div>
   
+  
+  <br />
   
 </div>
 

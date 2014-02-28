@@ -111,7 +111,5 @@ Above, the tweet is **POSTed** to the *elasticPercolatorURL* inside the *doc* pr
 
 Okay, that's all for this article. Initially I wanted it to be about replacing **AngularJS** with **ReactJS**, but then I did not have enough time left before my vacation and after running into this problem. So that article is next, probably some time later this month.
 
-Now back to my vacation in amazing Andalucía. 
-
 Cheers,
 Matthias

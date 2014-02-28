@@ -5,21 +5,21 @@ date: 2013-09-15 20:40
 comments: true
 categories: 
 ---
-So far I found my **[BirdWatch](http://birdwatch.matthiasnehlsen.com)** application nice to look at but not terribly useful as an original way of finding information. Let's face it, the vast majority of tweets is not terribly useful. But there are some in there that are highly relevant. What are the characteristics of these? At the most basic level, they come from people with huge numbers of followers and / or have been retweeted a lot. These tweets have a large audience, not the ones from users with low follower counts. The latter make up the majority of the chatter though. How do we find these more relevant tweets within an observation period though?
+So far I have found my **[BirdWatch](http://birdwatch.matthiasnehlsen.com)** application nice to look at but not terribly useful as an original way of finding information. Let's face it - the vast majority of tweets are not terribly useful. But there are some in there that are highly relevant. What are their characteristics? At the most basic level, they come from people with huge numbers of followers and / or have been re-tweeted a lot. It's these tweets that have a large audience, not the ones from users with low follower counts. The latter make up the majority of the chatter, though. How do we find these more relevant tweets within an observation period?
 
 <!-- more -->
 
-In my private instance of the application which is listening to tweets on US politics I have been increasingly annoyed by an overwhelming amount of irrelevancy. I'd search for "Obama Syria" and get shiploads of tweets from crazies; finding the relevant stuff was next to impossible when only having the result set sorted by time.
+I am running a private instance of this application which is listening to tweets on US politics. In this instance of the application I have been increasingly annoyed by an overwhelming amount of irrelevancy. I'd search for "Obama Syria" and get shiploads of tweets from crazies; finding the relevant stuff was next to impossible when I only had the result set sorted by time.
 
-**[Crossfilter](http://square.github.io/crossfilter/)** to the rescue. Over the weekend I have finally had time to integrate it into the project. Now you are able to sort tweets not only in natural order (by time) but also by the number of followers of the author
+**[Crossfilter](http://square.github.io/crossfilter/)** to the rescue. Over the weekend I finally had time to integrate it into the project. Now you will be able to sort tweets not only in natural order (by time) but also by the number of followers of the author
 
 {% img left /images/cf_followers.png 'image' 'images'%}
 
-or the number of times a particular tweet has been retweeted. As per usual you can **[try this out](http://birdwatch.matthiasnehlsen.com)**.
+or the number of times a particular tweet has been retweeted. As usual you can **[try this out](http://birdwatch.matthiasnehlsen.com)**.
  
  {% img left /images/cf_retweets.png 'image' 'images'%}
 
-The retweets sort order currently evaluates the number of total retweets during the entire lifecycle of the tweet, which makes this sort order somewhat biased towards older tweets that were retweeted a lot in the past but not necessarily proportionately often during the observation time, which is the time span between now (whenever looking at the page as searches are live) and the oldest tweet in the data set. One additional metric could be the number of retweets of a tweet during the observation period, not total. That should not be all that difficult using crossfilter.
+The re-tweets sort order currently evaluates the number of total re-tweets during the entire lifecycle of the tweet, which makes this sort order somewhat biased towards older tweets that were re-tweeted a lot in the past but not necessarily proportionately often during the observation time, which is the time span between now (whenever looking at the page as searches are live) and the oldest tweet in the data set. One additional metric could be the number of retweets of a tweet during the observation period, not the total number. That should not be all that difficult using crossfilter.
 
 Let's have a look at the source code. The **[Crossfilter](http://square.github.io/crossfilter/)** object lives in an **[AngularJS](http://angularjs.org)** service, which is a singleton within the application. The functionality is then exposed through exported functions for adding data, clearing the **[crossfilter](http://square.github.io/crossfilter/)** and retrieving items for the paginated tweets page.
 
@@ -92,14 +92,14 @@ angular.module('birdwatch.services').service('cf', function (utils) {
 });
 {% endcodeblock %}
 
-Depending on the selected sort order different dimensions are used for generating the paginated tweets list. Sorting by time of tweeting is achieved with a dimension sorting by tweet IDs (which are in chronological order). Another dimension sorts tweets by the follower count of the tweet author. In this case, maxRetweets (mapper function) looks up all retweets within the data set in memory and sets the retweet count to the highest value found. The tweets with the highest number of retweets are found using the retweets dimension. Within this dimension multiple versions of the same original tweet are returned when the tweet has been retweeted multiple times during the observation period. The _.uniq function from **[underscore.js](http://underscorejs.org/)** is used to filter out those duplicate entries. The descending order of retweet_count in the returned array from the dimension guarantees that the version of a retweet with the highest retweet count is found first and retained.
+Depending on the selected sort order different dimensions are used to generate the paginated tweets list. Sorting by time of tweeting is achieved with a dimension sorting by tweet IDs (which are in chronological order). Another dimension sorts tweets by the follower count of the tweet author. In this case, maxRetweets (mapper function) looks up all retweets within the data set in memory and sets the retweet count to the highest value found. The tweets with the highest number of retweets are found using the retweets dimension. Within this dimension multiple versions of the same original tweet are returned when the tweet has been retweeted multiple times during the observation period. The _.uniq function from **[underscore.js](http://underscorejs.org/)** is used to filter out those duplicate entries. The descending order of retweet_count in the returned array from the dimension guarantees that the version of a retweet with the highest re-tweet count is found first and retained.
 
-The paginated data is generated by retrieving all items from the selected dimension up to the current page. The _.rest function from **[underscore.js](http://underscorejs.org/)** then drops the items for all pages before the current page.
+The paginated data is generated by retrieving all items from the selected dimension up to the current page. The _.rest function from **[underscore.js](http://underscorejs.org/)** then drops the items for all pages that come before the current page.
 
 **[AngularJS](http://angularjs.org)** then takes care of rendering a view by calling the tweetPage function from the crossfilter service every time the UI is updated. This means that the visual representation of the data is always up to date, with automatic updates for example when a tweet in the followers order is retweeted again. All that without having to manipulate the DOM directly, thanks to 
 **[AngularJS](http://angularjs.org)**.  
 
-Evaluating the crossfilter dimension functions again and again can be problematic when tens of individual tweets per second are arriving through the **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** connection with the server though. In order to avoid evaluating the **[crossfilter](http://square.github.io/crossfilter/)** functions multiple times per second I am using _.throttle in the registerCallback function in controllers.js:
+Evaluating the crossfilter dimension functions again and again can be problematic when tens of individual tweets per second arrive through the **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** connection with the server, though. In order to avoid evaluating the **[crossfilter](http://square.github.io/crossfilter/)** functions multiple times per second I use _.throttle in the registerCallback function in controllers.js:
 
 {% codeblock Insertion Cache inside Controller lang:javascript https://github.com/matthiasn/BirdWatch/blob/ff861aa0df86c0c0ea2a078a0c3af50a6bc877b1/app/assets/javascripts/controllers.js controllers.js %}
 insertionCache = insertionCache.concat(t);    // every received item is appended to insertionCache.
@@ -109,7 +109,7 @@ _.throttle(function() {                       // throttle because every insertio
 }, 3000)();
 {% endcodeblock %}
 
-By the way, you can now increase the number of pre-loaded tweets to up to 20,000 under **settings**. That might slow the application down though. Many things aren't optimized yet, but overall it seems to be working fine.
+By the way, you can now increase the number of pre-loaded tweets to up to 20,000 under **settings**. That may slow the application down, though. A lot of things aren't perfect yet, but overall it seems to be working fine.
 
 Anyhow, I will go into more detail later. The source code for the entire application can be found on **[GitHub](https://github.com/matthiasn/BirdWatch)**. My **[previous article](http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/)** is the place to go for an explanation of the overall architecture of the application. It is a work in progress and I will get back to it in the next couple of days. For now I just wanted to give you a quick update on what I have been up to this weekend. 
 
