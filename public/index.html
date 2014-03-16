@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="ElasticSearch 1.0.0 is out, hooray! Great stuff, congrats to everyone involved. Not that I had any complaints about v0.9, but still, this is a great &hellip;">
+  <meta name="description" content="Summary: in this article I will dicuss how to replace AngularJS with ReactJS in my BirdWatch project. Despite the somewhat catchy title of this post &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,60 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/02/28/birdwatch-with-reactjs/">Replacing AngularJS with ReactJS</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-28T22:21:00+01:00" pubdate data-updated="true">02/28/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>Summary:</strong> in this article I will dicuss how to replace <strong><a href="http://angularjs.org">AngularJS</a></strong> with <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> in my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> project. Despite the somewhat catchy title of this post, I do not intend to say that one should replace AngularJS with ReactJS necessarily. Rather, I wanted to create yet another version of the BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. The AngularJS version will also not be replaced, rather multiple versions of the client exist at the same time for comparison. So think of it as something like the TodoMVC of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of.</p>
+
+<p>I will not go into a lot of detail about the BirdWatch application as such. What you need to know is that there is a server side application that connects to the Twitter Streaming API and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application, using AngularJS. Please check out <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a></strong> if you want to find out more. What you need to know about it for this</p>
+
+<p>That being said, let me dive right into why I felt like I wanted to replace AngularJS with ReactJS. Fear not if you prefer AngularJS, I will not kick it out, I am just writing a new version of the client side application. In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the service. Instead I want control on when the client UI is rendered. In other words, I want to take the priviledge of the client to ask for data away and instead decide in my application logic when the UI should update. This could be done in AngularJS as well by keeping a cached version of the last UI state, but I&#8217;d rather not waste any memory for that, particularly not on mobile.Instead I want my business logic to call the UI renderer exactly once whenever it wants to render data. No more, no less.</p>
+
+<p>ReactJS is a good fit for that. It does not impose any structure on my application, all it does is render the UI, and it does that really well by maintaining a virtual DOM that is used for diffing so that the DOM is only touched where changes have indeed happened. Check out my previous articles where I have explored this in more depth if you&#8217;re curious.</p>
+
+<h1>Conclusion</h1>
+
+<p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really nothing more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>The list of technical terms I am using for the live demo under birdwatch.matthiasnehlsen.com easily fits into this cap, in which case the application will receive all these tweets. The term <strong>Obama</strong> also usually fits into this limit. The term <strong>love</strong> on the other hand doesn&rsquo;t. If you were to download BirdWatch from GitHub, create a Twitter API key and replace the list of software terms with only the word <strong>love</strong>, I bet you will reach the 1% limit any second of the day. However not to worry, Twitter will still deliver at the rate limit, which last time I tried was about 4 million tweets per day. Sure, you might loose Tweets doing this, but not to worry when looking for popular tweets as those will appear time and time again as a retweet, making it highly unlikely to miss them over time. Only the current retweet count may lag behind when the last update as a retweet was dropped.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -449,47 +503,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/03/angularjs-and-play-maintenance/">Follow-Up: AngularJS and Play Framework</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-03T14:45:00+02:00" pubdate data-updated="true">07/03/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>This is the follow-up on last week&#8217;s article about <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS and Play Framework</a></strong>. I want to share with you the problems that I encountered on the server side while running the demo as well as my ideas of how to deal with comparable problems more efficiently in the future. I have not encountered any AngularJS-related problems with the chat application so we won&#8217;t deal with it today. I&#8217;ll have more on <strong><a href="http://angularjs.org">AngularJS</a></strong> next week.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/07/03/angularjs-and-play-maintenance/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -516,6 +529,10 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/02/28/birdwatch-with-reactjs/">Replacing AngularJS with ReactJS</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/02/16/elasticsearch-v1/">ElasticSearch 1.0.0 - Breaking Changes</a>
       </li>
     
@@ -529,10 +546,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     
       <li class="post">
         <a href="/blog/2013/12/31/new-years-resolution/">New Year&#8217;s Resolution</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2013/11/23/live-page-reload-on-any-device/">HTML5 Template with Live Reload and 100/100 PageSpeed</a>
       </li>
     
   </ul>

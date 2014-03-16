@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-02-28T19:21:09+01:00</updated>
+  <updated>2014-03-16T17:44:14+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,33 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Replacing AngularJS with ReactJS]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/02/28/birdwatch-with-reactjs/"/>
+    <updated>2014-02-28T22:21:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/02/28/birdwatch-with-reactjs</id>
+    <content type="html"><![CDATA[<p><strong>Summary:</strong> in this article I will dicuss how to replace <strong><a href="http://angularjs.org">AngularJS</a></strong> with <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> in my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> project. Despite the somewhat catchy title of this post, I do not intend to say that one should replace AngularJS with ReactJS necessarily. Rather, I wanted to create yet another version of the BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. The AngularJS version will also not be replaced, rather multiple versions of the client exist at the same time for comparison. So think of it as something like the TodoMVC of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of.</p>
+
+<p>I will not go into a lot of detail about the BirdWatch application as such. What you need to know is that there is a server side application that connects to the Twitter Streaming API and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application, using AngularJS. Please check out <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a></strong> if you want to find out more. What you need to know about it for this</p>
+
+<p>That being said, let me dive right into why I felt like I wanted to replace AngularJS with ReactJS. Fear not if you prefer AngularJS, I will not kick it out, I am just writing a new version of the client side application. In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the service. Instead I want control on when the client UI is rendered. In other words, I want to take the priviledge of the client to ask for data away and instead decide in my application logic when the UI should update. This could be done in AngularJS as well by keeping a cached version of the last UI state, but I&#8217;d rather not waste any memory for that, particularly not on mobile.Instead I want my business logic to call the UI renderer exactly once whenever it wants to render data. No more, no less.</p>
+
+<p>ReactJS is a good fit for that. It does not impose any structure on my application, all it does is render the UI, and it does that really well by maintaining a virtual DOM that is used for diffing so that the DOM is only touched where changes have indeed happened. Check out my previous articles where I have explored this in more depth if you&#8217;re curious.</p>
+
+<h1>Conclusion</h1>
+
+<p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really nothing more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>The list of technical terms I am using for the live demo under birdwatch.matthiasnehlsen.com easily fits into this cap, in which case the application will receive all these tweets. The term <strong>Obama</strong> also usually fits into this limit. The term <strong>love</strong> on the other hand doesn&rsquo;t. If you were to download BirdWatch from GitHub, create a Twitter API key and replace the list of software terms with only the word <strong>love</strong>, I bet you will reach the 1% limit any second of the day. However not to worry, Twitter will still deliver at the rate limit, which last time I tried was about 4 million tweets per day. Sure, you might loose Tweets doing this, but not to worry when looking for popular tweets as those will appear time and time again as a retweet, making it highly unlikely to miss them over time. Only the current retweet count may lag behind when the last update as a retweet was dropped.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[ElasticSearch 1.0.0 - Breaking Changes]]></title>
@@ -4293,46 +4320,6 @@ This allows us to do something upon return of the collection size in a non-block
 <p>One comment regarding possible Iteratee states: An Iteratee can  be in one of three states, Cont, Done and Error. The Done state does not seem particularly useful when dealing with truly open-ended streams. When is a Twitter stream done? When Twitter ceases to exist? For this reason I also do not care about any result that could be computed on a Done state in this application. Results over a stream of Tweets as presented here are only meaningful incrementally. But a Done state could certainly be useful in other applications, such as when reading from a large file in smaller chunks or when streaming data from <a href="http://reactivemongo.org">ReactiveMongo</a> until the iterator runs out of data. Then a final computation makes sense.</p>
 
 <p>Okay, this has been a lot. But I promised to share what I learned about Iteratees with this project so far. Let me know if this helped you in your understanding as well.</p>
-
-<p>-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Hello World]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/04/19/hello-world/"/>
-    <updated>2013-04-19T21:19:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/04/19/hello-world</id>
-    <content type="html"><![CDATA[<p><strong>Who am I?</strong>
-My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>
-
-<!-- more -->
-
-
-<p>After some wandering, I discovered what a delight it can be to write these amazing little things called &#8216;programs&#8217; that come to existence almost completely through the workings of the mind. A couple of years ago, I finally decided that it was time for a major change. I knew I really wanted to be spend my time and energy in the creative process of developing applications that elegantly solve problems, so I made the move, and I haven&#8217;t looked back since.</p>
-
-<p><strong>Why am I blogging?</strong>
-I am fascinated by the idea of reasoning over live data streams. There are quite a few things that I still need to learn in order to turn my ideas into working code. I find that I learn particularly well when explaining things to others, so writing this blog seems like an awesome idea.</p>
-
-<p>Recently I started to work on a reactive web project for my portfolio, written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>, installed a demo on a <strong><a href="http://birdwatch.matthiasnehlsen.com">web server</a></strong> and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense.</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/screenshot.png" title="image" alt="images"></p>
-
-<p>Then it got mentioned on Twitter, retweeted 16 times and before I knew it, I had visitors from 272 cities in 48 countries on that web server. I know because out of curiosity I wrote a little logging routine that does GeoIP-lookup for every IP-address visiting that server on the fly, but that is the topic for a future post, potentially with a live visualization for the curious website owner.</p>
-
-<p><strong>What will I be blogging about?</strong>
-I will be blogging about functional programming, reactive data processing and data visualization. I am particularly interested in observable data from the real world moving through information systems, ideally for visualizations that are both useful and pleasant to look at.</p>
-
-<p>For the time being, you can expect me to use <strong><a href="http://www.scala-lang.org">Scala</a></strong>, <strong><a href="http://www.playframework.com">Play</a></strong> and <strong><a href="http://akka.io">Akka</a></strong> on the server side, a beautiful technology stack that allows solving concurrent problems in surprisingly short amounts of time. For the client side I am just getting started with <strong><a href="http://d3js.org">D3.js</a></strong>, a JavaScript library for data-driven DOM manipulation. It allows for absolutely stunning visualizations, even though I am nowhere near that as of yet.</p>
-
-<p>You can also expect me to continue getting live prototypes up and running for the things I write about, just like the one for <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong>. I find code that is not executed to be a wasted effort, and there is no better proof for any code than running it. I already learned a lot regarding the architecture of BirdWatch and there are a few things that I would do differently in the future, but that is also a topic for a future post.</p>
-
-<p><strong>How can you leave feedback?</strong>
-I am starting this blog because I am hoping to learn a lot in the process, particularly from interaction with you, the reader. So please comment on the blog posts, correct me where I am wrong, and let me know where you think a more elegant solution could be found.</p>
-
-<p>Most importantly, ask if there is anything that you find difficult to understand. My goal in all of this is to explain things as clearly as possible, so please let me know when I&#8217;ve failed to do that. Ask questions in the comments section if you think that others might benefit from the answers as well. Of course, you can also always contact me by email, though that may take longer for a response.</p>
-
-<p>You can also follow me on Twitter <strong><a href="https://twitter.com/_MNehlsen">@_MNehlsen</a></strong>. I just launched my feed, so you&#8217;ll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.</p>
 
 <p>-Matthias</p>
 ]]></content>
