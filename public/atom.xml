@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-03-16T17:44:14+01:00</updated>
+  <updated>2014-03-22T19:44:54+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,15 +14,111 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Replacing AngularJS with ReactJS]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/02/28/birdwatch-with-reactjs/"/>
-    <updated>2014-02-28T22:21:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/02/28/birdwatch-with-reactjs</id>
-    <content type="html"><![CDATA[<p><strong>Summary:</strong> in this article I will dicuss how to replace <strong><a href="http://angularjs.org">AngularJS</a></strong> with <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> in my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> project. Despite the somewhat catchy title of this post, I do not intend to say that one should replace AngularJS with ReactJS necessarily. Rather, I wanted to create yet another version of the BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. The AngularJS version will also not be replaced, rather multiple versions of the client exist at the same time for comparison. So think of it as something like the TodoMVC of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of.</p>
+    <title type="html"><![CDATA[BirdWatch: AngularJS vs. ReactJS]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/03/18/birdwatch-with-reactjs/"/>
+    <updated>2014-03-18T22:21:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/03/18/birdwatch-with-reactjs</id>
+    <content type="html"><![CDATA[<p><strong>Summary:</strong> in this article I will dicuss a new version of the BirdWatch application that uses ReactJS on the client side instead of AngularJS. I do not intend to replace AngularJS in the application. Rather, I want to create yet another version of the client side BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. So think of it as something like the <strong><a href="http://todomvc.com">TodoMVC</a></strong> of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of.</p>
 
-<p>I will not go into a lot of detail about the BirdWatch application as such. What you need to know is that there is a server side application that connects to the Twitter Streaming API and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application, using AngularJS. Please check out <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a></strong> if you want to find out more. What you need to know about it for this</p>
+<!-- more -->
 
-<p>That being said, let me dive right into why I felt like I wanted to replace AngularJS with ReactJS. Fear not if you prefer AngularJS, I will not kick it out, I am just writing a new version of the client side application. In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the service. Instead I want control on when the client UI is rendered. In other words, I want to take the priviledge of the client to ask for data away and instead decide in my application logic when the UI should update. This could be done in AngularJS as well by keeping a cached version of the last UI state, but I&#8217;d rather not waste any memory for that, particularly not on mobile.Instead I want my business logic to call the UI renderer exactly once whenever it wants to render data. No more, no less.</p>
+
+<p>In this article I will not go into a lot of detail about the server side of the BirdWatch application. What you need to know is that there is a server side application that connects to the Twitter Streaming API and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application, using AngularJS. The client side application allows users to perform a live search inside a stream of tweets, with live updates of the UI when new matches to the search come in. Here&#8217;s how that looks like. Click the image to try out the application:</p>
+
+<p><a href="http://birdwatch.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/bw_expl_beer.png" /></a></p>
+
+<p>Here&#8217;s an animated architectural overview, mostly as a teaser for the previous article that describes the server side of the application in detail. Accordingly you can click it to get to that article:</p>
+
+<p><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/" target="_blank"><img src="http://matthiasnehlsen.com/images/bw_expl_anim.gif" /></a></p>
+
+<h2>Why might someone choose ReactJS over AngularJS</h2>
+
+<p>In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the crossfilter service. Instead I want control on when the client UI is rendered.</p>
+
+<p>As I have discussed in this <strong><a href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/">recent article</a></strong>, ReactJS would also potentially be a better fit when working with immutable data. That is not a concern in the current version of BirdWatch, but it might be in the future.</p>
+
+<h2>Implementing the existing functionality with ReactJS</h2>
+
+<p>There are four main areas of functionality in the application:</p>
+
+<ul>
+<li><p>Search: The user can start a search by entering it into the search bar, which will refresh the data and establish a Server Sent Event connection to the server that will deliver matches to the search in real time. At the same time previous matches are retrieved.</p></li>
+<li><p>Rendering of Tweets: Different sort orders of tweets are displayed in what I would call a tweet card. In AngularJS, directives nicely handle the abstraction of one such tweet.</p></li>
+<li><p>Pagination: The application loads many more tweets than can displayed on one page (with 5000 tweets being the default). The AngularJS version implements this with a modified version of the AngularUI-Bootstrap project.</p></li>
+<li><p>Charts: different visualizations are rendered on the page. At the core, D3 does this for us. In the AngularJS version, relatively thin wrappers make directives out of these charts that get wired data and that re-render when the data changes.</p></li>
+</ul>
+
+
+<p>Let us go through these areas one by one.</p>
+
+<h2>Search</h2>
+
+<p>In this area, AngularJS and its two-way data-binding shines. There the content of the search input element is bound to a property on the $scope, just like the button is bound to a function that is also part of the $scope and that triggers a new search. With ReactJS, I found it a little more complicated to achieve the same thing. I am actually not using ReactJS at all achieve this, instead I am assigning the functionality using onclick for triggering the search function, and jQuery to achieve the same when enter is pressed inside the input field. AngularJS offers more of a full framework solution for such problems, but I am okay with this solution here.</p>
+
+<h2>Rendering of tweets</h2>
+
+<p>This is where it gets much more interesting. AngularJS renders the list of tweets from the data model using <strong>ng-repeat</strong> like this:</p>
+
+<pre><code>                &lt;!-- Tweet Cards inside frame --&gt;
+                &lt;div class="col-lg-4" id="tweet-frame"&gt;
+                    &lt;div class="tweetCard" data-ng-repeat="tweet in cf.tweetPage(currentPage, pageSize, sortModel)"
+                        data-tweet="tweet"&gt;&lt;/div&gt;
+                &lt;/div&gt;
+</code></pre>
+
+<p>where <em>cf.tweetPage</em> is a function delivering the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling <em>$scope.$apply</em> and also when anything else happens that has any effect on the data model anywhere. This is what I meant when I said earlier that this might not be the most desirably thing when this function call is potentially expensive.</p>
+
+<p>ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application passes it new data. Let&#8217;s look at that in more detail. In the HTML, there is only a single div without any special notation:</p>
+
+<pre><code>                    &lt;!-- Tweet Cards inside frame --&gt;
+                &lt;div class="col-lg-4" id="tweet-frame"&gt;&lt;/div&gt;
+</code></pre>
+
+<p>Then in the component declaration, it looks as follows:</p>
+
+<pre><code>/** single Tweet component */
+var Tweet = React.createClass({
+    render: function () { return (
+        &lt;div className="tweet"&gt;
+            &lt;span&gt;
+                &lt;a href={"http://www.twitter.com/" + this.props.t.user.screen_name} target="_blank"&gt;
+                    &lt;img className="thumbnail" src={this.props.t.user.profile_image_url} /&gt;
+                &lt;/a&gt;
+            &lt;/span&gt;
+            &lt;a href={"http://www.twitter.com/" + this.props.t.user.screen_name} target="_blank"&gt;
+                &lt;span className="username"&gt;{this.props.t.user.name}&lt;/span&gt;
+            &lt;/a&gt;
+            &lt;span className="username_screen"&gt;&amp;nbsp;&amp;#64;{this.props.t.user.screen_name}&lt;/span&gt;
+            &lt;div className="pull-right timeInterval"&gt;{fromNow(this.props.t.created_at)}&lt;/div&gt;
+            &lt;div className="tweettext"&gt;
+                &lt;div dangerouslySetInnerHTML= className=""&gt;&lt;/div&gt;
+                &lt;div className="pull-left timeInterval"&gt;{numberFormat(this.props.t.user.followers_count)} followers&lt;/div&gt;
+                &lt;RetweetCount count={this.props.t.retweet_count} /&gt;
+                &lt;FavoriteCount count={this.props.t.favorite_count} /&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    ); }
+});
+
+/** Tweet list component, renders all Tweet items (above) */
+var TweetList = React.createClass({
+    render: function() {
+        var tweetNodes = this.props.tweets.map(function (tweet) {
+            if (!tweet) return "";
+            return &lt;Tweet t={tweet} key={tweet.id} /&gt;;
+        }.bind(this));
+        return &lt;div id="tweet-list"&gt;{tweetNodes}&lt;/div&gt;;
+    }
+});
+</code></pre>
+
+<p>Notice the TweetList component at the bottom. This component itself has elements of the Tweet type as child elements which it generates inside its only method <em>render</em>. This is the only method that a component has to have. In this particular component, the child elements are generated by by using the map function on the props.tweet, which accordingly needs to be an array. In the mapper function, a Tweet component is created for every element of the array, and that element is passed to the Tweet component as props.</p>
+
+<p>The Tweet component itself also has the a <em>render</em> function in which it creates a div holding a Tweet. Dynamic data for this comes from accessing the tweet object that was passed in the TweetList component. Note that the code above is not regular JavaScript but JSX, which allows writing a syntax fairly similar to HTML. This JSX is cross-compiled into JavaScript during the build process. More informatio on this build process can be found in this README.</p>
+
+<h2>Data observation (pull) vs. setProps (push)</h2>
+
+<p>In other words, I want to take the privilege of the client to ask for data away and instead decide in my application logic when the UI should update. This could be done in AngularJS as well by keeping a cached version of the last UI state, but I&#8217;d rather not waste any memory for that, particularly not on mobile.Instead I want my business logic to call the UI renderer exactly once whenever it wants to render data. No more, no less.</p>
 
 <p>ReactJS is a good fit for that. It does not impose any structure on my application, all it does is render the UI, and it does that really well by maintaining a virtual DOM that is used for diffing so that the DOM is only touched where changes have indeed happened. Check out my previous articles where I have explored this in more depth if you&#8217;re curious.</p>
 
