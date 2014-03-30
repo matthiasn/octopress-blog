@@ -76,7 +76,7 @@ Here is the final result of Google PageSpeed Insights after all the automated op
 
 Great, this is what I wanted to see. Let us have a look at timeline chart for the sample page now. Arguably the complexity of this page is higher than the blog index page, so I think this is a fair comparison:
 
-{% img left /images/gtmetrix-blog.png 'image' 'gtmetrix result for optimized live-html5 page'%}
+{% img left /images/gtmetrix-live-html5.png 'image' 'gtmetrix result for optimized live-html5 page'%}
 
 The **DOM loaded** event now occurs after 86ms, which is more than 12 times faster than what we saw for the index page of the blog initially. It also happens after loading only 7.7KB. That will load much faster over a suboptimal mobile connection for sure. Note that the remaining two resources are not important for the perceived speed. All that matters is the HTML and the embedded styles. The picture is at the bottom of the page on a small screen anyways, and I bet no visitor will give up because a **[font-awesome symbol](http://fontawesome.io)** renders with some delay.
 
