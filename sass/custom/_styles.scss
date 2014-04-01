@@ -73,3 +73,6 @@ article {
     margin: 6px;
   }
 }
+
+sup, sub { font-size: 0.7em; position: relative;  display: inline-block; }
+sup { top: -1.2em; }
