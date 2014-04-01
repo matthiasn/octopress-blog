@@ -6,6 +6,7 @@ comments: true
 categories: 
 ---
 **Summary:** in this article I will dicuss a new version of the BirdWatch application that uses **[ReactJS](http://facebook.github.io/react/)** on the client side instead of **[AngularJS](http://angularjs.org)**. No worries, I do not intend to replace AngularJS. Rather, I want to create yet another version of the client side BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. So think of it as something like the **[TodoMVC](http://todomvc.com)** of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of, I will happily accept pull request demonstrating different approaches.
+As an additional feature in the ReactJS version I will also rewrite the barchart as a ReactJS component with integrated trend analysis and no dependency on **[D3.js](http://d3js.org)**. 
 
 <!-- more -->
 
@@ -78,7 +79,7 @@ This is where it gets much more interesting. AngularJS renders the list of tweet
 
 where *cf.tweetPage* is a function delivering the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling *$scope.$apply* and also when anything else happens that has any effect on the data model anywhere. This is what I meant when I said earlier that this might not be the most desirably thing when this function call is potentially expensive. 
 
-ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application passes it new data. Let's look at that in more detail. In the HTML, there is only a single div without any special notation:
+ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application feeds it new data. Let's look at that in more detail. In the HTML, there is only a single div without any special notation:
 
 
                         <!-- Tweet Cards inside frame -->
@@ -142,6 +143,13 @@ ReactJS is a good fit for that. It does not impose any structure on my applicati
 ##Build system
 To round things off, I am also 
 
+
+##Building an SVG Bar Chart with ReactJS (without D3.js)
+D3.js is an amazing technology and really great visualizations have been built with it. However it also has a considerably steep learning curve. I personally also find ReactJS easier to reason about because unlike D3.js it does not have a notion of ***update***. Instead, we always pass it the entire data and it will put the changes in effect itself. Now I thought it would be nice if this concept could be applied to SVG (scalable vector graphics) as well and not only on HTML. Turns out the same principles apply so I found it fairly simple to re-build the bar chart and have ReactJS create the SVG instead of D3. The resulting code is much shorter than the previous D3 version despite a lot of added functionality. The previous version was a simplistic bar chart whereas the new version has a built-in trend analysis using **[regression-js](https://github.com/Tom-Alexander/regression-js)**, a neat little regression analysis library. In this new chart every bar is aware of its history and determines its trends using linear regression. Here's how that looks like:
+
+<img src="/images/react-barchart.png" />
+
+Each bar has two associated trend indicators, one for showing recent movements in the ranking and the other for an overall trend of the word occurrence. For today I don't have the time to go into detail about the implementation of this chart, but this will make for a nice article in the near future. 
 
 #Conclusion
 ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird's-eye view, it is really nothing more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes.

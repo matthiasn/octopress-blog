@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-03-22T19:44:54+01:00</updated>
+  <updated>2014-04-01T10:04:35+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,12 +18,13 @@
     <link href="http://matthiasnehlsen.com/blog/2014/03/18/birdwatch-with-reactjs/"/>
     <updated>2014-03-18T22:21:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/03/18/birdwatch-with-reactjs</id>
-    <content type="html"><![CDATA[<p><strong>Summary:</strong> in this article I will dicuss a new version of the BirdWatch application that uses ReactJS on the client side instead of AngularJS. I do not intend to replace AngularJS in the application. Rather, I want to create yet another version of the client side BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. So think of it as something like the <strong><a href="http://todomvc.com">TodoMVC</a></strong> of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of.</p>
+    <content type="html"><![CDATA[<p><strong>Summary:</strong> in this article I will dicuss a new version of the BirdWatch application that uses <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side instead of <strong><a href="http://angularjs.org">AngularJS</a></strong>. No worries, I do not intend to replace AngularJS. Rather, I want to create yet another version of the client side BirdWatch application in order to get a better intuition for the pros and cons of different frameworks and libraries. So think of it as something like the <strong><a href="http://todomvc.com">TodoMVC</a></strong> of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone? Or whatever else you can think of, I will happily accept pull request demonstrating different approaches.
+As an additional feature in the ReactJS version I will also rewrite the barchart as a ReactJS component with integrated trend analysis and no dependency on <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
 
 <!-- more -->
 
 
-<p>In this article I will not go into a lot of detail about the server side of the BirdWatch application. What you need to know is that there is a server side application that connects to the Twitter Streaming API and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application, using AngularJS. The client side application allows users to perform a live search inside a stream of tweets, with live updates of the UI when new matches to the search come in. Here&#8217;s how that looks like. Click the image to try out the application:</p>
+<p>In this article I will not go into a lot of detail about the server side of the BirdWatch application, there&#8217;s an <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article for that</a></strong> already. What you need to know is that there is a server side application that connects to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application, currently using AngularJS. The client side application allows users to perform a live search inside a stream of tweets, with live updates of the UI when new matches to the search come in. Here&#8217;s how that looks like. Click the image to try out the application:</p>
 
 <p><a href="http://birdwatch.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/bw_expl_beer.png" /></a></p>
 
@@ -31,9 +32,11 @@
 
 <p><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/" target="_blank"><img src="http://matthiasnehlsen.com/images/bw_expl_anim.gif" /></a></p>
 
+<p>This all works really nicely with AngularJS. Now let&#8217;s see if we can build the same thing with ReactJS on the client side.</p>
+
 <h2>Why might someone choose ReactJS over AngularJS</h2>
 
-<p>In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the crossfilter service. Instead I want control on when the client UI is rendered.</p>
+<p>In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: every call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the crossfilter service. Instead I want control on when the client UI is rendered by actively triggering it.</p>
 
 <p>As I have discussed in this <strong><a href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/">recent article</a></strong>, ReactJS would also potentially be a better fit when working with immutable data. That is not a concern in the current version of BirdWatch, but it might be in the future.</p>
 
@@ -42,9 +45,9 @@
 <p>There are four main areas of functionality in the application:</p>
 
 <ul>
-<li><p>Search: The user can start a search by entering it into the search bar, which will refresh the data and establish a Server Sent Event connection to the server that will deliver matches to the search in real time. At the same time previous matches are retrieved.</p></li>
-<li><p>Rendering of Tweets: Different sort orders of tweets are displayed in what I would call a tweet card. In AngularJS, directives nicely handle the abstraction of one such tweet.</p></li>
-<li><p>Pagination: The application loads many more tweets than can displayed on one page (with 5000 tweets being the default). The AngularJS version implements this with a modified version of the AngularUI-Bootstrap project.</p></li>
+<li><p>Search: The user can start a search by entering the terms into the search bar, which will refresh the data and establish a Server Sent Event connection to the server that will deliver matches to the search in real time. At the same time previous matches are retrieved.</p></li>
+<li><p>Rendering of Tweets: Different sort orders of tweets are displayed in what I would call a list of tweet cards. In AngularJS, directives nicely handle the abstraction of one such tweet.</p></li>
+<li><p>Pagination: The application loads many more tweets than can displayed on one page (with 5000 tweets being the default). The AngularJS version implements this with a modified subset of the AngularUI-Bootstrap project.</p></li>
 <li><p>Charts: different visualizations are rendered on the page. At the core, D3 does this for us. In the AngularJS version, relatively thin wrappers make directives out of these charts that get wired data and that re-render when the data changes.</p></li>
 </ul>
 
@@ -53,7 +56,37 @@
 
 <h2>Search</h2>
 
-<p>In this area, AngularJS and its two-way data-binding shines. There the content of the search input element is bound to a property on the $scope, just like the button is bound to a function that is also part of the $scope and that triggers a new search. With ReactJS, I found it a little more complicated to achieve the same thing. I am actually not using ReactJS at all achieve this, instead I am assigning the functionality using onclick for triggering the search function, and jQuery to achieve the same when enter is pressed inside the input field. AngularJS offers more of a full framework solution for such problems, but I am okay with this solution here.</p>
+<p>In this area, AngularJS and its two-way data-binding shines. There the content of the search input element is bound to a property on the $scope, just like the button is bound to a function that is also part of the $scope and that triggers a new search. With ReactJS, I found it a little more complicated to achieve the same thing. I am actually not using ReactJS at all to achieve this, instead I am assigning the functionality using onclick for triggering the search function, and jQuery to achieve the same when enter is pressed inside the input field. AngularJS offers more of a full framework solution for such problems, but I am okay with this solution here.</p>
+
+<p>Onclick:</p>
+
+<pre><code>&lt;button class="btn btn-primary" type="button" onclick="BirdWatch.search()"&gt;
+</code></pre>
+
+<p>Set up submit search by pressing Enter:</p>
+
+<pre><code>$('#searchForm').submit(function (e) {
+    BirdWatch.search();
+    e.preventDefault();
+    return false;
+});
+</code></pre>
+
+<p>Function for triggering search:</p>
+
+<pre><code>BirdWatch.search = function () {
+    var searchField = $("#searchField");
+    BirdWatch.wordcount.reset();
+    activePage = 1;
+    BirdWatch.crossfilter.clear();
+    BirdWatch.tweets.search(searchField.val(), $("#prev-size").val());
+    searchField.focus();
+};
+</code></pre>
+
+<p>Note that the above is not necessary, one could pass the function to ReactJS and define the search bar as a component, which assigns the functionality itself.</p>
+
+<p>ACTUALLY THIS WOULD BE CLEANER FOR COMPARISON, LET&#8217;S DO THAT&#8230;</p>
 
 <h2>Rendering of tweets</h2>
 
@@ -68,7 +101,7 @@
 
 <p>where <em>cf.tweetPage</em> is a function delivering the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling <em>$scope.$apply</em> and also when anything else happens that has any effect on the data model anywhere. This is what I meant when I said earlier that this might not be the most desirably thing when this function call is potentially expensive.</p>
 
-<p>ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application passes it new data. Let&#8217;s look at that in more detail. In the HTML, there is only a single div without any special notation:</p>
+<p>ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application feeds it new data. Let&#8217;s look at that in more detail. In the HTML, there is only a single div without any special notation:</p>
 
 <pre><code>                    &lt;!-- Tweet Cards inside frame --&gt;
                 &lt;div class="col-lg-4" id="tweet-frame"&gt;&lt;/div&gt;
@@ -122,14 +155,33 @@ var TweetList = React.createClass({
 
 <p>ReactJS is a good fit for that. It does not impose any structure on my application, all it does is render the UI, and it does that really well by maintaining a virtual DOM that is used for diffing so that the DOM is only touched where changes have indeed happened. Check out my previous articles where I have explored this in more depth if you&#8217;re curious.</p>
 
+<h2>Build system</h2>
+
+<p>To round things off, I am also</p>
+
+<h2>Building an SVG Bar Chart with ReactJS (without D3.js)</h2>
+
+<p>D3.js is an amazing technology and really great visualizations have been built with it. However it also has a considerably steep learning curve. I personally also find ReactJS easier to reason about because unlike D3.js it does not have a notion of <strong><em>update</em></strong>. Instead, we always pass it the entire data and it will put the changes in effect itself. Now I thought it would be nice if this concept could be applied to SVG (scalable vector graphics) as well and not only on HTML. Turns out the same principles apply so I found it fairly simple to re-build the bar chart and have ReactJS create the SVG instead of D3. The resulting code is much shorter than the previous D3 version despite a lot of added functionality. The previous version was a simplistic bar chart whereas the new version has a built-in trend analysis using <strong><a href="https://github.com/Tom-Alexander/regression-js">regression-js</a></strong>, a neat little regression analysis library. In this new chart every bar is aware of its history and determines its trends using linear regression. Here&#8217;s how that looks like:</p>
+
+<p><img src="http://matthiasnehlsen.com/images/react-barchart.png" /></p>
+
+<p>Each bar has two associated trend indicators, one for showing recent movements in the ranking and the other for an overall trend of the word occurrence. For today I don&#8217;t have the time to go into detail about the implementation of this chart, but this will make for a nice article in the near future.</p>
+
 <h1>Conclusion</h1>
 
 <p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really nothing more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes.</p>
+
+<p>Alright, this concludes today&#8217;s article. In this article I have for the first time used footnotes. How do you like this? Feedback welcome. Feel free to subscribe to the newsletter if you want to stay up-to-date and hear first when new articles come out. If you want to see work-in-progress, both in terms of projects and articles, you can follow me on GitHub.</p>
+
+<p>Until next time,
+Matthias</p>
 <div class="footnotes">
 <hr/>
 <ol>
 <li id="fn:1">
 <p>The list of technical terms I am using for the live demo under birdwatch.matthiasnehlsen.com easily fits into this cap, in which case the application will receive all these tweets. The term <strong>Obama</strong> also usually fits into this limit. The term <strong>love</strong> on the other hand doesn&rsquo;t. If you were to download BirdWatch from GitHub, create a Twitter API key and replace the list of software terms with only the word <strong>love</strong>, I bet you will reach the 1% limit any second of the day. However not to worry, Twitter will still deliver at the rate limit, which last time I tried was about 4 million tweets per day. Sure, you might loose Tweets doing this, but not to worry when looking for popular tweets as those will appear time and time again as a retweet, making it highly unlikely to miss them over time. Only the current retweet count may lag behind when the last update as a retweet was dropped.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p><strong>Idempotent</strong>: This basically means that it must be possible to call something multiple times without additional side-effects, if any at all. Idempotency is for example also essential in scenarios where some service gurantees at-least-once delivery. In that case you don&rsquo;t want to run into trouble (like wrongfully incrementing a counter) when that service delivers more than once.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
@@ -1327,7 +1379,7 @@ Matthias</p>
 
 <p>Great, this is what I wanted to see. Let us have a look at timeline chart for the sample page now. Arguably the complexity of this page is higher than the blog index page, so I think this is a fair comparison:</p>
 
-<p><img class="left" src="http://matthiasnehlsen.com/images/gtmetrix-blog.png" title="image" alt="gtmetrix result for optimized live-html5 page"></p>
+<p><img class="left" src="http://matthiasnehlsen.com/images/gtmetrix-live-html5.png" title="image" alt="gtmetrix result for optimized live-html5 page"></p>
 
 <p>The <strong>DOM loaded</strong> event now occurs after 86ms, which is more than 12 times faster than what we saw for the index page of the blog initially. It also happens after loading only 7.7KB. That will load much faster over a suboptimal mobile connection for sure. Note that the remaining two resources are not important for the perceived speed. All that matters is the HTML and the embedded styles. The picture is at the bottom of the page on a small screen anyways, and I bet no visitor will give up because a <strong><a href="http://fontawesome.io">font-awesome symbol</a></strong> renders with some delay.</p>
 
