@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/03/28/birdwatch-with-reactjs">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -97,7 +97,7 @@
   
 
 
-<time datetime="2014-03-28T22:21:00+01:00" pubdate data-updated="true">03/28/2014</time>
+<time datetime="2014-03-31T22:21:00+02:00" pubdate data-updated="true">03/31/2014</time>
         
       </p>
     
@@ -105,12 +105,12 @@
 
 
 <div class="entry-content"><p><strong>Summary:</strong> in this article I will present a new version of the BirdWatch application that uses <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side instead of <strong><a href="http://angularjs.org">AngularJS</a></strong>. No worries if you liked the previous AngularJS version, I do not intend to replace it. Rather, I want to create another version of the client side web application in order to get a better intuition for the pros and cons of different frameworks and libraries. So think of it as something like the <strong><a href="http://todomvc.com">TodoMVC</a></strong> of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS, anyone?
-For this new version I have also rewritten the barchart as a ReactJS component with integrated trend analysis and no dependency on <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
+For this new version I have also rewritten the barchart as a ReactJS component with integrated trend analysis and no dependency on <strong><a href="http://d3js.org">D3.js</a></strong>. Again, there is nothing wrong with D3, I just like to try different approaches to the same problem.</p>
 
 <!-- more -->
 
 
-<p>In this article I will not go into a lot of detail about the server side of the BirdWatch application, there&#8217;s an <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article for that</a></strong> already. What you need to know is that there is a server side application that connects to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing any of these terms up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application that allows users to perform a live search inside a stream of tweets, with realtime updates of the UI when new matches to the search come in. Here&#8217;s how that looks like. Click the image to try out the application:</p>
+<p>In this article I will not go into a lot of detail about the server side of the BirdWatch application, there&#8217;s an <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article for that</a></strong> already. What you need to know is that there is a server side application that connects to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing at least one of these terms, up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application that allows users to perform a live search inside a stream of tweets, with realtime updates of the UI when new matches to the search come in from Twitter. Here&#8217;s how that looks like. Click the image to try out the application:</p>
 
 <p><a href="http://birdwatch.matthiasnehlsen.com" target="_blank"><img src="/images/bw_reactjs.png" /></a></p>
 
@@ -122,7 +122,7 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 
 <h2>Why might someone choose ReactJS over AngularJS</h2>
 
-<p>In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. These calls can happen at any time, so these calls need to be idempotent <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: every call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the crossfilter service. Instead I want control on when the client UI is rendered by actively triggering it. That way I have full control when and how often the UI renderer is fed with new data.</p>
+<p>In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. These calls can happen at any time, so these calls need to be idempotent <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: every call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> service. Instead I want to decide when the client UI is rendered by actively triggering the render process. That way I have full control when and how often the UI renderer is fed with new data.</p>
 
 <p>As I have discussed in this <strong><a href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/">recent article</a></strong>, ReactJS would also potentially be a better fit when working with immutable data. That is not a concern in the current version of BirdWatch, but it might well be in the future.</p>
 
@@ -131,10 +131,11 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 <p>There are four main areas of functionality in the application:</p>
 
 <ul>
-<li><p><strong>Search:</strong> The user can start a search by entering the terms into the search bar, which will refresh the data and establish a Server Sent Event connection to the server that will deliver matches to the search in real time. At the same time previous matches are retrieved.</p></li>
-<li><p><strong>Rendering of Tweets:</strong> Different sort orders of tweets are displayed in what I call a list of tweet cards. In AngularJS, directives nicely handle the abstraction of one such tweet.</p></li>
+<li><p><strong>Search:</strong> The user can start a search by entering the terms into the search bar, which will refresh the data and establish a <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> connection to the server that will deliver matches to the search in real time. At the same time previous matches are retrieved and merged with the real time results.</p></li>
+<li><p><strong>Rendering of Tweets:</strong> Different sort orders of tweets are displayed in a list of what I call tweet cards. In AngularJS, directives nicely handle the abstraction of one such tweet.</p></li>
 <li><p><strong>Pagination:</strong> The application loads many more tweets than can displayed on one page (with 5000 tweets being the default). The AngularJS version implements this with a modified subset of the <strong><a href="http://angular-ui.github.io/bootstrap/">AngularUI-Bootstrap project</a></strong>.</p></li>
-<li><p><strong>Charts:</strong> different visualizations are rendered on the page. At the core, D3 does this for us. In the AngularJS version, relatively thin wrappers make directives out of these charts that get wired data and that re-render when the data changes.</p></li>
+<li><p><strong>Charts:</strong> different visualizations are rendered on the page. At the core, D3 does this for us. In the AngularJS version, relatively thin wrappers make <strong><a href="http://docs.angularjs.org/guide/directive">directives</a></strong> out of these charts that get wired data and that re-render when the data changes.</p></li>
+<li><p><strong>Bookmarkability:</strong> users can bookmark a search and come back to it later, send it to friends, tweet about it or whatever. AngularJS provides the <strong><a href="http://docs.angularjs.org/api/ng/provider/$locationProvider">$locationProvider</a></strong> for this.</p></li>
 </ul>
 
 
@@ -149,7 +150,7 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The button is plain HTML with an onclick handler. As the handler I have assigned the <em>search</em> function which lives in a property of the global BirdWatch object. In addition to the click handler for the button, I also want to be able to trigger a search when pressing ENTER inside the search field. jQuery is perfect for that:</p>
+<p>The button is plain HTML with an onclick handler. As the handler function I have assigned the <em>search</em> function which lives in a property of the global BirdWatch object. In addition to the click handler for the button, I also wanted to be able to trigger a search when pressing ENTER inside the search field. jQuery is perfect for that:</p>
 
 <figure class='code'><figcaption><span>Handling Enter in Search Field</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -185,7 +186,7 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The above is plain old HTML / JavaScript / jQuery. You might think that that is such an old-fashioned way of doing it. But on the upside, no special framework knowledge is required, anyone who has done any web development in the last decade can do this. Alternatively, we could make a ReactJS component out of the search bar and pass this component the handler function as part of the <strong>props</strong> <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. In this simple case I don&#8217;t feel like it is necessary to create a component for this, but this would be the way to go when more complex behavior and / or usability is desired.</p>
+<p>The above is plain old HTML / JavaScript / jQuery. You might think that that is such an old-fashioned way of doing it. But on the upside, no special framework knowledge is required, anyone who has done any web development in the last decade can do this without a learning curve. Alternatively, we could make a ReactJS component out of the search bar and pass this component the handler function as part of the <strong>props</strong> <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. In this simple case I don&#8217;t feel like it is necessary to create a component for this, but this would be the way to go when more complex behavior is desired.</p>
 
 <h2>Rendering of tweets</h2>
 
@@ -204,9 +205,9 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>where <em>cf.tweetPage</em> is a function delivering the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling <em>$scope.$apply</em> and also when anything else happens that has any effect on the data model anywhere. This is what I meant when I said earlier that this might not be the most desirably thing when this function call is potentially expensive.</p>
+<p>where <em>cf.tweetPage</em> is a function delivering the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling <em>$scope.$apply</em> and also when anything else happens that has any effect on the data model, anywhere. This is what I meant when I said earlier that this might not be the most desirably thing when this function call is potentially expensive.</p>
 
-<p>ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application feeds it new data. Let&#8217;s look at that in more detail. In the HTML, there is only a single div without any special notation:</p>
+<p>ReactJS works the other way around. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application actively feeds it new data. Let&#8217;s look at that in more detail. In the HTML, there is only a single div without any special notation:</p>
 
 <figure class='code'><figcaption><span>Tweet List Div in ReactJS</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/app/views/react_js.scala.html'>react_js.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -320,34 +321,134 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Notice the <strong>TweetList</strong> component at the bottom. This component itself has elements of the <strong>Tweet</strong> component type as child elements which it generates inside its only method <em>render</em>. <em>Render</em> is the only method that a component is required to have. In this particular component, the child elements are generated by by using the map function on the props.tweet, which accordingly needs to be an array. In the mapper function, a Tweet component is created for every element of the array, and that element is passed to the Tweet component as <strong>props</strong>.</p>
+<p>Notice the <strong>TweetList</strong> component close to the bottom. This component itself has elements of the <strong>Tweet</strong> component type as child elements which it generates inside its only method <em>render</em> by mapping data in the array to individual elements. <em>Render</em>, by the way, is the only method that a ReactJS component is required to have. In this particular component, the child elements are generated by using the map function on the props.tweet, which accordingly needs to be an array, otherwise the JavaScript map function would not be available. In the mapper function, a <strong>Tweet</strong> component is created for every element of the array, and that element is passed to the Tweet component as <strong>props</strong>.</p>
 
-<p>The Tweet component itself also has the a <em>render</em> function in which it creates a div holding a Tweet. Dynamic data for this comes from accessing the tweet object that was passed in the TweetList component. Note that the code above is not regular JavaScript but JSX, which allows writing a syntax fairly similar to HTML. This JSX is cross-compiled into JavaScript during the build process. More informatio on this build process can be found in this README.</p>
+<p>The Tweet component itself also has the a <em>render</em> function in which it creates a <strong>div</strong> holding the representation of a Tweet. Dynamic data for this comes from accessing the tweet object that was passed in the TweetList component. Note that the code above is not regular JavaScript but JSX, which allows writing a syntax fairly similar to HTML. This JSX is cross-compiled into JavaScript during the build process. More information on this build process can be found in the paragraph and in the <strong><a href="https://github.com/matthiasn/BirdWatch/tree/master/react-js">README</a></strong>.</p>
 
-<p>The Tweet component then includes the <strong>RetweetCount</strong> component, which it passes the RT count, again as <strong>props</strong>. This component has conditional logic in which it decided itself if it wants to return an empty <strong>div</strong> or actual content. The same goes for the <strong>FollowersCount</strong> component, which I have omitted here as it follows the same principle.</p>
+<p>The <strong>Tweet</strong> component then includes a <strong>RetweetCount</strong> component, to which it passes the RT count as <strong>props</strong>. This component has conditional logic in which it decides itself if it wants to return an empty <strong>div</strong> or actual content. The same goes for the <strong>FollowersCount</strong> component, which I have omitted here as it follows the same principle.</p>
+
+<h2>Pagination</h2>
+
+<p>Unlike in the AngularJS version, where I was relying on additional projects, I have implemented this from scratch with ReactJS. Here&#8217;s the entire component:</p>
+
+<figure class='code'><figcaption><span>Pagination component</span><a href='https://github.com/matthiasn/BirdWatch/blob/b9dc0b4cf19ec47c893aed27a690230dc882d1f8/react-js/jsx/pagination.js'>pagination.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** Pagination component, allows selecting the current page in the Tweet list */</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">PaginationItem</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">setActive</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">page</span><span class="p">)},</span>
+</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">active</span> <span class="o">?</span> <span class="s2">&quot;active&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">setActive</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="nx">a</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">page</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">var</span> <span class="nx">Pagination</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
+</span><span class='line'>    <span class="nx">toggleLive</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">toggleLive</span><span class="p">();</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">handleFirst</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">handleLast</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">numPages</span><span class="p">);</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">handleNext</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setNext</span><span class="p">();</span> <span class="p">},</span>
+</span><span class='line'>    <span class="nx">handlePrevious</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPrev</span><span class="p">();</span> <span class="p">},</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">numPages</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">numPages</span><span class="p">,</span> <span class="mi">25</span><span class="p">);</span>
+</span><span class='line'>        <span class="kd">var</span> <span class="nx">paginationItems</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">numPages</span><span class="o">+</span><span class="mi">1</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>            <span class="k">return</span> <span class="o">&lt;</span><span class="nx">PaginationItem</span> <span class="nx">page</span><span class="o">=</span><span class="p">{</span><span class="nx">p</span><span class="p">}</span> <span class="nx">active</span><span class="o">=</span><span class="p">{</span><span class="nx">p</span><span class="o">==</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">activePage</span><span class="p">}</span> <span class="nx">setPage</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">}</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">p</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
+</span><span class='line'>        <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
+</span><span class='line'>        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">ul</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;pagination-mini&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">live</span> <span class="o">?</span> <span class="s2">&quot;active&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">toggleLive</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Live</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleFirst</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">First</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handlePrevious</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Previous</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>            <span class="p">{</span><span class="nx">paginationItems</span><span class="p">}</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleNext</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Next</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleLast</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Last</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="err">/ul&gt;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">pagination</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Pagination</span> <span class="nx">numPages</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;pagination&#39;</span><span class="p">));</span>
+</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">setPagination</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">setProps</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span> <span class="p">};</span>
+</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">setPaginationHandlers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">handlers</span><span class="p">)</span> <span class="p">{</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">setProps</span><span class="p">(</span><span class="nx">handlers</span><span class="p">);</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Once again, we have two components, one for each item and one that combines the individual items. In the Pagination component, we first determine the minimum of either the number of pages (passed in as <strong>props</strong>) or 25 in order to render a maximum of 25 pages. Then we do a map on this the resulting range (with the range being created by an <strong><a href="http://underscorejs.org">underscore</a></strong> function), rendering one PaginationItem component for each of these pages. So far this is comparable to the components we have already seen above. What is new here is that the <em>handler functions</em> are also passed as <strong>props</strong> and assigned by the component. The nice thing about this is that this way we can also dynamically assign handler functions. We could just as well call functions on the global application object inside the handlers, but conceptually I find it cleaner to think about the component only ever being passed props without needing to know anything about the application it is embedded in.</p>
+
+<h2>Bookmarkability</h2>
+
+<p>At first I did not really know how to achieve this feature using ReactJS. I have seen examples using <strong><a href="http://backbonejs.org">Backbone</a></strong> and its <strong><a href="http://backbonetutorials.com/what-is-a-router/">router</a></strong>, which would make sense for more complex applications. One such example is <strong><a href="https://medium.com/react-tutorials/c00be0cf1592">this article</a></strong> and another one is <strong><a href="http://webdesignporto.com/react-js-with-backbone-router-and-local-storage/">this article</a></strong>. For this application, introducing Backbone seemed like overkill though, so I was looking for a simpler approach. Turns out achieving this is super simple using <strong><a href="http://jquery.com">jQuery</a></strong> and the plain old <strong><a href="http://www.w3.org/DOM/">DOM API</a></strong>. For the search function I had already created a jQuery object:</p>
+
+<figure class='code'><figcaption><span>searchField jQuery object</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">searchField</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#searchField&quot;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then inside the search function, I simply set the <strong>window.location.hash</strong> with a <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">URI encoded</a></strong> version of the search term:</p>
+
+<figure class='code'><figcaption><span>setting location hash when searching</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hash</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">searchField</span><span class="p">.</span><span class="nx">val</span><span class="p">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then when loading the page, I read the location hash into the search field and call <em>search()</em>, which reads the content of the search field and triggers the search with whatever is in there:</p>
+
+<figure class='code'><figcaption><span>trigger search on page load</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">searchField</span><span class="p">.</span><span class="nx">val</span><span class="p">(</span><span class="nb">decodeURIComponent</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hash</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">2</span><span class="p">)));</span>
+</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">search</span><span class="p">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <h2>Build system</h2>
 
-<p>To round things off, I have configured a <strong><a href="http://gruntjs.com">grunt-based</a></strong> a build system that automatically transpiles the JSX into plain old JavaScript and then concatenates the files into a single JavaScript file. I have also included tasks for <strong><a href="http://www.jshint.com">JsHint</a></strong> and <strong><a href="https://github.com/es-analysis/plato">Plato code analysis</a></strong> to improve the quality of the code. Ideally there should be additional tasks for a CSS preprocessor such as LESS and minification of HTML, CSS and JavaScript files to achieve the best user experience possible. Maybe I&#8217;ll get around to that at some point.</p>
+<p>To round things off, I have configured a <strong><a href="http://gruntjs.com">grunt-based</a></strong> build system that automatically <strong><a href="http://en.wikipedia.org/wiki/Source-to-source_compiler">transpiles</a></strong> JSX into plain old JavaScript and then concatenates the files into a single JavaScript file. I have also included tasks for <strong><a href="http://www.jshint.com">JsHint</a></strong> and <strong><a href="https://github.com/es-analysis/plato">Plato code analysis</a></strong> to improve code quality. Ideally there should be additional tasks for a CSS preprocessor such as <strong><a href="http://lesscss.org">LESS</a></strong> and minification of HTML, CSS and JavaScript files to achieve the best user experience possible, most notably fast load times. Maybe I&#8217;ll get around to that at some point. I should also do the same for the AngularJS version.</p>
 
 <h2>Building an SVG Bar Chart with ReactJS (without D3.js)</h2>
 
-<p><strong><a href="http://d3js.org">D3.js</a></strong> is an amazing technology and really great visualizations have been built with it. However it also has a considerably steep learning curve. I personally find ReactJS easier to reason about because unlike D3.js it does not have the notion of <strong><em>update</em></strong>. Instead, we always pass it the entire data and it will put the changes in effect itself through an intelligent diffing mechanism where it compares current and previous versions of a (fast) virtual DOM and only puts the detected changes into effect in the (slow) actual DOM. Now I thought it would be nice if this concept could be applied to SVG (scalable vector graphics) as well and not only to HTML. Turns out the same principles apply so I found it fairly simple to re-build the bar chart and have ReactJS instead of D3 create the SVG. The resulting code is much shorter than the previous D3 version despite a lot of added functionality. The previous version was a simplistic bar chart whereas the new version has a built-in trend analysis using <strong><a href="https://github.com/Tom-Alexander/regression-js">regression-js</a></strong>, a neat little regression analysis library. In this new chart every bar is aware of its history and determines its trends using linear regression. Here&#8217;s how that looks like:</p>
+<p><strong><a href="http://d3js.org">D3.js</a></strong> is an amazing technology and really great visualizations have been built with it. However it also has a considerably steep learning curve. I personally find ReactJS easier to reason about because unlike D3.js it does not have the notion of <strong><em>update</em></strong>. Instead, we always pass it the entire data and it will put the changes in effect itself through an intelligent diffing mechanism where it compares current and previous versions of a (fast) virtual DOM and only puts the detected changes into effect in the (slow) actual DOM. Now I thought it would be nice if this concept could be applied to <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG (scalable vector graphics)</a></strong> as well and not only to HTML. Turns out the same principles apply, accordingly I have found it fairly simple to re-build the bar chart and have ReactJS instead of D3 create the SVG inside the <strong><a href="http://en.wikipedia.org/wiki/Document_Object_Model">DOM</a></strong>. The resulting code is much shorter than the previous D3 version, despite a lot of added functionality. The previous version was a simplistic bar chart whereas the new version has a built-in trend analysis using <strong><a href="https://github.com/Tom-Alexander/regression-js">regression-js</a></strong>, a neat little regression analysis library. In this new chart each bar is aware of its history and determines its trends using linear regression. Here&#8217;s how that looks like:</p>
 
 <p><img src="/images/react-barchart.png" /></p>
 
-<p>Each bar has two associated trend indicators, one for showing recent movements in the ranking and the other for an overall trend of the word occurrence. For today I don&#8217;t have the time to go into detail about the implementation of this chart, but this will make for a nice article in the future.</p>
+<p>Each bar has two associated trend indicators, one for showing recent movements in the ranking and the other for an overall trend of the word occurrence. The trends are determined using a simple linear regression, where the slope of the resulting function directly translates into an upward or downward trend. For today I don&#8217;t have the time to go into detail about the implementation of this chart, but this topic should make for an interesting article in the future.</p>
 
 <h1>Conclusion</h1>
 
-<p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really not more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes. I find its data flow model very easy to reason about, simpler in fact than the multide of concepts one needs to think about when building an application with AngularJS.</p>
-
-<p>Alright, this concludes today&#8217;s article. As a new feature I have tried out footnotes and I am curious if you find them useful or distracting.</p>
-
-<p>Would you like to see work-in-progress, both in terms of projects and articles? <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&type=follow&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="165" height="20"></iframe></p>
+<p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really not more than a function that accepts data and that effects a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance; it does not require any more attention than the call necessary to inform it about data changes. I find its data flow model very easy to reason about, simpler in fact than the multide of concepts one needs to think about when building an application with AngularJS. AngularJS has also worked really well for this application so far though, so I&#8217;d say both are fine approaches to single page web applications. For now I&#8217;m curious about your opinion. You can find the source code on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>. A live version is available in two version: using <strong><a href="http://birdwatch.matthiasnehlsen.com/"> ReactJS </a></strong> and using <strong><a href="http://birdwatch.matthiasnehlsen.com/angular/#/">AngularJS</a></strong>.</p>
 
 <p>Until next time,
 Matthias</p>
+
+<p>Would you like to see work-in-progress, both in terms of projects and articles? <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&type=follow&count=true" allowtransparency="true" frameborder="0" scrolling="0" width="165" height="20"></iframe></p>
+
+<p>By the way, this is the first article in which I make use of the footnotes feature in <strong><a href="http://octopress.org">Octopress</a></strong> that I just recently discovered. I&#8217;m curious if you find this useful or if you&#8217;d prefer explanations directly in the text.</p>
 <div class="footnotes">
 <hr/>
 <ol>
@@ -382,7 +483,7 @@ Matthias</p>
   
 
 
-<time datetime="2014-03-28T22:21:00+01:00" pubdate data-updated="true">03/28/2014</time>
+<time datetime="2014-03-31T22:21:00+02:00" pubdate data-updated="true">03/31/2014</time>
       
 
 
@@ -390,7 +491,7 @@ Matthias</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/03/28/birdwatch-with-reactjs/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/03/28/birdwatch-with-reactjs/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/" >Tweet</a>
   
 
   
@@ -407,6 +508,7 @@ Matthias</p>
     <div class="fb-like" data-send="true" data-width="600" data-show-faces="false"></div>
   
   
+  <br />
   <br />
   
 </div>
@@ -447,7 +549,7 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/03/28/birdwatch-with-reactjs/">BirdWatch: AngularJS vs. ReactJS</a>
+        <a href="/blog/2014/03/31/birdwatch-with-reactjs/">BirdWatch: AngularJS vs. ReactJS</a>
       </li>
     
       <li class="post">
@@ -526,8 +628,8 @@ Matthias</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/03/28/birdwatch-with-reactjs/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/03/28/birdwatch-with-reactjs/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/';
         var disqus_script = 'embed.js';
       
     (function () {
