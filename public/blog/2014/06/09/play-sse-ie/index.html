@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Play Framework, Server Sent Events and Internet Explorer - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="Next week I will be presenting at Scala Days. In my talk I will be discussing building reactive applications with two-way (near) real-time &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+
+<script src="//use.typekit.net/rco1jij.js"></script>
+<script>try{Typekit.load();} catch (e){}</script>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Play Framework, Server Sent Events and Internet Explorer</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-09T19:35:00+02:00" pubdate data-updated="true">06/09/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Next week I will be presenting at <strong><a href="http://scaladays.org">Scala Days</a></strong>. In my talk I will be discussing building reactive applications with two-way (near) real-time communication using the combination of <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong> for providing clients with updates and <strong><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST calls</a></strong> for the backchannel. You may be familiar with two examples of this architecture already: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> and <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>. Now I was thinking about potential questions in the Q&amp;A session after the talk. One potential issue that came to mind almost immediately was the support for <strong><a href="http://en.wikipedia.org/wiki/Internet_Explorer">Internet Explorer</a></strong>. Out of the box, IE does not support <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong>. Personally, I do not care very much about IE support. I have not used it in years prior to researching this article, and only a low single digit percentage of visitors on my blog uses IE. But I understand this can be a showstopper. So if you don&#8217;t care about IE support at all, you really don&#8217;t need to read any further. Otherwise, bear with me.</p>
+
+<!-- more -->
+
+
+<p>So I started looking for Polyfills and found <strong><a href="https://github.com/Yaffle/EventSource">this one</a></strong>. From the description, it should work right away with IE 10 and above, with no changes to the server side required. What I am presenting in this article is a rather blunt fix, changing the JavaScript from the forked polyfill so that:</p>
+
+<ul>
+<li>The <strong>global EventSource object</strong> is only ever replaced if it doesn’t exist. That way I don’t have the burden of checking if this implementation works with all current browsers (and those to come). Rather, the global EventSource object from the polyfill is only created in Internet Explorer.</li>
+<li>The check for the &#8220;correct&#8221; <strong>ContentType</strong> is removed. Out of the box it did not work with Play Framework but without this check it does. I didn’t care much about changing the ContentType on the server side just to make the polyfill happy.</li>
+</ul>
+
+
+<p>Let&#8217;s have a quick look at the code modifications. They are really short.</p>
+
+<figure class='code'><figcaption><span>Conditional Execution of Anonymous Function</span><a href='https://github.com/matthiasn/EventSource/blob/9d1a842c6dbd11213c0fa73505da9ba6190de000/eventsource.js'>eventsource.js (lines 18 to 22)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** modified by Matthias Nehlsen on June 9th, 2014 to add </span>
+</span><span class='line'><span class="cm"> *  check without changing the indentation of the rest of </span>
+</span><span class='line'><span class="cm"> *  the file so that changes can more easily be tracked. */</span>
+</span><span class='line'><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'><span class="s2">&quot;use strict&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">global</span><span class="p">.</span><span class="nx">EventSource</span><span class="p">)</span> <span class="p">{</span> <span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">global</span><span class="p">)</span> <span class="p">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The block above ensures that the anonymous function creating / replacing the global EventSource object is really only executed when there is no such global object. This is done by wrapping the anonymous function creating the EventSource object in another anoynmous function that does the check. The global EventSource is then created below:</p>
+
+<figure class='code'><figcaption><span>Creating a global EventSource object</span><a href='https://github.com/matthiasn/EventSource/blob/9d1a842c6dbd11213c0fa73505da9ba6190de000/eventsource.js'>eventsource.js (lines 481 to 482)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'>   <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Using EventSource PolyFill&quot;</span><span class="p">);</span>
+</span><span class='line'>   <span class="nx">global</span><span class="p">.</span><span class="nx">EventSource</span> <span class="o">=</span> <span class="nx">EventSource</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The only other thing to note is that a check for the expected <em>ContentType</em> was disabled as that was incompatible with the out-of-the box behavior of Play Framework&#8217;s EventSource implementation:</p>
+
+<figure class='code'><figcaption><span>Check for expected ContentType</span><a href='https://github.com/matthiasn/EventSource/blob/9d1a842c6dbd11213c0fa73505da9ba6190de000/eventsource.js'>eventsource.js (lines 225 to 227)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** modified by Matthias Nehlsen on June 9th, 2014 to </span>
+</span><span class='line'><span class="cm"> *  remove incompatible ContentType type check. */</span>
+</span><span class='line'><span class="c1">//if (status === 200 &amp;&amp; contentTypeRegExp.test(contentType)) {</span>
+</span><span class='line'><span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">===</span> <span class="mi">200</span><span class="p">)</span> <span class="p">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then finally all there is left to do is load this modified polyfill in the application, like this:</p>
+
+<figure class='code'><figcaption><span>Loading Polyfill in Play Framework View</span><a href='https://github.com/matthiasn/BirdWatch/blob/c0ad30aea35937d624b103ff3b43dab252af7750/app/views/index.scala.html'>index.scala.html (line 141)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/assets/javascripts/vendor/eventsource.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With this JavaScript file loaded in the client side application, the application now works with Internet Explorer 10 and 11, with the potential of supporting versions 8 and 9 as well, should someone care to help. Supposedly, some padding at the beginning of an SSE connection is needed. I have no idea how to add this 2K padding, but maybe you, the reader, know how to achieve this? If so, please help. Thanks in advance. I will not fix this, instead I will side with Google. The have dropped support for IE 9 and below <strong><a href="http://googleappsupdates.blogspot.de/2013/11/end-of-support-for-internet-explorer-9.html">last year</a></strong> and I am fine with supporting what Google supports.</p>
+
+<p>Great. Much better having to answer “sorry, IE is not supported at all”. Blaming Microsoft alone is not going to help much when your client demands just this support. Now if you want to use this architecture for a reactive application and your pointy haired boss comes along, demanding support for IE, you can put a smile on your face.</p>
+
+<p>I am happy to have this potential showstopper out of the way. I&#8217;ve been meaning to address this problem for a while, I had just been dreading the logistics of setting up a testing environment for IE, and that part was about as annoying as expected. I had to dig out an old IE7 image for VMWare Fusion, copy the 40GB over slow wi-fi and then do all the due updates, with multiple restarts of the VM, of course. Oh how I have missed Windows. I had almost forgotten. How can this take hours for the updates that make me eligible for IE 10 alone? Anyhow, that&#8217;s about as much exposure to Internet Explorer as I can deal with. With Internet 10 and 11, the core functionality with the Server Sent Events works fine now.</p>
+
+<p>The <strong><a href="http://code.shutterstock.com/rickshaw/">Rickshaw</a></strong> time series chart on the upper right in BirdWatch does not seem to work in IE, but that&#8217;s not part of the proof that the proposed architecture works with newer versions of IE. I do not plan on spending any more time with making IE 8 and 9 work, but in theory it sounds like that would be possible, according to the documentation of <strong><a href="**[this%20one](https://github.com/Yaffle">Yaffle&#8217;s</a></strong> <strong><a href="https://github.com/Yaffle/EventSource">polyfill</a></strong>. Feel free to fix this in case you know a solution, please. There&#8217;s a <strong><a href="https://github.com/matthiasn/EventSource">fork</a></strong> of the polyfill that would happily accept pull requests. Thank you.</p>
+
+<p>Okay, until next time, I hope to see you at Scala Days. Say hi when you see me, please.
+Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-09T19:35:00+02:00" pubdate data-updated="true">06/09/2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+  
+  
+  
+  <br />
+  
+  
+    <div class="fb-like" data-send="true" data-width="600" data-show-faces="false"></div>
+  
+  
+  <br />
+  <br />
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/03/31/birdwatch-with-reactjs/" title="Previous Post: BirdWatch: AngularJS vs. ReactJS">&laquo; BirdWatch: AngularJS vs. ReactJS</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/06/09/play-sse-ie/">Play Framework, Server Sent Events and Internet Explorer</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/31/birdwatch-with-reactjs/">BirdWatch: AngularJS vs. ReactJS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/02/16/elasticsearch-v1/">ElasticSearch 1.0.0 - Breaking Changes</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/24/scala-dot-js-and-reactjs/">Scala.js and ReactJS</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/01/05/play-framework-and-facebooks-react-library/">Play Framework and Facebook's React library</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>&nbsp;
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+    </li>
+  </ul>
+</section>
+<section>
+    <a name="signup"><h1>Subscribe</h1></a>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    
+    <br />
+  </div>
+</section>
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
