@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-06-10T14:51:13+02:00</updated>
+  <updated>2014-06-22T23:02:56+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,16 +18,16 @@
     <link href="http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/"/>
     <updated>2014-06-09T19:35:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie</id>
-    <content type="html"><![CDATA[<p>Next week I will be presenting at <strong><a href="http://scaladays.org">Scala Days</a></strong>. In my talk I will be discussing building reactive applications with two-way (near) real-time communication using the combination of <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong> for providing clients with updates and <strong><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST calls</a></strong> for the backchannel. You may be familiar with two examples of this architecture already: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> and <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>. Now I was thinking about potential questions in the Q&amp;A session after the talk. One potential issue that came to mind almost immediately was the support for <strong><a href="http://en.wikipedia.org/wiki/Internet_Explorer">Internet Explorer</a></strong>. Out of the box, IE does not support <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong>. Personally, I do not care very much about IE support. I have not used it in years prior to researching this article, and only a low single digit percentage of visitors on my blog uses IE. But I understand this can be a showstopper. So if you don&#8217;t care about IE support at all, you really don&#8217;t need to read any further. Otherwise, bear with me.</p>
+    <content type="html"><![CDATA[<p>Next week I will be presenting at <strong><a href="http://scaladays.org">Scala Days</a></strong>. In my talk I will discuss how to build reactive applications with two-way (near) real-time communication, using the combination of <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong> for providing clients with updates and <strong><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST calls</a></strong> for the backchannel. You may already be familiar with two examples of this architecture: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> and <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>. Now I was thinking about potential questions in the Q&amp;A session after the talk. One potential issue that came to mind almost immediately was the support for <strong><a href="http://en.wikipedia.org/wiki/Internet_Explorer">Internet Explorer</a></strong>. Out of the box, IE does not support <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong>. Personally, I do not care very much about IE support. I have not used it in years before I started researching for this article, and only a low single digit percentage of visitors on my blog use IE. But I understand this can be a showstopper. So if you don&#8217;t care about IE support at all, you really don&#8217;t need to read any further. Otherwise, bear with me.</p>
 
 <!-- more -->
 
 
-<p>So I started looking for Polyfills and found <strong><a href="https://github.com/Yaffle/EventSource">this one</a></strong>. From the description, it should work right away with IE 10 and above, with no changes to the server side required. What I am presenting in this article is a rather blunt fix, changing the JavaScript from the forked polyfill so that:</p>
+<p>So I started looking for polyfills and found <strong><a href="https://github.com/Yaffle/EventSource">this one</a></strong>. From the description, it should work right away with IE 10 and above, with no changes to the server side required. What I am presenting in this article is a rather blunt fix, changing the JavaScript from the forked polyfill so that:</p>
 
 <ul>
-<li>The <strong>global EventSource object</strong> is only ever replaced if it doesn’t exist. That way I don’t have the burden of checking if this implementation works with all current browsers (and those to come). Rather, the global EventSource object from the polyfill is only created in Internet Explorer.</li>
-<li>The check for the &#8220;correct&#8221; <strong>ContentType</strong> is removed. Out of the box it did not work with Play Framework but without this check it does. I didn’t care much about changing the ContentType on the server side just to make the polyfill happy.</li>
+<li>The <strong>global EventSource object</strong> is only ever replaced if it doesn’t exist. That way I don’t have the burden of having to check if this implementation works with all currently available browser versions (and those to come). Rather, the global EventSource object from the polyfill is only created in Internet Explorer.</li>
+<li>The check for the &#8220;correct&#8221; <strong>ContentType</strong> is removed. Out of the box it did not work with Play Framework, but without this check it does. I didn’t care much about changing the ContentType on the server side just to make the polyfill happy.</li>
 </ul>
 
 
@@ -48,7 +48,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The block above ensures that the anonymous function creating / replacing the global EventSource object is really only executed when there is no such global object. This is done by wrapping the anonymous function creating the EventSource object in another anoynmous function that does the check. The global EventSource is then created below:</p>
+<p>The block above ensures that the anonymous function creating / replacing the global EventSource object is really only executed when there is no such global object. This is done by wrapping the anonymous function creating the EventSource object in another anonymous function that does the check. The global EventSource is then created below:</p>
 
 <figure class='code'><figcaption><span>Creating a global EventSource object</span><a href='https://github.com/matthiasn/EventSource/blob/9d1a842c6dbd11213c0fa73505da9ba6190de000/eventsource.js'>eventsource.js (lines 481 to 482)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -57,7 +57,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The only other thing to note is that a check for the expected <em>ContentType</em> was disabled as that was incompatible with the out-of-the box behavior of Play Framework&#8217;s EventSource implementation:</p>
+<p>The only other thing to note is that a check for the expected <em>ContentType</em> was disabled as it was incompatible with the out-of-the box behavior of Play Framework&#8217;s EventSource implementation:</p>
 
 <figure class='code'><figcaption><span>Check for expected ContentType</span><a href='https://github.com/matthiasn/EventSource/blob/9d1a842c6dbd11213c0fa73505da9ba6190de000/eventsource.js'>eventsource.js (lines 225 to 227)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -72,18 +72,18 @@
 
 <p>Then finally all there is left to do is load this modified polyfill in the application, like this:</p>
 
-<figure class='code'><figcaption><span>Loading Polyfill in Play Framework View</span><a href='https://github.com/matthiasn/BirdWatch/blob/c0ad30aea35937d624b103ff3b43dab252af7750/app/views/index.scala.html'>index.scala.html (line 141)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Loading polyfill in Play Framework View</span><a href='https://github.com/matthiasn/BirdWatch/blob/c0ad30aea35937d624b103ff3b43dab252af7750/app/views/index.scala.html'>index.scala.html (line 141)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;/assets/javascripts/vendor/eventsource.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>With this JavaScript file loaded in the client side application, the application now works with Internet Explorer 10 and 11, with the potential of supporting versions 8 and 9 as well, should someone care to help. Supposedly, some padding at the beginning of an SSE connection is needed. I have no idea how to add this 2K padding, but maybe you, the reader, know how to achieve this? If so, please help. Thanks in advance. I will not fix this, instead I will side with Google. The have dropped support for IE 9 and below <strong><a href="http://googleappsupdates.blogspot.de/2013/11/end-of-support-for-internet-explorer-9.html">last year</a></strong> and I am fine with supporting what Google supports.</p>
+<p>With this JavaScript file loaded in the client side application, the application now works with Internet Explorer 10 and 11, with the potential of supporting versions 8 and 9 as well, should someone care to help. Supposedly, some padding at the beginning of an SSE connection is needed. I have no idea how to add this 2K padding, but maybe you, the reader, know how to achieve this? If so, please help. Thanks in advance. I will not fix this, instead I will side with Google. They have dropped support for IE 9 and below <strong><a href="http://googleappsupdates.blogspot.de/2013/11/end-of-support-for-internet-explorer-9.html">last year</a></strong> and I am fine with supporting what Google supports.</p>
 
-<p>Great. Much better having to answer “sorry, IE is not supported at all”. Blaming Microsoft alone is not going to help much when your client demands just this support. Now if you want to use this architecture for a reactive application and your pointy haired boss comes along, demanding support for IE, you can put a smile on your face.</p>
+<p>Great. Much better than having to answer “sorry, IE is not supported at all”. Blaming Microsoft alone is not going to help much when your client demands just this particular support. Now if you want to use this architecture for a reactive application and your pointy-haired boss comes along, demanding support for IE, you can put a smile on your face.</p>
 
-<p>I am happy to have this potential showstopper out of the way. I&#8217;ve been meaning to address this problem for a while, I had just been dreading the logistics of setting up a testing environment for IE, and that part was about as annoying as expected. I had to dig out an old Windows 7 image for VMWare Fusion, copy the 40GB over rather slow wi-fi and then do all the due updates, with multiple restarts of the VM, of course. Oh how I have missed Windows. I had almost forgotten. How can this take hours for the updates that make me eligible for IE 10 alone? Anyhow, that&#8217;s about as much exposure to Internet Explorer as I can deal with for the moment. With Internet 10 and 11, the core functionality with the Server Sent Events works fine now.</p>
+<p>I am happy to have this potential showstopper out of the way. I&#8217;ve been meaning to address this problem for a while, I just dreaded the logistics of setting up a testing environment for IE, and that part was about as annoying as expected. I had to dig out an old Windows 7 image for VMWare Fusion, copy the 40GB over rather slow Wi-Fi and then do all the due updates, with multiple restarts of the VM, of course. Oh how I have missed Windows. I had almost forgotten. How can it take hours to load the updates that make me eligible for IE 10 alone? Anyhow, that&#8217;s about as much exposure to Internet Explorer as I can deal with for the moment. With Internet 10 and 11, the core functionality with the Server Sent Events works fine now.</p>
 
-<p>The <strong><a href="http://code.shutterstock.com/rickshaw/">Rickshaw</a></strong> time series chart on the upper right in BirdWatch does not seem to work in IE, but that&#8217;s not part of the proof that the proposed architecture works with newer versions of IE. I do not plan on spending any more time with making IE 8 and 9 work, but in theory it sounds like that would be possible, according to the documentation of <strong><a href="**[this%20one](https://github.com/Yaffle">Yaffle&#8217;s</a></strong> <strong><a href="https://github.com/Yaffle/EventSource">polyfill</a></strong>. Feel free to fix this in case you know a solution, please. There&#8217;s a <strong><a href="https://github.com/matthiasn/EventSource">fork</a></strong> of the polyfill that would happily accept pull requests. Thank you.</p>
+<p>The <strong><a href="http://code.shutterstock.com/rickshaw/">Rickshaw</a></strong> time series chart on the upper right in BirdWatch does not seem to work in IE, but that&#8217;s not part of the proof that the proposed architecture works with newer versions of IE. I do not plan on spending any more time making IE 8 and 9 work, but in theory it sounds like that would be possible, at least according to the documentation of <strong><a href="**[this%20one](https://github.com/Yaffle">Yaffle&#8217;s</a></strong> <strong><a href="https://github.com/Yaffle/EventSource">polyfill</a></strong>. Please feel free to fix this in case you know a solution. There&#8217;s a <strong><a href="https://github.com/matthiasn/EventSource">fork</a></strong> of the polyfill that would happily accept pull requests. Thank you.</p>
 
 <p>Okay, until next time, I hope to see you at Scala Days. Say hi when you see me, please.
 Matthias</p>
