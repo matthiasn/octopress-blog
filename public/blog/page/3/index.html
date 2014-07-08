@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="So far I have been using a WebSocket connection to push data to the client in the BirdWatch application, with mixed feelings. WebSocket communication &hellip;">
+  <meta name="description" content="Server Sent Events (SSE) turned out to be a great choice for what I am trying to achieve. Let&#8217;s review that quickly. I want to transmit &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +78,47 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Load Testing Server Sent Event Streams</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-05-11T22:07:00+02:00" pubdate data-updated="true">05/11/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/05/11/load-testing-server-sent-event-streams/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -270,6 +311,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/07/08/hamburg-angularjs-meetup/">New AngularJS Meetup in Hamburg</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/07/06/distributed-barometer/">Distributed Atmospheric Pressure Measurement</a>
       </li>
     
@@ -283,10 +328,6 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     
       <li class="post">
         <a href="/blog/2014/03/31/birdwatch-with-reactjs/">BirdWatch: AngularJS vs. ReactJS</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/02/16/elasticsearch-v1/">ElasticSearch 1.0.0 - Breaking Changes</a>
       </li>
     
   </ul>

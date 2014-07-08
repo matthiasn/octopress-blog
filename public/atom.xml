@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-07-07T00:10:58+02:00</updated>
+  <updated>2014-07-08T09:12:56+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[New AngularJS Meetup in Hamburg]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/"/>
+    <updated>2014-07-08T09:05:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup</id>
+    <content type="html"><![CDATA[<p>Hamburg is the second largest city in Germany, and as such it really should have an <strong>AngularJS Meetup</strong>. It did not have one until now, so I founded one.</p>
+
+<!-- more -->
+
+
+<p>I have done server side development for the most part over the last seven months but I finally had a chance to write an internal web application at work using <strong><a href="https://angularjs.org">AngularJS</a></strong> and I was pleasantly surprised how much I enjoyed this process. AngularJS provides you with a really quite useful way of structuring an application with services, controllers, directives, centralized configuration and most importantly <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong> for wiring parts of an application together.</p>
+
+<p>While doing work on the AngularJS application I noticed that I did not really have enough people to talk to when it comes to single page applications and user experience so I started looking for a nearby <strong><a href="https://angularjs.org">AngularJS</a></strong> meetup.</p>
+
+<p>To my surprise, there was none in Hamburg yet. After all, <strong><a href="http://en.wikipedia.org/wiki/Hamburg">Hamburg</a></strong> is the second largest city in Germany with well over 2 million people when you include the suburbs. I do believe it should have such a meetup so I founded the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/">Hamburg AngularJS Meetup</a></strong>. Please do join if you agree with me that this meetup was still missing.</p>
+
+<p>A first Meetup is scheduled for <strong>Monday, July 21st, 2014 at 7pm</strong>. There is no venue for the event yet, so please let me know if you would like to sponsor the meetup by providing a location or know anyone who can provide the space. There is also no agenda as of yet. Please let me know if you have anything AngularJS-related that you would like to talk about or that you are particularly interested in.</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Distributed Atmospheric Pressure Measurement]]></title>
@@ -3887,40 +3910,6 @@ Room 3.11, 16:30 - 17:15</p>
 <p>The stream I use as a trigger has data every 3 seconds. I found that it looks <strong><a href="http://en.wikipedia.org/wiki/Bradycardia">unhealthy</a></strong> if the heartbeat only animates 20 times a second, so I do the expansion / contraction cycle twice on each event. <strong><a href="http://d3js.org">D3.js</a></strong> is great; it has a bit of a learning curve but it is well worth it because it will give you full control over everything you could possibly want to tweak on your page.</p>
 
 <p>This is it for today, check back for more elaborate examples in the future. If you haven&#8217;t already, how about you <strong><a href="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5">subscribe to the mailing list</a></strong> so you won&#8217;t miss anything?</p>
-
-<p>-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Load Testing Server Sent Event Streams]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/"/>
-    <updated>2013-05-11T22:07:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams</id>
-    <content type="html"><![CDATA[<p><strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> turned out to be a great choice for what I am <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">trying to achieve</a></strong>. Let&#8217;s review that quickly. I want to transmit information in the form of <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> containing information about Tweets to browsers, as fast as possible, with much less information flowing the other direction. Now I needed to benchmark the &#8220;as fast as possible&#8221; part so I would be more informed for future architectural decisions. For this I have started <strong><a href="https://github.com/matthiasn/sse-perf">sse-perf</a></strong>: a reactive web application that consumes many (like thousands) concurrent SSE streams and then animates the results (MB transferred, messages / chunks per second and such) using <strong><a href="http://d3js.org">D3.js</a></strong>.</p>
-
-<!-- more -->
-
-
-<p>In the current version of the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> the major part of the statistical reasoning is done on the server side, individually for each client. That is not a good idea, it just happened because I had some of the code lying around, and that was in Scala so the options were server side or re-write. I chose server-side, knowing that this technical debt would have to be addressed at some point. First of all I needed metrics on how bad the situation actually was. I found a search word that guarantees high traffic up to the &#8220;1% of all Tweets at the time&#8221; limit imposed by Twitter: &#8220;love&#8221;. At least at all times I have tested it, this cute word will saturate your <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> connection, unless you have a special agreement with them. This amounts to about 35 Tweets per second or approximately 3,000,000 Tweets per day. Any modern server should easily be able to process this number of messages and distribute them to a large number of clients, hundreds of them at the same time. Unlike <strong><a href="http://tools.ietf.org/html/rfc6455">WebSocket</a></strong> connections, <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> streams are easy to test; it is just an HTTP connection that delivers data not at once but one chunk at a time, like this:</p>
-
-<figure class='code'><figcaption><span>One Tweet via SSE </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;tweet_id&quot;</span><span class="o">:</span><span class="mi">334409665431625728</span><span class="p">,</span><span class="s2">&quot;img_url_local&quot;</span><span class="o">:</span><span class="s2">&quot;/images/334409665431625728.png&quot;</span><span class="p">,</span><span class="s2">&quot;img_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://a0.twimg.com/profile_images/3637039114/94d639a38a9040b32397642cddbf685f_normal.jpeg&quot;</span><span class="p">,</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;Official_TMC101&quot;</span><span class="p">,</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;This week Daft Punk holds the number 1 spot with Get Lucky @DaftPunk_Online #getlucky&quot;</span><span class="p">,</span><span class="s2">&quot;followers&quot;</span><span class="o">:</span><span class="mi">34</span><span class="p">,</span><span class="s2">&quot;words&quot;</span><span class="o">:</span><span class="mi">14</span><span class="p">,</span><span class="s2">&quot;chars&quot;</span><span class="o">:</span><span class="mi">85</span><span class="p">,</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="mi">1368564451000</span><span class="p">,</span><span class="s2">&quot;timeAgo&quot;</span><span class="o">:</span><span class="s2">&quot;1 sec 141 ms ago&quot;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>You can see this yourself by opening the Tweet stream on my <strong><a href="http://birdwatch.matthiasnehlsen.com/tweetFeedCF">BirdWatch server</a></strong>. This is one of the streams from a much-extended version of BirdWatch that I&#8217;ve been working on in the meantime, which allows interacting with the data in interesting ways on the client side. This version is not ready for publishing yet, but I expect to have something to show fairly soon. Pushing the Tweets to the client and reasoning about the data there was already decided on, and benchmarking confirmed how problematic the old solution was. At first I used wget in different terminal sessions with the URL of the link above, and I would max out the CPU with tens of concurrent connections already when consuming the full 1% of Tweets. That is orders of magnitude less than what I expect from a modern server, but completely makes sense when looking at what heavy work the server actually has to perform.</p>
-
-<p>So I started working on delivering streams for client side reasoning. That fixed exactly what I expected it to fix, allowing orders of magnitude more concurrent connections. But now opening many terminal sessions was a much less appealing workaround. I looked around for testing tools a little and soon realized that writing a reactive web application for load testing myself would be a good learning exercise, and it would also give me the opportunity for some more experience in using <strong><a href="http://d3js.org">D3.js</a></strong> for animating the results. This it what it looks like (but with animated bar charts showing live data):</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/sse-perf-screenshot.png" title="image" alt="images"></p>
-
-<p>I have put the code on <strong><a href="https://github.com/matthiasn/sse-perf">GitHub</a></strong> and I also run it live, putting a load of 1,500 connections on the BirdWatch server, in production. The server is not processing the full 1% stream though, and with the current load the 1,500 connections only cause a CPU utilization of 40-60% in <strong><a href="https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/top.1.html">top</a></strong> (out of possible 800% on a quadcore machine with HyperThreading). With the full 1% stream from Twitter I can currently connect up to 700 to 800 concurrent connections without adding significant delay, thus delivering about 1.8 Billion messages a day. That sounds much more like what I was looking for. I have found that the messages per second max out at around 28,000. If these are reached then additional clients will still get the messages but they will queue up more and more. I have found that the server recovers after decreasing the number of concurrent connections, allowing all messages to be delivered to the connected clients eventually. This makes the server fail on overload very gracefully.</p>
-
-<p><strong><a href="http://birdwatch.matthiasnehlsen.com:9001">Have a look for yourself</a></strong>. Changing the load on the server requires authentication, but you will surely find this out yourself.</p>
-
-<p>In the next posts I will introduce animating live streaming data on the client and also share what I have learned when establishing thousands of connections at the same time, using <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.ws.WS$">WS</a></strong> from the <strong><a href="http://www.playframework.com">Play Framework</a></strong>. Let me know which one you would like to read first.</p>
 
 <p>-Matthias</p>
 ]]></content>
