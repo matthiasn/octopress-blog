@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>BirdWatch with ReactJS - Matthias Nehlsen</title>
+  <title>BirdWatch client using ClojureScript and Om - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Summary: in this article I will dicuss how to replace AngularJS with ReactJS in the BirdWatch project. If this doesn&#8217;t concern you, you might &hellip;">
+  <meta name="description" content="Back in January I wanted to try out Om: @swannodette Om looks really powerful, I think I&#39;m going to give it a try in one of the next articles.& &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">BirdWatch with ReactJS</h1>
+      <h1 class="entry-title">BirdWatch client using ClojureScript and Om</h1>
     
     
       <p class="meta">
@@ -97,22 +97,49 @@
   
 
 
-<time datetime="2014-02-12T22:21:00+01:00" pubdate data-updated="true">02/12/2014</time>
+<time datetime="2014-07-17T08:30:00+02:00" pubdate data-updated="true">07/17/2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><strong>Summary:</strong> in this article I will dicuss how to replace AngularJS with ReactJS in the BirdWatch project. If this doesn&#8217;t concern you, you might as well take the time to go get some fresh air, read something else or even talk to your spouse.</p>
+<div class="entry-content"><p>Back in January I wanted to try out <strong><a href="https://github.com/swannodette/om">Om</a></strong>:</p>
 
-<p>That being said, let me dive right into why I felt like I wanted to replace AngularJS with ReactJS. Fear not if you prefer AngularJS, I will not kick it out, I am just writing a new version of the client side application. In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. That requires any calls to the data providing service to be idempotent. That requirement is fulfilled, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: any call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the service. Instead I want control on when the client UI is rendered. In other words, I want to take the priviledge of the client to ask for data away and instead decide in my application logic when the UI should update. This could be done in AngularJS as well by keeping a cached version of the last UI state, but I&#8217;d rather not waste any memory for that, particularly not on mobile.Instead I want my business logic to call the UI renderer exactly once whenever it wants to render data. No more, no less.</p>
+<blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/swannodette">@swannodette</a> Om looks really powerful, I think I&#39;m going to give it a try in one of the next articles.</p>&mdash; Matthias Nehlsen (@matthiasnehlsen) <a href="https://twitter.com/matthiasnehlsen/statuses/427945296971042816">January 27, 2014</a></blockquote>
 
-<p>ReactJS is a good fit for that. It does not impose any structure on my application, all it does is render the UI, and it does that really well by maintaining a virtual DOM that is used for diffing so that the DOM is only touched where changes have indeed happened. Check out my previous articles where I have explored this in more depth if you&#8217;re curious.</p>
 
-<h1>Conclusion</h1>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<p>ReactJS is a nice complement for rendering the UI of the BirdWatch application. From bird&#8217;s-eye view, it is really nothing more than a function that accepts data and that a DOM representation in line with the provided data as a side effect. It does the rendering in a very efficient way and it is low-maintenance, it does not want any more attention than the call necessary to inform it about data changes.</p>
+
+<p>For those of you who do not know, <strong><a href="https://github.com/swannodette/om">Om</a></strong> is a <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> wrapper around Facebook&#8217;s <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> library. I have covered <strong>ReactJS</strong> on this blog a few times, for example in the post mentioned in the twitter conversation above. <strong>ClojureScript</strong> is very similar to <strong><a href="http://clojure.org">Clojure</a></strong>, except that it targets the browser and not the <strong><a href="http://en.wikipedia.org/wiki/Java_virtual_machine">JVM</a></strong>. Like <strong><a href="http://www.scala-js.org">Scala.js</a></strong>, ClojureScript is compiled into <strong>JavaScript</strong>.</p>
+
+<!-- more -->
+
+
+<p>Finally I got around to giving <strong>Om</strong> a spin and wrote my first application in <strong>ClojureScript</strong>. You can try it out <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><strong>here</strong></a>. Before, I had only read a little bit about Clojure and ClojureScript and I had also gone through <strong><a href="http://clojurekoans.com">clojurekoans</a></strong>. Then, just for the fun of it (and to see for myself if I could make it work), I wanted to write a new client for my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, this time in ClojureScript. BirdWatch is kind of a live search engine for tweets for an area of interest, with a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> retrieving search results from a server component, including updates to that search over a streaming connection using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. In the browser, some basic stats about specific tweets (like recent RTs) and about usage of words (wordcloud and trending barchart) plus a time series chart displaying the time distribution of recent tweets matching a query. The server side is written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong>, however that does not need to concern us for this article as the wire format is plain <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>.</p>
+
+<p>The UI of the new client is done in <strong><a href="https://github.com/swannodette/om">Om</a></strong> and the internal communication between application parts is realized with <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. All the data mangling is done in ClojureScript instead of using <strong><a href="http://square.github.io/crossfilter/">crossfilter.js</a></strong> as was the case in previous versions. For more information about the server side and a JavaScript version of the client side application, I can recommend <a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a>. The description of the server side is still accurate, it has not changed in the process of writing this ClojureScript version. By now there are version using AngularJS, ReactJS and now ClojureScript and Om.</p>
+
+<p>This is how the UI of the application looks like now. I have also improved the application while writing this recent addition by</p>
+
+<ul>
+<li>offering additional sort orders (by favorite and by retweet within analyzed tweets)</li>
+<li>enabling retweets, replies and favorites directly from within the application using web intents</li>
+<li>showing photos embedded in tweets</li>
+</ul>
+
+
+<p>Some of these changes have made it back into the ReactJS version so far, with the AngularJS version planned to follow.</p>
+
+<p><a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="/images/cljs-screenshot.png" /></a></p>
+
+<p>Click the image above to give this new client that was written in <strong>ClojureScript</strong> a try. Writing it worked surprisingly well and I have learned a lot in the process. I will write a detailed post about the architecture of the application soon. This being my first application in ClojureScript, I expect that many things can be done much more elegantly. Please let me know about such improvements, should you stumble upon them in the <strong><a href="https://github.com/matthiasn/BirdWatch/tree/master/cljs-om">source code on GitHub</a></strong>. The detailed article about the ClojureScript client for the application will be that much better with your code review.</p>
+
+<p>Looking forward to your thoughts and suggestions!</p>
+
+<p>Cheers,
+Matthias</p>
 </div>
 
 
@@ -135,7 +162,7 @@
   
 
 
-<time datetime="2014-02-12T22:21:00+01:00" pubdate data-updated="true">02/12/2014</time>
+<time datetime="2014-07-17T08:30:00+02:00" pubdate data-updated="true">07/17/2014</time>
       
 
 
@@ -143,7 +170,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/" >Tweet</a>
   
 
   
@@ -167,6 +194,8 @@
 
     
     <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/08/hamburg-angularjs-meetup/" title="Previous Post: New AngularJS Meetup in Hamburg">&laquo; New AngularJS Meetup in Hamburg</a>
       
       
     </p>
@@ -278,8 +307,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html';
-        var disqus_url = 'http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/';
         var disqus_script = 'embed.js';
       
     (function () {

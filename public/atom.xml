@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-07-08T20:43:14+02:00</updated>
+  <updated>2014-07-18T16:55:37+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[BirdWatch client using ClojureScript and Om]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/"/>
+    <updated>2014-07-17T08:30:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript</id>
+    <content type="html"><![CDATA[<p>Back in January I wanted to try out <strong><a href="https://github.com/swannodette/om">Om</a></strong>:</p>
+
+<blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/swannodette">@swannodette</a> Om looks really powerful, I think I&#39;m going to give it a try in one of the next articles.</p>&mdash; Matthias Nehlsen (@matthiasnehlsen) <a href="https://twitter.com/matthiasnehlsen/statuses/427945296971042816">January 27, 2014</a></blockquote>
+
+
+<script async src="http://matthiasnehlsen.com//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+
+<p>For those of you who do not know, <strong><a href="https://github.com/swannodette/om">Om</a></strong> is a <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> wrapper around Facebook&#8217;s <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> library. I have covered <strong>ReactJS</strong> on this blog a few times, for example in the post mentioned in the twitter conversation above. <strong>ClojureScript</strong> is very similar to <strong><a href="http://clojure.org">Clojure</a></strong>, except that it targets the browser and not the <strong><a href="http://en.wikipedia.org/wiki/Java_virtual_machine">JVM</a></strong>. Like <strong><a href="http://www.scala-js.org">Scala.js</a></strong>, ClojureScript is compiled into <strong>JavaScript</strong>.</p>
+
+<!-- more -->
+
+
+<p>Finally I got around to giving <strong>Om</strong> a spin and wrote my first application in <strong>ClojureScript</strong>. You can try it out <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><strong>here</strong></a>. Before, I had only read a little bit about Clojure and ClojureScript and I had also gone through <strong><a href="http://clojurekoans.com">clojurekoans</a></strong>. Then, just for the fun of it (and to see for myself if I could make it work), I wanted to write a new client for my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, this time in ClojureScript. BirdWatch is kind of a live search engine for tweets for an area of interest, with a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> retrieving search results from a server component, including updates to that search over a streaming connection using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. In the browser, some basic stats about specific tweets (like recent RTs) and about usage of words (wordcloud and trending barchart) plus a time series chart displaying the time distribution of recent tweets matching a query. The server side is written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong>, however that does not need to concern us for this article as the wire format is plain <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>.</p>
+
+<p>The UI of the new client is done in <strong><a href="https://github.com/swannodette/om">Om</a></strong> and the internal communication between application parts is realized with <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. All the data mangling is done in ClojureScript instead of using <strong><a href="http://square.github.io/crossfilter/">crossfilter.js</a></strong> as was the case in previous versions. For more information about the server side and a JavaScript version of the client side application, I can recommend <a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a>. The description of the server side is still accurate, it has not changed in the process of writing this ClojureScript version. By now there are version using AngularJS, ReactJS and now ClojureScript and Om.</p>
+
+<p>This is how the UI of the application looks like now. I have also improved the application while writing this recent addition by</p>
+
+<ul>
+<li>offering additional sort orders (by favorite and by retweet within analyzed tweets)</li>
+<li>enabling retweets, replies and favorites directly from within the application using web intents</li>
+<li>showing photos embedded in tweets</li>
+</ul>
+
+
+<p>Some of these changes have made it back into the ReactJS version so far, with the AngularJS version planned to follow.</p>
+
+<p><a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="http://matthiasnehlsen.com/images/cljs-screenshot.png" /></a></p>
+
+<p>Click the image above to give this new client that was written in <strong>ClojureScript</strong> a try. Writing it worked surprisingly well and I have learned a lot in the process. I will write a detailed post about the architecture of the application soon. This being my first application in ClojureScript, I expect that many things can be done much more elegantly. Please let me know about such improvements, should you stumble upon them in the <strong><a href="https://github.com/matthiasn/BirdWatch/tree/master/cljs-om">source code on GitHub</a></strong>. The detailed article about the ClojureScript client for the application will be that much better with your code review.</p>
+
+<p>Looking forward to your thoughts and suggestions!</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[New AngularJS Meetup in Hamburg]]></title>
@@ -3791,125 +3835,6 @@ Room 3.11, 16:30 - 17:15</p>
 <p><img class="left" src="http://matthiasnehlsen.com/images/champions_league_10k.png" title="image" alt="images"></p>
 
 <p>Not too bad, I&#8217;m very glad the <strong><a href="http://www.playframework.com">Play Framework</a></strong> does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. It remains to be seen how much of a performance hit the matching algorithm will incur.</p>
-
-<p>-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[D3.js and Play Framework: Getting Started]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/"/>
-    <updated>2013-05-18T13:21:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play</id>
-    <content type="html"><![CDATA[<p>Data without visualization is dull. This is particularly true for changing data. We seem to be much better at noticing moving things than we are at noticing changes between spreadsheet cells or other text. That&#8217;s okay. I&#8217;m actually a big fan of that. Text does not usually threaten to run me over when I attempt to cross a street. So let&#8217;s create moving things with <strong><a href="http://d3js.org">D3.js</a></strong> and drive the animation reactively with data from a server written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
-
-<!-- more -->
-
-
-<p>In the <strong><a href="http://bit.ly/sse_load_testing">last article</a></strong> I have introduced <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>, a load testing tool for <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Event (SSE)</a></strong> streams. With that tool I gather data that I want to present in the browser using animated barcharts:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/sse-perf-screenshot.png" title="image" alt="images"></p>
-
-<p>Creating the animated barchart is a little more involved. Let us start with something really simple today. Luckily I have a problem to solve that calls for a simple animation:
-<strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong> when running might or might not have have established connections hitting a server. If it does, it becomes immediately obvious that the connection to the <strong><a href="http://bit.ly/sse-perf-live">sse-perf server</a></strong> is alive because the bars are animated. What if there are no client connections and thus there is nothing to report except zero values? I can have these zeros fly into the chart instead of the bars, but that looks really awful, I&#8217;ve tried it. But without anything moving, the connection looks dead. What do I do?</p>
-
-<p>How about a visual heartbeat? Just a simple red dot that gets bigger when a new Server Sent Event is received and then shrinks to normal size again. This succeeds in convincing me that what I am looking at is still alive:</p>
-
-<iframe width="40" height="40" src="http://matthiasnehlsen.com/iframes/heartbeat.html" frameborder="0" allowfullscreen></iframe>
-
-
-<p>Let&#8217;s implement that and drive it by a Server Sent Event stream. First of all, we need a div that will hold our animation which we can style and position by css however we like:</p>
-
-<figure class='code'><figcaption><span>heartbeat div</span><a href='https://github.com/matthiasn/sse-perf/blob/f0feae4d2a82c136eb351d2a99e18b12f8e2f953/app/views/metrics.scala.html'>from metrics.scala.html</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>  <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;heartbeat&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>  @helper.requireJs(core = routes.Assets.at(&quot;javascripts/require.js&quot;).url,
-</span><span class='line'>        module = routes.Assets.at(&quot;javascripts/main&quot;).url)
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>#heartbeat css</span><a href='https://github.com/matthiasn/sse-perf/blob/f0feae4d2a82c136eb351d2a99e18b12f8e2f953/public/stylesheets/main.css'>from main.css </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='css'><span class='line'><span class="nf">#heartbeat</span> <span class="p">{</span>
-</span><span class='line'>    <span class="k">width</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">height</span><span class="o">:</span> <span class="m">20px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">top</span><span class="o">:</span> <span class="m">18px</span><span class="p">;</span>
-</span><span class='line'>    <span class="k">left</span><span class="o">:</span> <span class="m">530px</span><span class="p">;</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let us put all JavaScript in modules conforming to the <strong><a href="http://requirejs.org/docs/whyamd.html">require.js / AMD pattern</a></strong>. This prevents global namespace pollution, potentially loads faster and makes for a cleaner design. <strong><a href="http://www.playframework.com/documentation/2.1.0/RequireJS-support">Play handles</a></strong> loading the JavaScript with require.js for us with @helper.requireJs.</p>
-
-<p>The best thing with this approach is probably that Play will now run the closure compiler over our JavaScript code and show problems immediately by failing the build:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/closure_comp_err.png" title="image" alt="images"></p>
-
-<p>Sweet! Here are the excerpts of the JavaScript code that we need for the heartbeat. Full code is available on <strong><a href="http://bit.ly/sse-perf">GitHub</a></strong> as usual.</p>
-
-<figure class='code'><figcaption><span>main.js (require.js compatible)</span><a href='https://github.com/matthiasn/sse-perf/blob/f0feae4d2a82c136eb351d2a99e18b12f8e2f953/app/assets/javascripts/main.js'>from main.js</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">require</span><span class="p">([</span><span class="s2">&quot;barchart&quot;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">chart</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">heartbeat</span> <span class="o">=</span> <span class="nx">d3</span><span class="p">.</span><span class="nx">select</span><span class="p">(</span><span class="s2">&quot;#heartbeat&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;svg&quot;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;width&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;height&quot;</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;cx&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;cy&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-</span><span class='line'>    <span class="p">.</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;fill&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">var</span> <span class="nx">feed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/metricsFeed&quot;</span><span class="p">);</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="kd">function</span> <span class="nx">handler</span><span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">);</span>
-</span><span class='line'>    <span class="nx">heartbeat</span><span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
-</span><span class='line'>      <span class="p">.</span><span class="nx">transition</span><span class="p">().</span><span class="nx">duration</span><span class="p">(</span><span class="mi">700</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'>  <span class="nx">feed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="nx">handler</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>We draw the dot first. Using the global d3 object, we select our #heartbeat div, append an <strong><a href="https://de.wikipedia.org/wiki/Scalable_Vector_Graphics">svg</a></strong> of size 20px by 20px, append a circle at x=10px, y=10px, give it a radius of 3px and fill it red. Thanks to <strong><a href="http://bit.ly/chaining-methods">method chaining</a></strong>, the D3 code almost reads like prose.</p>
-
-<p>We then establish an EventSource(&#8220;/metricsFeed&#8221;) connection to the metrics feed and assign a handler function as an event listener to the &#8220;message&#8221; event. <strong><a href="http://bit.ly/113clAb">See the stream for yourself</a></strong>.  We can use the handler function to trigger the animation.</p>
-
-<p>Once again, the D3 code reads like a sentence: using the heartbeat object created above, we transition the radius from the initial 3px to 7px, to 3px, to 6px and back to 3px, all of these with a duration of 700ms each.</p>
-
-<p>The stream I use as a trigger has data every 3 seconds. I found that it looks <strong><a href="http://en.wikipedia.org/wiki/Bradycardia">unhealthy</a></strong> if the heartbeat only animates 20 times a second, so I do the expansion / contraction cycle twice on each event. <strong><a href="http://d3js.org">D3.js</a></strong> is great; it has a bit of a learning curve but it is well worth it because it will give you full control over everything you could possibly want to tweak on your page.</p>
-
-<p>This is it for today, check back for more elaborate examples in the future. If you haven&#8217;t already, how about you <strong><a href="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5">subscribe to the mailing list</a></strong> so you won&#8217;t miss anything?</p>
 
 <p>-Matthias</p>
 ]]></content>
