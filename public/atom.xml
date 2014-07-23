@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-07-19T18:20:45+02:00</updated>
+  <updated>2014-07-23T18:16:45+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,331 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[BirdWatch with ClojureScript and Om explained, Part 1]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1/"/>
+    <updated>2014-07-24T08:30:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1</id>
+    <content type="html"><![CDATA[<p><strong>This article is currently Work in Progress</strong></p>
+
+<p><strong><a href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/">Last week</a></strong> I wrote about having written my first actual application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and <strong><a href="https://github.com/swannodette/om">Om</a></strong>, a web client for my <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">BirdWatch</a></strong> application. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to go into part 1 of the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :)</p>
+
+<!-- more -->
+
+
+<p>So my experience. I have been reading articles and books about <strong><a href="http://clojure.org">Clojure</a></strong> for a while and it did seem to resonate with me. I like this whole <strong><a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a></strong> thing. Code and data are basically the same thing and they thus share the same data structures. Code is really data, representing the <strong><a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree (AST)</a></strong> directly. Now my initial reaction to this concept was that it must be rather low-level to do so, but to my surprise the opposite is true with a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong>; you gain a tremendous amount of expressiveness. I also really like that <strong>a)</strong> Clojure introduces <strong><a href="http://clojure.org/data_structures">additional data structures</a></strong> besides the obvious <strong>list</strong>, i.e. Maps, Sets and Vectors and <strong>b)</strong> that it is idiomatic to simply use those.</p>
+
+<p>Sure, there is something to be said about types and how <strong><a href="http://en.wikipedia.org/wiki/Type_safety">type safety</a></strong> makes working on large-scale applications less error-prone. But at the same time I have a hunch that having hundreds of (case) classes complects an application in a way that idiomatic usage of a map does not. Have you seen this before, where you have cascades of only slightly differing data structures, when the next step of a computation adds only a little bit of data and calls that a new thing, modeled as a different something? That can become difficult to reason about, particularly when there are no useful design documents outlining how one morphs into the other.</p>
+
+<p>But then again I am somewhat afraid of the lack of compile time errors when I call a function with something of a wrong type. So as of now, that is an unsolved question for me. May my endeavor into Clojure and thus Lisp afford me with a more educated opinion on this matter. Against strongly typed systems I have to say that I have seen way too many runtime failures that <strong>a)</strong> the type system and the compiler did not catch and <strong>b)</strong> really came from the application being so incidentally complex that the consequences of changes were by all means hard to grasp even for the most senior team members.</p>
+
+<p>I guess I really need some production experience with Clojure in order to get to a fair and substantial comparison of the different apporaches. But at least this application is a start. And learning a new language has never hurt anyone, I guess.</p>
+
+<p>So how is this going as an experience so far, you might ask.</p>
+
+<p>Here are my perceived pros:</p>
+
+<ul>
+<li>When crafting functions in Clojure, I just feel more like playing an instrument. It feels more playful.</li>
+<li>Code tends to be short and concise.</li>
+<li>The core of the language is easily understood, at least as far as my limited understanding goes.</li>
+<li>Immutability is great, no more thinking about concurrency issues and mutating state in different places.</li>
+<li>Om uses Facebook&#8217;s ReactJS, a UI rendering library that I have tried out previously and that I am somewhat familiar with.</li>
+<li>Refactoring is fun, I have found spotting repetitive parts among functions and then factoring these parts out into new and shared functions not only easier compared to other languages but also pleasant.</li>
+<li>Maps and sets and, by importing an external library in the case of this application, priority maps are a great thing to have, much nicer than only having JavaScript arrays and objects at your disposal.</li>
+<li>Time and time again I am amazed that replacing an external dependency with a newer version generally seems to work in Clojure. This is the complete opposite of my experience in Scala. I has gotten better over the last year with Scala for sure, but it is nowhere near as smooth as it appears to be with Clojure. Why do you think that is?</li>
+</ul>
+
+
+<p>Here are some cons, as well:</p>
+
+<ul>
+<li>As of now, I feel like I can be more productive with plain JavaScript and ReactJS in comparison to Om. This is specific to UI problems, with general data manipulation I feel I am in the process of becoming more productive with Clojure already when compared to JavaScript and <strong><a href="http://underscorejs.org">underscore</a></strong> and definitely more productive than with plain JavaScript <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
+<li>Testing. I have tried out <strong><a href="http://cemerick.com">Chas Emerick</a></strong>&#8217;s <strong><a href="https://github.com/cemerick/clojurescript.test">clojurescript.test</a></strong> and while it seems do do its job alright, I don&#8217;t feel I have fully figured out how to use it. I am using it with the <strong><a href="https://github.com/cemerick/clojurescript.test#using-with-lein-cljsbuild">leiningen test runner</a></strong> and there are two things I find less than pleasing. First, every time I call <em>lein test</em> a full compile is started, even if I have <em>lein cljsbuild auto</em> for the <em>test</em> task running in another terminal window. This seems unnecessary. Am I missing something, maybe watch and re-run the tests automatically when file system changes are detected? Second, the output is plain black and white. How am I supposed to do <strong><a href="http://www.jamesshore.com/Blog/Red-Green-Refactor.html">red-green refactoring</a></strong> with this? But seriously, this might be mostly cosmetic but still I like to see green in my tests as that soothes my mind. When I see red in tests, my alertness level goes up. Black and white output excites none of these emotions. Is there just something wrong with my installation or vision that I don&#8217;t see colors in my test output?</li>
+<li>Performance. The application so far is MUCH slower than the JavaScript counterpart. When processing preloaded tweets, the plain JavaScript version (used in the <strong><a href="http://birdwatch.matthiasnehlsen.com/angular/#/">AngularJS</a></strong> and <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">ReactJS</a></strong> clients) is probably ten times as fast. Click those previous links and see what I mean. The previous tweets are loaded by an Ajax call in chunks of 500 items and loading and processing each chunk takes maybe a second. Now when you open the <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">ClojureScript version</a></strong>, you see that it takes much longer to process the previous items. I suspect keywordizing the JSON when converting a tweet to a Clojure Map could be the problem, but I don&#8217;t know for sure. Please enlighten me and, better yet, suggest a more performant way of ingesting the JSON.</li>
+<li>Application state in a single large map stored in an <strong><a href="http://clojure.org/atoms">atom</a></strong> can be cumbersome, I would not mind having something like objects here and there. I am not terribly happy with this, I have to admit, but it did seem to be what is going on in the Om tutorials. I have looked at <strong><a href="http://stuartsierra.com">Stuart Sierra</a></strong>&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> and it does seem to offer a good approach to compenentizing the application, but I have yet to find the time to try it out.</li>
+<li>Interacting with the state from inside Om is different than interacting with the state atom from other parts of the application. <strong><a href="https://github.com/Prismatic/om-tools">Om-tools</a></strong> seem to be an interesting way around this, will need to give that a try and see if that feels good.</li>
+</ul>
+
+
+<p>By the way, regarding performance, I have seen the same problems with my naïve Scala.js approach before. I have not played around with that one again yet ever since my first attempt back in January. That is mostly for the lack of a ReactJS binding that is anywhere near as complete as Om. I&#8217;ll be happy to give it a try again once ReactJS support is better.</p>
+
+<h1>Introduction to Clojure</h1>
+
+<p>First of all, you will need to understand a few very basic things about Clojure being a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong> <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. Feel free to skip this section if you know the basics already. I hope you will be able to follow along even if you&#8217;ve never tried Clojure or a Lisp before. So the basic idea in a Lisp is the List (no wonder, as Lisp stands for List Programming), a <strong><a href="http://en.wikipedia.org/wiki/Singly_linked_list#Singly_linked_lists">singly linked list</a></strong>, to be precise. This list can hold both code and data. Let&#8217;s see how that looks like. You can try these examples out using the <strong><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">REPL</a></strong> in <strong><a href="http://leiningen.org">Leiningen</a></strong> by running <code>lein repl</code> from your command line.</p>
+
+<p>This is an empty list: <code>()</code> It evaluates to itself.</p>
+
+<p>When the list is not empty, the first item in the list will be evaluated: <code>(some-function "a" "b")</code>
+Here, <em>some-function</em> will be called with the two arguments &#8220;a&#8221; and &#8220;b&#8221;. Example <code>(print "Hello World!")</code> Sweet, that&#8217;s all there is to <strong><a href="http://en.wikipedia.org/wiki/Hello_world_program">Hello World</a></strong>.</p>
+
+<p>The first item in a list has to implement the <em>IFn</em> interface meaning it must be possible to call the item as a function. Try this: <code>("a" "b")</code>. Not surprisingly, the string &#8220;a&#8221; is not a function, causing this to fail. You can however <strong>quote</strong> the list to prevent evaluation, like this: <code>'("a" "b")</code>. Now we can use the list to store items without the first one being implemented.</p>
+
+<p>Luckily, Clojure also has a <strong>vector</strong> which is best compared to an array. You can use it in place of a quoted list, and in fact it is idomatic to do so when you do not want the first item evaluated. Example <code>[1 2 3]</code></p>
+
+<p>When you want to name something, you have different ways of doing so. The first one is <em>def</em>, you can use this to name stuff in the top level of a namespace. Example <code>(def foo [1 2 3])</code> This creates a vector named <em>foo</em> which you can then refer to from elsewhere. After typing in the previous example, you will see that now you can just type <code>foo</code> in the REPL and get the vector we have defined previously.</p>
+
+<p>Or you can use the <strong>let-binding</strong> to name things locally, for example inside a function body, like so <code>(let [foo [1 2 3]])</code> Here, you can only refer to <em>foo</em> inside form. Let&#8217;s use <em>foo</em>: <code>(let [foo [1 2 3]] (print foo))</code> You should see the vector being printed in your REPL.</p>
+
+<p>Functions can be defined as follows: <code>(fn [a] (+ a 1))</code> with this, we have defined a function that adds 1 to the specified argument.
+You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</code> Remember, the first item in a list will be evaluated, and this happens to be the function we just defined. However, this is a little clumsy. We can also store the function in a def: <code>(def add-one (fn [a] (+ a 1)))</code> now we can call the function, like so <code>(add-one 2)</code>.</p>
+
+<p>However, this can even be simpler using the <strong>defn macro</strong>, like so: <code>(defn add-one [a] (+ a 1))</code></p>
+
+<p>Sometimes, you may want to create a function in place using the anonymous function literal, like so: <code>(#(+ % 1) 2)</code>. This does the same as the anymous function in the first position of the list as above, except for being shorter. During compilation, the <code>#(+ % 1)</code> expands into <code>(fn [a] (+ a 1))</code>, where the percent sign denotes the first argument. If there are multiple arguments, you use <em>%1</em>, <em>%2</em> and so on instead (1-based).</p>
+
+<p><strong>TO BE CONTINUED</strong></p>
+
+<h1>Application architecture</h1>
+
+<p>Let us now have a look at the implementation details <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+
+<p>The most important part to understand is that the application state lives in one large <strong><a href="http://clojure.org/atoms">atom</a></strong>. When the application is started, this atom is populated with the return of a function that returns a map representing a clean slate. Here is how that looks like:</p>
+
+<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/util.cljs'>util.cljs</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">initial-state</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="s">&quot;function returning fresh application state&quot;</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:count</span> <span class="mi">0</span>
+</span><span class='line'>   <span class="ss">:n</span> <span class="mi">10</span>
+</span><span class='line'>   <span class="ss">:retweets</span> <span class="p">{}</span>
+</span><span class='line'>   <span class="ss">:tweets-map</span> <span class="p">{}</span>
+</span><span class='line'>   <span class="ss">:search-text</span> <span class="s">&quot;&quot;</span>
+</span><span class='line'>   <span class="ss">:page</span> <span class="mi">1</span>
+</span><span class='line'>   <span class="ss">:search</span> <span class="s">&quot;*&quot;</span>
+</span><span class='line'>   <span class="ss">:stream</span> <span class="nv">nil</span>
+</span><span class='line'>   <span class="ss">:sorted</span> <span class="ss">:by-rt-since-startup</span>
+</span><span class='line'>   <span class="ss">:by-followers</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-retweets</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-favorites</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-rt-since-startup</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-id</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:words-sorted-by-count</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>All the keys in this map are <strong><a href="http://clojure.org/data_structures#Data%20Structures-Keywords">keywords</a></strong>. Keywords have the great property that we can use them as functions that take a map as an argument and that then return the value for this key. We will see that in action below.</p>
+
+<p>Upon startup of the application, the function above is called for populating the state atom:</p>
+
+<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 13 to 16)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="c1">;;; Application state in a single atom</span>
+</span><span class='line'><span class="c1">;;; Will be initialized with the map returned by util/initial-state.</span>
+</span><span class='line'><span class="c1">;;; Reset to a new clean slate when a new search is started.</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">app-state</span> <span class="p">(</span><span class="nf">atom</span> <span class="p">(</span><span class="nf">util/initial-state</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then the reference to this <strong><a href="http://clojure.org/atoms">atom</a></strong> is passed around, which is dereferenced wherever a change occurs and then updated back into the atom. It is important to note that clojure data structures are immutable. Immutability guarantees that you can pass data structures around without having to worry that whoever you pass it to might change the data. State changes only can only happen inside a transaction, a new and altered version of the state is passed back. The transaction part would also mean that no other process could alter state at the same time, in that case the later transaction would be retried when the first one has succeeded. This would be particularly useful when running in a multithreaded environment. However, the JavaScript code resulting from the ClojureScript compilation process runs in a single threaded event loop. In that environment, there&#8217;s only ever one thing happening at the same time anyway.</p>
+
+<p>Using this map generated from a helper function makes it trivial to reset the application state at a later point <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, we can simply swap the current state with the clean slate map.</p>
+
+<h2>Ingesting tweets</h2>
+
+<p>Tweets get into the system for further analysis in two ways. First, there is a Server Sent Event stream continously delivering new matches to a query, with low latency (typically around a second between sending tweet and having it show up in the application). Then also previous tweets are loaded. Both are triggered in the <strong>start-search</strong> function:</p>
+
+<figure class='code'><figcaption><span>start-search function</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 47 to 57)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">start-search</span> <span class="p">[</span><span class="nv">app</span> <span class="nv">tweets-chan</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;initiate new search by starting SSE stream&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">search</span> <span class="p">(</span><span class="ss">:search-text</span> <span class="o">@</span><span class="nv">app</span><span class="p">)</span>
+</span><span class='line'>        <span class="nv">s</span> <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">search</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="s">&quot;*&quot;</span> <span class="nv">search</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">not </span><span class="p">(</span><span class="nb">nil? </span><span class="p">(</span><span class="ss">:stream</span> <span class="o">@</span><span class="nv">app</span><span class="p">)))</span> <span class="p">(</span><span class="nf">.close</span> <span class="p">(</span><span class="ss">:stream</span> <span class="o">@</span><span class="nv">app</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">reset!</span> <span class="nv">app</span> <span class="p">(</span><span class="nf">util/initial-state</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span> <span class="nb">assoc </span><span class="ss">:search</span> <span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">aset </span><span class="nv">js/window</span> <span class="s">&quot;location&quot;</span> <span class="s">&quot;hash&quot;</span> <span class="p">(</span><span class="nf">js/encodeURIComponent</span> <span class="nv">s</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span> <span class="nb">assoc </span><span class="ss">:stream</span> <span class="p">(</span><span class="nf">js/EventSource.</span> <span class="p">(</span><span class="nb">str </span><span class="s">&quot;/tweetFeed?q=&quot;</span> <span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">.addEventListener</span> <span class="p">(</span><span class="ss">:stream</span> <span class="o">@</span><span class="nv">app</span><span class="p">)</span> <span class="s">&quot;message&quot;</span> <span class="o">#</span><span class="p">(</span><span class="nf">receive-sse</span> <span class="nv">tweets-chan</span> <span class="nv">%</span><span class="p">)</span> <span class="nv">false</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">doall </span><span class="p">(</span><span class="nb">for </span><span class="p">[</span><span class="nv">x</span> <span class="p">(</span><span class="nb">range </span><span class="mi">5</span><span class="p">)]</span> <span class="p">(</span><span class="nf">ajax/prev-search</span> <span class="nv">s</span> <span class="mi">500</span> <span class="p">(</span><span class="nb">* </span><span class="mi">500</span> <span class="nv">x</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let us go through this line by line. The <strong>defn</strong> macro denotes a function named start-search which takes two arguments, <em>app</em> for a reference to the application state and <em>tweets-chan</em>, a channel where to put tweets. Channels are building blocks in <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. We will get to that in a little bit, for now just think about a channel as a conveyor belt onto which one part of the application puts data. On the other end, another part of the application picks up the data, but the sender does not need to know about it. Broadly speaking, it is a sweet way to decouple an application.</p>
+
+<p>In the next line there is the description of the function, followed by a <strong><a href="http://clojure.org/special_forms#binding-forms">let binding</a></strong> where we declare first two local immutable values, both of which are available for the remainder of the function. The first one, <em>search</em>, retrieves the value for the key <em>:search-text</em> in the application state. <em>@app</em> dereferences the application state, giving us an immutable copy of the current app state. <code>(:search-text @app)</code> will run the keyword as a function with the state map as an argument, returning the value in the map. Next we declare <em>s</em> whose value can take two paths as decided by the <strong><a href="http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?)">if special form</a></strong>. The if form consists of three parts. There is a test: <code>(= search "")</code>. Not surprisingly at this point, <strong>=</strong> is a function that evaluates if the arguments passed to it are equal, returning either true or false. The <strong>if</strong> form then either returns the expression right after the test if the test evaluated to <em>true</em> or the subsequent one if it evaluated to <em>false</em>. What we are doing here is simply replacing an empty string with an asterisk or otherwise just taking the search string.</p>
+
+<p>Next, we close a previous Server Sent Event stream, should one exist. This is only required when resetting the application state as on initial startup the value for the <em>:stream</em> key will be nil. Then we reset the application state by replacing it with a clean state. Then we swap the value for the <em>:search</em> key with out local value <em>s</em>. Then we set the location hash to represent a URI encoded version of the search string.</p>
+
+<p>In the next line, we create a new EventSource object for the live stream of tweets and store it under the <em>:stream</em> key, to which we attach a function as an event listener. We are using an anonymous function literal here because the <em>receive-sse</em> function takes two arguments (a channel and an event from the EventSource object) whereas the event listener requires a function that only takes a single argument. Then finally we call <em>ajax/prev-search</em> with 5 chunks of 500 results each, but we will look at that later. Let us for now focus on the <em>receive-sse</em> function:</p>
+
+<figure class='code'><figcaption><span>receive-sse function</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 42 to 45)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">receive-sse</span> <span class="p">[</span><span class="nv">tweets-chan</span> <span class="nv">e</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;callback, called for each item (tweet) received by SSE stream&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">tweet</span> <span class="p">(</span><span class="nf">js-&gt;clj</span> <span class="p">(</span><span class="nf">JSON/parse</span> <span class="p">(</span><span class="nf">.-data</span> <span class="nv">e</span><span class="p">))</span> <span class="ss">:keywordize-keys</span> <span class="nv">true</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">put!</span> <span class="nv">tweets-chan</span> <span class="nv">tweet</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a function with two arguments, a channel and an event. In the <strong>let-binding</strong>, the event is parsed into a tweet. This reads inside out: 1) get event data 2) parse JSON into JavaScript object 3) convert JavaScript object into a Clojure(Script) Map. Note that for the conversion into a Clojure Map we can automatically have the keys converted into keywords using <em>:keywordize-keys true</em>. This is convenient as we can use the keywords as functions later for retrieving values for the respective key. Then the <em>tweet</em> from the let binding is <em>put!</em> onto the <em>tweets-chan</em>, this aforementioned conveyor belt.</p>
+
+<p>Now is a good time to talk a little more about those channels. Channels are brought to Clojure by importing the <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong> library. <strong>Core async</strong> is modeled after channels in the <strong><a href="http://golang.org">Go programming language</a></strong>, which implements <strong><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">Communicating Sequential Processes</a></strong> or <strong>CSP</strong> for short. You really should watch <strong><a href="http://www.infoq.com/presentations/clojure-core-async">Rick Hickey&#8217;s talk about core.async</a></strong> now if you haven&#8217;t already.</p>
+
+<p>I am really only scratching the surface of what can be achieved with CSP, but it does seem like a useful abstraction to decouple parts of an application. Besides the aforementioned <em>tweets-chan</em> there is also a channel for previous tweets, those that are retrieved using Ajax calls (we will cover that part next):</p>
+
+<figure class='code'><figcaption><span>Channels</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 37 to 44)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="c1">;;; Channels for handling information flow in the application.</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">tweets-chan</span> <span class="p">(</span><span class="nf">chan</span> <span class="mi">10000</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">prev-tweets-chan</span> <span class="p">(</span><span class="nf">chan</span> <span class="mi">10000</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span>
+</span><span class='line'> <span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">t</span> <span class="nv">chan</span><span class="p">]</span> <span class="p">(</span><span class="nf">alts!</span> <span class="p">[</span><span class="nv">tweets-chan</span> <span class="nv">prev-tweets-chan</span><span class="p">]</span> <span class="ss">:priority</span><span class="p">)]</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">tweets/add-tweet</span> <span class="nv">t</span> <span class="nv">app-state</span> <span class="nv">word-cloud</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">recur</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, two channels are defined. Then, inside the <em>go-block</em>, <em>alts!</em> with <em>:priority</em> takes the one of the items from the two channels, with priority on the first one. That is because live tweets shall always be processed immediately whereas previous results can wait. With this item <em>t</em> taken from one of the channels, the <em>add-tweet</em> function in the <em>tweets</em> namespace is called. Finally, the go-loop runs continously using <em>recur</em>.</p>
+
+<p>Before looking at the <em>tweets</em> namespace, let us have a quick look at the ajax call performed in the <em>start-search</em> function above:</p>
+
+<figure class='code'><figcaption><span>Ajax</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/ajax.cljs'>core.cljs (lines 35 to 40)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">prev-search</span> <span class="p">[</span><span class="nv">query-string</span> <span class="nv">size</span> <span class="nv">from</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">json-xhr</span>
+</span><span class='line'>    <span class="p">{</span><span class="ss">:method</span> <span class="ss">:post</span>
+</span><span class='line'>     <span class="ss">:url</span> <span class="s">&quot;/tweets/search&quot;</span>
+</span><span class='line'>     <span class="ss">:data</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">query-string</span> <span class="nv">size</span> <span class="nv">from</span><span class="p">)</span>
+</span><span class='line'>     <span class="ss">:on-complete</span> <span class="o">#</span><span class="p">(</span><span class="nf">put!</span> <span class="nv">ajax-results-chan</span> <span class="nv">%</span><span class="p">)}))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, we see a function that takes a query string, the expected number of items in the result and an offset. What it then does is call <em>json-xhr</em> from the imported <strong><a href="http://docs.closure-library.googlecode.com/git/class_goog_net_XhrIo.html">goog.net.XhrIo</a></strong> with a map specifying method, url, data and an event handler. <strong>XhrIo</strong> comes with <strong><a href="https://developers.google.com/closure/compiler/">Google&#8217;s Closure Compiler</a></strong> that is used in the ClojureScript to JavaScript compilation process.</p>
+
+<p>The query itself is generated by the <em>query</em> function in the same namespace:</p>
+
+<figure class='code'><figcaption><span>Ajax</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/ajax.cljs'>core.cljs (lines 19 to 23)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">query</span> <span class="p">[</span><span class="nv">query-string</span> <span class="nv">size</span> <span class="nv">from</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:size</span> <span class="nv">size</span> <span class="ss">:from</span> <span class="nv">from</span>
+</span><span class='line'>   <span class="ss">:sort</span> <span class="p">{</span><span class="ss">:id</span> <span class="s">&quot;desc&quot;</span><span class="p">}</span>
+</span><span class='line'>   <span class="ss">:query</span> <span class="p">{</span><span class="ss">:query_string</span> <span class="p">{</span><span class="ss">:default_field</span> <span class="s">&quot;text&quot;</span> <span class="ss">:default_operator</span> <span class="s">&quot;AND&quot;</span>
+</span><span class='line'>                          <span class="ss">:query</span> <span class="p">(</span><span class="nb">str </span><span class="s">&quot;(&quot;</span> <span class="nv">query-string</span> <span class="s">&quot;) AND lang:en&quot;</span><span class="p">)}}})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This function generates the map with the required properties for the ElasticSearch query on the server side. This query will eventually go on the wire as JSON.</p>
+
+<p>Then finally as an event handler there is an anonymous function literal putting the result onto another channel for the Ajax results:</p>
+
+<figure class='code'><figcaption><span>Ajax results channel and Go Loop</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/ajax.cljs'>core.cljs (lines 11 to 17)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">ajax-results-chan</span> <span class="p">(</span><span class="nf">chan</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">parsed</span> <span class="p">(</span><span class="nf">js-&gt;clj</span> <span class="p">(</span><span class="nf">JSON/parse</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">ajax-results-chan</span><span class="p">))</span> <span class="ss">:keywordize-keys</span> <span class="nv">true</span><span class="p">)]</span>
+</span><span class='line'>           <span class="p">(</span><span class="nb">doseq </span><span class="p">[</span><span class="nv">t</span> <span class="p">(</span><span class="ss">:hits</span> <span class="p">(</span><span class="ss">:hits</span> <span class="nv">parsed</span><span class="p">))]</span>
+</span><span class='line'>             <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">= </span><span class="mi">0</span> <span class="p">(</span><span class="nf">mod</span> <span class="p">(</span><span class="ss">:_id</span> <span class="nv">t</span><span class="p">)</span> <span class="mi">200</span><span class="p">))</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="p">(</span><span class="nf">timeout</span> <span class="mi">10</span><span class="p">)))</span>
+</span><span class='line'>             <span class="p">(</span><span class="nf">put!</span> <span class="nv">cljs-om.core/prev-tweets-chan</span> <span class="p">(</span><span class="ss">:_source</span> <span class="nv">t</span><span class="p">)))</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">recur</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, the JSON for each item on the channel is parsed into a Clojure(Script) data structure, where <em>parsed</em> is a vector. Then, each item in that vector is put! onto the prev-tweets-chan. Rather, the value for the <em>:_source</em> key is used here as that is where ElasticSearch stores the original item. One thing to note here is the usage of a <strong><a href="https://clojure.github.io/core.async/#clojure.core.async/timeout">timeout</a></strong> roughly every 200 tweets. I have introduced this in order to occasionally return control to the <strong><a href="http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/">JavaScript Event Loop</a></strong> so that a) the UI gets rendered and b) the event listener for tweets from the Server Sent Event stream can do its thing. Otherwise, the application just appears to halt until all previous tweets are processed, which is really annoying. But this seems rather hacky, I would be really curious about solving this problem more elegantly.</p>
+
+<p>With the preloading of tweets using Ajax calls covered, we can now proceed to the processing of tweets inside the <em>tweets</em> namespace. As we have seen before with the go loop alternating between channels, <em>add-tweet</em> is called for each tweet coming into the application:</p>
+
+<figure class='code'><figcaption><span>add-tweet function</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 31 to 40)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">add-tweet</span> <span class="p">[</span><span class="nv">tweet</span> <span class="nv">app</span> <span class="nv">word-cloud</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;increment counter, add tweet to tweets map and to sorted sets by id and by followers&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">state</span> <span class="o">@</span><span class="nv">app</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span> <span class="nb">assoc </span><span class="ss">:count</span> <span class="p">(</span><span class="nb">inc </span><span class="p">(</span><span class="ss">:count</span> <span class="nv">state</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">add-to-tweets-map</span> <span class="nv">app</span> <span class="ss">:tweets-map</span> <span class="p">(</span><span class="nf">util/format-tweet</span> <span class="nv">tweet</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">util/swap-pmap</span> <span class="nv">app</span> <span class="ss">:by-followers</span> <span class="p">(</span><span class="nb">keyword </span><span class="p">(</span><span class="ss">:id_str</span> <span class="nv">tweet</span><span class="p">))</span> <span class="p">(</span><span class="ss">:followers_count</span> <span class="p">(</span><span class="ss">:user</span> <span class="nv">tweet</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">util/swap-pmap</span> <span class="nv">app</span> <span class="ss">:by-id</span> <span class="p">(</span><span class="nb">keyword </span><span class="p">(</span><span class="ss">:id_str</span> <span class="nv">tweet</span><span class="p">))</span> <span class="p">(</span><span class="ss">:id</span> <span class="nv">tweet</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">add-rt-status</span> <span class="nv">app</span> <span class="nv">tweet</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">wc/process-tweet</span> <span class="nv">app</span> <span class="p">(</span><span class="ss">:text</span> <span class="nv">tweet</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">. </span><span class="nv">word-cloud</span> <span class="p">(</span><span class="nf">redraw</span> <span class="p">(</span><span class="nf">clj-&gt;js</span> <span class="p">(</span><span class="nf">wc/get-words</span> <span class="nv">app</span> <span class="mi">250</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First of all, for each new tweet, the counter inside the application state is swapped with the number incremented by one. Then, <strong>add-to-tweets-map</strong> is called (described below), which as the name suggests adds the current tweet to the map that is found under the <em>:tweets-map</em> key in the application state. Before being added, each tweet is also processed, in that step for example user mentions and links are replaced with the correct HTML representation.</p>
+
+<p>For a better understanding: the application allows displaying the tweets in different sort orders. Priority maps are used for maintaining the sort order. These priority maps contain nothing more than the ID of the tweet and whatever that specific map is sorted on, i.e. the number of followers. The full tweets are stored in one map with the ID of a tweet as the key and the tweet itself as the value. For displaying a sorted list of tweets in the UI, a sorted vector from the priority map is mapped by looking up each item in <em>:tweets-map</em> and using that item instead of the sorted value.</p>
+
+<p><strong>TO BE CONTINUED</strong></p>
+
+<h1>Summary</h1>
+
+<p>Overall I find working with Clojure(Script) quite pleasant. However I still need to understand how to better structure an application as I am not completely happy with the current architecture yet. But that will hopefully improve.</p>
+
+<p>Please comment and suggest any improvement you can think of, including typos and difficult to understand sentences. This is a work in progress, and a rather early draft at that. Any help is certainly welcome.</p>
+
+<p>Cheers,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Actually I should mention <strong><a href="http://lodash.com">Lo-Dash</a></strong> instead of <strong>underscore</strong>. I use it as a drop-in replacement for underscore especially for one reason and that is <strong><a href="http://lodash.com/docs#cloneDeep">_.cloneDeep</a></strong>. The ability to deep clone a data structure makes developing an undo functionality much, much, much easier. Not as trivial as with <strong><a href="http://swannodette.github.io/2013/12/31/time-travel/">ClojureScript</a></strong> or with <strong><a href="http://matthiasnehlsen.com/01/24/scala-dot-js-and-reactjs/">Scala.js</a></strong> but it is not difficult, either.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Please let me know if you do not understand everything in here or have suggestions on how to make it simpler.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>I might edit this article should a better architecture evolve.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>That is not completely true here. The application makes use of channels for processing both previous and current tweets. What if there is still stuff on channels when the reset takes place? This still needs to be solved.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[BirdWatch client using ClojureScript and Om]]></title>
@@ -3705,138 +4030,6 @@ Room 3.11, 16:30 - 17:15</p>
 <p>-Matthias</p>
 
 <p><em>You should follow me on Twitter <a href="https://twitter.com/matthiasnehlsen" target="_blank">here</a>.</em></p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Making BirdWatch Interactive]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/"/>
-    <updated>2013-05-26T20:45:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive</id>
-    <content type="html"><![CDATA[<p>Some weeks ago when I started working on the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> project, I basically wanted to play around with Iteratees and stream information to the browser, any information. But in the meantime, I have become more excited in making Tweet visualizations useful and interesting. First I needed to move the reasoning over to the client though because the server side reasoning did not scale well at all. In the latest update I address both client-side reasoning and the first steps in making the application interactive.</p>
-
-<!-- more -->
-
-
-<p>My other application on GitHub, <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>, was quite useful in identifying where the scalability problem was. When getting as many as 1% of all Tweets from Twitter, which is the current limit for the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> without some extra agreement with Twitter (amounting to 3-4 million Tweets a day), server-side calculations for each client connection only allowed somewhere between ten and twenty concurrent connections whereas moving the calculations over to the client side now allows about 600 concurrent connections to a single server under the same load.</p>
-
-<p>With that problem out of the way, I also added interactive functionality where the words in the word cloud and in the bar chart are now clickable, allowing drilling into the data. Currently this works with a logical AND. Only previous and live Tweets are now shown that contain all of the search words. The queries are resources that can be bookmarked, with the query encoded in the URL, comparable to a Google search.</p>
-
-<p>Ok, this is becoming a little more interesting than the previous version where the observer did not have any influence over what was shown on the screen. I have used the current version of <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> for following Tweets about the Champions League final between Bayern München and Borussia Dortmund at Wembley stadium (besides the TV, of course):</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/champions_league.png" title="image" alt="images"></p>
-
-<p>It was interesting to see a correlation between events in the game and the teams being mentioned in the Tweets. But that experience also showed me what is missing and could be addressed in a future version: a time component. I would find it interesting to track words and hashtags over time. That will be much more interesting and shall come in a future version.</p>
-
-<p>Let&#8217;s look at a few implementation details in the current version:</p>
-
-<h4>Filter Enumeratee</h4>
-
-<p>Tweets from the TwitterClient are delivered to connected clients using a channel and enumerator provided by Concurrent.broadcast in the Play Iteratee API.</p>
-
-<figure class='code'><figcaption><span>Tweet Enumerator</span><a href='https://github.com/matthiasn/BirdWatch/blob/74fbdfa568bbcc3f4c6c14de45b70a8bd6e828dc/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** system-wide channel / enumerator for attaching SSE streams to clients*/</span>
-</span><span class='line'>  <span class="k">val</span> <span class="o">(</span><span class="n">tweetsOut</span><span class="o">,</span> <span class="n">tweetChannel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The Tweets are from there fed into the EventSource object which acts as a simple Iteratee that does nothing more than generate a chunked HTTP response, with &#8220;data: &#8221; prepended to every piece of data (Tweets as <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong> in this case), like this:</p>
-
-<figure class='code'><figcaption><span>One Tweet via SSE </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">data</span><span class="o">:</span> <span class="p">{</span><span class="s2">&quot;tweet_id&quot;</span><span class="o">:</span><span class="mi">339406567420080130</span><span class="p">,</span><span class="s2">&quot;img_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://a0.twimg.com/profile_images/3669634376/302cdf34520f1ffd45395438da689c3f_normal.jpeg&quot;</span><span class="p">,</span><span class="s2">&quot;profile_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://twitter.com/muhammadmucin&quot;</span><span class="p">,</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;muhammadmucin&quot;</span><span class="p">,</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;RT @Milanello: Video: Nesta vs. Juventus (Champions League final in 2003): http://t.co/heGrklYXo6 #TempestaPerfettaNesta&quot;</span><span class="p">,</span><span class="s2">&quot;followers&quot;</span><span class="o">:</span><span class="mi">361</span><span class="p">,</span><span class="s2">&quot;words&quot;</span><span class="o">:</span><span class="mi">13</span><span class="p">,</span><span class="s2">&quot;chars&quot;</span><span class="o">:</span><span class="mi">120</span><span class="p">,</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="mi">1369755806000</span><span class="p">,</span><span class="s2">&quot;hashtags&quot;</span><span class="o">:</span><span class="p">[{</span><span class="s2">&quot;text&quot;</span><span class="o">:</span><span class="s2">&quot;TempestaPerfettaNesta&quot;</span><span class="p">,</span><span class="s2">&quot;indices&quot;</span><span class="o">:</span><span class="p">[</span><span class="mi">98</span><span class="p">,</span><span class="mi">120</span><span class="p">]}],</span><span class="s2">&quot;user_mentions&quot;</span><span class="o">:</span><span class="p">[{</span><span class="s2">&quot;screen_name&quot;</span><span class="o">:</span><span class="s2">&quot;Milanello&quot;</span><span class="p">,</span><span class="s2">&quot;indices&quot;</span><span class="o">:</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">13</span><span class="p">]}],</span><span class="s2">&quot;urls&quot;</span><span class="o">:</span><span class="p">[{</span><span class="s2">&quot;url&quot;</span><span class="o">:</span><span class="s2">&quot;http://t.co/heGrklYXo6&quot;</span><span class="p">,</span><span class="s2">&quot;expanded_url&quot;</span><span class="o">:</span><span class="s2">&quot;http://sulia.com/milanello/f/43a24f3c-54e5-48ba-9653-508476c3fbc0/&quot;</span><span class="p">,</span><span class="s2">&quot;display_url&quot;</span><span class="o">:</span><span class="s2">&quot;sulia.com/milanello/f/43â€¦&quot;</span><span class="p">}],</span><span class="s2">&quot;timeAgo&quot;</span><span class="o">:</span><span class="s2">&quot;367 ms ago&quot;</span><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I already used a transforming Enumeratee before, for transforming Tweets in case class form into <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>. It is very simple to put another Enumeratee into this chain for filtering only those Tweets that contain the desired search words:</p>
-
-<figure class='code'><figcaption><span>Enumerator | Enumeratees | Iteratee</span><a href='https://github.com/matthiasn/BirdWatch/blob/74fbdfa568bbcc3f4c6c14de45b70a8bd6e828dc/app/controllers/Twitter.scala'>Twitter.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'>  <span class="cm">/** Enumeratee: Tweet to JsValue adapter */</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">tweetToJson</span><span class="k">:</span> <span class="kt">Enumeratee</span><span class="o">[</span><span class="kt">Tweet</span>, <span class="kt">JsValue</span><span class="o">]</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">map</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">t</span> <span class="k">=&gt;</span> <span class="nc">Json</span><span class="o">.</span><span class="n">toJson</span><span class="o">(</span><span class="n">t</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Tests if all comma-separated words in q are contained in Tweet.text  */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">containsAll</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">tokens</span> <span class="k">=</span> <span class="n">q</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">split</span><span class="o">(</span><span class="s">&quot;,&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">matches</span> <span class="k">=</span> <span class="n">tokens</span><span class="o">.</span><span class="n">foldLeft</span><span class="o">(</span><span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">case</span> <span class="o">(</span><span class="n">acc</span><span class="o">,</span> <span class="n">token</span><span class="o">)</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">toLowerCase</span><span class="o">.</span><span class="n">contains</span><span class="o">(</span><span class="n">token</span><span class="o">)</span> <span class="k">=&gt;</span>  <span class="n">acc</span> <span class="o">+</span> <span class="mi">1</span>
-</span><span class='line'>      <span class="k">case</span> <span class="o">(</span><span class="n">acc</span><span class="o">,</span> <span class="n">token</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">acc</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="n">matches</span> <span class="o">==</span> <span class="n">tokens</span><span class="o">.</span><span class="n">length</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Filtering Enumeratee applying containsAll function*/</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">textFilter</span><span class="o">(</span><span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">filter</span><span class="o">[</span><span class="kt">Tweet</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span> <span class="o">=&gt;</span> <span class="n">containsAll</span><span class="o">(</span><span class="n">t</span><span class="o">,</span> <span class="n">q</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Serves Tweets as Server Sent Events over HTTP connection */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">tweetFeed</span><span class="o">(</span><span class="n">q</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">implicit</span> <span class="n">req</span> <span class="k">=&gt;</span> <span class="o">{</span>
-</span><span class='line'>      <span class="nc">RequestLogger</span><span class="o">.</span><span class="n">log</span><span class="o">(</span><span class="n">req</span><span class="o">,</span> <span class="s">&quot;/tweetFeed&quot;</span><span class="o">,</span> <span class="mi">200</span><span class="o">)</span>
-</span><span class='line'>      <span class="nc">Ok</span><span class="o">.</span><span class="n">stream</span><span class="o">(</span><span class="nc">TwitterClient</span><span class="o">.</span><span class="n">tweetsOut</span>
-</span><span class='line'>        <span class="o">&amp;&gt;</span> <span class="n">textFilter</span><span class="o">(</span><span class="n">q</span><span class="o">)</span>
-</span><span class='line'>        <span class="o">&amp;&gt;</span> <span class="n">tweetToJson</span>
-</span><span class='line'>        <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The filtering Enumeratee above is nothing more than a convenient way to run a predicate function on every data item and pass data down the chain only when the predicate function evaluates to true.</p>
-
-<h4>Queries as bookmarkable resources</h4>
-
-<p>Queries against the system are now represented by a particular URL that encodes the query string. This URL represents the resource of that particular query within a stream of Tweets at the time of the request. Examples: <strong><a href="http://bit.ly/bw_dortmund_bayern">Dortmund AND Bayern</a></strong> or <strong><a href="http://bit.ly/wembley_soccer">Wembley AND soccer</a></strong>.</p>
-
-<h4>No more image processing</h4>
-
-<p>Initially I was playing around with image processing on the server side. But once that was working with a supervised actor hierarchy, it really wasn&#8217;t all that interesting any more. I know that I can easily process 4 million of the large Twitter profile images a day without putting substantial load on my quadcore server. That&#8217;s what I wanted to know. Other than that, the images were littering my harddrive space, without being useful enough for me to keep them. I removed that functionality from the application.</p>
-
-<h4>Client-side Wordcount implementation in Coffeescript</h4>
-
-<p>I wanted to move the Wordcount functionality into the client when I discovered that <strong><a href="http://www.playframework.com">Play Framework</a></strong> comes with nice features for <strong><a href="http://www.playframework.com/documentation/2.1.1/AssetsCoffeeScript">compiling CoffeeScript into JavaScript</a></strong>. I have done a little bit with <strong><a href="http://coffeescript.org">CoffeeScript</a></strong> in the past and I remembered finding it pleasant enough to give it another try. But that will be the topic for a future article.</p>
-
-<h4>Performance of the current version</h4>
-
-<p>Right before the Champions League final, I measured the performance for the search words I had selected for the game. At that time I was receiving about 4 Tweets per second, which I was then able to simultaneously stream to 10,000 clients (using <strong><a href="http://bit.ly/sse-perf">sse-perf</a></strong>).</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/champions_league_10k.png" title="image" alt="images"></p>
-
-<p>Not too bad, I&#8217;m very glad the <strong><a href="http://www.playframework.com">Play Framework</a></strong> does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. It remains to be seen how much of a performance hit the matching algorithm will incur.</p>
-
-<p>-Matthias</p>
 ]]></content>
   </entry>
   
