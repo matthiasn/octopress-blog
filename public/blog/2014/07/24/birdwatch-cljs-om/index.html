@@ -111,6 +111,10 @@
 <!-- more -->
 
 
+<p>Click the screenshot below to see a live version of the application:</p>
+
+<p><a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="/images/cljs-screenshot.png" /></a></p>
+
 <p>So my experience. I have been reading articles and books about <strong><a href="http://clojure.org">Clojure</a></strong> for a while and it really does seem to resonate with me. I like this whole <strong><a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a></strong> thing. Code and data are basically the same thing and they thus share the same data structures. Code is really data, representing the <strong><a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree (AST)</a></strong> directly. Now my initial reaction to this concept was that it must be rather low-level to do so, but to my surprise the opposite is true with a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong>; you gain a tremendous amount of expressiveness. I also really like that <strong>a)</strong> Clojure introduces <strong><a href="http://clojure.org/data_structures">additional data structures</a></strong> besides the obvious <strong>list</strong>, i.e. Maps, Sets and Vectors and <strong>b)</strong> it is idiomatic to simply use those.</p>
 
 <p>Sure, there is something to be said about types and how <strong><a href="http://en.wikipedia.org/wiki/Type_safety">type safety</a></strong> makes working on large-scale applications less error-prone. But at the same time I have a hunch that the presence of hundreds of (case) classes complects an application in a way that idiomatic usage of a map does not. Have you seen this before, where you have cascades of only slightly differing data structures, when the next step of a computation adds only a little bit of data and calls that a new thing, modeled as a different something? That can become difficult to reason about, particularly when there are no useful design documents outlining how one morphs into the other.</p>

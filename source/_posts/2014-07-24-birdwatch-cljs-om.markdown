@@ -7,9 +7,13 @@ categories:
 ---
 **This article is currently Work in Progress. Feedback more than welcome. Thanks!**
 
-**[Last week](http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/)** I wrote about having written my first actual application using **[ClojureScript](https://github.com/clojure/clojurescript)** and **[Om](https://github.com/swannodette/om)**, a web client for my **[BirdWatch](http://birdwatch.matthiasnehlsen.com/cljs/#*)** application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to start describing the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :)
+**[Last week](http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/)** I wrote about having written my first actual application using **[ClojureScript](https://github.com/clojure/clojurescript)** and **[Om](https://github.com/swannodette/om)**, a web client for my **[BirdWatch](http://birdwatch.matthiasnehlsen.com/cljs/#*)** application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to start describing the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :) 
 
 <!-- more -->
+
+Click the screenshot below to see a live version of the application:
+
+<a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="/images/cljs-screenshot.png" /></a>
 
 So my experience. I have been reading articles and books about **[Clojure](http://clojure.org)** for a while and it really does seem to resonate with me. I like this whole **[homoiconicity](http://en.wikipedia.org/wiki/Homoiconicity)** thing. Code and data are basically the same thing and they thus share the same data structures. Code is really data, representing the **[abstract syntax tree (AST)](http://en.wikipedia.org/wiki/Abstract_syntax_tree)** directly. Now my initial reaction to this concept was that it must be rather low-level to do so, but to my surprise the opposite is true with a **[Lisp](http://en.wikipedia.org/wiki/Lisp_(programming_language\))**; you gain a tremendous amount of expressiveness. I also really like that **a)** Clojure introduces **[additional data structures](http://clojure.org/data_structures)** besides the obvious **list**, i.e. Maps, Sets and Vectors and **b)** it is idiomatic to simply use those.
 
