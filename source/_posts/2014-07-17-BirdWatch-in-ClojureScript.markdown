@@ -28,9 +28,9 @@ Some of these changes have made it back into the ReactJS version so far, with th
 
 <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="/images/cljs-screenshot.png" /></a>
 
-Click the image above to give this new client that was written in **ClojureScript** a try. Writing it worked surprisingly well and I have learned a lot in the process. I will write a detailed post about the architecture of the application soon. This being my first application in ClojureScript, I expect that many things can be done much more elegantly. Please let me know about such improvements, should you stumble upon them in the **[source code on GitHub](https://github.com/matthiasn/BirdWatch/tree/master/cljs-om)**. The detailed article about the ClojureScript client for the application will be that much better with your code review.
+Click the image above to give this new client that was written in **ClojureScript** a try. Writing it worked surprisingly well and I have learned a lot in the process. 
 
-Looking forward to your thoughts and suggestions!
+EDIT July 24th, 2014: The **[next article](http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/)** goes into detail on how this application is implemented.
 
 Cheers,
 Matthias

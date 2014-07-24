@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>BirdWatch with ClojureScript and Om explained, Part 1 - Matthias Nehlsen</title>
+  <title>BirdWatch with ClojureScript and Om explained - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="This article is currently Work in Progress Last week I wrote about having written my first actual application using ClojureScript and Om, a web &hellip;">
+  <meta name="description" content="This article is currently Work in Progress. Feedback more than welcome. Thanks! Last week I wrote about having written my first actual application &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">BirdWatch with ClojureScript and Om explained, Part 1</h1>
+      <h1 class="entry-title">BirdWatch with ClojureScript and Om explained</h1>
     
     
       <p class="meta">
@@ -104,69 +104,70 @@
   </header>
 
 
-<div class="entry-content"><p><strong>This article is currently Work in Progress</strong></p>
+<div class="entry-content"><p><strong>This article is currently Work in Progress. Feedback more than welcome. Thanks!</strong></p>
 
-<p><strong><a href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/">Last week</a></strong> I wrote about having written my first actual application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and <strong><a href="https://github.com/swannodette/om">Om</a></strong>, a web client for my <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">BirdWatch</a></strong> application. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to go into part 1 of the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :)</p>
+<p><strong><a href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/">Last week</a></strong> I wrote about having written my first actual application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and <strong><a href="https://github.com/swannodette/om">Om</a></strong>, a web client for my <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">BirdWatch</a></strong> application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to start describing the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :)</p>
 
 <!-- more -->
 
 
-<p>So my experience. I have been reading articles and books about <strong><a href="http://clojure.org">Clojure</a></strong> for a while and it did seem to resonate with me. I like this whole <strong><a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a></strong> thing. Code and data are basically the same thing and they thus share the same data structures. Code is really data, representing the <strong><a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree (AST)</a></strong> directly. Now my initial reaction to this concept was that it must be rather low-level to do so, but to my surprise the opposite is true with a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong>; you gain a tremendous amount of expressiveness. I also really like that <strong>a)</strong> Clojure introduces <strong><a href="http://clojure.org/data_structures">additional data structures</a></strong> besides the obvious <strong>list</strong>, i.e. Maps, Sets and Vectors and <strong>b)</strong> that it is idiomatic to simply use those.</p>
+<p>So my experience. I have been reading articles and books about <strong><a href="http://clojure.org">Clojure</a></strong> for a while and it really does seem to resonate with me. I like this whole <strong><a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a></strong> thing. Code and data are basically the same thing and they thus share the same data structures. Code is really data, representing the <strong><a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree (AST)</a></strong> directly. Now my initial reaction to this concept was that it must be rather low-level to do so, but to my surprise the opposite is true with a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong>; you gain a tremendous amount of expressiveness. I also really like that <strong>a)</strong> Clojure introduces <strong><a href="http://clojure.org/data_structures">additional data structures</a></strong> besides the obvious <strong>list</strong>, i.e. Maps, Sets and Vectors and <strong>b)</strong> it is idiomatic to simply use those.</p>
 
-<p>Sure, there is something to be said about types and how <strong><a href="http://en.wikipedia.org/wiki/Type_safety">type safety</a></strong> makes working on large-scale applications less error-prone. But at the same time I have a hunch that having hundreds of (case) classes complects an application in a way that idiomatic usage of a map does not. Have you seen this before, where you have cascades of only slightly differing data structures, when the next step of a computation adds only a little bit of data and calls that a new thing, modeled as a different something? That can become difficult to reason about, particularly when there are no useful design documents outlining how one morphs into the other.</p>
+<p>Sure, there is something to be said about types and how <strong><a href="http://en.wikipedia.org/wiki/Type_safety">type safety</a></strong> makes working on large-scale applications less error-prone. But at the same time I have a hunch that the presence of hundreds of (case) classes complects an application in a way that idiomatic usage of a map does not. Have you seen this before, where you have cascades of only slightly differing data structures, when the next step of a computation adds only a little bit of data and calls that a new thing, modeled as a different something? That can become difficult to reason about, particularly when there are no useful design documents outlining how one morphs into the other.</p>
 
-<p>But then again I am somewhat afraid of the lack of compile time errors when I call a function with something of a wrong type. So as of now, that is an unsolved question for me. May my endeavor into Clojure and thus Lisp afford me with a more educated opinion on this matter. Against strongly typed systems I have to say that I have seen way too many runtime failures that <strong>a)</strong> the type system and the compiler did not catch and <strong>b)</strong> really came from the application being so incidentally complex that the consequences of changes were by all means hard to grasp even for the most senior team members.</p>
+<p>But then again I am somewhat afraid of the lack of compile time errors when I call a function with something of a wrong type. So as of now, that is an unsolved question for me. May my endeavor into Clojure and thus Lisp afford me with a more educated opinion on this matter. Against strongly typed systems I have to say that I have seen way too many runtime failures that <strong>a)</strong> the type system and the compiler did not catch and <strong>b)</strong> which really came from the application being so incidentally complex that the consequences of changes were by all means (too) hard to grasp even for the most senior team members.</p>
 
-<p>I guess I really need some production experience with Clojure in order to get to a fair and substantial comparison of the different apporaches. But at least this application is a start. And learning a new language has never hurt anyone, I guess.</p>
+<p>I guess I really need some production experience with Clojure in order to get to a fair and substantial comparison of the different approaches. But at least the application I am talking about today is a start. And learning a new language has never hurt anyone, I guess.</p>
 
 <p>So how is this going as an experience so far, you might ask.</p>
 
 <p>Here are my perceived pros:</p>
 
 <ul>
-<li>When crafting functions in Clojure, I just feel more like playing an instrument. It feels more playful.</li>
-<li>Code tends to be short and concise.</li>
-<li>The core of the language is easily understood, at least as far as my limited understanding goes.</li>
-<li>Immutability is great, no more thinking about concurrency issues and mutating state in different places.</li>
-<li>Om uses Facebook&#8217;s ReactJS, a UI rendering library that I have tried out previously and that I am somewhat familiar with.</li>
-<li>Refactoring is fun, I have found spotting repetitive parts among functions and then factoring these parts out into new and shared functions not only easier compared to other languages but also pleasant.</li>
-<li>Maps and sets and, by importing an external library in the case of this application, priority maps are a great thing to have, much nicer than only having JavaScript arrays and objects at your disposal.</li>
-<li>Time and time again I am amazed that replacing an external dependency with a newer version generally seems to work in Clojure. This is the complete opposite of my experience in Scala. I has gotten better over the last year with Scala for sure, but it is nowhere near as smooth as it appears to be with Clojure. Why do you think that is?</li>
+<li>When crafting functions in Clojure, I just feel more like playing an instrument. It feels more <strong>playful</strong>, in a good way.</li>
+<li>Code tends to be <strong>short</strong> and <strong>concise</strong>.</li>
+<li>The core of the language is <strong>easily understood</strong>, at least as far as my limited understanding goes.</li>
+<li><strong>Immutability</strong> is great, I have been a fan of immutable data structures for a while and Clojure makes it relatively hard to work with mutable state, which is good.</li>
+<li><strong>Om</strong> uses Facebook&#8217;s <strong>ReactJS</strong>, a UI rendering library that I have tried out previously and that I am somewhat familiar with.</li>
+<li><strong>Refactoring is fun</strong>, I have found spotting repetitive parts among functions and then factoring these parts out into new and shared functions not only easier compared to many other languages but also pleasant.</li>
+<li><strong>Data structures</strong>: maps and sets and, by importing an external library in the case of this application, priority maps are a great thing to have, much nicer than only having JavaScript arrays and objects at your disposal.</li>
+<li><strong>Replacing external dependencies</strong> with newer versions generally seems to work in Clojure. This is the complete opposite of my experience in Scala, where a new version of pretty much anything oftentimes results in days of work. I has gotten better over the last year with Scala for sure, but it is nowhere near as smooth as it appears to be with Clojure.</li>
+<li>For general data manipulation I already feel I am becoming more <strong>productive</strong> with Clojure compared to JavaScript and <strong><a href="http://underscorejs.org">underscore</a></strong> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.</li>
 </ul>
 
 
 <p>Here are some cons, as well:</p>
 
 <ul>
-<li>As of now, I feel like I can be more productive with plain JavaScript and ReactJS in comparison to Om. This is specific to UI problems, with general data manipulation I feel I am in the process of becoming more productive with Clojure already when compared to JavaScript and <strong><a href="http://underscorejs.org">underscore</a></strong> and definitely more productive than with plain JavaScript <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></li>
-<li>Testing. I have tried out <strong><a href="http://cemerick.com">Chas Emerick</a></strong>&#8217;s <strong><a href="https://github.com/cemerick/clojurescript.test">clojurescript.test</a></strong> and while it seems do do its job alright, I don&#8217;t feel I have fully figured out how to use it. I am using it with the <strong><a href="https://github.com/cemerick/clojurescript.test#using-with-lein-cljsbuild">leiningen test runner</a></strong> and there are two things I find less than pleasing. First, every time I call <em>lein test</em> a full compile is started, even if I have <em>lein cljsbuild auto</em> for the <em>test</em> task running in another terminal window. This seems unnecessary. Am I missing something, maybe watch and re-run the tests automatically when file system changes are detected? Second, the output is plain black and white. How am I supposed to do <strong><a href="http://www.jamesshore.com/Blog/Red-Green-Refactor.html">red-green refactoring</a></strong> with this? But seriously, this might be mostly cosmetic but still I like to see green in my tests as that soothes my mind. When I see red in tests, my alertness level goes up. Black and white output excites none of these emotions. Is there just something wrong with my installation or vision that I don&#8217;t see colors in my test output?</li>
-<li>Performance. The application so far is MUCH slower than the JavaScript counterpart. When processing preloaded tweets, the plain JavaScript version (used in the <strong><a href="http://birdwatch.matthiasnehlsen.com/angular/#/">AngularJS</a></strong> and <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">ReactJS</a></strong> clients) is probably ten times as fast. Click those previous links and see what I mean. The previous tweets are loaded by an Ajax call in chunks of 500 items and loading and processing each chunk takes maybe a second. Now when you open the <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">ClojureScript version</a></strong>, you see that it takes much longer to process the previous items. I suspect keywordizing the JSON when converting a tweet to a Clojure Map could be the problem, but I don&#8217;t know for sure. Please enlighten me and, better yet, suggest a more performant way of ingesting the JSON.</li>
-<li>Application state in a single large map stored in an <strong><a href="http://clojure.org/atoms">atom</a></strong> can be cumbersome, I would not mind having something like objects here and there. I am not terribly happy with this, I have to admit, but it did seem to be what is going on in the Om tutorials. I have looked at <strong><a href="http://stuartsierra.com">Stuart Sierra</a></strong>&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> and it does seem to offer a good approach to compenentizing the application, but I have yet to find the time to try it out.</li>
-<li>Interacting with the state from inside Om is different than interacting with the state atom from other parts of the application. <strong><a href="https://github.com/Prismatic/om-tools">Om-tools</a></strong> seem to be an interesting way around this, will need to give that a try and see if that feels good.</li>
+<li>I don&#8217;t feel I have fully grasped Om yet, despite having worked with ReactJS before.</li>
+<li>Testing. I have tried out <strong><a href="http://cemerick.com">Chas Emerick</a></strong>&#8217;s <strong><a href="https://github.com/cemerick/clojurescript.test">clojurescript.test</a></strong> and while it seems do do its job alright, I don&#8217;t feel I have fully figured out how to use it. I am using it with the <strong><a href="https://github.com/cemerick/clojurescript.test#using-with-lein-cljsbuild">leiningen test runner</a></strong> and there are two things I find less than great. First, every time I call <em>lein test</em>, a full compile is started, even if I have <code>lein cljsbuild auto</code> for the <em>test</em> task running in another terminal window. This seems unnecessary. Am I missing something, maybe there is a way to watch and re-run the tests automatically when file system changes are detected? Second, the output is plain black and white. How am I supposed to do <strong><a href="http://www.jamesshore.com/Blog/Red-Green-Refactor.html">red-green refactoring</a></strong> with this? But seriously, this might be mostly cosmetic but still I like to see green in my tests as that soothes my mind. When I see red in tests, my alertness level goes up. Black and white output excites none of these emotions. Is there just something wrong with my installation or vision that I don&#8217;t see colors in my test output?</li>
+<li>Performance. The application so far is MUCH slower than the JavaScript counterpart ins some areas. When processing preloaded tweets, the plain JavaScript version (used in the <strong><a href="http://birdwatch.matthiasnehlsen.com/angular/#/">AngularJS</a></strong> and <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">ReactJS</a></strong> clients) is probably ten times as fast. Click those previous links and see what I mean. The previous tweets are loaded by an Ajax call in chunks of 500 items and loading and processing each chunk takes maybe a second. Now when you open the <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">ClojureScript version</a></strong>, you see that it takes much longer to process the previous items. I suspect keywordizing the JSON when converting a tweet to a Clojure Map could be the problem, but I don&#8217;t know for sure. Please enlighten me and, better yet, suggest a more performant way of ingesting the JSON.</li>
+<li>Application state in a single large map stored in an <strong><a href="http://clojure.org/atoms">atom</a></strong> can be cumbersome, I would not mind having something like objects or separate services here and there. I have looked at <strong><a href="http://stuartsierra.com">Stuart Sierra</a></strong>&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> and it does seem to offer a good approach to componentizing the application, but I have yet to find the time to try it out.</li>
+<li>Interacting with the state from inside Om is different than interacting with the state atom from other parts of the application. <strong><a href="https://github.com/Prismatic/om-tools">Om-tools</a></strong> seem to be an interesting way around this, will need to give that a try and see how that works.</li>
 </ul>
 
 
-<p>By the way, regarding performance, I have seen the same problems with my naïve Scala.js approach before. I have not played around with that one again yet ever since my first attempt back in January. That is mostly for the lack of a ReactJS binding that is anywhere near as complete as Om. I&#8217;ll be happy to give it a try again once ReactJS support is better.</p>
+<p>By the way, regarding performance, I have seen the same problems with my naïve Scala.js approach before. I have not played around with that one again since my first attempt back in January. That is mostly for the lack of a ReactJS binding that is anywhere near as complete as Om. I&#8217;ll be happy to give it a try again once ReactJS support is better.</p>
 
 <h1>Introduction to Clojure</h1>
 
-<p>First of all, you will need to understand a few very basic things about Clojure being a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong> <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. Feel free to skip this section if you know the basics already. I hope you will be able to follow along even if you&#8217;ve never tried Clojure or a Lisp before. So the basic idea in a Lisp is the List (no wonder, as Lisp stands for List Programming), a <strong><a href="http://en.wikipedia.org/wiki/Singly_linked_list#Singly_linked_lists">singly linked list</a></strong>, to be precise. This list can hold both code and data. Let&#8217;s see how that looks like. You can try these examples out using the <strong><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">REPL</a></strong> in <strong><a href="http://leiningen.org">Leiningen</a></strong> by running <code>lein repl</code> from your command line.</p>
+<p>First of all, you will need to understand a few very basic things about Clojure being a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong> <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. Feel free to skip this section if you know Clojure already. My aim is for you to be able to follow along even if you&#8217;ve never tried Clojure or a Lisp before. So the basic idea in a Lisp is the List (no wonder, as Lisp stands for List Programming), a <strong><a href="http://en.wikipedia.org/wiki/Singly_linked_list#Singly_linked_lists">singly linked list</a></strong>, to be precise. This list can hold both code and data. Let&#8217;s see how that looks like. You can try these examples out using the <strong><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">REPL</a></strong> in <strong><a href="http://leiningen.org">Leiningen</a></strong> by running <code>lein repl</code> from your command line.</p>
 
 <p>This is an empty list: <code>()</code> It evaluates to itself.</p>
 
-<p>When the list is not empty, the first item in the list will be evaluated: <code>(some-function "a" "b")</code>
-Here, <em>some-function</em> will be called with the two arguments &#8220;a&#8221; and &#8220;b&#8221;. Example <code>(print "Hello World!")</code> Sweet, that&#8217;s all there is to <strong><a href="http://en.wikipedia.org/wiki/Hello_world_program">Hello World</a></strong>.</p>
+<p>When the list is not empty, the first item in the list will be evaluated as a function: <code>(some-function "a" "b")</code>
+Here, <em>some-function</em> will be called with the two arguments &#8220;a&#8221; and &#8220;b&#8221;. Example <code>(print "Hello World!")</code> Sweet, that is all there is to <strong><a href="http://en.wikipedia.org/wiki/Hello_world_program">Hello World</a></strong>.</p>
 
-<p>The first item in a list has to implement the <em>IFn</em> interface meaning it must be possible to call the item as a function. Try this: <code>("a" "b")</code>. Not surprisingly, the string &#8220;a&#8221; is not a function, causing this to fail. You can however <strong>quote</strong> the list to prevent evaluation, like this: <code>'("a" "b")</code>. Now we can use the list to store items without the first one being implemented.</p>
+<p>The first item in a list has to implement the <em>IFn</em> interface meaning it must be possible to call the item as a function. Try this: <code>("a" "b")</code>. Not surprisingly, the string &#8220;a&#8221; is not a function, causing this to fail. You can however <strong>quote</strong> the list to prevent evaluation, like this: <code>'("a" "b")</code>. Now we can use the list to store items without the first one being evaluated.</p>
 
-<p>Luckily, Clojure also has a <strong>vector</strong> which is best compared to an array. You can use it in place of a quoted list, and in fact it is idomatic to do so when you do not want the first item evaluated. Example <code>[1 2 3]</code></p>
+<p>Conveniently, Clojure also has a <strong>vector</strong> which comparable to an array. You can use it in place of a quoted list, and in fact it is idomatic to do so when we do not want the first item evaluated. Example <code>[1 2 3]</code></p>
 
-<p>When you want to name something, you have different ways of doing so. The first one is <em>def</em>, you can use this to name stuff in the top level of a namespace. Example <code>(def foo [1 2 3])</code> This creates a vector named <em>foo</em> which you can then refer to from elsewhere. After typing in the previous example, you will see that now you can just type <code>foo</code> in the REPL and get the vector we have defined previously.</p>
+<p>When you want to name something, you have different ways of doing so. The first one is <strong>def</strong>, you can use this to name stuff in the top level of a namespace. Example <code>(def foo [1 2 3])</code> This creates a vector named <em>foo</em> which you can then refer to from elsewhere. After typing in the previous example, you will see that now you can just type <code>foo</code> in the REPL and get the vector we have defined previously.</p>
 
-<p>Or you can use the <strong>let-binding</strong> to name things locally, for example inside a function body, like so <code>(let [foo [1 2 3]])</code> Here, you can only refer to <em>foo</em> inside form. Let&#8217;s use <em>foo</em>: <code>(let [foo [1 2 3]] (print foo))</code> You should see the vector being printed in your REPL.</p>
+<p>Or you can use the <strong>let-binding</strong> to name things locally, for example inside a function body, like so <code>(let [bar [1 2 3]])</code> Here, you can only refer to <em>bar</em> inside the let form, meaning inside the pair of braces that enclose the let form. Let&#8217;s use <em>bar</em>: <code>(let [bar [1 2 3]] (print bar))</code> You should see the vector being printed in your REPL.</p>
 
-<p>Functions can be defined as follows: <code>(fn [a] (+ a 1))</code> with this, we have defined a function that adds 1 to the specified argument.
-You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</code> Remember, the first item in a list will be evaluated, and this happens to be the function we just defined. However, this is a little clumsy. We can also store the function in a def: <code>(def add-one (fn [a] (+ a 1)))</code> now we can call the function, like so <code>(add-one 2)</code>.</p>
+<p>Functions can be defined as follows: <code>(fn [a] (+ a 1))</code> with this, we have defined a function that adds 1 to the provided argument.
+You can use the above as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</code> Remember, the first item in a list will be evaluated, and this happens to be the anonymous function we just defined. However, this can be a little clumsy. We can also store the function in a def: <code>(def add-one (fn [a] (+ a 1)))</code> now we can call the function, like so <code>(add-one 2)</code>.</p>
 
 <p>However, this can even be simpler using the <strong>defn macro</strong>, like so: <code>(defn add-one [a] (+ a 1))</code></p>
 
@@ -176,11 +177,11 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 
 <h1>Application architecture</h1>
 
-<p>Let us now have a look at the implementation details <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+<p>Let us now have a look at the implementation of the BirdWatch client <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
 
-<p>The most important part to understand is that the application state lives in one large <strong><a href="http://clojure.org/atoms">atom</a></strong>. When the application is started, this atom is populated with the return of a function that returns a map representing a clean slate. Here is how that looks like:</p>
+<p>The most important part to understand is that the application state lives in one large <strong><a href="http://clojure.org/atoms">atom</a></strong>. When the application is started, this atom is populated with the return of a function that returns a map representing a clean slate. Here is how that function looks like:</p>
 
-<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/util.cljs'>util.cljs</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/util.cljs'>util.cljs (Lines 72 to 83)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -217,11 +218,11 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>All the keys in this map are <strong><a href="http://clojure.org/data_structures#Data%20Structures-Keywords">keywords</a></strong>. Keywords have the great property that we can use them as functions that take a map as an argument and that then return the value for this key. We will see that in action below.</p>
+<p>All the keys in this map are <strong><a href="http://clojure.org/data_structures#Data%20Structures-Keywords">keywords</a></strong>. Keywords have the great property that we can use them as functions that take a map as an argument and that then return the value for this key. We will see that in action further below.</p>
 
 <p>Upon startup of the application, the function above is called for populating the state atom:</p>
 
-<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 13 to 16)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 13 to 16)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -232,15 +233,15 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then the reference to this <strong><a href="http://clojure.org/atoms">atom</a></strong> is passed around, which is dereferenced wherever a change occurs and then updated back into the atom. It is important to note that clojure data structures are immutable. Immutability guarantees that you can pass data structures around without having to worry that whoever you pass it to might change the data. State changes only can only happen inside a transaction, a new and altered version of the state is passed back. The transaction part would also mean that no other process could alter state at the same time, in that case the later transaction would be retried when the first one has succeeded. This would be particularly useful when running in a multithreaded environment. However, the JavaScript code resulting from the ClojureScript compilation process runs in a single threaded event loop. In that environment, there&#8217;s only ever one thing happening at the same time anyway.</p>
+<p>Then the reference to this <strong><a href="http://clojure.org/atoms">atom</a></strong> is passed around. When an update is desired, the map is dereferenced, an updated version is created using some function call and the result is then written back into the atom using a transaction. It is important to note that clojure data structures are immutable. Immutability guarantees that you can pass data structures around without having to worry that whoever you pass it to might change the data. Data also does not become invalid. Instead, whatever version in time you get a hold on does represent the definite state at the time that version was created. State changes only can only happen inside a transaction, in which a new and altered version of the state is passed back. The transaction part would also mean that no other process could alter state at the same time, in that case the later transaction would be retried until the first one has succeeded. This would be particularly useful when running in a multithreaded environment. However, the JavaScript code resulting from the ClojureScript compilation process runs in a single threaded event loop so there&#8217;s only ever one thing happening at the same time anyway. On the server side this property becomes more valuable, still.</p>
 
-<p>Using this map generated from a helper function makes it trivial to reset the application state at a later point <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, we can simply swap the current state with the clean slate map.</p>
+<p>Having a function that provides an initial, clean state makes it trivial to reset the application state at a later point <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, we can simply swap the current state with the clean slate map.</p>
 
 <h2>Ingesting tweets</h2>
 
-<p>Tweets get into the system for further analysis in two ways. First, there is a Server Sent Event stream continously delivering new matches to a query, with low latency (typically around a second between sending tweet and having it show up in the application). Then also previous tweets are loaded. Both are triggered in the <strong>start-search</strong> function:</p>
+<p>Tweets get into the system for further analysis in two ways. First, there is a Server Sent Event stream continously delivering new matches to a query, with low latency (typically around a second between tweeting and having the tweet show up in the application). Then also previous tweets are loaded. Both are triggered in the <strong>start-search</strong> function:</p>
 
-<figure class='code'><figcaption><span>start-search function</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 47 to 57)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>start-search function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 49 to 59)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -265,15 +266,15 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Let us go through this line by line. The <strong>defn</strong> macro denotes a function named start-search which takes two arguments, <em>app</em> for a reference to the application state and <em>tweets-chan</em>, a channel where to put tweets. Channels are building blocks in <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. We will get to that in a little bit, for now just think about a channel as a conveyor belt onto which one part of the application puts data. On the other end, another part of the application picks up the data, but the sender does not need to know about it. Broadly speaking, it is a sweet way to decouple an application.</p>
+<p>Let us go through this line by line. The <strong>defn</strong> macro denotes a function named <em>start-search</em> which takes two arguments, <em>app</em> for a reference to the application state and <em>tweets-chan</em>, a channel where to put tweets. Channels are building blocks in <strong><a href="https://github.com/clojure/core.async">core.async</a></strong>. We will get to that in a little bit, for now just think about a channel as a conveyor belt onto which one part of the application puts data. On the other end, another part of the application picks up the data, but the sender does not need to know about it. Broadly speaking, it is a sweet way to decouple parts of an application.</p>
 
 <p>In the next line there is the description of the function, followed by a <strong><a href="http://clojure.org/special_forms#binding-forms">let binding</a></strong> where we declare first two local immutable values, both of which are available for the remainder of the function. The first one, <em>search</em>, retrieves the value for the key <em>:search-text</em> in the application state. <em>@app</em> dereferences the application state, giving us an immutable copy of the current app state. <code>(:search-text @app)</code> will run the keyword as a function with the state map as an argument, returning the value in the map. Next we declare <em>s</em> whose value can take two paths as decided by the <strong><a href="http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?)">if special form</a></strong>. The if form consists of three parts. There is a test: <code>(= search "")</code>. Not surprisingly at this point, <strong>=</strong> is a function that evaluates if the arguments passed to it are equal, returning either true or false. The <strong>if</strong> form then either returns the expression right after the test if the test evaluated to <em>true</em> or the subsequent one if it evaluated to <em>false</em>. What we are doing here is simply replacing an empty string with an asterisk or otherwise just taking the search string.</p>
 
-<p>Next, we close a previous Server Sent Event stream, should one exist. This is only required when resetting the application state as on initial startup the value for the <em>:stream</em> key will be nil. Then we reset the application state by replacing it with a clean state. Then we swap the value for the <em>:search</em> key with out local value <em>s</em>. Then we set the location hash to represent a URI encoded version of the search string.</p>
+<p>Next, we close a previous Server Sent Event stream, should one exist. This is only required when resetting the application state as on initial startup the value for the <em>:stream</em> key will be nil. Then we reset the application state by replacing it with a clean state. Then we swap the value for the <em>:search</em> key with the content of the local value <em>s</em>. Then we set the location hash to represent a URI encoded version of the search string.</p>
 
-<p>In the next line, we create a new EventSource object for the live stream of tweets and store it under the <em>:stream</em> key, to which we attach a function as an event listener. We are using an anonymous function literal here because the <em>receive-sse</em> function takes two arguments (a channel and an event from the EventSource object) whereas the event listener requires a function that only takes a single argument. Then finally we call <em>ajax/prev-search</em> with 5 chunks of 500 results each, but we will look at that later. Let us for now focus on the <em>receive-sse</em> function:</p>
+<p>In the next line, we create a new EventSource object for the live stream of tweets and store it under the <em>:stream</em> key, to which we next attach a function as an event listener. We are using an anonymous function literal here because the <em>receive-sse</em> function takes two arguments (a channel and an event from the EventSource object) whereas the event listener requires a function that only takes a single argument. Then finally we call <em>ajax/prev-search</em> with 5 chunks of 500 results each, but we will look at that later. Let us for now focus on the <em>receive-sse</em> function:</p>
 
-<figure class='code'><figcaption><span>receive-sse function</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 42 to 45)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>receive-sse function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 44 to 47)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -284,13 +285,13 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This is a function with two arguments, a channel and an event. In the <strong>let-binding</strong>, the event is parsed into a tweet. This reads inside out: 1) get event data 2) parse JSON into JavaScript object 3) convert JavaScript object into a Clojure(Script) Map. Note that for the conversion into a Clojure Map we can automatically have the keys converted into keywords using <em>:keywordize-keys true</em>. This is convenient as we can use the keywords as functions later for retrieving values for the respective key. Then the <em>tweet</em> from the let binding is <em>put!</em> onto the <em>tweets-chan</em>, this aforementioned conveyor belt.</p>
+<p>This is a function with two arguments, a channel and an event. In the <strong>let-binding</strong>, the event is parsed into a tweet. This reads inside out: <strong>1)</strong> get event data <strong>2)</strong> parse JSON into a JavaScript object <strong>3)</strong> convert the JavaScript object into a Clojure(Script) Map. Note that for the conversion into a Clojure Map we can automatically have the keys converted into keywords using <em>:keywordize-keys true</em>. This is convenient as we can use the keywords as functions later for retrieving values for the respective key. Then the <em>tweet</em> from the let binding is <em>put!</em> onto the <em>tweets-chan</em>, representing the aforementioned conveyor belt where we do not need to worry about who picks up the items on the other end.</p>
 
-<p>Now is a good time to talk a little more about those channels. Channels are brought to Clojure by importing the <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong> library. <strong>Core async</strong> is modeled after channels in the <strong><a href="http://golang.org">Go programming language</a></strong>, which implements <strong><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">Communicating Sequential Processes</a></strong> or <strong>CSP</strong> for short. You really should watch <strong><a href="http://www.infoq.com/presentations/clojure-core-async">Rick Hickey&#8217;s talk about core.async</a></strong> now if you haven&#8217;t already.</p>
+<p>Now is a good time to talk a little more about those channels. Channels are brought to Clojure by importing the <strong><a href="https://github.com/clojure/core.async">core.async</a></strong> library. <strong>Core async</strong> is modeled after channels in the <strong><a href="http://golang.org">Go programming language</a></strong>, which implement <strong><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">Communicating Sequential Processes</a></strong> or <strong>CSP</strong> for short. You really should watch <strong><a href="http://www.infoq.com/presentations/clojure-core-async">Rick Hickey&#8217;s talk about core.async</a></strong> now if you haven&#8217;t already. The same goes for this talk from 2012 by Rob Pike, who played a key role in the development of Go: <strong><a href="https://www.youtube.com/watch?v=f6kdp27TYZs">Go Concurrency Patterns</a></strong>.</p>
 
 <p>I am really only scratching the surface of what can be achieved with CSP, but it does seem like a useful abstraction to decouple parts of an application. Besides the aforementioned <em>tweets-chan</em> there is also a channel for previous tweets, those that are retrieved using Ajax calls (we will cover that part next):</p>
 
-<figure class='code'><figcaption><span>Channels</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 37 to 44)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Channels</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 37 to 44)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -313,7 +314,7 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 
 <p>Before looking at the <em>tweets</em> namespace, let us have a quick look at the ajax call performed in the <em>start-search</em> function above:</p>
 
-<figure class='code'><figcaption><span>Ajax</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/ajax.cljs'>core.cljs (lines 35 to 40)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>prev-search</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs'>ajax.cljs (lines 35 to 40)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -332,7 +333,7 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 
 <p>The query itself is generated by the <em>query</em> function in the same namespace:</p>
 
-<figure class='code'><figcaption><span>Ajax</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/ajax.cljs'>core.cljs (lines 19 to 23)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Ajax</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs'>ajax.cljs (lines 19 to 23)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -349,7 +350,7 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 
 <p>Then finally as an event handler there is an anonymous function literal putting the result onto another channel for the Ajax results:</p>
 
-<figure class='code'><figcaption><span>Ajax results channel and Go Loop</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/ajax.cljs'>core.cljs (lines 11 to 17)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>Ajax results channel and Go Loop</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs'>ajax.cljs (lines 11 to 17)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -366,11 +367,11 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Above, the JSON for each item on the channel is parsed into a Clojure(Script) data structure, where <em>parsed</em> is a vector. Then, each item in that vector is put! onto the prev-tweets-chan. Rather, the value for the <em>:_source</em> key is used here as that is where ElasticSearch stores the original item. One thing to note here is the usage of a <strong><a href="https://clojure.github.io/core.async/#clojure.core.async/timeout">timeout</a></strong> roughly every 200 tweets. I have introduced this in order to occasionally return control to the <strong><a href="http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/">JavaScript Event Loop</a></strong> so that a) the UI gets rendered and b) the event listener for tweets from the Server Sent Event stream can do its thing. Otherwise, the application just appears to halt until all previous tweets are processed, which is really annoying. But this seems rather hacky, I would be really curious about solving this problem more elegantly.</p>
+<p>Above, the JSON for each item on the channel is parsed into a Clojure(Script) data structure, where <em>parsed</em> is a vector. Then, each item in that vector is <em>put!</em> onto the <em>prev-tweets-chan</em>. Rather, the value for the <em>:_source</em> key is used here as that is where ElasticSearch stores the original item. One thing to note here is the usage of a <strong><a href="https://clojure.github.io/core.async/#clojure.core.async/timeout">timeout</a></strong> roughly every 200 tweets. I have introduced this in order to occasionally return control to the <strong><a href="http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/">JavaScript Event Loop</a></strong> so that <strong>a)</strong> the UI gets rendered and <strong>b)</strong> the event listener for tweets from the Server Sent Event stream can do its thing. Otherwise, the application just appears to halt until all previous tweets are processed, which is really annoying. But this seems rather hacky, I would be really curious about solving this problem more elegantly.</p>
 
 <p>With the preloading of tweets using Ajax calls covered, we can now proceed to the processing of tweets inside the <em>tweets</em> namespace. As we have seen before with the go loop alternating between channels, <em>add-tweet</em> is called for each tweet coming into the application:</p>
 
-<figure class='code'><figcaption><span>add-tweet function</span><a href='https://github.com/matthiasn/BirdWatch/blob/4eb23097ef0e375a5e69c3164cb39167f82c12f3/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 31 to 40)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>add-tweet function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 33 to 42)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -393,15 +394,34 @@ You can use it as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</c
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>First of all, for each new tweet, the counter inside the application state is swapped with the number incremented by one. Then, <strong>add-to-tweets-map</strong> is called (described below), which as the name suggests adds the current tweet to the map that is found under the <em>:tweets-map</em> key in the application state. Before being added, each tweet is also processed, in that step for example user mentions and links are replaced with the correct HTML representation.</p>
+<p>First of all, for each new tweet, the counter inside the application state is swapped with the number incremented by one. Then, <em>add-to-tweets-map</em> is called (described below), which as the name suggests adds the current tweet to the map that is found under the <em>:tweets-map</em> key in the application state. Before being added, each tweet is also processed; in that step for example user mentions and links are replaced with the correct HTML representation.</p>
 
 <p>For a better understanding: the application allows displaying the tweets in different sort orders. Priority maps are used for maintaining the sort order. These priority maps contain nothing more than the ID of the tweet and whatever that specific map is sorted on, i.e. the number of followers. The full tweets are stored in one map with the ID of a tweet as the key and the tweet itself as the value. For displaying a sorted list of tweets in the UI, a sorted vector from the priority map is mapped by looking up each item in <em>:tweets-map</em> and using that item instead of the sorted value.</p>
+
+<p>Here is how a tweet is added to the application state:</p>
+
+<figure class='code'><figcaption><span>add-to-tweets-map function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 11 to 15)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">add-to-tweets-map</span> <span class="p">[</span><span class="nv">app</span> <span class="nv">tweets-map</span> <span class="nv">tweet</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;adds tweet to tweets-map&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span>
+</span><span class='line'>         <span class="nv">assoc-in</span> <span class="p">[</span><span class="nv">tweets-map</span> <span class="p">(</span><span class="nb">keyword </span><span class="p">(</span><span class="ss">:id_str</span> <span class="nv">tweet</span><span class="p">))]</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">util/format-tweet</span> <span class="nv">tweet</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The function above takes the application state, the keyword under which the tweets-map can be found in the application state and a tweet to be added. It then swaps the application state with a new version into which the tweet is added after undergoing the <em>format-tweet</em> treatment. Note that <em>assoc-in</em> takes a vector that describes the path to the item being added or changed. The string representation of the tweet ID is converted to a keyword so that it can be used as a functionfor lookup later (as previously described). As an example, let&#8217;s say we have a tweet with ID string &#8220;12345&#8221;, then the path passed to <em>assoc-in</em> looks like this: [:tweets-map :12345]. Afterwards, the map stored under the <em>:tweets-map</em> key will have a new key <em>:12345</em> with the formatted tweet as the associated value. A call to this function will also replace an already existing item.</p>
 
 <p><strong>TO BE CONTINUED</strong></p>
 
 <h1>Summary</h1>
 
-<p>Overall I find working with Clojure(Script) quite pleasant. However I still need to understand how to better structure an application as I am not completely happy with the current architecture yet. But that will hopefully improve.</p>
+<p>Overall I find working with Clojure(Script) and Om pleasant. Working and thinking in Clojure is a lot of fun. I have heard many people complain about all the parentheses in Lisp but I do not share that sentiment. Quite the opposite, I find that <strong><a href="http://en.wikipedia.org/wiki/S-expression">s-expressions</a></strong> and the associated <strong><a href="http://en.wikipedia.org/wiki/Polish_notation">prefix notation</a></strong> add a lot of clarity without having to learn any additional, language-specific rules.</p>
+
+<p>However I still need to understand how to better structure an application in Clojure(Script). I am not completely happy with the current architecture of the application described in this post yet. But that will hopefully improve.</p>
 
 <p>Please comment and suggest any improvement you can think of, including typos and difficult to understand sentences. This is a work in progress, and a rather early draft at that. Any help is certainly welcome.</p>
 
@@ -451,7 +471,7 @@ Matthias</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/" >Tweet</a>
   
 
   
@@ -509,7 +529,7 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/07/24/BirdWatch-in-ClojureScript-1/">BirdWatch with ClojureScript and Om explained, Part 1</a>
+        <a href="/blog/2014/07/24/birdwatch-cljs-om/">BirdWatch with ClojureScript and Om explained</a>
       </li>
     
       <li class="post">
@@ -588,8 +608,8 @@ Matthias</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/07/24/BirdWatch-in-ClojureScript-1/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/';
         var disqus_script = 'embed.js';
       
     (function () {
