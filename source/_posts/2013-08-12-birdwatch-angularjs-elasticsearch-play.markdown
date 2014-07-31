@@ -37,3 +37,7 @@ In the future I will probably write some articles that further explain different
 
 Alright, this is it for today. Until next time.
 Matthias
+
+Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. **Thank you!** Your support will allow me to write more articles like this one.
+
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
