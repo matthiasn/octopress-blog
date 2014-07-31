@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-07-31T04:40:54+02:00</updated>
+  <updated>2014-07-31T04:42:06+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,94 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Monetizing a blog with Amazon Affiliate Links]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links/"/>
+    <updated>2014-07-30T17:44:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links</id>
+    <content type="html"><![CDATA[<p>It has been around 15 months since I wrote my first blog post. And I like writing these articles a lot, particularly the long one. I just constantly find that I do not have enough time for it. It should be immediately obvious when you for example look at <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a></strong> that writing and developing something like this is not doable with an hour a week or so. So I wondered what it would take to have the blog buy me some more time to focus on it.
+From the number of visitors that I am seeing, it should be possible to make some money off of <strong><a href="https://affiliate-program.amazon.com/gp/associates/join/landing/main.html">Amazon affiliate links</a></strong>, which in return would afford me to work less on other things and more on the blog.</p>
+
+<!-- more -->
+
+
+<p>Now affiliate links seem particularly suitable when the majority of visitors come from a single country. Otherwise there need to be different links for people from different countries, or you lose the commission. At the point of this writing, there are 11 Amazon storefronts world-wide, and you need to be an affiliate in each one where you have a significant amount of users. Have you ever seen pages with 11 different national flags with links to the different stores? Thanks but no thanks, that is not really not an option for me.</p>
+
+<p>I have looked into two readily available commercial options, <strong><a href="http://affiliate-geo-target.com/amazon.html">A-FWD</a></strong> and <strong><a href="http://www.georiot.com/home">Georiot</a></strong>, both addressing the geo-fragmentation problem. They both have monetization strategies of different complexity. They have in common that both take a certain amount of visitors away by assigning their affiliate IDs in a share of visits instead of yours.</p>
+
+<p>I have not evaluated one against the other as I am more interested in implementing this myself. That way, I have more to write about and get to start another open source project. So what do I need to do? I need a reactive web application hosting the links for me for example as <strong>http://r.matthiasnehlsen.com/amzn/ProductID</strong>. Then, when a visitor clicks a link, a GeoIP lookup is performed and, based on the resulting country, the proper store is chosen if it so happens that an Amazon store is assigned for the country where the visitor is from, and the US store as a default when there is no store in that country.</p>
+
+<p>Let us build this application in a simple form from scratch. I can see how a web application for managing links with realtime dashboards showing visitors can be useful at some later point. But for today I am focusing a very simple scenario possible and that is delivering a country specific slide show. I have created one for the US store with some books I have found useful:</p>
+
+<SCRIPT charset="utf-8" type="text/javascript" src="http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&MarketPlace=US&ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&Operation=GetScriptTemplate"> </SCRIPT>
+
+
+<p> <NOSCRIPT><A HREF="http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&MarketPlace=US&ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&Operation=NoScript">Amazon.com Widgets</A></NOSCRIPT></p>
+
+<p>Here&#8217;s the source code from Amazon:</p>
+
+<figure class='code'><figcaption><span>Amazon Script </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;SCRIPT</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span> <span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src=</span><span class="s">&quot;http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;MarketPlace=US&amp;ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&amp;Operation=GetScriptTemplate&quot;</span><span class="nt">&gt;&lt;/SCRIPT&gt;</span>
+</span><span class='line'><span class="nt">&lt;NOSCRIPT&gt;&lt;A</span> <span class="na">HREF=</span><span class="s">&quot;http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;MarketPlace=US&amp;ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&amp;Operation=NoScript&quot;</span><span class="nt">&gt;</span>Amazon.com Widgets<span class="nt">&lt;/A&gt;&lt;/NOSCRIPT&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above is really nothing more than a script tag with some JavaScript to run which will then display the slideshow.</p>
+
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
+
+
+<p>How can I make</p>
+
+<p> a link leads the visitor to the Amazon storefront of the respective country, should it exist, and otherwise to the amazon.com website. At this point no products will be linked, that can come next, right now it will only be a redirect to Amazon store itself. Then later in the article I will ask you if you want to support this blog by clicking on the link before you intend to purchase something within the next 24 hours. That would really help supporting this blog. Actually, let&#8217;s do that now and later:</p>
+
+<p>Please support this blog through the Amazon affiliate link program so I have more time to write articles like this one.</p>
+
+<p>&#8212;->> set up my Amazon page with list of favorite books and stuff?
+- Books
+- MacBook Retina
+- Sony Cam</p>
+
+<ul>
+<li>Start photography sub page soon, focusing on manual focus lenses in front of Sony A7</li>
+</ul>
+
+
+<p>Now let us get technical and implement this application from scratch.</p>
+
+<h2>Setting up local MaxMind GeoIP database?</h2>
+
+<pre><code>play new amazn-geo-defragmenter
+
+play idea or play intellij
+</code></pre>
+
+<p>edit routes to include amzn link</p>
+
+<p>add controller action that performs the GeoIP lookup</p>
+
+<p>At some later point I also want to be able to link to books and cool stuff directly as I write about these items, but that is not a problem to solve today.</p>
+
+<p>This is it for today. As usual, please share this article if you find it useful. Certainly also let me know if you have additional questions. I&#8217;m happy to help. You can also get a little more involved in supporting this blog by clicking this Amazon affiliate link before you intend to make a purchase. A small portion of the sales will then contribute to running this blog. In return I will be able to write more articles like this one.</p>
+
+<p>Cheers,
+Matthias</p>
+
+<p>http://www.associateprograms.com/articles/pat-flynn-interview-50k-a-month-affiliate.html
+Seven Seven Seven Strategy</p>
+
+<p>http://www.associateprograms.com/articles/geo-targeting-service-solves-amazon-associates-problem.html</p>
+
+<p>http://www.mywritingblog.com/2013/11/georiot-alternative-to-fwd-for-creating.html</p>
+
+<p>http://www.playframework.com/documentation/2.0/ScalaActions</p>
+
+<hr />
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[BirdWatch with ClojureScript and Om explained]]></title>
@@ -3974,133 +4062,6 @@ Room 3.11, 16:30 - 17:15</p>
 <p>In the next couple of days I will write about presentations and topics I found particularly inspiring.</p>
 
 <p>-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Scaling Play applications with ZeroMQ]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/"/>
-    <updated>2013-06-02T07:48:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq</id>
-    <content type="html"><![CDATA[<p>Let us assume for a second that the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It would work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed. How do we connect these separate parts of the application though?</p>
-
-<!-- more -->
-
-
-<p>One possible approach is using an HTTP stream between the parts as well, basically using the TwitterClient application as a hub for delivering the Twitter stream to multiple instances as needed. While this works, it is not an elegant solution: how do I handle reconnects? How do I even detect them? I&#8217;d rather not deal with this.</p>
-
-<p>An Akka cluster should work. This approach seems more promising, as all the messaging elements are already there. But this does not offer the best possible flexibility, as it requires all participants to use Akka / the JVM / the same version of Scala. I&#8217;d rather not limit myself to one technology stack if not absolutely necessary.</p>
-
-<p>I would prefer a solution that is completely agnostic of the technology each building block of the whole application uses. I might want to run statistics using <strong><a href="http://www.numpy.org">numpy</a></strong> in the future or whatever. This should be possible without much glue code. HTTP is obviously technology independent but it falls short due to the reconnect issues.</p>
-
-<p>Turns out there is a great solution for polyglot applications: <strong><a href="http://www.zeromq.org/">ZeroMQ</a></strong>, a socket toolbox offering bindings for <strong><a href="http://zguide.zeromq.org/page:all">30+ languages</a></strong>. Unlike broker-centered JMS or RabbitMQ, ZeroMQ is a messaging library, not a full messaging solution. There are no brokers; instead we get access to TCP sockets (fast) that we can use to build complex communication patterns. I cannot say it any better than this:</p>
-
-<blockquote><p>What ZeroMQ does is create an API that looks a lot like sockets, and feels the same, but gives you the messaging styles you actually want. By simply specifying the type of socket when you call zmq_socket you can have multicast, request/reply, and many other styles.</p><footer><strong>Zed Shaw on ZeroMQ</strong> <cite><a href='http://www.zeromq.org/intro:read-the-manual'>www.zeromq.org/&hellip;</a></cite></footer></blockquote>
-
-
-<p>Please check out these articles for more in-depth information about ZeroMQ:</p>
-
-<ul>
-<li><strong><a href="http://nichol.as/zeromq-an-introduction">ZeroMQ an introduction, by Nicholas Piël</a></strong></li>
-<li><strong><a href="http://www.igvita.com/2010/09/03/zeromq-modern-fast-networking-stack/">ZeroMQ: Modern &amp; Fast Networking Stack, by Ilya Grigorik</a></strong></li>
-<li><strong><a href="http://www.josetteorama.com/zeromq/">The Appeal and Controversy of ZeroMQ, by Pieter Hintjens</a></strong></li>
-</ul>
-
-
-<p>Let us put ZeroMQ to practical use. First thing to do is to install ZeroMQ. One thing to note is that the current Scala bindings require ZeroMQ version 2. On a Mac with homebrew installed you can do this (or refer to the <strong><a href="http://www.zeromq.org/area:download">ZeroMQ instructions</a></strong>):</p>
-
-<figure class='code'><figcaption><span>Installing ZeroMQ (Mac) </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>brew install zeromq
-</span><span class='line'>brew switch zeromq 2.2.0
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>For demonstration purposes I will publish and consume all messages from within the same application. I&#8217;m actually working on a more sophisticated version of the BirdWatch application that uses ZeroMQ between different applications running in separate JVMs, but more about that another time. For now I will split the TwitterClient class into separate TweetsPublisher and TweetsConsumer classes within the same application and let them communicate using ZeroMQ publish/subscribe topics. Check out this <strong><a href="https://github.com/matthiasn/BirdWatch/tree/130602-ZeroMQ">branch</a></strong> on GitHub.</p>
-
-<figure class='code'><figcaption><span>TweetsPublisher</span><a href='https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala'>TweetsPublisher.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** ZeroMQ Publishing Socket (clients attach to this). Specify IP </span>
-</span><span class='line'><span class="cm"> *  address or use *:PORT if you want this open to outside world.</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="k">val</span> <span class="n">tweetPubSocket</span> <span class="k">=</span> <span class="nc">ZeroMQExtension</span><span class="o">(</span><span class="n">system</span><span class="o">).</span><span class="n">newSocket</span><span class="o">(</span><span class="nc">SocketType</span><span class="o">.</span><span class="nc">Pub</span><span class="o">,</span>
-</span><span class='line'>  <span class="nc">Bind</span><span class="o">(</span><span class="s">&quot;tcp://127.0.0.1:21231&quot;</span><span class="o">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** Send message to socket (yes, it is that simple)*/</span>
-</span><span class='line'><span class="n">tweetPubSocket</span> <span class="o">!</span> <span class="nc">ZMQMessage</span><span class="o">(</span><span class="nc">Seq</span><span class="o">(</span><span class="nc">Frame</span><span class="o">(</span><span class="s">&quot;birdwatch.tweets&quot;</span><span class="o">),</span> <span class="nc">Frame</span><span class="o">(</span><span class="n">json</span><span class="o">.</span><span class="n">toString</span><span class="o">)))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span>TweetsConsumer</span><a href='https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsConsumer.scala'>TweetsConsumer.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Actor listening to Tweets socket */</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">TweetsListener</span> <span class="k">extends</span> <span class="nc">Actor</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">receive</span><span class="k">:</span> <span class="kt">Receive</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">case</span> <span class="n">m</span><span class="k">:</span> <span class="kt">ZMQMessage</span> <span class="o">=&gt;</span> <span class="o">{</span>
-</span><span class='line'>      <span class="cm">/** payload is Array[Byte], make String and parse into JSON*/</span>
-</span><span class='line'>      <span class="k">val</span> <span class="n">chunkString</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">String</span><span class="o">(</span><span class="n">m</span><span class="o">.</span><span class="n">payload</span><span class="o">(</span><span class="mi">1</span><span class="o">),</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">)</span>
-</span><span class='line'>      <span class="k">val</span> <span class="n">json</span> <span class="k">=</span> <span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>      <span class="cm">/** read into Tweet case class representation, push onto channel */</span>
-</span><span class='line'>      <span class="nc">TweetReads</span><span class="o">.</span><span class="n">reads</span><span class="o">(</span><span class="n">json</span><span class="o">)</span> <span class="k">match</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">case</span> <span class="nc">JsSuccess</span><span class="o">(</span><span class="n">t</span><span class="k">:</span> <span class="kt">Tweet</span><span class="o">,</span> <span class="k">_</span><span class="o">)</span> <span class="k">=&gt;</span> <span class="n">tweetChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">t</span><span class="o">)</span>
-</span><span class='line'>        <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">JsError</span> <span class="o">=&gt;</span> <span class="n">println</span><span class="o">(</span><span class="n">chunkString</span><span class="o">)</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>    <span class="k">case</span> <span class="k">_</span> <span class="k">=&gt;</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** Socket with attached listener */</span>
-</span><span class='line'><span class="k">val</span> <span class="n">tweetsListener</span> <span class="k">=</span> <span class="n">system</span><span class="o">.</span><span class="n">actorOf</span><span class="o">(</span><span class="nc">Props</span><span class="o">(</span><span class="k">new</span> <span class="nc">TweetsListener</span><span class="o">()),</span> <span class="s">&quot;TweetsListener&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="k">val</span> <span class="n">tweetsSocket</span> <span class="k">=</span> <span class="nc">ZeroMQExtension</span><span class="o">(</span><span class="n">system</span><span class="o">).</span><span class="n">newSocket</span><span class="o">(</span><span class="nc">SocketType</span><span class="o">.</span><span class="nc">Sub</span><span class="o">,</span>
-</span><span class='line'>  <span class="nc">Listener</span><span class="o">(</span><span class="n">tweetsListener</span><span class="o">),</span> <span class="nc">Connect</span><span class="o">(</span><span class="s">&quot;tcp://127.0.0.1:21231&quot;</span><span class="o">),</span>
-</span><span class='line'>  <span class="nc">Subscribe</span><span class="o">(</span><span class="s">&quot;birdwatch.tweets&quot;</span><span class="o">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This additional layer of indirection opens up a wide range of possibilities. Scaling becomes straightforward, we can attach pretty much as many of the client-facing controller applications (once split up) to the Tweet publishing application, without even having to individually configure them. Have them all point to the same publishing socket, spread the load using for example <strong><a href="http://wiki.nginx.org/Main">nginx</a></strong> and you&#8217;re done.</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/zeromq.png" title="image" alt="images"></p>
-
-<p>We can also swap individual parts of the application for better ones. I personally do not like the current approach to consuming the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> as used in <strong><a href="https://github.com/matthiasn/BirdWatch/blob/980916bcecb7c65e34a1a1c983eb02ccede00674/app/actors/TweetsPublisher.scala">TweetsPublisher.scala</a></strong> and I would like to replace it with the <strong><a href="https://dev.twitter.com/blog/the-hosebird-client-streaming-library">Twitter Hosebird Client (hbc)</a></strong>. If folks at Twitter have developed this for usage in their own projects, I have no doubt they can do this much better than my simple reconnect strategy possibly could. Last time I checked, hbc was not compatible with Scala version 2.10 used in Play 2.1 though, but thanks to ZeroMQ, the library can be run in its native habitat (Java application without having to worry about which version of Scala is used in some embedded library) and publish Tweets onto a ZeroMQ socket. The TweetsConsumer then would only have to point to another socket address. Anyone experienced with using ZeroMQ in a Java application interested in writing this client?</p>
-
-<p>-Matthias</p>
-
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
 ]]></content>
   </entry>
   

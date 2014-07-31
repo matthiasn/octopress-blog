@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework - Matthias Nehlsen</title>
+  <title>Monetizing a blog with Amazon Affiliate Links - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to &hellip;">
+  <meta name="description" content="It has been around 15 months since I wrote my first blog post. And I like writing these articles a lot, particularly the long one. I just constantly &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -81,7 +81,7 @@
   
   <header>
     
-      <h1 class="entry-title">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</h1>
+      <h1 class="entry-title">Monetizing a blog with Amazon Affiliate Links</h1>
     
     
       <p class="meta">
@@ -97,51 +97,93 @@
   
 
 
-<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
+<time datetime="2014-07-30T17:44:00+02:00" pubdate data-updated="true">07/30/2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to work in for a single article, but then again there is enough interesting stuff going on in this new version that calls for multiple blog articles. Initially this application was only meant to be an exercise in streaming information to web clients. But along the way I noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
+<div class="entry-content"><p>It has been around 15 months since I wrote my first blog post. And I like writing these articles a lot, particularly the long one. I just constantly find that I do not have enough time for it. It should be immediately obvious when you for example look at <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a></strong> that writing and developing something like this is not doable with an hour a week or so. So I wondered what it would take to have the blog buy me some more time to focus on it.
+From the number of visitors that I am seeing, it should be possible to make some money off of <strong><a href="https://affiliate-program.amazon.com/gp/associates/join/landing/main.html">Amazon affiliate links</a></strong>, which in return would afford me to work less on other things and more on the blog.</p>
 
 <!-- more -->
 
 
-<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest, and  I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> for software engineering related tweets. The application subscribes to all tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped at one percent of all tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
+<p>Now affiliate links seem particularly suitable when the majority of visitors come from a single country. Otherwise there need to be different links for people from different countries, or you lose the commission. At the point of this writing, there are 11 Amazon storefronts world-wide, and you need to be an affiliate in each one where you have a significant amount of users. Have you ever seen pages with 11 different national flags with links to the different stores? Thanks but no thanks, that is not really not an option for me.</p>
 
-<p>Here is how it looks like:</p>
+<p>I have looked into two readily available commercial options, <strong><a href="http://affiliate-geo-target.com/amazon.html">A-FWD</a></strong> and <strong><a href="http://www.georiot.com/home">Georiot</a></strong>, both addressing the geo-fragmentation problem. They both have monetization strategies of different complexity. They have in common that both take a certain amount of visitors away by assigning their affiliate IDs in a share of visits instead of yours.</p>
 
-<p><img class="left" src="/images/130812-screenshot.png" title="image" alt="images"></p>
+<p>I have not evaluated one against the other as I am more interested in implementing this myself. That way, I have more to write about and get to start another open source project. So what do I need to do? I need a reactive web application hosting the links for me for example as <strong>http://r.matthiasnehlsen.com/amzn/ProductID</strong>. Then, when a visitor clicks a link, a GeoIP lookup is performed and, based on the resulting country, the proper store is chosen if it so happens that an Amazon store is assigned for the country where the visitor is from, and the US store as a default when there is no store in that country.</p>
 
-<p>As you can see above, there is now a search bar which allows you to narrow down the selection of tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time the link is opened, not at the time it is bookmarked. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
+<p>Let us build this application in a simple form from scratch. I can see how a web application for managing links with realtime dashboards showing visitors can be useful at some later point. But for today I am focusing a very simple scenario possible and that is delivering a country specific slide show. I have created one for the US store with some books I have found useful:</p>
 
-<p>Here are some examples.</p>
+<SCRIPT charset="utf-8" type="text/javascript" src="http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&MarketPlace=US&ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&Operation=GetScriptTemplate"> </SCRIPT>
 
-<p>You&#8217;re a Java developer and you&#8217;re looking for a new job? Try this search: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring)</strong></a></p>
 
-<p>You want to limit your job search to London? No problem. Here you go: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring) london</strong></a></p>
+<p> <NOSCRIPT><A HREF="http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&MarketPlace=US&ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&Operation=NoScript">Amazon.com Widgets</A></NOSCRIPT></p>
 
-<p>You&#8217;re interested in tweets about Python the language but not about <a target="_blank" href="http://www.youtube.com/watch?v=kQFKtI6gn9Y&list=TLbNXOyfwTL14"><strong>Monty Python</strong></a>: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/python%20-monty"><strong>python -monty</strong></a></p>
+<p>Here&#8217;s the source code from Amazon:</p>
 
-<p>Well, you get the idea. <strong>AND</strong> is the standard operator, it is applied unless <strong>OR</strong> is specifically used between two terms.</p>
+<figure class='code'><figcaption><span>Amazon Script </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;SCRIPT</span> <span class="na">charset=</span><span class="s">&quot;utf-8&quot;</span> <span class="na">type=</span><span class="s">&quot;text/javascript&quot;</span> <span class="na">src=</span><span class="s">&quot;http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;MarketPlace=US&amp;ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&amp;Operation=GetScriptTemplate&quot;</span><span class="nt">&gt;&lt;/SCRIPT&gt;</span>
+</span><span class='line'><span class="nt">&lt;NOSCRIPT&gt;&lt;A</span> <span class="na">HREF=</span><span class="s">&quot;http://ws-na.amazon-adsystem.com/widgets/q?ServiceVersion=20070822&amp;MarketPlace=US&amp;ID=V20070822%2FUS%2Fmatthiasnehls-20%2F8003%2Fc99b01ed-8119-449a-a7f3-07cbef1c84bb&amp;Operation=NoScript&quot;</span><span class="nt">&gt;</span>Amazon.com Widgets<span class="nt">&lt;/A&gt;&lt;/NOSCRIPT&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
 
-<p>You can download the application and run it for a different area of your choosing. Personally, I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I may decide to run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
 
-<p>So how can this be improved in the future? A stream of tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at a glance, which newspaper articles and other links are most talked about. This analysis could even be weighted by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be some visualizations about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? Or is it the other way around? Get involved, there are plenty of options on how to work with the data.</p>
-
-<p>You can find a brief overview of the technology in the project description on <a target="_blank" href="https://github.com/matthiasn/BirdWatch"><strong>Github</strong></a>.</p>
-
-<p>In the future I will probably write some articles that further explain different parts of the application. Let me know what you are particularly interested in.</p>
-
-<p>Alright, this is it for today. Until next time.
-Matthias</p>
-
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
+<p>The above is really nothing more than a script tag with some JavaScript to run which will then display the slideshow.</p>
 
 <SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
 
+
+<p>How can I make</p>
+
+<p> a link leads the visitor to the Amazon storefront of the respective country, should it exist, and otherwise to the amazon.com website. At this point no products will be linked, that can come next, right now it will only be a redirect to Amazon store itself. Then later in the article I will ask you if you want to support this blog by clicking on the link before you intend to purchase something within the next 24 hours. That would really help supporting this blog. Actually, let&#8217;s do that now and later:</p>
+
+<p>Please support this blog through the Amazon affiliate link program so I have more time to write articles like this one.</p>
+
+<p>&#8212;->> set up my Amazon page with list of favorite books and stuff?
+- Books
+- MacBook Retina
+- Sony Cam</p>
+
+<ul>
+<li>Start photography sub page soon, focusing on manual focus lenses in front of Sony A7</li>
+</ul>
+
+
+<p>Now let us get technical and implement this application from scratch.</p>
+
+<h2>Setting up local MaxMind GeoIP database?</h2>
+
+<pre><code>play new amazn-geo-defragmenter
+
+play idea or play intellij
+</code></pre>
+
+<p>edit routes to include amzn link</p>
+
+<p>add controller action that performs the GeoIP lookup</p>
+
+<p>At some later point I also want to be able to link to books and cool stuff directly as I write about these items, but that is not a problem to solve today.</p>
+
+<p>This is it for today. As usual, please share this article if you find it useful. Certainly also let me know if you have additional questions. I&#8217;m happy to help. You can also get a little more involved in supporting this blog by clicking this Amazon affiliate link before you intend to make a purchase. A small portion of the sales will then contribute to running this blog. In return I will be able to write more articles like this one.</p>
+
+<p>Cheers,
+Matthias</p>
+
+<p>http://www.associateprograms.com/articles/pat-flynn-interview-50k-a-month-affiliate.html
+Seven Seven Seven Strategy</p>
+
+<p>http://www.associateprograms.com/articles/geo-targeting-service-solves-amazon-associates-problem.html</p>
+
+<p>http://www.mywritingblog.com/2013/11/georiot-alternative-to-fwd-for-creating.html</p>
+
+<p>http://www.playframework.com/documentation/2.0/ScalaActions</p>
+
+<hr />
 </div>
 
 
@@ -164,7 +206,7 @@ Matthias</p>
   
 
 
-<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
+<time datetime="2014-07-30T17:44:00+02:00" pubdate data-updated="true">07/30/2014</time>
       
 
 
@@ -172,7 +214,7 @@ Matthias</p>
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links/" >Tweet</a>
   
 
   
@@ -197,10 +239,8 @@ Matthias</p>
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/07/09/transforming-logs-into-information/" title="Previous Post: Transforming Log Events into Information">&laquo; Transforming Log Events into Information</a>
+        <a class="basic-alignment left" href="/blog/2014/07/24/birdwatch-cljs-om/" title="Previous Post: BirdWatch with ClojureScript and Om explained">&laquo; BirdWatch with ClojureScript and Om explained</a>
       
-      
-        <a class="basic-alignment right" href="/blog/2013/09/10/birdwatch-explained/" title="Next Post: BirdWatch explained">BirdWatch explained &raquo;</a>
       
     </p>
   </footer>
@@ -311,8 +351,8 @@ Matthias</p>
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/07/30/monetizing-with-amazon-affiliate-links/';
         var disqus_script = 'embed.js';
       
     (function () {
