@@ -1,0 +1,426 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Weekly Update - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="Here&#8217;s something new to try, a weekly update, covering pretty much what I keep myself busy with. That can be what I am reading, what I am &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,600,300,700' rel='stylesheet' type='text/css'>
+
+<script src="//use.typekit.net/rco1jij.js"></script>
+<script>try{Typekit.load();} catch (e){}</script>
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-40261983-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Weekly Update</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-01T15:51:00+02:00" pubdate data-updated="true">08/01/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Here&#8217;s something new to try, a weekly update, covering pretty much what I keep myself busy with. That can be what I am reading, what I am learning and what I am currently working on, mostly software-related. In this installment I discuss monetization, the Hamburg AngularJS meetup and photography in the mountains while hiking.</p>
+
+<!-- more -->
+
+
+<h1>Buying time for more blogging</h1>
+
+<p>There&#8217;s been one thought that seems to keep coming back. I do like writing this blog a lot, but the problem is that I just do not seem to be having enough free time to really focus on this. Now I could try to make more time in my free time, but obviously that would be at the expense of my remaining private life. Or I could shift the blogging effort into my work life and get paid to do so. That&#8217;s quite an attractive thought. How could one go about this? I do buy a lot at <a target="_blank" href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a><img src="http://r.matthiasnehlsen.com/amazon-landing/img" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> because I find it really convenient to always get my orders delivered the next day and because I have not a single time had problems sending stuff back that I did not like. Now I usually have an opinion on the stuff I buy, so why not share my thoughts on those? Using the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>, I can link to the product pages and whenever someone clicks on those links and then buys something within the next 24 hours, a small percentage of the paid price goes to me, the affiliate partner. The same goes for banner ads and such. Sounds like a decent way for the blog to start paying for itself, right?</p>
+
+<p>But not so fast. There is one issue with the approach as outlined above. The Amazon Affiliate Program is on a per country basis. When I simply link to the U.S. store and you are in the United Kingdom and get redirected there, I won&#8217;t get a commission, even if I have signed up for the program in the UK. Instead, I would have to send you to the UK store in the first place. How can I do that though? How can I detect which country you come from and send you to the appropriate store, should there be one in your country? I would need to do a very fast GeoIP lookup to determine where your IP address is located and then redirect you to your country store. So I <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">wrote an application</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong> and a local installation of <strong><a href="http://freegeoip.net">freegeoip</a></strong> which looks up the IP address in a few milliseconds and then redirects to the appropriate store. A detailed, tutorial-style article on that application will follow soon. Maybe others will find this useful as well.</p>
+
+<h1>The first Hamburg AngularJS meetup</h1>
+
+<p>Okay, this was technically last week, but there was no weekly review back then yet. So the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/193495902/">first session of the Hamburg AngularJS meetup</a></strong> that I founded recently (see <strong><a href="http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/">this article</a></strong>) went great, it was fun to meet and solve a problem together. I had found a sponsor for the meetup, <strong><a href="https://www.packtpub.com">Packt Publisher</a></strong>, and they were so kind to provide some free ebooks that could be given away during the meetup. So I thought, why not do a raffle so that everyone gets a fair chance. Then I thought, why not build an <strong><a href="http://angularjs.org">AngularJS</a></strong> application together that draws the winning tickets in that raffle.</p>
+
+<p>We had a total of four ebooks to give away, two each of these:</p>
+
+<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/mastering-angular/iframe">
+</iframe>
+
+
+
+
+<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/angular-directives/iframe">
+</iframe>
+
+
+<p>I reserved one for the volunteer who was willing to do the coding on the big screen so there were three more to draw with the application we were about to build. Then as a group we discussed the options of how to go about this and that worked really well. We wrote a web application for drawing the three winners and we even wrote tests for the application.</p>
+
+<p>I am looking forward to the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/196972082/">next session on August 21th</a></strong>, which is already fully booked. On that note, last time all 20 spots were gone and there was a waiting list with an additional 10 members. But we were &#8220;only&#8221; 13 who actually showed up. I wonder how to best deal with that. It is not a problem to not come, but at least it would be great to change the RSVP as soon as possible. But on the other hand, I am totally guilty of doing the same in the past, sign up for something free and then neither show up nor change the RSVP. Maybe the best way would be to just increase the number of spots and plan for a percentage of <strong><a href="http://www.merriam-webster.com/dictionary/no-show">no-shows</a></strong>? That&#8217;s working for airlines, why should it not work here. Maybe I should plan for 25% no-shows to be on the safe side and then just increase the number of spots accordingly?</p>
+
+<h1>The mountains / photography</h1>
+
+<p>I am already back. The weather turned quite bad and I wasn&#8217;t in the mood to get struck by a lightning while on a mountain top. It was still great though and I am looking forward to the next time. I had my camera with me, a <strong>Sony A7</strong> full-frame but surprisingly compact camera with the <strong>Zeiss 24-70 OSS 4.0</strong> lens, hoping I had found a good combination for travel. Here are some results:</p>
+
+<p><img class="left" src="/images/photography/DSC02249-1200x800.jpg" title="'snow'" ></p>
+
+<p>If you&#8217;re interested, here is the image in the <strong><a href="/images/photography/DSC02249-full.jpg">original resolution</a></strong>. It is not the original image, but rather the processed version I used when ordering a larger format print. If anyone is interested in the post processing in Photoshop, let me know. The same goes for the next image, with the original resolution <strong><a href="/images/photography/DSC02231-full.jpg">here</a></strong>.</p>
+
+<p><img class="left" src="/images/photography/DSC02231-1200x800.jpg" title="'valley'" ></p>
+
+<p>I am happy overall with the image quality, but it is by far not as good images taken with fixed focal length lenses. Usually I don&#8217;t use zoom lenses at all, so this lens would mostly be used when traveling. But is it really a good travel lens? No, I don&#8217;t think so. It is way too bulky:</p>
+
+<p><img class="left" src="/images/sony-a7-24-70.jpg" title="'a7 with 24-70mm'" ></p>
+
+<p>I only got to use it so often as it had to go into the backpack because of it&#8217;s large size. That&#8217;s kinda pointless when you are hiking with other people. Once you find your pace, you don&#8217;t like to stop for that guy with the bulky camera, so you don&#8217;t. Meaning I will fall behind. So I ended up taking way more photos with my smartphone because that was always easily accessible. Could I simply have have taken these particular photos with the smartphone? Not a chance, besides the better image quality, they also are much more wide angle.</p>
+
+<p>So the Zeiss lens goes back to Amazon tomorrow for a refund. My opinion on the lens is actually not terrible, I just don&#8217;t use zoom lenses frequently but rather use fixed focal length lenses when I can. If you do like to have a zoom lens, this one might serve you well. It is by all means better than the plastic kit lens. That one&#8217;s just plain awful. For traveling, I do find this lens to be prohibitively large though.</p>
+
+<p>I think I have an idea for a better travel lens, but more on that another time. For those interested in the equipment I was talking about, here are the links:</p>
+
+<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/sony-a7/iframe">
+</iframe>
+
+
+
+
+<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/zeiss-24-70/iframe">
+</iframe>
+
+
+<p>The camera is really great, by the way, I do not regret that purchase at all. The menu might not be the greatest but the image quality is unbeatable in this form factor at the moment, except for the more expensive <strong><a href="http://r.matthiasnehlsen.com/sony-a7r/link">A7R</a></strong>. But I do not usually need <strong>36MP</strong>.</p>
+
+<h1>Newsletter for the weekly updates</h1>
+
+<p>I have a newsletter for my purely software related blog posts, you can sign up for that one in the sidebar on the right. But these weekly updates are somewhat different, so I don&#8217;t want to spam you by announcing these articles on that newsletter. If you are interested in receiving news about the weekly update, you can sign up for that newsletter right here:</p>
+
+<!-- Begin MailChimp Signup Form -->
+
+
+<p><link href="//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css"></p>
+
+
+
+<div id="mc_embed_signup">
+<form action="//matthiasnehlsen.us7.list-manage.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=e8729041d5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <label for="mce-EMAIL">Subscribe to weekly updates</label>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;"><input type="text" name="b_798fd7b50a1d9cc58be41c2af_e8729041d5" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+</form>
+</div>
+
+
+<!--End mc_embed_signup-->
+
+
+
+
+<br />
+
+
+<br />
+
+
+<p>Cheers,
+Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-01T15:51:00+02:00" pubdate data-updated="true">08/01/2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+  
+  
+  
+  <br />
+  
+  
+    <div class="fb-like" data-send="true" data-width="600" data-show-faces="false"></div>
+  
+  
+  <br />
+  <br />
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/24/birdwatch-cljs-om/" title="Previous Post: BirdWatch with ClojureScript and Om explained">&laquo; BirdWatch with ClojureScript and Om explained</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/08/01/weekly-update/">Weekly Update</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/24/birdwatch-cljs-om/">BirdWatch with ClojureScript and Om explained</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/17/BirdWatch-in-ClojureScript/">BirdWatch client using ClojureScript and Om</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/08/hamburg-angularjs-meetup/">New AngularJS Meetup in Hamburg</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/07/06/distributed-barometer/">Distributed Atmospheric Pressure Measurement</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+        <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </li>  
+    <li><a href="https://github.com/matthiasn/amzn-geo-lookup">amzn-geo-lookup</a>&nbsp;
+        <p>Web application for redirecting requests depending on the country of the requesting IP address. Useful for Amazon Affiliate Links.</p>
+        <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=amzn-geo-lookup&type=watch&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      </li>
+  </ul>
+</section>
+<section>
+    <a name="signup"><h1>Subscribe</h1></a>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    
+    <br />
+  </div>
+</section>
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/narrow"> </SCRIPT>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
