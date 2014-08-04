@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-08-01T20:12:04+02:00</updated>
+  <updated>2014-08-05T11:12:19+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,225 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a geo-aware link shortener with Play Framework]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/"/>
+    <updated>2014-08-04T15:16:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework</id>
+    <content type="html"><![CDATA[<p><strong><a href="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/">Last week</a></strong> I wrote about blog monetization through the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>. I needed a way to serve country specific URLs depending on the location of the page visitor, so I wrote a geo-aware link shortener using <strong><a href="http://www.playframework.com">Play Framework</a></strong>. This week I would like to introduce that application. The source code is available on <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">GitHub</a></strong>. You may find that tool useful for your own purposes, or you might just want to read this as a tutorial on how to call backend services with Play Framework and the asynchrous <strong><a href="http://www.playframework.com/documentation/2.3.2/ScalaWS">WS client</a></strong>.</p>
+
+<!-- more -->
+
+
+<p>Let us define the purpose of this application: visitors (for example on a blog) shall be redirected to country-specific banners, slideshows or plain links for the matching Amazon store front for the country of origin of the request, or if none exists for the visitor&#8217;s country, the U.S. store. Links should be shortened as well. Let&#8217;s look at an <strong>example</strong>.</p>
+
+<p>The link for <code>http://r.matthiasnehlsen.com/amazon-landing/link</code> is requested. Then, depending on the visitor&#8217;s country, the following happens:</p>
+
+<p>1) request from the U.S.: the request is redirected to <strong><a href="http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW">amazon.com</a></strong></p>
+
+<p>2) request from the UK: the request is redirected to <strong><a href="http://www.amazon.co.uk/?_encoding=UTF8&amp;camp=1634&amp;creative=19450&amp;linkCode=ur2&amp;tag=matthiasneh0c-21&amp;linkId=O6XF3Z2DDAH6EUXU" title="">amazon.co.uk</a></strong></p>
+
+<p>3) requests from countries that do not have an Amazon store (or rather also where I have not created an account, such as India, Brazil, China, Japan) are redirected <strong><a href="http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW">amazon.com</a></strong> as well.</p>
+
+<p>You can try this for yourself by following <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">this link</a></strong>. When you click it, you should be directed to your country&#8217;s own store if you&#8217;re from the United States, Canada, the United Kingdom, France, Germany, Spain or Italy, or to the U.S. otherwise.</p>
+
+<p>Now building this application was surprisingly simple with <strong><a href="http://www.playframework.com">Play Framework</a></strong>. The relevant code easily fits on a single printed page. Before we get into the details, we will need a backend service for the actual lookup of the requesting IP address. There is one well working open source service for that already: <strong><a href="http://freegeoip.net">freegeoip</a></strong>. Freeogeoip is also running as a free online service, but I would rather run this myself, as that will give me a much faster and more predictable response time when there are only local requests. In fact, doing the GeoIP lookup locally only requires a consistent single digit number of milliseconds.</p>
+
+<h2>Installing freegeoip</h2>
+
+<p>You really only need to follow the <strong><a href="https://github.com/fiorix/freegeoip">instructions here</a></strong>. That worked well for me both on my development Mac and on my Ubuntu server, with a slight change in the <strong><a href="http://upstart.ubuntu.com">upstart</a></strong> script on Ubuntu, which I have commited to the project as a <strong><a href="https://github.com/fiorix/freegeoip/commit/90e974c653631e135e3e4e6ed08df6da39c7cef4">pull request</a></strong>.</p>
+
+<h2>Building the link shortener with Play Framework</h2>
+
+<p>We will need to be using three building blocks of Play applications: the <strong><a href="http://www.playframework.com/documentation/2.3.2/ScalaWS">WS client</a></strong>, <strong><a href="http://www.playframework.com/documentation/2.2.3/ScalaAsync">async controller actions</a></strong> and <strong><a href="http://www.playframework.com/documentation/2.2.3/ScalaJson">JSON parsing</a></strong>. A client requests a resource, which is handled by an async action. Inside this action, the WS client performs a GeoIP lookup by calling the local freegeoip service. The result of this async WS call, which is JSON, is then parsed for the country code matching the request. Then the model is asked for the URL matching the requested resource and country. We will look at the source code below, but first here is a flowchart:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/amzn-geo-lookup.png" title="'flowchart'" ></p>
+
+<p>I hope this flowchart helps a little in following through the source code below.</p>
+
+<figure class='code'><figcaption><span>Async controller action</span><a href='https://github.com/matthiasn/amzn-geo-lookup/blob/e75c16d198f9f266fa63dbe463856982a1b4fe22/app/controllers/Application.scala'>Application.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">controllers</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="nn">play.api._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">play.api.mvc._</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">play.api.libs.ws.WS</span>
+</span><span class='line'><span class="k">import</span> <span class="nn">play.api.libs.concurrent.Execution.Implicits.defaultContext</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">import</span> <span class="nn">model._</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">Application</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">   * Controller Action for redirecting requester to URL matching the shortUrl and the country for the remote address,</span>
+</span><span class='line'><span class="cm">   * otherwise when shortUrl exists but country does not have a configured URL, the U.S. entry as a fallback. Should</span>
+</span><span class='line'><span class="cm">   * the entry for the U.S. store also not exist, the default URL is used.</span>
+</span><span class='line'><span class="cm">   *</span>
+</span><span class='line'><span class="cm">   * The country of the requester is determined by performing a GeoIP lookup. For this, a local installation of</span>
+</span><span class='line'><span class="cm">   * freegeoip is expected (https://github.com/fiorix/freegeoip).</span>
+</span><span class='line'><span class="cm">   *</span>
+</span><span class='line'><span class="cm">   * Handled errors:</span>
+</span><span class='line'><span class="cm">   *   - freegeoip not running -&gt; fallback URL</span>
+</span><span class='line'><span class="cm">   *   - freegeoip not responding within 100ms -&gt; fallback URL (critical, script loading blocks page load)</span>
+</span><span class='line'><span class="cm">   *   - freegeoip responds with code other than 200 -&gt; fallback URL</span>
+</span><span class='line'><span class="cm">   * The fallback URL is the U.S store link for existing shortened links and a specified general default URL otherwise.</span>
+</span><span class='line'><span class="cm">   *</span>
+</span><span class='line'><span class="cm">   **/</span>
+</span><span class='line'>  <span class="k">def</span> <span class="n">redirect</span><span class="o">(</span><span class="n">shortUrl</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">format</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Action</span><span class="o">.</span><span class="n">async</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">req</span> <span class="k">=&gt;</span>
+</span><span class='line'>      <span class="k">val</span> <span class="n">fallbackUrl</span> <span class="k">=</span> <span class="nc">Links</span><span class="o">.</span><span class="n">redirectMap</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">shortUrl</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">format</span> <span class="o">+</span> <span class="s">&quot;.US&quot;</span><span class="o">).</span><span class="n">getOrElse</span><span class="o">(</span><span class="nc">Links</span><span class="o">.</span><span class="n">defaultRedirect</span><span class="o">)</span>
+</span><span class='line'>      <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="nc">Links</span><span class="o">.</span><span class="n">geoLookupAddress</span> <span class="o">+</span> <span class="n">req</span><span class="o">.</span><span class="n">remoteAddress</span><span class="o">).</span><span class="n">withRequestTimeout</span><span class="o">(</span><span class="mi">100</span><span class="o">).</span><span class="n">get</span><span class="o">().</span><span class="n">map</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">geoRes</span> <span class="k">=&gt;</span>
+</span><span class='line'>          <span class="n">geoRes</span><span class="o">.</span><span class="n">status</span> <span class="k">match</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">case</span> <span class="mi">200</span> <span class="k">=&gt;</span>
+</span><span class='line'>              <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="o">(</span><span class="n">geoRes</span><span class="o">.</span><span class="n">json</span> <span class="o">\</span> <span class="s">&quot;country_code&quot;</span><span class="o">).</span><span class="n">asOpt</span><span class="o">[</span><span class="kt">String</span><span class="o">].</span><span class="n">flatMap</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">cc</span> <span class="k">=&gt;</span>
+</span><span class='line'>                  <span class="k">val</span> <span class="n">url</span> <span class="k">=</span> <span class="n">shortUrl</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">format</span> <span class="o">+</span> <span class="s">&quot;.&quot;</span> <span class="o">+</span> <span class="n">cc</span>
+</span><span class='line'>                  <span class="nc">ReqLogger</span><span class="o">.</span><span class="n">logCc</span><span class="o">(</span><span class="n">shortUrl</span><span class="o">,</span> <span class="n">format</span><span class="o">,</span> <span class="n">cc</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>                  <span class="nc">Links</span><span class="o">.</span><span class="n">redirectMap</span><span class="o">.</span><span class="n">get</span><span class="o">(</span><span class="n">url</span><span class="o">)</span>
+</span><span class='line'>              <span class="o">}.</span><span class="n">getOrElse</span><span class="o">(</span><span class="n">fallbackUrl</span><span class="o">)</span>
+</span><span class='line'>              <span class="nc">ReqLogger</span><span class="o">.</span><span class="n">logUrl</span><span class="o">(</span><span class="n">shortUrl</span><span class="o">,</span> <span class="n">format</span><span class="o">,</span> <span class="n">url</span><span class="o">)</span>
+</span><span class='line'>              <span class="nc">Redirect</span><span class="o">(</span><span class="n">url</span><span class="o">)</span>
+</span><span class='line'>
+</span><span class='line'>            <span class="k">case</span> <span class="n">status</span><span class="k">:</span> <span class="kt">Int</span> <span class="o">=&gt;</span>
+</span><span class='line'>              <span class="nc">ReqLogger</span><span class="o">.</span><span class="n">logGeoFail</span><span class="o">(</span><span class="n">shortUrl</span><span class="o">,</span> <span class="n">format</span><span class="o">,</span> <span class="s">&quot;Status &quot;</span> <span class="o">+</span> <span class="n">status</span><span class="o">,</span> <span class="nc">None</span><span class="o">)</span>
+</span><span class='line'>              <span class="nc">Redirect</span><span class="o">(</span><span class="n">fallbackUrl</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>      <span class="o">}.</span><span class="n">recover</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">case</span> <span class="n">e</span><span class="k">:</span> <span class="kt">Exception</span> <span class="o">=&gt;</span>
+</span><span class='line'>          <span class="nc">ReqLogger</span><span class="o">.</span><span class="n">logGeoFail</span><span class="o">(</span><span class="n">shortUrl</span><span class="o">,</span> <span class="n">format</span><span class="o">,</span> <span class="n">e</span><span class="o">.</span><span class="n">getMessage</span><span class="o">,</span> <span class="nc">Some</span><span class="o">(</span><span class="n">e</span><span class="o">))</span>
+</span><span class='line'>          <span class="nc">Redirect</span><span class="o">(</span><span class="n">fallbackUrl</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That is really all, including all the imports and four calls to a request logger. The actual code is a mere <strong>23 lines</strong> long, including error handling. Let us go through this line by line. <em>redirect</em> is a controller method that takes two parameters, <em>shortUrl</em> and <em>format</em>, both of which are Strings. They come from the route definition:</p>
+
+<figure class='code'><figcaption><span>routes</span><a href='https://raw.githubusercontent.com/matthiasn/amzn-geo-lookup/e75c16d198f9f266fa63dbe463856982a1b4fe22/conf/routes'>routes </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>GET   /:shortUrl/:format   controllers.Application.redirect(shortUrl: String, format: String)
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above configuration means that the application will call <em>controllers.Application.redirect</em> with the two strings it parses out of the request&#8217;s path.</p>
+
+<p>The controller action is built by play&#8217;s <strong><a href="http://www.playframework.com/documentation/2.2.3/api/scala/index.html#play.api.mvc.ActionBuilder">ActionBuilder</a></strong> by calling <em>Action.async</em> with a block that takes a <em>request</em> of type <strong><a href="http://www.playframework.com/documentation/2.2.3/api/scala/index.html#play.api.mvc.Request">play.api.mvc.Request</a></strong> and returns the future of a result. Next we construct a fallback link to be delivered when the following GeoIP lookup fails in one way or another.</p>
+
+<p>Next we fire up an asynchronous call to the local <strong>freegeoip</strong> instance for the IP address derived from the request. I only give this a timeout of 100 milliseconds as I do not want to hold up page loading for longer than that, no matter what. In reality, this is plenty for this local lookup when things are running smoothly, I usually only measured around 7 milliseconds to fulfil this request end to end.</p>
+
+<p>First, we create the <em>fallbackUrl</em> which will either be the specific link to the U.S. store or a default URL when the map lookup with the provided <em>shortUrl</em> and <em>format</em> is unsuccessful. This is either the corresponding link to the shortUrl but for the U.S. store, should that exist in the model, or a default URL otherwise (also specified in the model).</p>
+
+<p>Next, we create a <strong><a href="http://www.playframework.com/documentation/2.2.3/api/scala/index.html#play.api.libs.ws.WS$$WSRequestHolder">WsRequestHolder</a></strong> by specifying the URL, setting the timeout. Then we call <em>get()</em> on the request holder and <em>map</em> on it by providing a function to apply to a successful result of the future. In here, the result could either be a status code of <strong><a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">200</a></strong> or something else, for example a <strong><a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">400</a></strong> when the request failed. Such a failure can occur when calling freeogeoip locally from an IPv6 address, as is the case locally on my Mac. When the result is a <strong>200</strong>, we expect the result body to contain valid JSON, so we parse it for the country code. This parsing step returns the Option of a String, depending on if it found the specified JSON property or not. We <em>flatMap</em> with a function that itself returns an Option of a URL String by taking the parsed country code String and looking that up in the <strong><a href="http://docs.scala-lang.org/overviews/collections/maps.html">Map</a></strong> of the model. If such an entry exists, the Map lookup returns Some(urlString), otherwise it returns <strong><a href="http://www.scala-lang.org/api/current/index.html#scala.None$">None</a></strong>. Using <em>flatMap</em> now returns a single option instead of having to map on two options. Then we call <em>getOrElse</em> on the resulting Option, retrieving either the lookup result or the <em>fallbackUrl</em>. When encountering any result code other than <strong>200</strong>, we redirect to the <em>fallbackUrl</em>.</p>
+
+<p>Now there is a second failure scenario where not the result code indicates what went wrong but instead the WS call fails altogether. That case would result in an failed future, which we can catch using <em>recover</em>, again redirecting to the <em>fallbackUrl</em>. For understanding what is going on here, it is important to realize that both the map combinator on the WS result and the recover combinator return new futures, both of type <strong><a href="http://www.playframework.com/documentation/2.2.3/api/scala/index.html#play.api.mvc.SimpleResult">SimpleResult</a></strong>. I have found <strong><a href="http://docs.scala-lang.org/overviews/core/futures.html">this article</a></strong> in the Scala documentation helpful for understanding futures better. We could have used pattern matching on specific types of exceptions but that wasn&#8217;t necessary in this case, as we always want to simply return a Redirect to the <em>fallbackUrl</em> (plus log the exception).</p>
+
+<h2>The model</h2>
+
+<p>Right now all the data lives in the model&#8217;s source code. Obviously it would be better to utilize a database for this purpose, but for a first version, this serves us alright. The model is really just a <strong><a href="http://docs.scala-lang.org/overviews/collections/maps.html">Map</a></strong>. Here&#8217;s a shortened version as an example:</p>
+
+<figure class='code'><figcaption><span>Links model amzn-geo-lookup/blob/e75c16d198f9f266fa63dbe463856982a1b4fe22/app/model/Links.scala Links.scala </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">model</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">object</span> <span class="nc">Links</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">val</span> <span class="n">redirectMap</span> <span class="k">=</span> <span class="nc">Map</span><span class="o">[</span><span class="kt">String</span>, <span class="kt">String</span><span class="o">](</span>
+</span><span class='line'>    <span class="c1">// Amazon landing page</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.US&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.DE&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;http://www.amazon.de/?_encoding=UTF8&amp;camp=1638&amp;creative=19454&amp;linkCode=ur2&amp;site-redirect=de&amp;tag=matnehblo-21&amp;linkId=GTDGKZ677SJ76DR2&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.GB&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;http://www.amazon.co.uk/?_encoding=UTF8&amp;camp=1634&amp;creative=19450&amp;linkCode=ur2&amp;tag=matthiasneh0c-21&amp;linkId=O6XF3Z2DDAH6EUXU&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.FR&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;https://www.amazon.fr/?_encoding=UTF8&amp;camp=1642&amp;creative=19458&amp;linkCode=ur2&amp;tag=matthiasneh03-21&amp;linkId=WATXOGQM2BDD44FL&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.CA&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;http://www.amazon.ca/?_encoding=UTF8&amp;camp=15121&amp;creative=390961&amp;linkCode=ur2&amp;tag=matthiasneh0d-20&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.IT&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;https://www.amazon.it/?_encoding=UTF8&amp;camp=3370&amp;creative=24114&amp;linkCode=ur2&amp;tag=matthiasneh01-21&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="s">&quot;amazon-landing.link.ES&quot;</span> <span class="o">-&gt;</span> <span class="s">&quot;https://www.amazon.es/?_encoding=UTF8&amp;camp=3626&amp;creative=24822&amp;linkCode=ur2&amp;tag=matthiasne0ac-21&quot;</span><span class="o">,</span>
+</span><span class='line'>  <span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>Building this geo-aware link shortener (in a very basic form) was really easy with <strong><a href="http://www.playframework.com">Play Framework</a></strong>. I am currently using this tool for the lookup of Amazon store fronts for redirecting affiliate links to the country of the visitor. But there is no reason why this couldn&#8217;t be used for all kinds of other scenarios where such a country-specific redirection of requests might be useful.
+Now of course it is not ideal to store the links in code. Instead, that data should live in a database of some kind, propably with the stored values cached inside the application to not introduce additional round-trips for every lookup. Placing the data in a model object is already the first step towards building that. The redirecting controller would not have to change at all when replacing this model object with one that internally uses a database. Then it would also be really useful to create new links from a user interface. That could for example easily be achieved with an AngularJS application for link maintenance. There&#8217;s surely stuff for me to do. Please let me know if you would find this more elaborate version I just described (database, UI) useful, may it be that you would use it yourself or that you would just like to follow along a tutorial in which we build this application. The more successful this application turns out to be in contributing to this blog, the more time I will find to work on these improvements. Thus, you can literally vote with your wallet by clicking on links delivered by the described application.</p>
+
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
+
+
+<p>Please let me know about your thoughts. I will be happy to clarify anything that is not easy to understand just yet. Also please let me know if you encounter problems making any of this work for yourself.</p>
+
+<p>That&#8217;s it for today, hope to see you back soon. And now that you have made it this far in the article, why don&#8217;t you follow me on Twitter <strong><a href="https://twitter.com/matthiasnehlsen">@matthiasnehlsen</a></strong> so you&#8217;ll be informed about the next article.</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Weekly Update]]></title>
@@ -3997,89 +4216,6 @@ Matthias</p>
 
 <SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Scala Days 2013]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/"/>
-    <updated>2013-06-10T10:31:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013</id>
-    <content type="html"><![CDATA[<p><strong><a href="http://scaladays.org">Scala Days 2013</a></strong> are starting at Hudson Theater in New York City today, with a very promising lineup of presentations. Unfortunately I won&#8217;t get to see all of them live as there are three parallel tracks. So far this is my selection of presentations I want to attend.</p>
-
-<!-- more -->
-
-
-<h3>Monday, June 10th</h3>
-
-<p><strong><a href="https://twitter.com/odersky">Martin Odersky</a></strong> <br/>
-Keynote - Scala with Style <br/>
-Hudson Theater, 19:00 - 20:30</p>
-
-<h3>Tuesday, June 11th</h3>
-
-<p><strong><a href="https://twitter.com/etorreborre">Eric Torreborre</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/9:15-10:00/A-Walk-Down-the-Beach%2C-How-Kiama-Helps-Implementing-Distributed-Collections-on-Top-of-Hadoop">A Walk Down the Beach, How Kiama Helps Implementing Distributed Collections on Top of Hadoop</a> <br/>
-Metropolis, 09:15 - 10:00</p>
-
-<p><strong><a href="https://twitter.com/viktorklang">Viktor Klang</a></strong> &amp; <strong><a href="https://twitter.com/rolandkuhn">Roland Kuhn</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room1/10:15-11:00/Concurrency-%u2013-The-good%2C-the-bad%2C-the-ugly">Concurrency – The good, the bad, the ugly</a><br/>
-Room 4.11, 10:15 - 11:00</p>
-
-<p><strong><a href="https://twitter.com/ccsevers">Christopher Severs</a></strong> &amp; <strong><a href="https://twitter.com/BigDataSc">Vitaly Gordon</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/11:15-12:00/Scalable-and-Flexible-Machine-Learning-With-Scala">Scalable and Flexible Machine Learning With Scala</a><br/>
-Metropolis, 11:15 - 12:00</p>
-
-<p><strong><a href="https://twitter.com/kevin_j_brown">Kevin Brown</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/13:30-14:15/Big-Data-Analytics-with-Delite">Big Data Analytics with Delite</a><br/>
-Metropolis, 13:30 - 14:15</p>
-
-<p><strong><a href="https://twitter.com/matei_zaharia">Matei Zaharia</a></strong> &amp; <strong><a href="https://twitter.com/rxin">Reynold Xin</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/14:30-15:15/The-Spark-Stack%3A-Fast-and-Expressive-Big-Data-Analytics-in-Scala">The Spark Stack: Fast and Expressive Big Data Analytics in Scala</a><br/>
-Metropolis, 14:30 - 15:15</p>
-
-<p><strong><a href="https://twitter.com/josh_wills">Josh Wills</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room3/15:30-16:15/Scala-for-Data-Pipelines">Scala for Data Pipelines</a><br/>
-Metropolis, 15:30 - 16:15</p>
-
-<p><strong><a href="https://twitter.com/Sadache">Sadache Aldrobi</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-11/room1/16:30-17:15/Realtime-Web%2C-The-Urge-for-a-Programming-Model">Realtime Web, The Urge for a Programming Model</a><br/>
-Room 4.11, 16:30 - 17:15</p>
-
-<h3>Wednesday, June 12th</h3>
-
-<p><strong><a href="https://twitter.com/springrod">Rod Johnson</a></strong>: <br/>
-Keynote - Scala in 2018<br/>
-Hudson Theater, 08:45 - 10:00</p>
-
-<p><strong><a href="https://twitter.com/xeno_by">Eugene Burmako</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room1/10:15-11:00/Half-a-Year-in-Macro-Paradise">Half a Year in Macro Paradise</a><br/>
-Room 4.11, 10:15 - 11:00</p>
-
-<p><strong><a href="https://twitter.com/andrey_cheptsov">Andrey Cheptsov</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room3/11:15-12:00/Scala-Developer-Tools-in-IntelliJ-IDEA%3A-SBT%2C-Play-and-Scalate">Scala Developer Tools in IntelliJ IDEA: SBT, Play and Scalate</a> <br/>
-Metropolis, 11:15 - 12:00</p>
-
-<p><strong><a href="https://twitter.com/philippkhaller">Philipp Haller</a></strong> &amp;
-<strong><a href="https://twitter.com/retronym">Jason Zaugg</a></strong>: <br/>
-<a href="http://scaladays.org/#/june-12/room1/13:30-14:15/Scala-Async%3A-A-New-Way-to-Simplify-Asynchronous-Code-%28Make-the-Compiler-Do-It%21%29">Scala Async: A New Way to Simplify Asynchronous Code</a><br/>
-Room 4.11, 13:30 - 14:15</p>
-
-<p><strong><a href="https://twitter.com/tathadas">Tathagata Das</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room2/14:30-15:15/Spark-Streaming%3A-Fast-Distributed-Stream-Processing-with-a-High-Level-API">Spark Streaming: Fast Distributed Stream Processing with a High-Level API</a><br/>
-Room 3.11, 14:30 - 15:15</p>
-
-<p><strong>Rex Kerr</strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room2/15:30-16:15/Designing-for-performance">Designing for performance</a><br/>
-Room 3.11, 15:30 - 16:15</p>
-
-<p><strong><a href="https://twitter.com/sjrdoeraene">Sébastien Doeraene</a></strong>:<br/>
-<a href="http://scaladays.org/#/june-12/room2/16:30-17:15/Scala.js%3A-write-in-Scala-for-the-browser">Scala.js: write in Scala for the browser</a><br/>
-Room 3.11, 16:30 - 17:15</p>
-
-<p>In the next couple of days I will write about presentations and topics I found particularly inspiring.</p>
-
-<p>-Matthias</p>
 ]]></content>
   </entry>
   

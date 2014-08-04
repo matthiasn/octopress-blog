@@ -33,6 +33,6 @@ I am starting this blog because I am hoping to learn a lot in the process, parti
 
 Most importantly, ask if there is anything that you find difficult to understand. My goal in all of this is to explain things as clearly as possible, so please let me know when I've failed to do that. Ask questions in the comments section if you think that others might benefit from the answers as well. Of course, you can also always contact me by email, though that may take longer for a response. 
 
-You can also follow me on Twitter **[@_MNehlsen](https://twitter.com/_MNehlsen)**. I just launched my feed, so you'll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.
+You can also follow me on Twitter **[@matthiasnehlsen](https://twitter.com/matthiasnehlsen)**. I just launched my feed, so you'll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.
 
 -Matthias
