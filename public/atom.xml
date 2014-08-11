@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-08-05T11:12:19+02:00</updated>
+  <updated>2014-08-11T02:40:45+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,52 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/"/>
+    <updated>2014-08-10T22:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update</id>
+    <content type="html"><![CDATA[<p>I mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated it&#8217;s first contribution to running this blog. I also read a little more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
+
+<!-- more -->
+
+
+<p>This week I have been doing a lot of <strong><a href="http://angularjs.org">AngularJS</a></strong> work. I haven&#8217;t announced this much so far, but last year I have started co-authoring a book about <strong><a href="https://www.packtpub.com/web-development/angularjs-ui-development">AngularUI Development</a></strong>. This book will come out later this year and is scheduled to be out in November. Right now I am doing the finishing touches on the chapters that I wrote. I added quite a few pages to the first chapter about bootstrapping an <strong><a href="http://angularjs.org">AngularJS</a></strong> environment, in particular about AngularJS integration tests using <strong><a href="https://github.com/angular/protractor">Protractor</a></strong>. I am quite happy with how testability of AngularJS application is progressing. Protractor is really powerful and I am looking forward to implementing a comprehensive testing strategy at my current work project. Protractor looks like it will be up to the job. I will be interesting to integrate this into the overall <strong><a href="http://www.scala-lang.org">Scala</a></strong> / <strong><a href="http://www.playframework.com">Play Framework</a></strong> / <strong><a href="http://www.scala-sbt.org">SBT</a></strong> build chain, though. Maybe that&#8217;ll be an article for another day.</p>
+
+<p>Then earlier this week I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote about building</a></strong> an application for country-specific embedding of links for the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>, with the idea of having purchases on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a></strong> contribute to the running costs of this blog. Besides the time that I invest, I also rent a server for serving my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch application</a></strong> at <strong><a href="http://www.hetzner.de">Hetzner Online AG</a></strong>, spending <strong>€81</strong> per months. Today I am happy to report that in the first week, clicks on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon links</a></strong> have generated roughly <strong>$37</strong> in advertising fees aka revenue through orders in the <strong><a href="http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW">U.S. store</a></strong>. Sweet, thanks a lot to the purchasers, much appreciated. If that became the weekly average, the running costs for my server would be covered. Feels great that my baby, the blog, might be well on the way to paying its own rent. I will have to make my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> application more user friendly though; it is already annoying me a lot to store created links in code. But that&#8217;s on my list anyway; for this week the idea was to create a proof-of-concept and for that, storing the links in code was okay.</p>
+
+<p>Also I was able to read a little more in <strong><a href="https://twitter.com/unclebobmartin">Uncle Bob</a></strong>&#8217;s book, <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers (Robert C. Martin Series)</a></strong>. I enjoy this book a lot and I will make sure to share some thoughts soon. The main idea about sharing thoughts on what I read is that I read a lot but that I forget too much too soon. I have been planning on taking notes by chapter for the books I am reading for a while, but never really got around to that. By publishing those notes, I will be able to force myself to actually take good notes. First of all, I want to have these notes for my future reference so that I can more easily recap what I learned. If anyone else finds my notes useful, so much the better. More on that soon.</p>
+
+<p>Okay, that&#8217;s it for today. Next week I will stay busy with the book chapters for a good part, but I also want to try to get back to my work in progress <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">article about writing the BirdWatch client in ClojureScript</a></strong>.</p>
+
+<p>Are  you interested in receiving news about my weekly updates? If so, you can sign up for the newsletter right here:</p>
+
+<!-- Begin MailChimp Signup Form -->
+
+
+<p><link href="http://matthiasnehlsen.com//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css"></p>
+
+
+
+<div id="mc_embed_signup">
+<form action="//matthiasnehlsen.us7.list-manage.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=e8729041d5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+    <label for="mce-EMAIL">Subscribe to weekly updates</label>
+    <input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
+    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+    <div style="position: absolute; left: -5000px;"><input type="text" name="b_798fd7b50a1d9cc58be41c2af_e8729041d5" tabindex="-1" value=""></div>
+    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+</form>
+</div>
+
+
+<!--End mc_embed_signup-->
+
+
+<p>Have a great week,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a geo-aware link shortener with Play Framework]]></title>
@@ -3976,241 +4022,6 @@ Matthias</p>
 <p>So I am looking into combining <strong><a href="http://three.kibana.org/about.html">Kibana 3</a></strong> with a logging object in Play that receives all loggable events and which, depending on the environment (dev or production), by default either processes them further or not, with further configuration of the defaults for each logging type when specified. The logging object could then also expose an endpoint that allows switching individual loggers on or off during execution, without restarting the application. That way we could easily peek into a running instance in a production environment and watch what is going on, right now. I started working on this and I will present something here soon. Having such a logging system available will be a great help for all projects in the pipeline. I would like to shift my focus back to the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> project rather sooner than later, but first I want to have the right tools in place.</p>
 
 <p>-Matthias</p>
-
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[AngularJS and Play Framework]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/"/>
-    <updated>2013-06-23T14:36:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework</id>
-    <content type="html"><![CDATA[<p>I felt a sudden urge to write a <strong><a href="http://bit.ly/sse-chat-github">chat application</a></strong> during <strong><a href="http://scaladays.org">Scala Days</a></strong>. Writing the server side code in <strong><a href="http://www.scala-lang.org">Scala</a></strong> was fun and only took like 30 minutes. The JavaScript part was not nearly as gratifying. Changing the client to <strong><a href="http://angularjs.org">AngularJS</a></strong> over the last couple of days allowed me to reclaim client side development joy.</p>
-
-<!-- more -->
-
-
-<p><strong>UPDATE 06/27/2013:</strong> Here is how it looks like. <strong><a href="https://github.com/matthiasn/sse-chat/">The source is on GitHub</a></strong>.</p>
-
-<iframe width="420" height="425" src="http://sse-chat.matthiasnehlsen.com/" frameborder="0" allowfullscreen></iframe>
-
-
-<p>There should be actors randomly reciting Romeo and Juliet in Room 1 above if everything worked, but that&#8217;s not our problem right now. Last month I wrote about <strong><a href="http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/">Server Sent Events vs. WebSockets</a></strong> and decided to go with SSE for my <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application. In that application information only flows from server to the client, though, so I wanted proof of the concept that REST style calls are an appropriate way to communicate back with the server.</p>
-
-<p>I challenged myself to write a chat server for this purpose, with 10 lines of code on the server side (or less). I knew this would be possible thanks to the awesome <strong><a href="http://www.playframework.com/documentation/2.1.1/Iteratees">Play Iteratee library</a></strong>:</p>
-
-<figure class='code'><figcaption><span>Chat Controller</span><a href='https://github.com/matthiasn/sse-chat-example/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/controllers/ChatApplication.scala'>ChatApplication.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">object</span> <span class="nc">ChatApplication</span> <span class="k">extends</span> <span class="nc">Controller</span> <span class="o">{</span>
-</span><span class='line'>  <span class="cm">/** Central hub for distributing chat messages */</span>
-</span><span class='line'>  <span class="k">val</span> <span class="o">(</span><span class="n">chatOut</span><span class="o">,</span> <span class="n">chatChannel</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Concurrent</span><span class="o">.</span><span class="n">broadcast</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">]</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Controller action serving chat page */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">index</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span> <span class="nc">Ok</span><span class="o">(</span><span class="n">views</span><span class="o">.</span><span class="n">html</span><span class="o">.</span><span class="n">index</span><span class="o">(</span><span class="s">&quot;Chat using Server Sent Events&quot;</span><span class="o">))</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Controller action for POSTing chat messages */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">postMessage</span> <span class="k">=</span> <span class="nc">Action</span><span class="o">(</span><span class="n">parse</span><span class="o">.</span><span class="n">json</span><span class="o">)</span> <span class="o">{</span> <span class="n">req</span> <span class="k">=&gt;</span> <span class="n">chatChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">req</span><span class="o">.</span><span class="n">body</span><span class="o">);</span> <span class="nc">Ok</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Enumeratee for filtering messages based on room */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">filter</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Enumeratee</span><span class="o">.</span><span class="n">filter</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">json</span><span class="k">:</span> <span class="kt">JsValue</span> <span class="o">=&gt;</span> <span class="o">(</span><span class="n">json</span> <span class="o">\</span> <span class="s">&quot;room&quot;</span><span class="o">).</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">==</span> <span class="n">room</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** Controller action serving activity based on room */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">chatFeed</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="nc">Action</span> <span class="o">{</span>
-</span><span class='line'>    <span class="nc">Ok</span><span class="o">.</span><span class="n">stream</span><span class="o">(</span><span class="n">chatOut</span> <span class="o">&amp;&gt;</span> <span class="n">filter</span><span class="o">(</span><span class="n">room</span><span class="o">)</span> <span class="o">&amp;&gt;</span> <span class="nc">EventSource</span><span class="o">()).</span><span class="n">as</span><span class="o">(</span><span class="s">&quot;text/event-stream&quot;</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>What happens here is fairly straightforward once we look at the drawing:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat.png" title="image" alt="images"></p>
-
-<p>The <strong><a href="https://github.com/playframework/Play20/tree/2.1.0/framework/src/iteratees/src/main/scala/play/api/libs/iteratee/Concurrent.scala">Concurrent object</a></strong> is the central information hub which provides us with a channel to push JSON into. The messages from all clients are pushed into the chatChannel <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Concurrent$$Broadcaster">Broadcaster</a></strong>. The individual streaming connections then attach an Iteratee to the provided chatOut <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumerator">Enumerator</a></strong>, with <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong>  in between.</p>
-
-<p>What is an <strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Iteratee">Iteratee</a></strong>? An Iteratee is a function that represents a single step of an ongoing computation. Any state it might have is immutable; supplying input results in a new function / a new Iteratee. This ongoing computation is driven by an Enumerator which keeps track of the latest step. The Enumerator calls the associated Iteratee function with new input when available and then stores that resulting Iteratee (and so on). The way state is handled is somewhat comparable to a fold function that holds intermediate state in an accumulator using an immutable data structure, with the difference here being that the computation can run over an infinite stream.</p>
-
-<p><strong><a href="http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.iteratee.Enumeratee">Enumeratees</a></strong> are adapters between Enumerators and Iteratees. They allow, for example, type transformation or filtering. The filter Enumeratee makes sure input will only be used when the input matches the criteria, which in this case is the message for the correct chat room for a particular stream / client connection. EventSource provides a transforming Enumeratee for wrapping chunks as Server Sent Events.</p>
-
-<p>In the <strong>chatFeed</strong> function we have a chain of Enumerator and two Enumeratees: <strong>chatOut &amp;> filter(room) &amp;> EventSource()</strong>, which results in a composed Enumerator. We pass this composed Enumerator into Ok.stream, which internally connects the Enumerator with a simple Iteratee. This simple Iteratee does not hold intermediate state; it only does something for each input item: deliver it as a chunk of bytes to the client over the open HTTP connection.</p>
-
-<p>Let&#8217;s visualize this:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat2.png" title="image" alt="images"></p>
-
-<p>A message is pushed into the chatChannel and distributed to all attached Iteratees (wrapped by the filter Enumeratee and the EventSource). The message is then sent to the client as a Server Sent Event, but only if the filter predicate evaluates to true.</p>
-
-<h1>AngularJS Client</h1>
-
-<p>I wrote an <strong><a href="https://github.com/matthiasn/sse-chat/blob/0af191e628a450ca8fd4d41bcbff382011cd0a13/app/assets/javascripts/main.js">initial version</a></strong> using jQuery to manipulate the DOM. It worked fine, just getting there wasn&#8217;t really that much fun. I would have liked the expressive greatness of <strong><a href="http://www.playframework.com/documentation/2.1.1/ScalaTemplates">templates in Play</a></strong>, but without having to reload the page every time the model changes.</p>
-
-<p>Last week I started learning AngularJS, so I thought I&#8217;d give it a try. Not only is the resulting code more than 30% smaller, it also is a real pleasure to work with. Dynamic views are written in an extended HTML vocabulary which attaches elements on the page to the $scope, which can be seen as the ViewModel of the application. The views are then automatically updated when the associated data changes.</p>
-
-<figure class='code'><figcaption><span>AngularJS Chat View</span><a href='https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/views/index.scala.html'>index.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;div</span> <span class="na">ng-controller=</span><span class="s">&quot;ChatCtrl&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;header&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        Your Name: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;user&quot;</span> <span class="na">id=</span><span class="s">&quot;userField&quot;</span> <span class="na">value=</span><span class="s">&quot;John Doe&quot;</span>
-</span><span class='line'>          <span class="na">ng-model=</span><span class="s">&quot;user&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;select</span> <span class="na">ng-model=</span><span class="s">&quot;currentRoom&quot;</span> <span class="na">ng-change=</span><span class="s">&quot;setCurrentRoom(currentRoom)&quot;</span>
-</span><span class='line'>          <span class="na">ng-options=</span><span class="s">&quot;r.name for r in rooms&quot;</span><span class="nt">&gt;&lt;/select&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;chat&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot; msg&quot;</span> <span class="na">ng-repeat=</span><span class="s">&quot;msg in msgs | limitTo:-10&quot;</span>
-</span><span class='line'>        <span class="na">ng-class=</span><span class="s">&quot;msg.user !== user ? &#39;others&#39; : &#39;&#39;&quot;</span>
-</span><span class='line'>        <span class="na">data-ng-show=</span><span class="s">&quot;hidden == false&quot;</span> <span class="na">data-ng-hide=</span><span class="s">&quot;hidden == true&quot;</span>
-</span><span class='line'>        <span class="na">data-ng-animate=</span><span class="s">&quot;&#39;fadeIn&#39;&quot;</span><span class="nt">&gt;&lt;br/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;strong&gt;</span> says: <span class="nt">&lt;/strong&gt;&lt;br/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;footer&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;form</span> <span class="na">ng-submit=</span><span class="s">&quot;submitMsg()&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>            Say something: <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;text&quot;</span> <span class="na">name=</span><span class="s">&quot;chat&quot;</span> <span class="na">id=</span><span class="s">&quot;textField&quot;</span>
-</span><span class='line'>              <span class="na">ng-model=</span><span class="s">&quot;inputText&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">id=</span><span class="s">&quot;saySomething&quot;</span> <span class="na">value=</span><span class="s">&quot;Submit&quot;</span>
-</span><span class='line'>              <span class="na">ng-click=</span><span class="s">&quot;submitMsg()&quot;</span> <span class="nt">/&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/form&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The latest 10 items within <strong>$scope.msgs</strong> are rendered into the &#8220;chat&#8221; div above. The color of each div is also defined in the view by testing if the current user is the sender of the message or by adding CSS class &#8216;others&#8217; if not. No more direct DOM manipulation. Very nice.</p>
-
-<figure class='code'><figcaption><span>AngularJS Chat Controller</span><a href='https://github.com/matthiasn/sse-chat/blob/6d39660cca26ce089c6c80238a155ce6610b3684/app/assets/javascripts/controllers.js'>controllers.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** Controllers */</span>
-</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;sseChat.controllers&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;sseChat.services&#39;</span><span class="p">]).</span>
-</span><span class='line'>    <span class="nx">controller</span><span class="p">(</span><span class="s1">&#39;ChatCtrl&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$scope</span><span class="p">,</span> <span class="nx">$http</span><span class="p">,</span> <span class="nx">chatModel</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">rooms</span> <span class="o">=</span> <span class="nx">chatModel</span><span class="p">.</span><span class="nx">getRooms</span><span class="p">();</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">msgs</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">inputText</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span> <span class="o">=</span> <span class="s2">&quot;Jane Doe #&quot;</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">);</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">currentRoom</span> <span class="o">=</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">rooms</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/** change current room, restart EventSource connection */</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">setCurrentRoom</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">room</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">currentRoom</span> <span class="o">=</span> <span class="nx">room</span><span class="p">;</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">chatFeed</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">listen</span><span class="p">();</span>
-</span><span class='line'>        <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/** posting chat text to server */</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">submitMsg</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">$http</span><span class="p">.</span><span class="nx">post</span><span class="p">(</span><span class="s2">&quot;/chat&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">inputText</span><span class="p">,</span> <span class="nx">user</span><span class="o">:</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">user</span><span class="p">,</span>
-</span><span class='line'>                <span class="nx">time</span><span class="o">:</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">toUTCString</span><span class="p">(),</span> <span class="nx">room</span><span class="o">:</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">currentRoom</span><span class="p">.</span><span class="nx">value</span> <span class="p">});</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">inputText</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/** handle incoming messages: add to messages array */</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">addMsg</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">$apply</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">msgs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">));</span> <span class="p">});</span>
-</span><span class='line'>        <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="cm">/** start listening on messages from selected room */</span>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">listen</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">chatFeed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/chatFeed/&quot;</span> <span class="o">+</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">currentRoom</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>
-</span><span class='line'>            <span class="nx">$scope</span><span class="p">.</span><span class="nx">chatFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="nx">$scope</span><span class="p">.</span><span class="nx">addMsg</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-</span><span class='line'>        <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>        <span class="nx">$scope</span><span class="p">.</span><span class="nx">listen</span><span class="p">();</span>
-</span><span class='line'>    <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <strong>$scope</strong> is managed by <strong><a href="http://angularjs.org">AngularJS</a></strong> and we define its properties inside the controller, for example <strong>$scope.msgs</strong>, as an empty array. Whenever new messages come in, they are appended to the array, automagically updating the view. Note that manipulations to the data structure that are not triggered by AngularJS itself must be wrapped in an <strong>apply()</strong> call in order to update the UI. That was one of the valuable lessons I learned.</p>
-
-<p>I have to say I am really impressed by AngularJS, it is a great addition to my toolbox. I now feel that client side development will be as much fun as server side development already is with Play Framework. I will probably use this newly gained knowledge in the next version of the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application.</p>
-
-<p>If you enjoyed this post, then make sure you&#8217;ll subscribe to my <strong><a href="http://eepurl.com/y0HWv" target="_blank">Newsletter</a></strong>.</p>
-
-<p>There is a <strong><a href="http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/">follow-up article</a></strong> with the lessons learned, please check it out if you are interested in the server side problems I encountered while running the demo application.</p>
-
-<p>Cheers, Matthias</p>
 
 <p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
 
