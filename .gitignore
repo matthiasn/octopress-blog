@@ -19,3 +19,5 @@ doc/
 .pygments-cache
 .sass-cache
 .DS_Store
+
+public
