@@ -2,135 +2,135 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/19/hello-world/</loc>
-        <lastmod>2014-08-04T23:48:19+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/
         </loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/
         </loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/
         </loc>
-        <lastmod>2014-07-31T03:48:20+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/</loc>
-        <lastmod>2014-07-31T03:48:23+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/</loc>
-        <lastmod>2014-07-31T03:48:26+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/</loc>
-        <lastmod>2014-07-31T03:48:25+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/
         </loc>
-        <lastmod>2014-07-31T03:48:27+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/</loc>
-        <lastmod>2014-07-31T03:48:29+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/09/15/using-crossfilter-with-angularjs/</loc>
-        <lastmod>2014-07-31T03:48:30+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/</loc>
-        <lastmod>2014-07-31T03:48:32+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/
         </loc>
-        <lastmod>2014-07-31T03:48:15+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/</loc>
-        <lastmod>2014-07-31T03:48:08+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/02/16/elasticsearch-v1/</loc>
-        <lastmod>2014-07-31T03:47:17+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/</loc>
-        <lastmod>2014-07-31T03:47:09+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/</loc>
-        <lastmod>2014-07-31T03:46:15+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/02/new-approach/</loc>
-        <lastmod>2014-07-06T13:29:46+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/06/distributed-barometer/</loc>
-        <lastmod>2014-07-06T23:55:47+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/</loc>
-        <lastmod>2014-07-08T20:42:43+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/</loc>
-        <lastmod>2014-07-30T17:01:36+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/</loc>
-        <lastmod>2014-07-25T18:09:06+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/</loc>
-        <lastmod>2014-08-12T01:14:03+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/
         </loc>
-        <lastmod>2014-08-05T11:12:05+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/</loc>
-        <lastmod>2014-08-12T00:27:03+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
@@ -138,7 +138,11 @@
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/drafts/2014-02-12-birdwatch-with-reactjs.html</loc>
-        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/drafts/2014-08-17-weekly-update.html</loc>
+        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
