@@ -47,7 +47,7 @@ So I decided to try inlining custom CSS in the HTML file and then compressing th
 
 At the end, I find either option viable. What I want to avoid isI would just like to bri
 
- But if I decide to deliver the CSS myself, it should be as concise as possible.  
+But if I decide to deliver the CSS myself, it should be as concise as possible.  
 
 I set up a build system based on **[grunt](http://gruntjs.com)** and started trying out flexbox. It turned out that my frustration tolerance for reloading the page on my mobile devices was so low that I shortly thereafter found myself working on a live **CSS reload** feature. After covering **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)** more than once on this blog, I thought I might as well utilize SSE for notifying the browser about file system changes. Detecting file system changes is a solved problem, so all it took was transmitting the events to the browser and have a script on the client side initiate a page reload / refresh. To my surprise, SSE support has only **[recently come to Android](http://caniuse.com/eventsource)**, requiring either the KitKat built-in browser, or Chrome for Android version 30. Things worked well with Chrome 30 on Jelly Bean and with mobile Safari on iOS 6 and 7. I cannot say anything about older versions or other browsers. Please report if things fail in your browser, or better submit a fix. 
 
@@ -59,7 +59,7 @@ The refresh function combined with the file system refresh messages sent over th
 Have a look what this means in practice:
 
 <div class="video-container">
-    <iframe width="320" height="180" src="//www.youtube.com/embed/mNxFQva-Shw"></iframe>
+    <iframe width="320" height="180" src="http://www.youtube.com/embed/mNxFQva-Shw"></iframe>
 </div>
 
 Things look decent for flexbox in terms of **[compatibility](http://caniuse.com/flexbox)**. In the mobile world, flexbox has been supported since Android 2.1 and iOS 3.1, and by now it is supported on at least the latest browser version on each platform, which should cover the vast majority of mobile devices out there. On the desktop side of things, flexbox has also been supported for a while on different platforms, even on IE since version 10. This is in contrast to SSE, which Microsoft apparently does not want to support at all. But there is one **caveat**: Flexbox exists in different versions, with the old ones prefixed. For -webkit, even different prefixed versions exist. In itself that is not a huge problem, particularly if you use **[LESS mixins](http://lesscss.org/#-mixins)** so you do not have to continuously repeat yourself. But it is still a quite annoying because it means optimizing for different browser versions. Well, nothing new in the world of browser compatibility issues. 
