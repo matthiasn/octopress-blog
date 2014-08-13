@@ -248,7 +248,7 @@ Cheers,
 Matthias
 
 
-[^1]: Actually I should mention **[Lo-Dash](http://lodash.com)** instead of **underscore**. I use it as a drop-in replacement for underscore especially for one reason and that is **[_.cloneDeep](http://lodash.com/docs#cloneDeep)**. The ability to deep clone a data structure makes developing an undo functionality much, much, much easier. Not as trivial as with **[ClojureScript](http://swannodette.github.io/2013/12/31/time-travel/)** or with **[Scala.js](/01/24/scala-dot-js-and-reactjs/)** but it is not difficult, either.
+[^1]: Actually I should mention **[Lo-Dash](http://lodash.com)** instead of **underscore**. I use it as a drop-in replacement for underscore especially for one reason and that is **[_.cloneDeep](http://lodash.com/docs#cloneDeep)**. The ability to deep clone a data structure makes developing an undo functionality much, much, much easier. Not as trivial as with **[ClojureScript](http://swannodette.github.io/2013/12/31/time-travel/)** or with **[Scala.js](http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/)** but it is not difficult, either.
 
 [^2]: That is not completely true here. The application makes use of channels for processing both previous and current tweets. What if there is still stuff on channels when the reset takes place? This still needs to be solved.
 
