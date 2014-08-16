@@ -5,14 +5,14 @@ date: 2014-07-17 08:30
 comments: true
 categories: 
 ---
-Back in January I wanted to try out **[Om](https://github.com/swannodette/om)**:
+Back in January I wanted to try out **[Om](https://github.com/swannodette/om)**. Now I finally got around to doing so.
+
+<!-- more -->
 
 <blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/swannodette">@swannodette</a> Om looks really powerful, I think I&#39;m going to give it a try in one of the next articles.</p>&mdash; Matthias Nehlsen (@matthiasnehlsen) <a href="https://twitter.com/matthiasnehlsen/statuses/427945296971042816">January 27, 2014</a></blockquote>
 <script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 For those of you who do not know, **[Om](https://github.com/swannodette/om)** is a **[ClojureScript](https://github.com/clojure/clojurescript)** wrapper around Facebook's **[ReactJS](http://facebook.github.io/react/)** library. I have covered **ReactJS** on this blog a few times, for example in the post mentioned in the twitter conversation above. **ClojureScript** is very similar to **[Clojure](http://clojure.org)**, except that it targets the browser and not the **[JVM](http://en.wikipedia.org/wiki/Java_virtual_machine)**. Like **[Scala.js](http://www.scala-js.org)**, ClojureScript is compiled into **JavaScript**.
-
-<!-- more -->
 
 Finally I got around to giving **Om** a spin and wrote my first application in **ClojureScript**. You can try it out <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><strong>here</strong></a>. Before, I had only read a little bit about Clojure and ClojureScript and I had also gone through **[clojurekoans](http://clojurekoans.com)**. Then, just for the fun of it (and to see for myself if I could make it work), I wanted to write a new client for my **[BirdWatch](https://github.com/matthiasn/BirdWatch)** application, this time in ClojureScript. BirdWatch is kind of a live search engine for tweets for an area of interest, with a **[Single Page Application](http://en.wikipedia.org/wiki/Single-page_application)** retrieving search results from a server component, including updates to that search over a streaming connection using **[Server Sent Events (SSE)](http://dev.w3.org/html5/eventsource/)**. In the browser, some basic stats about specific tweets (like recent RTs) and about usage of words (wordcloud and trending barchart) plus a time series chart displaying the time distribution of recent tweets matching a query. The server side is written in **[Scala](http://www.scala-lang.org)** using **[Play Framework](http://www.playframework.com)**, however that does not need to concern us for this article as the wire format is plain **[JSON](http://tools.ietf.org/html/rfc4627)**.
 
