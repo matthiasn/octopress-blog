@@ -41,13 +41,20 @@ I am using Octopress for generating my blog. It has served me alright, but I don
 
 Along those lines, I was thinking about rolling my own blogging engine. Yeah I know what you're thinking. At some point every (technical) blogger will reach that stage where you want to create your own blogging engine. But hear me out, this one might be a little different. I am thinking about making use of Polymer and Web Components. Now that Google robots run JavaScript, the blog would get indexed just fine. Why not load the markdown directly from a web component handling the current post and then let that render itself? Polymer handles browser compatibility, but I do not care much about IE6 users and the like anyway. At the same time that would give me a chance to dive deeper into web components. The idea of a shadow DOM is just brilliant, and I hope web components will have the success they deserve. Finally a vendor-agnotic way of building web application.
 
-## Clean coder
+## Feeling good
+
+
+## Mailing list: one and only one
+At first I thought about creating a separate mailing list because I didn't want to spam anyone who subscribed for infrequent tutorials with weekly updates. But that's too much work. So instead I will unify the mailing lists. If that is to much for existing subscribers, there are two options: a) let me know or b) unsubscribe. But why don't you give it a try?
+
+## Book and gadget reviews
+Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created an overview page for reviews and took some time to take notes on the book I am reading plus write about the most recent gadget that I bought. All the articles are work in progress for the time being, with some of them being placeholders altogether for now. Here's the **[reviews overview page](/reviews)**.
+
+### Clean coder
 Last week I mentioned that I was starting to take notes about books that I am reading, the book being Clean Coder by uncle bob. I did more reading this week and created a separate page for that. I will add to that page as I read more. The short version: every serious developer needs to read this book. Full stop.
 
-
-## Persisting Iptables 
-
-
+### Behringer XENYX X1222USB
+I recently kicked out a highend surround sound system in favor of a mixer and two (great) active speaker. **[Find out why](/reviews/xenyx-x1222usb)**.
 
 
 Have a great week,

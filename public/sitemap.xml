@@ -100,45 +100,69 @@
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/02/new-approach/</loc>
-        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+        <lastmod>2014-08-16T14:52:06+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/06/distributed-barometer/</loc>
-        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+        <lastmod>2014-08-16T14:52:17+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/</loc>
-        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+        <lastmod>2014-08-16T14:53:14+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/</loc>
-        <lastmod>2014-08-16T12:11:46+02:00</lastmod>
+        <lastmod>2014-08-16T14:52:30+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/</loc>
-        <lastmod>2014-08-13T12:23:03+02:00</lastmod>
+        <lastmod>2014-08-16T14:52:37+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/</loc>
-        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+        <lastmod>2014-08-16T14:52:44+02:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/
         </loc>
-        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+        <lastmod>2014-08-16T14:52:58+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/</loc>
-        <lastmod>2014-08-13T04:55:37+02:00</lastmod>
+        <lastmod>2014-08-16T14:53:04+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/about/</loc>
+        <lastmod>2014-08-16T15:22:01+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
-        <lastmod>2014-08-16T12:11:46+02:00</lastmod>
+        <lastmod>2014-08-16T14:53:14+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
-        <lastmod>2014-08-16T12:11:46+02:00</lastmod>
+        <lastmod>2014-08-16T14:53:14+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/reviews/cleancoder/</loc>
+        <lastmod>2014-08-16T15:42:39+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/reviews/</loc>
+        <lastmod>2014-08-16T15:53:16+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/reviews/sony-a7/</loc>
+        <lastmod>2014-08-16T15:53:07+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/reviews/xenyx-x1222usb/</loc>
+        <lastmod>2014-08-16T18:04:39+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/reviews/zeiss-24-70/</loc>
+        <lastmod>2014-08-16T15:35:03+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/robots.txt</loc>
