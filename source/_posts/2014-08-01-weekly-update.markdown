@@ -56,27 +56,5 @@ I think I have an idea for a better travel lens, but more on that another time. 
 
 The camera is really great, by the way, I do not regret that purchase at all. The menu might not be the greatest but the image quality is unbeatable in this form factor at the moment, except for the more expensive **[A7R](http://r.matthiasnehlsen.com/sony-a7r/link)**. But I do not usually need **36MP**.
 
-#Newsletter for the weekly updates
-I have a newsletter for my purely software related blog posts, you can sign up for that one in the sidebar on the right. But these weekly updates are somewhat different, so I don't want to spam you by announcing these articles on that newsletter. If you are interested in receiving news about the weekly update, you can sign up for that newsletter right here:
-
-<!-- Begin MailChimp Signup Form -->
-<link href="//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
-</style>
-<div id="mc_embed_signup">
-<form action="//matthiasnehlsen.us7.list-manage.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=e8729041d5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-	<label for="mce-EMAIL">Subscribe to weekly updates</label>
-	<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;"><input type="text" name="b_798fd7b50a1d9cc58be41c2af_e8729041d5" tabindex="-1" value=""></div>
-    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-</form>
-</div>
-<!--End mc_embed_signup-->
-
-<br />
-<br />
-
 Cheers,
 Matthias

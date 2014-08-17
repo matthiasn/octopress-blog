@@ -17,23 +17,5 @@ Also I was able to read a little more in **[Uncle Bob](https://twitter.com/uncle
 
 Okay, that's it for today. Next week I will stay busy with the book chapters for a good part, but I also want to try to get back to my work in progress **[article about writing the BirdWatch client in ClojureScript](http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/)**.
 
-Are  you interested in receiving news about my weekly updates? If so, you can sign up for the newsletter right here:
-
-<!-- Begin MailChimp Signup Form -->
-<link href="//cdn-images.mailchimp.com/embedcode/slim-081711.css" rel="stylesheet" type="text/css">
-<style type="text/css">
-	#mc_embed_signup{background:#fff; clear:left; font:14px Helvetica,Arial,sans-serif; }
-</style>
-<div id="mc_embed_signup">
-<form action="//matthiasnehlsen.us7.list-manage.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=e8729041d5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
-	<label for="mce-EMAIL">Subscribe to weekly updates</label>
-	<input type="email" value="" name="EMAIL" class="email" id="mce-EMAIL" placeholder="email address" required>
-    <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
-    <div style="position: absolute; left: -5000px;"><input type="text" name="b_798fd7b50a1d9cc58be41c2af_e8729041d5" tabindex="-1" value=""></div>
-    <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
-</form>
-</div>
-<!--End mc_embed_signup-->
-
 Have a great week,
 Matthias
