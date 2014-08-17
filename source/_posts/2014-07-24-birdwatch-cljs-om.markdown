@@ -75,9 +75,9 @@ Sometimes, you may want to create a function in place using the anonymous functi
 
 With the basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.
 
-Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. I have found a great resource online for learning Clojure. If you like it, why don't your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.
+Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. I have found a **[great resource online for learning Clojure](http://www.braveclojure.com)**. Check it out. And if you like it, why don't your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.
 
-Another great resource is Joy of Clojure, 2nd edition. Fun read and I learned a lot. I will revisit it and share some thoughts about it in the **[reviews section]()** soon.
+Another great resource is **[Joy of Clojure, 2nd edition](http://r.matthiasnehlsen.com/joyclojure/link)**. Fun read and I learned a lot. I will revisit it and share some thoughts about it in the **[reviews section](/reviews)** soon.
 
 
 **TO BE CONTINUED**

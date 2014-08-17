@@ -45,13 +45,13 @@ Along those lines, I was thinking about rolling my own blogging engine. Yeah I k
 
 
 ## Mailing list: one and only one
-At first I thought about creating a separate mailing list because I didn't want to spam anyone who subscribed for infrequent tutorials with weekly updates. But that's too much work. So instead I will unify the mailing lists. If that is to much for existing subscribers, there are two options: a) let me know or b) unsubscribe. But why don't you give it a try?
+At first I thought about creating a separate mailing list because I didn't want to spam anyone who subscribed for infrequent tutorials with weekly updates. But that's too much work on my end. So instead I will unify the mailing lists. If the updates are too frequent for any of the existing subscribers, there are two options: a) let me know or b) unsubscribe. But why don't you give it a try? I'll try to make the weekly update an entertaining read.
 
 ## Book and gadget reviews
 Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created an overview page for reviews and took some time to take notes on the book I am reading plus write about the most recent gadget that I bought. All the articles are work in progress for the time being, with some of them being placeholders altogether for now. Here's the **[reviews overview page](/reviews)**.
 
 ### Clean coder
-Last week I mentioned that I was starting to take notes about books that I am reading, the book being Clean Coder by uncle bob. I did more reading this week and created a separate page for that. I will add to that page as I read more. The short version: every serious developer needs to read this book. Full stop.
+Last week I mentioned that I was starting to take notes about books that I am reading, the book being Clean Coder by uncle bob. I did more reading this week and created a separate page for that. I will add to that page as I read more. The short version: every serious developer needs to read this book. Full stop. **[Read more]()**.
 
 ### Behringer XENYX X1222USB
 I recently kicked out a highend surround sound system in favor of a mixer and two (great) active speaker. **[Find out why](/reviews/xenyx-x1222usb)**.
