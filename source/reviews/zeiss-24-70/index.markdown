@@ -6,6 +6,7 @@ comments: true
 sharing: true
 footer: true
 ---
+Come back for a more detailed review. For now: not bad but I still decided to send it back.
 
 <iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/zeiss-24-70/iframe">
 </iframe>

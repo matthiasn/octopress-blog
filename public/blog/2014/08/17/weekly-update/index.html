@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Sony A7 - Matthias Nehlsen</title>
+  <title>Weekly Update - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Sony A7 08/16/2014 I like photography. Particularly with my selection of classic, manual focus Leica and Zeiss prime lenses. I really loved taking &hellip;">
+  <meta name="description" content="git vs brain fart The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/reviews/sony-a7">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/08/17/weekly-update">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -57,50 +57,17 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
-  
+<article class="hentry" role="article">
+  <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
   <header>
-    <h1 class="entry-title">Sony A7</h1>
-    <p class="meta">
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-08-16T15:34:00+02:00" pubdate data-updated="true">08/16/2014</time></p>
-  </header>
-  
-  <p>I like photography. Particularly with my selection of classic, manual focus Leica and Zeiss prime lenses. I really loved taking photos with my old Leica SLR. Now that is a beautiful camera:</p>
-
-<p><img class="left" src="/images/leica-r4s.jpg" title="leica r4s" alt="images"></p>
-
-<p>But beautiful and fun to use does make up for one minor but still missing feature. Did you spot it above? That was not a typo, the D of DSLR is indeed missing. While I do have the intention of using my Leica with film again at some point, I just do not seem to get around to doing so. And then the lab situation. A mere ten years ago there were a couple of good to great profesional photo labs. The kind were you talk to the person developing your film and printing your photos, asking them to just pull out a little bit of magenta and add a little yellow, just like last week. Or you&#8217;d do an experiment with her, with different filter settings to work out what looks best. Those days are gone and most of those labs are out of business. Before digital, they were serving the professional market. As the advertising and media capital of the country, there are lots of professional photographers in the Hamburg, with the vast majority of course having an all-digital workflow today.</p>
-
-<p>This is not to sound too nostalgic, I love digital photography. I previously used a Canon 5D, with a couple of Canon and third-party lenses. And while all that works alright, I am just not excited about the equipment. The haptic perception is that of plastic and I don&#8217;t love how the photos look. Instead I like fast <strong><a href="http://en.wikipedia.org/wiki/Prime_lens">prime lenses</a></strong>.</p>
-
-<p>If only there were a way to keep using these old and great lenses, ideally on a camera with a <strong><a href="http://digital-photography-school.com/full-frame-sensor-vs-crop-sensor-which-is-right-for-you/">full-frame (24*36mm) digital sensor</a></strong>. I tried using the lenses with an adapter in front the Canon 5D but the results were usually gruesome because it was next to impossible to properly focus. I installed a different <strong><a href="http://en.wikipedia.org/wiki/Focusing_screen">focusing screen</a></strong> with a microprism ring but while the same technology worked nicely in the Leica, the 5D would not let enough light shine through to the focusing screen, rendering the microprism useless.</p>
-
-<p>So for a while I had the lenses just laying around until I heard about the <strong>Sony A7</strong>, a compact full-frame camera with live view on the screen and a high-resolution <strong><a href="http://en.wikipedia.org/wiki/Electronic_viewfinder">electronic viewfinder</a></strong> (EVF):</p>
-
-<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/sony-a7/iframe">
-</iframe>
-
-
-<p>With plenty of adapters for different lens mounts available, I had to give this camera a try. It is not the last camera I will every buy, but it is a huge improvement over my previous digital photography experience. Let&#8217;s look at a few results next.</p>
-
-<p><strong>TO BE CONTINUED</strong></p>
-
-  
-    <footer>
+    
+      <h1 class="entry-title">Weekly Update</h1>
+    
+    
       <p class="meta">
         
-        
 
 
 
@@ -112,13 +79,98 @@
   
 
 
-<time datetime="2014-08-16T15:34:00+02:00" pubdate data-updated="true">08/16/2014</time>
+<time datetime="2014-08-17T22:06:00+02:00" pubdate data-updated="true">08/17/2014</time>
         
       </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>git vs brain fart</h2>
+
+<p>The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more that I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed <code>git add .</code> on the command line.</p>
+
+<p>So far so good. But then I got distracted by a rather annoying phone call. During that call, something happened that I can best label a <strong><a href="http://en.wikipedia.org/wiki/Brain_fart">brain fart</a></strong>. I typed <code>git reset --hard HEAD</code> and pressed ENTER. Now you will probably ask why anyone would want to do that, particularly before actually committing the changes. To be honest, I am clueless. Maybe it was the geek&#8217;s version of a <strong><a href="http://en.wikipedia.org/wiki/Freudian_slip">Freudian slip</a></strong>? Something in my brain probably wanted to reset its own state to the happier state pre-call, but somehow that idea landed on the command line instead?</p>
+
+<p>In case you don&#8217;t know this (destructive) <strong><a href="http://git-scm.com/">git</a></strong> command, this is what it does:</p>
+
+<blockquote><p>&#8211;hard<br/>Resets the index and working tree. Any changes to tracked files in the working tree since <commit> are discarded.</p><footer><strong>git-reset documentation</strong> <cite><a href='http://git-scm.com/docs/git-reset'>git-scm.com/docs/git-reset/&hellip;</a></cite></footer></blockquote>
+
+
+<p>Okay, think about that one. The documentation says it loud and clear. Changes to tracked files since HEAD, which is the current commit to which I have added above, are <strong>discarded</strong>. Oops.</p>
+
+<p>I have no idea what I was thinking, but the changes that I had added but not committed appeared to be lost. Not a surprise really when you think about the description above. But for me in that second it was like getting hide by a truck that came out of nowhere.</p>
+
+<p>So I really wanted the fruits of my previous and tedious labor back.</p>
+
+<p>I tried <code>git reflog</code> according to <strong><a href="http://stackoverflow.com/questions/5788037/recover-from-git-reset-hard">these instructions</a></strong> but that did not help, I did not find anything useful in the output. Luckily though, <strong><a href="http://git-scm.com/docs/git-fsck">fsck</a></strong> helped:</p>
+
+<pre><code>git fsck --lost-found --verbose
+cd .git/lost-found/other/
+find . -print | xargs grep someUniqueTextHere
+</code></pre>
+
+<p>So basically, git only runs a garbage collection every once in a while. In found this <strong><a href="http://gitready.com/advanced/2009/01/17/restoring-lost-commits.html">here</a></strong>. Using the commands above, I tell git to run a fschk and store write out the lost and found items. Then I can find the one I was looking for by piping the result of find in that directory to grep, looking for some specific text I remembered from the work I had lost.</p>
+
+<h2>Octopress, one year later</h2>
+
+<p>I am using Octopress for generating my blog. It has served me alright, but I don&#8217;t like it a lot and I wouldn&#8217;t use it again.  I am just not enough of a Ruby guy to tinker around with it. I cannot even fix issues when I try to update it. The other night I wasted two precious hours on trying to get my installation current so that I would benefit from newer features, without success. And quite frankly I have no intentions of becoming a Ruby expert any time soon or ever.</p>
+
+<p>Along those lines, I was thinking about rolling my own blogging engine. Yeah I know what you&#8217;re thinking. At some point every (technical) blogger will reach that stage where you want to create your own blogging engine. But hear me out, this one might be a little different. I am thinking about making use of Polymer and Web Components. Now that Google robots run JavaScript, the blog would get indexed just fine. Why not load the markdown directly from a web component handling the current post and then let that render itself? Polymer handles browser compatibility, but I do not care much about IE6 users and the like anyway. At the same time that would give me a chance to dive deeper into web components. The idea of a shadow DOM is just brilliant, and I hope web components will have the success they deserve. Finally a vendor-agnotic way of building web application.</p>
+
+<h2>Feeling good</h2>
+
+<p>I have a lot of fun writing stuff at the moment. I also do so for myself. The first 25-30 minutes in the morning belong to me and me alone. Before even reading email, I fully focus on everything that comes to mind and write it down. It is a great way for gaining some clarity on what I want to do and where I want to go. The only thing that&#8217;s missing in the process is a decent and searchable way to organize the notes. That part needs work. But nonetheless, I am a happier person when I do this regurlarly. Highly recommended.</p>
+
+<h2>Mailing list: one and only one</h2>
+
+<p>At first I thought about creating a separate mailing list because I didn&#8217;t want to spam anyone who subscribed for infrequent tutorials with weekly updates. But that&#8217;s too much work on my end. So instead I will unify the mailing lists. If the updates are too frequent for any of the existing subscribers, there are two options: <strong>a)</strong> let me know or <strong>b)</strong> unsubscribe. But why don&#8217;t you give it a try? I&#8217;ll try to make the weekly update an entertaining read.</p>
+
+<h2>Book and gadget reviews</h2>
+
+<p>Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created a <strong><a href="/reviews">page for reviews</a></strong>. I also started writing about some electronic stuff that I own:.</p>
+
+<h3>My audio setup</h3>
+
+<p>I recently kicked out a highend surround sound system in favor of a mixer and two (great) active speakers. <strong><a href="/reviews/xenyx-x1222usb">Find out why</a></strong>.</p>
+
+<h3>My camera, Sony A7</h3>
+
+<p>I can finally use my classic Zeiss and Leica prime lenses again thanks to this camera. Overall I am quite happy with it. This review is work in progress, but you can already read some of it <strong><a href="/reviews/sony-a7">here</a></strong>.</p>
+
+<p>Have a great week,
+Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
       
-        <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/reviews/sony-a7/index.html" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/reviews/sony-a7/index.html" >Tweet</a>
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-08-17T22:06:00+02:00" pubdate data-updated="true">08/17/2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/" >Tweet</a>
   
 
   
@@ -140,9 +192,14 @@
   
 </div>
 
+    
+    <p class="meta">
       
-    </footer>
-  
+        <a class="basic-alignment left" href="/blog/2014/08/10/weekly-update/" title="Previous Post: Weekly Update">&laquo; Weekly Update</a>
+      
+      
+    </p>
+  </footer>
 </article>
 
   <section>
@@ -254,8 +311,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/reviews/sony-a7/index.html';
-        var disqus_url = 'http://matthiasnehlsen.com/reviews/sony-a7/index.html';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/';
         var disqus_script = 'embed.js';
       
     (function () {
