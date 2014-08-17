@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 ---
-Great book, go read it now if you truly want to be a software professional. I am serious.
+Great book, go read it now if you truly want to be a software professional. I am serious. Come back for a detailed review, more soon.
 
 <iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/cleancoder/iframe">
 </iframe>
