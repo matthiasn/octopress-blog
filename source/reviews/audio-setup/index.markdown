@@ -1,12 +1,12 @@
 ---
 layout: page
-title: "My current audio setup: Behringer X1222USB, ADAM A7 and Beyerdynamic DT-990"
+title: "My audio setup: Behringer X1222USB, ADAM A7 and Beyerdynamic DT-990"
 date: 2014-08-16 15:35
 comments: true
 sharing: true
 footer: true
 ---
-Recently I blew a fuse and threw out my 80lbs Onkyo receiver together with the entire **[THX](http://en.wikipedia.org/wiki/THX)** surround sound system. Okay, I did not literally throw that stuff out of the window but instead sold it all for two point something grand. What had happened?
+Recently I blew a fuse and threw out my **80lbs** Onkyo receiver together with the entire **[THX](http://en.wikipedia.org/wiki/THX)** surround sound system. Okay, I did not literally throw that stuff out of the window but instead sold it all for two point something grand. What had happened?
 
 ## There were couple of reasons:
 * I wanted to reorganize my apartment and the rear speakers were in the way.

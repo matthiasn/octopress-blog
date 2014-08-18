@@ -6,7 +6,7 @@ comments: true
 sharing: true
 footer: true
 ---
-I like photography. Particularly with my selection of classic, manual focus Leica and Zeiss prime lenses. I really loved taking photos with my old Leica SLR. Now that is a beautiful camera:
+I like photography. Particularly with my selection of classic, manual focus Leica and Zeiss prime lenses. I really loved taking photos with my old Leica SLR. Now this is a beautiful camera:
 
 {% img left /images/leica-r4s.jpg 'leica r4s' 'images'%}
 
