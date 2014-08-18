@@ -30,7 +30,7 @@ I threw out my fancy surround sound system for this setup[^1]:
 
 I am now using a Behringer XENYX X1222USB mixer together with a pair of ADAM A7. These are amazing active speakers. I already had them but wasn't using them enough recently. Unfortunately you won't get new ones any more but this is the successor:
 
-The price is per unit, not per pair, and they are **totally worth it**. My setup is that the TV out and two 3.5mm jacks (for Smartphone, Tablet) are connected to stereo sources. Video sources are connected to the TV, thus whatever signal is playing on the screen will play on the audio out of the TV.
+The price is of the speakers is per unit, not per pair, and they are **totally worth it**. My setup is that the TV out and two 3.5mm jacks (for Smartphone, Tablet) are connected to stereo sources. Video sources are connected to the TV, thus whatever signal is playing on the screen will play on the audio out of the TV.
 
 I find that this setup works really well and sounds better than the previous and much more expensive expensive surround sound system. And using it is much more fun. I really like the feel of adjusting real faders. Sure, 100mm faders would be nicer still, but the tactile feel and repsonsiveness of 60mm faders is already much better than what any remote control could ever offer. Granted, the mixer is near the couch and desk, so your mileage may vary when trying to replace a home audio system with the setup I describe here.
 
