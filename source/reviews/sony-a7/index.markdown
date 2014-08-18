@@ -23,4 +23,9 @@ So for a while I had the lenses just laying around until I heard about the **Son
 
 With plenty of adapters for different lens mounts available, I had to give this camera a try. It is not the last camera I will every buy, but it is a huge improvement over my previous digital photography experience. Let's look at a few results next.
 
+{% img left /images/audio-setup.jpg 'audio setup' 'images'%}
+
+I like having a minimal **[depth of field](http://en.wikipedia.org/wiki/Depth_of_field)**. You won't achieve that with anything smaller than full-frame and a fast prime lense, as the depth-of-field increases both with smaller sensors and with slower lenses / higher f-number.
+
 **TO BE CONTINUED**
+
