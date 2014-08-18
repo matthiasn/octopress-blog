@@ -5,7 +5,9 @@ date: 2014-07-24 08:30
 comments: true
 categories: 
 ---
-**[Last week](http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/)** I wrote about having written my first actual application using **[ClojureScript](https://github.com/clojure/clojurescript)** and **[Om](https://github.com/swannodette/om)**, a web client for my **[BirdWatch](http://birdwatch.matthiasnehlsen.com/cljs/#*)** application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to start describing the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :) 
+**WORK IN PROGRESS**, last update on August 18th, 2014
+
+I **[wrote](http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/)** about having written my first actual application using **[ClojureScript](https://github.com/clojure/clojurescript)** and **[Om](https://github.com/swannodette/om)**, a web client for my **[BirdWatch](http://birdwatch.matthiasnehlsen.com/cljs/#*)** application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to start describing the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :) 
 
 <!-- more -->
 
@@ -243,7 +245,7 @@ The function above takes the application state, the keyword under which the twee
 **TO BE CONTINUED**
 
 #Summary
-Overall I find working with Clojure(Script) and Om pleasant. Working and thinking in Clojure is a lot of fun. I have heard many people complain about all the parentheses in Lisp but I do not share that sentiment. Quite the opposite, I find that **[s-expressions](http://en.wikipedia.org/wiki/S-expression)** and the associated **[prefix notation](http://en.wikipedia.org/wiki/Polish_notation)** add a lot of clarity without having to learn any additional, language-specific rules.
+Overall I find working with Clojure(Script) and Om pleasant. Working and thinking in Clojure is a lot of fun. I have heard people complain about all the parentheses in Lisp but I do not share that sentiment. Quite the opposite, I find that **[s-expressions](http://en.wikipedia.org/wiki/S-expression)** and the associated **[prefix notation](http://en.wikipedia.org/wiki/Polish_notation)** add a lot of clarity without having to learn any additional, language-specific rules.
 
 However I still need to understand how to better structure an application in Clojure(Script). I am not completely happy with the current architecture of the application described in this post yet. But that will hopefully improve. 
 
