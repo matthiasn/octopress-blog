@@ -71,17 +71,15 @@ However, this can even be simpler using the **defn macro**, like so: ````(defn a
 
 Sometimes, you may want to create a function in place using the anonymous function literal, like so: ````(#(+ % 1) 2)````. This does the same as the anymous function in the first position of the list as above, except for being shorter. During compilation, the ````#(+ % 1)```` expands into ````(fn [a] (+ a 1))````, where the percent sign denotes the first argument. If there are multiple arguments, you use *%1*, *%2* and so on instead (1-based).
 
-**CONTROL STRUCTURES**
+No language would be complete if there was no way to make decisions and branch off accordingly. Of course, Clojure has constructs to control flow as well, most notably the **[if special form](http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?\))**. It is really quite simple: ````(if test then else?)````. The test will be evaluated first. Then based on the result, either **then** or **else** are yielded. Other contructs derive from this, such as the **[when macro](http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/when)**. 
 
-With the basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.
+With these basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.
 
-Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. I have found a **[great resource online for learning Clojure](http://www.braveclojure.com)**. Check it out. And if you like it, why don't your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.
+Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. As the next step I would suggest **[Learn Clojure in Y Minutes](http://learnxinyminutes.com/docs/clojure/)**. There, you simply have more examples to follow along and play around with in your REPL.
+
+As another online resource, I have also found a **[Clojure for the Brave and True](http://www.braveclojure.com)** to be fun and helpful. Check it out. And if you like it, why don't your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.
 
 Another great resource is **[Joy of Clojure, 2nd edition](http://r.matthiasnehlsen.com/joyclojure/link)**. Fun read and I learned a lot. I will revisit it and share some thoughts about it in the **[reviews section](/reviews)** soon.
-
-
-**TO BE CONTINUED**
-
 
 #Application architecture
 Let us now have a look at the implementation of the BirdWatch client [^4]. 
@@ -256,6 +254,7 @@ Please comment and suggest any improvement you can think of, including typos and
 Cheers,
 Matthias
 
+Check out my **[reviews page](/reviews)** where I share my thoughts on books and gadgets.
 
 [^1]: Actually I should mention **[Lo-Dash](http://lodash.com)** instead of **underscore**. I use it as a drop-in replacement for underscore especially for one reason and that is **[_.cloneDeep](http://lodash.com/docs#cloneDeep)**. The ability to deep clone a data structure makes developing an undo functionality much, much, much easier. Not as trivial as with **[ClojureScript](http://swannodette.github.io/2013/12/31/time-travel/)** or with **[Scala.js](http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/)** but it is not difficult, either.
 

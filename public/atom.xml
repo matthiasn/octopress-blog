@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-08-18T01:23:18+02:00</updated>
+  <updated>2014-08-18T10:40:04+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,13 +14,18 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Weekly Update]]></title>
+    <title type="html"><![CDATA[Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/"/>
     <updated>2014-08-17T22:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/17/weekly-update</id>
-    <content type="html"><![CDATA[<h2>git vs brain fart</h2>
+    <content type="html"><![CDATA[<p>In this weekly update, I will show you how <strong>git</strong> helped me alleviate the disastrous consequences of a <strong>brain fart</strong>. I&#8217;ll also share my experiences with <strong>Octopress</strong>. You will learn what helps me <strong>feel better</strong>, day in and day out. Then, there are some changes regarding the <strong>mailing list</strong> for this blog. Also there are <strong>reviews</strong> on a) a great <strong>audio setup</strong> for a combined work / chill area and b) the <strong>Sony A7</strong> full frame camera.</p>
 
-<p>The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more that I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed <code>git add .</code> on the command line.</p>
+<!-- more -->
+
+
+<h2>git vs brain fart</h2>
+
+<p>The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more than I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed <code>git add .</code> on the command line.</p>
 
 <p>So far so good. But then I got distracted by a rather annoying phone call. During that call, something happened that I can best label a <strong><a href="http://en.wikipedia.org/wiki/Brain_fart">brain fart</a></strong>. I typed <code>git reset --hard HEAD</code> and pressed ENTER. Now you will probably ask why anyone would want to do that, particularly before actually committing the changes. To be honest, I am clueless. Maybe it was the geek&#8217;s version of a <strong><a href="http://en.wikipedia.org/wiki/Freudian_slip">Freudian slip</a></strong>? Something in my brain probably wanted to reset its own state to the happier state pre-call, but somehow that idea landed on the command line instead?</p>
 
@@ -76,7 +81,7 @@ Matthias</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Weekly Update]]></title>
+    <title type="html"><![CDATA[Weekly Update: AngularJS book, Geo-Lookup, Reading]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/"/>
     <updated>2014-08-10T22:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update</id>
@@ -318,7 +323,7 @@ Matthias</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Weekly Update]]></title>
+    <title type="html"><![CDATA[Weekly Update: Buying time, AngularJS Meetup, Mountains]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/"/>
     <updated>2014-08-01T15:51:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/01/weekly-update</id>
@@ -468,15 +473,15 @@ You can use the above as an anonymous function like this: <code>((fn [a] (+ a 1)
 
 <p>Sometimes, you may want to create a function in place using the anonymous function literal, like so: <code>(#(+ % 1) 2)</code>. This does the same as the anymous function in the first position of the list as above, except for being shorter. During compilation, the <code>#(+ % 1)</code> expands into <code>(fn [a] (+ a 1))</code>, where the percent sign denotes the first argument. If there are multiple arguments, you use <em>%1</em>, <em>%2</em> and so on instead (1-based).</p>
 
-<p><strong>CONTROL STRUCTURES</strong></p>
+<p>No language would be complete if there was no way to make decisions and branch off accordingly. Of course, Clojure has constructs to control flow as well, most notably the <strong><a href="http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?)">if special form</a></strong>. It is really quite simple: <code>(if test then else?)</code>. The test will be evaluated first. Then based on the result, either <strong>then</strong> or <strong>else</strong> are yielded. Other contructs derive from this, such as the <strong><a href="http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/when">when macro</a></strong>.</p>
 
-<p>With the basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.</p>
+<p>With these basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.</p>
 
-<p>Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. I have found a <strong><a href="http://www.braveclojure.com">great resource online for learning Clojure</a></strong>. Check it out. And if you like it, why don&#8217;t your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.</p>
+<p>Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. As the next step I would suggest <strong><a href="http://learnxinyminutes.com/docs/clojure/">Learn Clojure in Y Minutes</a></strong>. There, you simply have more examples to follow along and play around with in your REPL.</p>
+
+<p>As another online resource, I have also found a <strong><a href="http://www.braveclojure.com">Clojure for the Brave and True</a></strong> to be fun and helpful. Check it out. And if you like it, why don&#8217;t your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.</p>
 
 <p>Another great resource is <strong><a href="http://r.matthiasnehlsen.com/joyclojure/link">Joy of Clojure, 2nd edition</a></strong>. Fun read and I learned a lot. I will revisit it and share some thoughts about it in the <strong><a href="http://matthiasnehlsen.com/reviews">reviews section</a></strong> soon.</p>
-
-<p><strong>TO BE CONTINUED</strong></p>
 
 <h1>Application architecture</h1>
 
@@ -730,6 +735,8 @@ You can use the above as an anonymous function like this: <code>((fn [a] (+ a 1)
 
 <p>Cheers,
 Matthias</p>
+
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 <div class="footnotes">
 <hr/>
 <ol>
@@ -790,6 +797,8 @@ Matthias</p>
 
 <p>Cheers,
 Matthias</p>
+
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -944,10 +953,7 @@ Matthias</p>
 <p>Okay, until next time, I hope to see you at Scala Days. Say hi when you see me, please.
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -1298,12 +1304,7 @@ For this new version I have also rewritten the barchart as a ReactJS component w
 <p>Until next time,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
-
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 <div class="footnotes">
 <hr/>
 <ol>
@@ -1503,10 +1504,7 @@ Matthias</p>
 <p>Cheers,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -2031,10 +2029,7 @@ It is great to only have to think about components and then be able to build you
 <p>Until next time,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -2390,10 +2385,7 @@ Matthias</p>
 <p>Cheers,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -2544,10 +2536,7 @@ Matthias</p>
 <p>Cheers,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -2739,10 +2728,7 @@ Matthias</p>
 <p>Until next time,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -3733,10 +3719,7 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 <p>Cheers,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -3779,10 +3762,7 @@ Matthias</p>
 <p>Alright, this is it for today. Until next time.
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
@@ -3929,10 +3909,7 @@ Matthias</p>
 <p>Cheers,
 Matthias</p>
 
-<p>Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. <strong>Thank you!</strong> Your support will allow me to write more articles like this one.</p>
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
-
+<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   

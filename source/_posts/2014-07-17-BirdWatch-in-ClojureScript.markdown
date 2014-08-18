@@ -34,3 +34,5 @@ EDIT July 24th, 2014: The **[next article](http://matthiasnehlsen.com/blog/2014/
 
 Cheers,
 Matthias
+
+Check out my **[reviews page](/reviews)** where I share my thoughts on books and gadgets.

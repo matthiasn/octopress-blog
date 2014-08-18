@@ -159,15 +159,15 @@ You can use the above as an anonymous function like this: <code>((fn [a] (+ a 1)
 
 <p>Sometimes, you may want to create a function in place using the anonymous function literal, like so: <code>(#(+ % 1) 2)</code>. This does the same as the anymous function in the first position of the list as above, except for being shorter. During compilation, the <code>#(+ % 1)</code> expands into <code>(fn [a] (+ a 1))</code>, where the percent sign denotes the first argument. If there are multiple arguments, you use <em>%1</em>, <em>%2</em> and so on instead (1-based).</p>
 
-<p><strong>CONTROL STRUCTURES</strong></p>
+<p>No language would be complete if there was no way to make decisions and branch off accordingly. Of course, Clojure has constructs to control flow as well, most notably the <strong><a href="http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?)">if special form</a></strong>. It is really quite simple: <code>(if test then else?)</code>. The test will be evaluated first. Then based on the result, either <strong>then</strong> or <strong>else</strong> are yielded. Other contructs derive from this, such as the <strong><a href="http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/when">when macro</a></strong>.</p>
 
-<p>With the basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.</p>
+<p>With these basic constructs you may already find yourself in the position to follow along the following source code. Clojure is not hard. Please let me know if you have problems following along. If so, it is likely not you but rather that my intro was not good enough.</p>
 
-<p>Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. I have found a <strong><a href="http://www.braveclojure.com">great resource online for learning Clojure</a></strong>. Check it out. And if you like it, why don&#8217;t your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.</p>
+<p>Of course there is a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. As the next step I would suggest <strong><a href="http://learnxinyminutes.com/docs/clojure/">Learn Clojure in Y Minutes</a></strong>. There, you simply have more examples to follow along and play around with in your REPL.</p>
+
+<p>As another online resource, I have also found a <strong><a href="http://www.braveclojure.com">Clojure for the Brave and True</a></strong> to be fun and helpful. Check it out. And if you like it, why don&#8217;t your support the author and buy his ebook? You can then enjoy the book on your ebook-reader as well, and even if you read it on the web, you ensure that the author can keep up the good work. Great feeling, I did the same.</p>
 
 <p>Another great resource is <strong><a href="http://r.matthiasnehlsen.com/joyclojure/link">Joy of Clojure, 2nd edition</a></strong>. Fun read and I learned a lot. I will revisit it and share some thoughts about it in the <strong><a href="/reviews">reviews section</a></strong> soon.</p>
-
-<p><strong>TO BE CONTINUED</strong></p>
 
 <h1>Application architecture</h1>
 
@@ -421,6 +421,8 @@ You can use the above as an anonymous function like this: <code>((fn [a] (+ a 1)
 
 <p>Cheers,
 Matthias</p>
+
+<p>Check out my <strong><a href="/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 <div class="footnotes">
 <hr/>
 <ol>
@@ -493,7 +495,7 @@ Matthias</p>
         <a class="basic-alignment left" href="/blog/2014/07/17/BirdWatch-in-ClojureScript/" title="Previous Post: BirdWatch client using ClojureScript and Om">&laquo; BirdWatch client using ClojureScript and Om</a>
       
       
-        <a class="basic-alignment right" href="/blog/2014/08/01/weekly-update/" title="Next Post: Weekly Update">Weekly Update &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2014/08/01/weekly-update/" title="Next Post: Weekly Update: Buying time, AngularJS Meetup, Mountains">Weekly Update: Buying time, AngularJS Meetup, Mountains &raquo;</a>
       
     </p>
   </footer>
@@ -525,11 +527,11 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/08/17/weekly-update/">Weekly Update</a>
+        <a href="/blog/2014/08/17/weekly-update/">Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2014/08/10/weekly-update/">Weekly Update</a>
+        <a href="/blog/2014/08/10/weekly-update/">Weekly Update: AngularJS book, Geo-Lookup, Reading</a>
       </li>
     
       <li class="post">
@@ -537,7 +539,7 @@ Matthias</p>
       </li>
     
       <li class="post">
-        <a href="/blog/2014/08/01/weekly-update/">Weekly Update</a>
+        <a href="/blog/2014/08/01/weekly-update/">Weekly Update: Buying time, AngularJS Meetup, Mountains</a>
       </li>
     
       <li class="post">

@@ -1,12 +1,16 @@
 ---
 layout: post
-title: "Weekly Update"
+title: "Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup"
 date: 2014-08-17 22:06
 comments: true
 categories: 
 ---
+In this weekly update, I will show you how **git** helped me alleviate the disastrous consequences of a **brain fart**. I'll also share my experiences with **Octopress**. You will learn what helps me **feel better**, day in and day out. Then, there are some changes regarding the **mailing list** for this blog. Also there are **reviews** on a) a great **audio setup** for a combined work / chill area and b) the **Sony A7** full frame camera.
+
+<!-- more -->
+
 ## git vs brain fart
-The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more that I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed ````git add .```` on the command line.
+The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more than I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed ````git add .```` on the command line.
 
 So far so good. But then I got distracted by a rather annoying phone call. During that call, something happened that I can best label a **[brain fart](http://en.wikipedia.org/wiki/Brain_fart)**. I typed ````git reset --hard HEAD```` and pressed ENTER. Now you will probably ask why anyone would want to do that, particularly before actually committing the changes. To be honest, I am clueless. Maybe it was the geek's version of a **[Freudian slip](http://en.wikipedia.org/wiki/Freudian_slip)**? Something in my brain probably wanted to reset its own state to the happier state pre-call, but somehow that idea landed on the command line instead?
 
@@ -41,7 +45,6 @@ I have a lot of fun writing stuff at the moment. I also do so for myself. The fi
 
 ## Mailing list: one and only one
 At first I thought about creating a separate mailing list because I didn't want to spam anyone who subscribed for infrequent tutorials with weekly updates. But that's too much work on my end. So instead I will unify the mailing lists. If the updates are too frequent for any of the existing subscribers, there are two options: **a)** let me know or **b)** unsubscribe. But why don't you give it a try? I'll try to make the weekly update an entertaining read.
-
 
 ## Book and gadget reviews
 Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created a **[page for reviews](/reviews)**. I also started writing about some electronic stuff that I own:.

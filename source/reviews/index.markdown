@@ -8,10 +8,14 @@ I like books and gadgets. Who doesn't? Regarding the books, I read a lot but I a
 
 Regarding the gadgets, I usually have strong feelings, good or bad, about gadgets I buy. I usually also wish to share that opinion. I will just dump my thoughts here so I won't have to annoy my friends with stuff they don't care about. Maybe someone cares.
 
+##Gadgets
+* **[My current audio setup](/reviews/audio-setup)**: a **Behringer XENYX X1222USB** mixer, **ADAM A7** active speakers and **Beyerdynamic DT-990** headphones.
+* **[Sony A7](/reviews/sony-a7)**: my current camera, a full-frame, mirrorless and compact camera that plays well with my classic Leica and Zeiss lenses.
+* **[Zeiss Vario-Tessar T* FE 24-70mm f/4 ZA OSS](/reviews/zeiss-24-70)**: a zoom lens for the camera above. I ultimately decided to send it back.
+
 ##Books
 * **[Robert C. Martin (Uncle Bob) - Clean Coder](/reviews/cleancoder)**
 
-##Gadgets
-* **[Sony A7](/reviews/sony-a7)**: my current camera, a full-frame, mirrorless and compact camera that plays well with my classic Leica and Zeiss lenses.
-* **[Zeiss Vario-Tessar T* FE 24-70mm f/4 ZA OSS](/reviews/zeiss-24-70)**: a zoom lens for the camera above. I ultimately decided to send it back.
-* **[My current audio setup](/reviews/audio-setup)**: a **Behringer XENYX X1222USB** mixer, **ADAM A7** active speakers and **Beyerdynamic DT-990** headphones.
+The books list will grow in the foreseeable future. Here are some of the books that I am planning to cover:
+
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>

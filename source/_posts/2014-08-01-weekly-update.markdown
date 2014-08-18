@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Weekly Update"
+title: "Weekly Update: Buying time, AngularJS Meetup, Mountains"
 date: 2014-08-01 15:51
 comments: true
 categories: 

@@ -230,9 +230,7 @@ ReactJS nicely complements the rendering of the UI of the BirdWatch application.
 Until next time,
 Matthias
 
-Below are some books that I have found useful and I hope will be helpful for you as well. You can support this blog by clicking on the slideshow and buying anything on Amazon, no matter if it is a listed item or not. **Thank you!** Your support will allow me to write more articles like this one.
-
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/wide"> </SCRIPT>
+Check out my **[reviews page](/reviews)** where I share my thoughts on books and gadgets.
 
 [^1]: The list of technical terms I use for the live demo under birdwatch.matthiasnehlsen.com easily fits into this cap, in which case the application will receive all these tweets. The term **Obama** also usually fits into this limit. The term **love** on the other hand doesn't. If you were to download BirdWatch from GitHub, create a Twitter API key and replace the list of software terms with only the word **love**, I bet you will reach the 1% limit any second of the day. However not to worry, Twitter will still deliver at the rate limit. When I last tried it, it was about 4 million tweets per day. Sure, you might lose tweets doing this, but there's not need to worry when you are looking for popular tweets as they will appear time and time again as a retweet, making it highly unlikely to miss them over time. Only the current retweet count may lag behind when the last update as a retweet was dropped.
 

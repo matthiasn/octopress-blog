@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Weekly Update"
+title: "Weekly Update: AngularJS book, Geo-Lookup, Reading"
 date: 2014-08-10 22:06
 comments: true
 categories: 
