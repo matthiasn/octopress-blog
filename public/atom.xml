@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-08-25T19:41:09+02:00</updated>
+  <updated>2014-08-25T23:39:52+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -27,41 +27,88 @@
 
 <p>I am very excited that the book that <strong><a href="http://amitgharat.wordpress.com">Amit Gharat</a></strong> and I wrote about <strong><a href="http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1783288477&amp;linkCode=as2&amp;tag=matthiasnehls-20&amp;linkId=7WKFJKNQICCUSFES">AngularJS UI Development</a></strong> is now available for <strong><a href="http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1783288477&amp;linkCode=as2&amp;tag=matthiasnehls-20&amp;linkId=7WKFJKNQICCUSFES">pre-order on Amazon</a></strong>. Interesting experience to see it being listed already while still working on the final stages.</p>
 
-<p>We will have content available for preview soon. On my end, I will <strong>publish</strong> an article about <strong>setting up the environment for AngularJS</strong> with a <strong>build system consisting of Grunt, Bower, Karma and Protractor</strong>. Last week I have also given a talk on the subject at the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/196972082/">Hamburg AngularJS meetup</a></strong>. Or rather a live coding session in which we coded up an application that is <strong>tested in Chrome, Firefox, PhantomJS and also in Mobile Safari</strong>. Android is still missing due to some difficulties I had but should be added soon. The project that this article will be based upon is already available on <strong><a href="https://github.com/matthiasn/angular-grunt-protractor-starter">GitHub</a></strong>. You may find it to be a good starting point for an AngularJS application that includes a test and build system. Besides the planned article I also want to do a screencast on the subject. Stay tuned. By the way, <strong>you</strong> could help me here with testing it on Android.</p>
+<p>We will have <strong>content</strong> available for <strong>preview</strong> soon. On my end, I will <strong>publish</strong> an article about <strong>setting up the environment for AngularJS</strong> with a <strong>build system consisting of Grunt, Bower, Karma and Protractor</strong>. Last week I have also given a talk on the subject at the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/196972082/">Hamburg AngularJS meetup</a></strong>. Or rather a live coding session in which we coded up an application that is <strong>tested in Chrome, Firefox, PhantomJS and also in Mobile Safari</strong>. <strong>Android</strong> is still <strong>missing</strong> due to some difficulties but should be added soon. The project that this article will be based upon is already available on <strong><a href="https://github.com/matthiasn/angular-grunt-protractor-starter">GitHub</a></strong>. You may find it to be a good starting point for an <strong>AngularJS</strong> application that includes a <strong>test</strong> and <strong>build</strong> system. Besides the planned article I also want to do a <strong>screencast</strong> on the subject. Stay tuned. By the way, <strong>you</strong> could help with testing the application on Android.</p>
 
 <h2>Tweet stream analysis with Clojure and ClojureScript</h2>
 
-<p>I recently rewrote the client side of my BirdWatch application using ClojureScript. While I enjoyed the process, I also noticed some issues with performance when trying to keep the application response while transforming previous tweets as quickly as possible. While optimizations certainly could have done on the client side alone, this was a good reminder that the architecture of the information flow was far from ideal. The previous version was also a bit of a <strong>Frankenstein&#8217;s patchwork</strong> of programming languages. I acknowledge that it might be a little bit of a tough sell to have to understand both Scala and Clojure in order to wrap your head around a single application. Totally unnecesary, too.</p>
+<p>I recently <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">rewrote</a></strong> the client side of my <strong><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a></strong> application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong>. While I enjoyed the process, I also noticed some issues with performance when trying to keep the application responsive while <strong>ingesting and transforming</strong> thousands of previous tweets as quickly as possible. While optimizations certainly could have been done on the client side alone, this was a good reminder that the architecture of the information flow was <strong>far from ideal</strong>. The previous version was also a bit of a <strong>Frankenstein&#8217;s patchwork</strong> of programming languages. I acknowledge that it might be a little bit of a <strong>tough sell</strong> to have to understand both <strong><a href="http://www.scala-lang.org">Scala</a></strong> and <strong><a href="http://clojure.org">Clojure</a></strong> in order to wrap your head around a single application. Totally unnecessary, too.</p>
 
-<p>So I rewrote the server side using Clojure. That already works nice, this time making use of Websockets instead of Server-Sent events.</p>
+<p>So I rewrote the server side using <strong>Clojure</strong>. That already works nicely, this time making use of <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSockets</a></strong> instead of <strong><a href="http://en.wikipedia.org/wiki/Server-sent_events">Server-Sent Events</a></strong>. Turns out <strong>WebSockets</strong> are a nice fit conceptually for <strong><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">CSP-style channels</a></strong>.</p>
 
-<p>Chunks of previous tweeets were all loaded into the client and processed there. While that kept the server load fairly low, it also meant that the user experience would degrade substantially when the available network connection between client and server was any less than ideal. All along I had been wanting to process the historic tweets on the server side and then only do incremental updates on the client side, but that seemed very tedious when different languages on the client and on the server were involved. I decidedly did not want to test and write more or less the same code but in different languages.</p>
+<p>A couple of things still need to be solved. In order to fully achieve the previous functionality, there needs to be an <strong>auto-reconnect</strong> when the connection to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> is lost. That should be really simple, given what is there already. Also, <strong>matching</strong> new tweets with the clients&#8217; queries using <strong>ElasticSearch</strong>&#8217;s <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html">Percolator</a></strong> and only delivering a <strong>filtered stream</strong> needs to be implemented. This one is slightly more involved, but also totally seems doable.</p>
 
-<p>Now with Clojure and ClojureScript being so similar, my idea was to use a part of the code base on both sides and split the computation. Then, the amount of data having to traverse the potentially slow network connection would be much, leading to a better user experience.</p>
+<p>Above and beyond, it seems useful to <strong>partially perform</strong> the computation (ranking by retweets, word counts) <strong>on the server</strong> in order to <strong>reduce load</strong> on the client. With <strong>Clojure</strong> and <strong>ClojureScript</strong> being so similar, my idea is to use a part of the code base on both sides and split the computation. Then, the amount of data having to traverse the potentially slow network connection would be reduced drastically, leading to faster loading and a more <strong>mobile-friendly</strong> memory footprint of the client.</p>
 
-<p>A new article on that application will follow soon, the code is out on Github now already.</p>
+<p>A new article on this application rewrite will follow soon. The work in progress code is on <strong><a href="https://github.com/matthiasn/BirdWatch/tree/2014-08-25-Clojure-Server">Github</a></strong> already, currently in a separate branch.</p>
 
 <h2>Web Components / Polymer / X-Tag resources</h2>
 
-<p>I already mentioned last week that I find some of the ideas behind <strong><a href="http://webcomponents.org">Web Components</a></strong> brilliant, in particular <strong>Shadow DOM</strong> and <strong>Custom Elements</strong>. Now that I am learning these concepts anyway, I thought I might as well share useful resources I have found so I created a <strong><a href="https://github.com/matthiasn/WebComponents-Polymer-Resources">list over on GitHub</a></strong>. Check it out and please add your links as well. I expect this list to grow a lot in the next couple of weeks.</p>
+<p>I already mentioned last week that I find some of the ideas behind <strong><a href="http://webcomponents.org">Web Components</a></strong> <strong>brilliant</strong>, in particular <strong>Shadow DOM</strong> and <strong>Custom Elements</strong>. Now that I am learning these concepts anyway, I thought I might as well <strong>share useful resources</strong> I find, so I created a <strong><a href="https://github.com/matthiasn/WebComponents-Polymer-Resources">list over on GitHub</a></strong>. Check it out and <strong>please add your links</strong> as well. I expect this list to grow substantially in the next couple of weeks.</p>
 
 <h2>Upstart scripts for Play</h2>
 
-<p>I am running the live instances of my <strong><a href="http://playframework">Play</a></strong> applications (BirdWatch, sse-chat, amzn-geo-lookup) on an Ubuntu server. There are hardly any disruptions, like once every few months, but when there are, so far I had to restart the applications manually. Not terrible but not great either. So how could that be done better? <strong><a href="http://upstart.ubuntu.com">Upstart</a></strong> provides an answer. Let us create scripts so that we can start and stop applications as a service (and have them start automatically when the system reboots).</p>
+<p>I am running <strong>live instances</strong> of my <strong><a href="http://playframework">Play</a></strong> applications (BirdWatch, sse-chat, amzn-geo-lookup) on an <strong><a href="http://www.ubuntu.com">Ubuntu</a></strong> server. There are <strong>hardly any disruptions</strong>, like once every few months, but when there were, so far I had to restart the applications <strong>manually</strong>. Not terrible when all is running smoothly but not great either. So how could that be done better? <strong><a href="http://upstart.ubuntu.com">Upstart</a></strong> provides the answer. After some googling I found <strong><a href="http://www.agileand.me/blog/posts/play-2-2-x-upstart-init-script">this blog post</a></strong> by <strong><a href="https://twitter.com/ajevans85">Adam Evans</a></strong>. I have only slightly modified it and now I have all of my applications running as services that I can <strong>start</strong> and <strong>stop</strong> the way one would expect, e.g.:</p>
 
-<p>Then</p>
+<pre><code># status birdwatch
+birdwatch start/running, process 947
+# stop birdwatch
+birdwatch stop/waiting
+# start birdwatch
+birdwatch start/running, process 30453
+</code></pre>
 
-<p>I particularly found <strong><a href="http://www.agileand.me/blog/posts/play-2-2-x-upstart-init-script">this blog post</a></strong> by <strong><a href="https://twitter.com/ajevans85">Adam Evans</a></strong> useful.</p>
+<p>Also, the services <strong>start automatically</strong> after a system reboot.</p>
 
-<p>https://www.playframework.com/documentation/2.2.x/ProductionDist
-http://upstart.ubuntu.com/cookbook/
-http://upstart.ubuntu.com/getting-started.html</p>
+<p>So what needed to be done? First of all, we need a standalone instance of the applications using the <strong><a href="https://www.playframework.com/documentation/2.2.x/ProductionDist">dist</a></strong> command, e.g.;</p>
 
-<p>Et voilà, after a restart of the server, all services come up as expected. Much nicer.</p>
+<pre><code># play dist
+[info] Loading project definition from /home/bw/BirdWatch/project
+[info] Set current project to BirdWatch (in build file:/home/bw/BirdWatch/)
+[info] Wrote /home/bw/BirdWatch/target/scala-2.10/birdwatch_2.10-0.3.0.pom
+[info] 
+[info] Your package is ready in /home/bw/BirdWatch/target/universal/birdwatch-0.3.0.zip
+</code></pre>
+
+<p>We can unpack the zip file where we choose and then simply adapt the script from the blog post mentioned above, in this case:</p>
+
+<pre><code>description "Upstart script for https://github.com/matthiasn/Birdwatch, modified from http://www.agileand.me/blog/posts/play-2-2-x-upstart-init-script"
+
+env USER=bw
+env GROUP=www
+env APP_HOME=/home/bw/apps/birdwatch-0.3.0
+env APP_NAME=birdwatch
+env PORT=9000
+env BIND_ADDRESS=0.0.0.0
+env EXTRA=""
+
+start on (filesystem and net-device-up IFACE=lo)
+stop on runlevel [!2345]
+
+respawn
+respawn limit 30 10
+umask 022
+expect daemon
+
+pre-start script
+    #If improper shutdown and the PID file is left on disk delete it so we can start again
+
+    if [ -f $APP_HOME/RUNNING_PID ] &amp;&amp; ! ps -p `cat $APP_HOME/RUNNING_PID` &gt; /dev/null ; then
+        rm $HOME/RUNNING_PID ;
+    fi
+end script
+
+exec start-stop-daemon --pidfile ${APP_HOME}/RUNNING_PID --chdir ${APP_HOME} --chuid $USER:$GROUP --exec ${APP_HOME}/bin/$APP_NAME --background --start -- -Dhttp.port=$PORT -Dhttp.address=$BIND_ADDRESS $EXTRA
+</code></pre>
+
+<p>Et voilà, after a restart of the server, all services come up as expected. Much nicer. The script is also on <strong><a href="https://github.com/matthiasn/BirdWatch/blob/797c9b27eeb018138e90f95ad3df8774b4fbd6e5/conf/upstart/birdwatch.conf">GitHub</a></strong>. For more information, also check out the <strong><a href="http://upstart.ubuntu.com/cookbook/">upstart cookbok</a></strong> and the <strong><a href="http://upstart.ubuntu.com/getting-started.html">getting started guide</a></strong>.</p>
 
 <h2>Conclusion</h2>
 
-<p>Last week was fairly productive, I got some really cool stuff done that had been on my mind for a while. I hope to continue this flow in the week that just started. I&#8217;ll let you know next week. <strong><a href="http://en.wikipedia.org/wiki/Cliffhanger">Cliffhanger</a>: I recently increased the </strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fmatthiasnehlsen.com&amp;tab=desktop">Google PageSpeed Insights</a><strong> score of this blog by a lot, from </strong>58/100 to 83/100 for mobile<strong> and from </strong>77/100 to 84/100 for desktop**. It also feels like it is loading a lot faster. Next week I&#8217;ll let you know what I did.</p>
+<p>Last week was fairly <strong>productive</strong>, I got some really cool stuff done that had been on my mind for a while. I hope to continue this flow in the week that just started. I&#8217;ll let you know next week. <strong><a href="http://en.wikipedia.org/wiki/Cliffhanger">Cliffhanger</a></strong>: I recently increased the <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fmatthiasnehlsen.com&amp;tab=desktop">Google PageSpeed Insights</a></strong> score of this blog by a lot, from <strong>58/100 to 83/100 for mobile</strong> and from <strong>77/100 to 90/100 for desktop</strong>.</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed.png" title="'pagespeed results'" ></p>
+
+<p>It also feels like the pages are loading a lot faster. <strong>Next week</strong> I&#8217;ll let you know what I did.</p>
 
 <p>Have a great week,
 Matthias</p>
