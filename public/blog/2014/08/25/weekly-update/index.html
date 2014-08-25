@@ -5,12 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Hello World - Matthias Nehlsen</title>
+  <title>Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Who am I?
-My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project &hellip;">
+  <meta name="description" content="In this weekly update, I am talking about Clojure and ClojureScript, an upcoming article on AngularJS, Grunt, Karma and Protractor and how I am using &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -19,7 +18,7 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/04/19/hello-world">
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -64,7 +63,7 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
 
   <header>
     
-      <h1 class="entry-title">Hello World</h1>
+      <h1 class="entry-title">Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play</h1>
     
     
       <p class="meta">
@@ -80,45 +79,60 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   
 
 
-<time datetime="2013-04-19T21:19:00+02:00" pubdate data-updated="true">04/19/2013</time>
+<time datetime="2014-08-25T19:06:00+02:00" pubdate data-updated="true">08/25/2014</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p><strong>Who am I?</strong>
-My name is Matthias and I had my first computer before I had my first bike. I&#8217;ve spent most of my career working in IT project management and systems engineering, having run my own company for over a decade. I was doing well financially, but really wasn&#8217;t satisfying my own curiosity. Who wants to spend their time chasing bugs in systems they didn&#8217;t have any part in creating. I don’t.</p>
+<div class="entry-content"><p>In this weekly update, I am talking about <strong>Clojure and ClojureScript</strong>, an upcoming article on <strong>AngularJS, Grunt, Karma and Protractor</strong> and how I am using <strong>Upstart</strong> to run my <strong>Play</strong> applications as services on <strong>Ubuntu</strong>.</p>
 
 <!-- more -->
 
 
-<p>After some wandering, I discovered what a delight it can be to write these amazing little things called &#8216;programs&#8217; that come to existence almost completely through the workings of the mind. A couple of years ago, I finally decided that it was time for a major change. I knew I really wanted to be spend my time and energy in the creative process of developing applications that elegantly solve problems, so I made the move, and I haven&#8217;t looked back since.</p>
+<h2>AngularJS book available for pre-order on Amazon, Meetup</h2>
 
-<p><strong>Why am I blogging?</strong>
-I am fascinated by the idea of reasoning over live data streams. There are quite a few things that I still need to learn in order to turn my ideas into working code. I find that I learn particularly well when explaining things to others, so writing this blog seems like an awesome idea.</p>
+<p>I am very excited that the book that <strong><a href="http://amitgharat.wordpress.com">Amit Gharat</a></strong> and I wrote about <strong><a href="http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1783288477&amp;linkCode=as2&amp;tag=matthiasnehls-20&amp;linkId=7WKFJKNQICCUSFES">AngularJS UI Development</a></strong> is now available for <strong><a href="http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1783288477&amp;linkCode=as2&amp;tag=matthiasnehls-20&amp;linkId=7WKFJKNQICCUSFES">pre-order on Amazon</a></strong>. Interesting experience to see it being listed already while still working on the final stages.</p>
 
-<p>Recently I started to work on a reactive web project for my portfolio, written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using the <strong><a href="http://www.playframework.com">Play Framework</a></strong>. It presented an ideal opportunity to make this project open source and use it as the first thing to write about. This has been tremendous fun and really exciting so far. I put that project called BirdWatch on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>, installed a demo on a <strong><a href="http://birdwatch.matthiasnehlsen.com">web server</a></strong> and showed it to a handful of people, not thinking that it was anywhere near being published in a broader sense.</p>
+<p>We will have content available for preview soon. On my end, I will <strong>publish</strong> an article about <strong>setting up the environment for AngularJS</strong> with a <strong>build system consisting of Grunt, Bower, Karma and Protractor</strong>. Last week I have also given a talk on the subject at the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/196972082/">Hamburg AngularJS meetup</a></strong>. Or rather a live coding session in which we coded up an application that is <strong>tested in Chrome, Firefox, PhantomJS and also in Mobile Safari</strong>. Android is still missing due to some difficulties I had but should be added soon. The project that this article will be based upon is already available on <strong><a href="https://github.com/matthiasn/angular-grunt-protractor-starter">GitHub</a></strong>. You may find it to be a good starting point for an AngularJS application that includes a test and build system. Besides the planned article I also want to do a screencast on the subject. Stay tuned. By the way, <strong>you</strong> could help me here with testing it on Android.</p>
 
-<p><img class="left" src="/images/screenshot.png" title="image" alt="images"></p>
+<h2>Tweet stream analysis with Clojure and ClojureScript</h2>
 
-<p>Then it got mentioned on Twitter, retweeted 16 times and before I knew it, I had visitors from 272 cities in 48 countries on that web server. I know because out of curiosity I wrote a little logging routine that does GeoIP-lookup for every IP-address visiting that server on the fly, but that is the topic for a future post, potentially with a live visualization for the curious website owner.</p>
+<p>I recently rewrote the client side of my BirdWatch application using ClojureScript. While I enjoyed the process, I also noticed some issues with performance when trying to keep the application response while transforming previous tweets as quickly as possible. While optimizations certainly could have done on the client side alone, this was a good reminder that the architecture of the information flow was far from ideal. The previous version was also a bit of a <strong>Frankenstein&#8217;s patchwork</strong> of programming languages. I acknowledge that it might be a little bit of a tough sell to have to understand both Scala and Clojure in order to wrap your head around a single application. Totally unnecesary, too.</p>
 
-<p><strong>What will I be blogging about?</strong>
-I will be blogging about functional programming, reactive data processing and data visualization. I am particularly interested in observable data from the real world moving through information systems, ideally for visualizations that are both useful and pleasant to look at.</p>
+<p>So I rewrote the server side using Clojure. That already works nice, this time making use of Websockets instead of Server-Sent events.</p>
 
-<p>For the time being, you can expect me to use <strong><a href="http://www.scala-lang.org">Scala</a></strong>, <strong><a href="http://www.playframework.com">Play</a></strong> and <strong><a href="http://akka.io">Akka</a></strong> on the server side, a beautiful technology stack that allows solving concurrent problems in surprisingly short amounts of time. For the client side I am just getting started with <strong><a href="http://d3js.org">D3.js</a></strong>, a JavaScript library for data-driven DOM manipulation. It allows for absolutely stunning visualizations, even though I am nowhere near that as of yet.</p>
+<p>Chunks of previous tweeets were all loaded into the client and processed there. While that kept the server load fairly low, it also meant that the user experience would degrade substantially when the available network connection between client and server was any less than ideal. All along I had been wanting to process the historic tweets on the server side and then only do incremental updates on the client side, but that seemed very tedious when different languages on the client and on the server were involved. I decidedly did not want to test and write more or less the same code but in different languages.</p>
 
-<p>You can also expect me to continue getting live prototypes up and running for the things I write about, just like the one for <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong>. I find code that is not executed to be a wasted effort, and there is no better proof for any code than running it. I already learned a lot regarding the architecture of BirdWatch and there are a few things that I would do differently in the future, but that is also a topic for a future post.</p>
+<p>Now with Clojure and ClojureScript being so similar, my idea was to use a part of the code base on both sides and split the computation. Then, the amount of data having to traverse the potentially slow network connection would be much, leading to a better user experience.</p>
 
-<p><strong>How can you leave feedback?</strong>
-I am starting this blog because I am hoping to learn a lot in the process, particularly from interaction with you, the reader. So please comment on the blog posts, correct me where I am wrong, and let me know where you think a more elegant solution could be found.</p>
+<p>A new article on that application will follow soon, the code is out on Github now already.</p>
 
-<p>Most importantly, ask if there is anything that you find difficult to understand. My goal in all of this is to explain things as clearly as possible, so please let me know when I&#8217;ve failed to do that. Ask questions in the comments section if you think that others might benefit from the answers as well. Of course, you can also always contact me by email, though that may take longer for a response.</p>
+<h2>Web Components / Polymer / X-Tag resources</h2>
 
-<p>You can also follow me on Twitter <strong><a href="https://twitter.com/matthiasnehlsen">@matthiasnehlsen</a></strong>. I just launched my feed, so you&#8217;ll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.</p>
+<p>I already mentioned last week that I find some of the ideas behind <strong><a href="http://webcomponents.org">Web Components</a></strong> brilliant, in particular <strong>Shadow DOM</strong> and <strong>Custom Elements</strong>. Now that I am learning these concepts anyway, I thought I might as well share useful resources I have found so I created a <strong><a href="https://github.com/matthiasn/WebComponents-Polymer-Resources">list over on GitHub</a></strong>. Check it out and please add your links as well. I expect this list to grow a lot in the next couple of weeks.</p>
 
-<p>-Matthias</p>
+<h2>Upstart scripts for Play</h2>
+
+<p>I am running the live instances of my <strong><a href="http://playframework">Play</a></strong> applications (BirdWatch, sse-chat, amzn-geo-lookup) on an Ubuntu server. There are hardly any disruptions, like once every few months, but when there are, so far I had to restart the applications manually. Not terrible but not great either. So how could that be done better? <strong><a href="http://upstart.ubuntu.com">Upstart</a></strong> provides an answer. Let us create scripts so that we can start and stop applications as a service (and have them start automatically when the system reboots).</p>
+
+<p>Then</p>
+
+<p>I particularly found <strong><a href="http://www.agileand.me/blog/posts/play-2-2-x-upstart-init-script">this blog post</a></strong> by <strong><a href="https://twitter.com/ajevans85">Adam Evans</a></strong> useful.</p>
+
+<p>https://www.playframework.com/documentation/2.2.x/ProductionDist
+http://upstart.ubuntu.com/cookbook/
+http://upstart.ubuntu.com/getting-started.html</p>
+
+<p>Et voilà, after a restart of the server, all services come up as expected. Much nicer.</p>
+
+<h2>Conclusion</h2>
+
+<p>Last week was fairly productive, I got some really cool stuff done that had been on my mind for a while. I hope to continue this flow in the week that just started. I&#8217;ll let you know next week. <strong><a href="http://en.wikipedia.org/wiki/Cliffhanger">Cliffhanger</a>: I recently increased the </strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fmatthiasnehlsen.com&amp;tab=desktop">Google PageSpeed Insights</a><strong> score of this blog by a lot, from </strong>58/100 to 83/100 for mobile<strong> and from </strong>77/100 to 84/100 for desktop**. It also feels like it is loading a lot faster. Next week I&#8217;ll let you know what I did.</p>
+
+<p>Have a great week,
+Matthias</p>
 </div>
 
 
@@ -141,7 +155,7 @@ I am starting this blog because I am hoping to learn a lot in the process, parti
   
 
 
-<time datetime="2013-04-19T21:19:00+02:00" pubdate data-updated="true">04/19/2013</time>
+<time datetime="2014-08-25T19:06:00+02:00" pubdate data-updated="true">08/25/2014</time>
       
 
 
@@ -149,7 +163,7 @@ I am starting this blog because I am hoping to learn a lot in the process, parti
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/04/19/hello-world/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/04/19/hello-world/" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/" >Tweet</a>
   
 
   
@@ -174,8 +188,8 @@ I am starting this blog because I am hoping to learn a lot in the process, parti
     
     <p class="meta">
       
+        <a class="basic-alignment left" href="/blog/2014/08/17/weekly-update/" title="Previous Post: Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup">&laquo; Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup</a>
       
-        <a class="basic-alignment right" href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/" title="Next Post: Iteratee: can I have that in a sentence?">Iteratee: can I have that in a sentence? &raquo;</a>
       
     </p>
   </footer>
@@ -290,8 +304,8 @@ I am starting this blog because I am hoping to learn a lot in the process, parti
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/04/19/hello-world/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/04/19/hello-world/';
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/';
         var disqus_script = 'embed.js';
       
     (function () {
