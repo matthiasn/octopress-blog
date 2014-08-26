@@ -86,7 +86,7 @@ Last week was fairly **productive**, I got some really cool stuff done that had 
 
 {% img left /images/pagespeed.png 'pagespeed results'%}
 
-It also feels like the pages are loading a lot faster. **Next week** I'll let you know what I did.
+It also feels like the pages are loading a lot faster. **Next week** I'll let you know what I did. Would you like to get notified when the next article is out? How about you <a href="http://eepurl.com/y0HWv" target="_blank"><strong>sign up for the mailing list</strong></a>.
 
 Have a great week,
 Matthias

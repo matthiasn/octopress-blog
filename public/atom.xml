@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-08-26T01:06:34+02:00</updated>
+  <updated>2014-08-26T02:04:04+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -108,7 +108,7 @@ exec start-stop-daemon --pidfile ${APP_HOME}/RUNNING_PID --chdir ${APP_HOME} --c
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed.png" title="'pagespeed results'" ></p>
 
-<p>It also feels like the pages are loading a lot faster. <strong>Next week</strong> I&#8217;ll let you know what I did.</p>
+<p>It also feels like the pages are loading a lot faster. <strong>Next week</strong> I&#8217;ll let you know what I did. Would you like to get notified when the next article is out? How about you <a href="http://eepurl.com/y0HWv" target="_blank"><strong>sign up for the mailing list</strong></a>.</p>
 
 <p>Have a great week,
 Matthias</p>
