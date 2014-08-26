@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework - Matthias Nehlsen</title>
+  <title>Reading Lists - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to &hellip;">
+  <meta name="description" content="Reading Lists I needed a good way to keep track of articles and other resources about technologies that I am interested in so I started compiling &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play">
+  <link rel="canonical" href="http://matthiasnehlsen.com/reading-lists">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
@@ -58,105 +58,30 @@
   <div id="main">
     <div id="content">
       <div>
-<article class="hentry" role="article">
-  <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title">BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework</h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
+<article role="article">
   
-
-
-<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
-        
-      </p>
+  <header>
+    <h1 class="entry-title">Reading Lists</h1>
     
   </header>
+  
+  <p>I needed a good way to keep track of articles and other resources about technologies that I am interested in so I started compiling lists for this purpose. Now chances are that other people will find these lists useful as well, so I have put them on <strong>GitHub</strong>:</p>
+
+<ul>
+<li><a href="https://github.com/matthiasn/WebComponents-Polymer-Resources" target="_blank"><strong>Web Components and Polymer</strong></a></li>
+<li><a href="https://github.com/matthiasn/Clojure-Resources" target="_blank"><strong>Clojure, ClojureScript and Om</strong></a>: coming soon</li>
+</ul>
 
 
-<div class="entry-content"><p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to work in for a single article, but then again there is enough interesting stuff going on in this new version that calls for multiple blog articles. Initially this application was only meant to be an exercise in streaming information to web clients. But along the way I noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
+<p>Please get involved and add your links as well. Your contribution is only one pull request away.</p>
 
-<!-- more -->
-
-
-<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest, and  I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> for software engineering related tweets. The application subscribes to all tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped at one percent of all tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
-
-<p>Here is how it looks like:</p>
-
-<p><img class="left" src="/images/130812-screenshot.png" title="image" alt="images"></p>
-
-<p>As you can see above, there is now a search bar which allows you to narrow down the selection of tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time the link is opened, not at the time it is bookmarked. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
-
-<p>Here are some examples.</p>
-
-<p>You&#8217;re a Java developer and you&#8217;re looking for a new job? Try this search: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring)</strong></a></p>
-
-<p>You want to limit your job search to London? No problem. Here you go: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring) london</strong></a></p>
-
-<p>You&#8217;re interested in tweets about Python the language but not about <a target="_blank" href="http://www.youtube.com/watch?v=kQFKtI6gn9Y&list=TLbNXOyfwTL14"><strong>Monty Python</strong></a>: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/python%20-monty"><strong>python -monty</strong></a></p>
-
-<p>Well, you get the idea. <strong>AND</strong> is the standard operator, it is applied unless <strong>OR</strong> is specifically used between two terms.</p>
-
-<p>You can download the application and run it for a different area of your choosing. Personally, I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I may decide to run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
-
-<p>So how can this be improved in the future? A stream of tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at a glance, which newspaper articles and other links are most talked about. This analysis could even be weighted by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be some visualizations about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? Or is it the other way around? Get involved, there are plenty of options on how to work with the data.</p>
-
-<p>You can find a brief overview of the technology in the project description on <a target="_blank" href="https://github.com/matthiasn/BirdWatch"><strong>Github</strong></a>.</p>
-
-<p>In the future I will probably write some articles that further explain different parts of the application. Let me know what you are particularly interested in.</p>
-
-<p>Alright, this is it for today. Until next time.
-Matthias</p>
-
-<p>Check out my <strong><a href="/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-</div>
-
-
-  <footer>
-    <p class="meta">
+  
+    <footer>
       
-  
-
-<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
-
       
-
-
-
-
-
-
-
-
+        <div class="sharing">
   
 
-
-<time datetime="2013-08-13T10:08:00+02:00" pubdate data-updated="true">08/13/2013</time>
-      
-
-
-    </p>
-    
-      <div class="sharing">
-  
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/" >Tweet</a>
-  
-
-  
-  <div class="g-plusone" data-size="medium"></div>
   
 
   
@@ -165,8 +90,6 @@ Matthias</p>
   
   <br />
   
-  
-    <div class="fb-like" data-send="true" data-width="600" data-show-faces="false"></div>
   
   
   <br />
@@ -174,23 +97,10 @@ Matthias</p>
   
 </div>
 
-    
-    <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2013/07/09/transforming-logs-into-information/" title="Previous Post: Transforming Log Events into Information">&laquo; Transforming Log Events into Information</a>
-      
-      
-        <a class="basic-alignment right" href="/blog/2013/09/10/birdwatch-explained/" title="Next Post: BirdWatch explained">BirdWatch explained &raquo;</a>
-      
-    </p>
-  </footer>
+    </footer>
+  
 </article>
-
-  <section>
-    <h1>Comments</h1>
-    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-</div>
-  </section>
 
 </div>
 
@@ -294,10 +204,7 @@ Matthias</p>
       var disqus_shortname = 'matthiasnehlsen';
       
         
-        // var disqus_developer = 1;
-        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
-        var disqus_url = 'http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/';
-        var disqus_script = 'embed.js';
+        var disqus_script = 'count.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
