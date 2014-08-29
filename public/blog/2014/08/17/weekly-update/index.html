@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="In this weekly update, I will show you how git helped me alleviate the disastrous consequences of a brain fart. I&#8217;ll also share my experiences &hellip;">
+  <meta name="description" content="In this weekly update, I will show you how git helped me alleviate the disastrous consequences of a brain fart. I will also share my experiences with &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -87,7 +87,7 @@
   </header>
 
 
-<div class="entry-content"><p>In this weekly update, I will show you how <strong>git</strong> helped me alleviate the disastrous consequences of a <strong>brain fart</strong>. I&#8217;ll also share my experiences with <strong>Octopress</strong>. You will learn what helps me <strong>feel better</strong>, day in and day out. Then, there are some changes regarding the <strong>mailing list</strong> for this blog. Also there are <strong>reviews</strong> on my <strong>audio setup</strong> for a combined work / chill area and on the <strong>Sony A7</strong> full frame camera.</p>
+<div class="entry-content"><p>In this weekly update, I will show you how <strong>git</strong> helped me alleviate the disastrous consequences of a <strong>brain fart</strong>. I will also share my experiences with <strong>Octopress</strong>. You will learn what helps me <strong>feel better</strong>, day in and day out. Then, I&#8217;ll talk about some changes regarding the <strong>mailing list</strong> for this blog. And last, there&#8217;ll be <strong>reviews</strong> on my <strong>audio setup</strong> for a combined work / chill area and on the <strong>Sony A7</strong> full frame camera.</p>
 
 <!-- more -->
 
@@ -96,20 +96,20 @@
 
 <p>The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more than I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed <code>git add .</code> on the command line.</p>
 
-<p>So far so good. But then I got distracted by a rather annoying phone call. During that call, something happened that I can best label a <strong><a href="http://en.wikipedia.org/wiki/Brain_fart">brain fart</a></strong>. I typed <code>git reset --hard HEAD</code> and pressed ENTER. Now you will probably ask why anyone would want to do that, particularly before actually committing the changes. To be honest, I am clueless. Maybe it was the geek&#8217;s version of a <strong><a href="http://en.wikipedia.org/wiki/Freudian_slip">Freudian slip</a></strong>? Something in my brain probably wanted to reset its own state to the happier pre-call state, but somehow that idea landed on the command line instead?</p>
+<p>So far so good. But then I got distracted by a rather annoying phone call. During that call, something happened that I can best describe as a <strong><a href="http://en.wikipedia.org/wiki/Brain_fart">brain fart</a></strong>. I typed <code>git reset --hard HEAD</code> and pressed ENTER. Now you will probably ask why anyone would want to do that, particularly before actually committing the changes. To be honest, I am clueless. Maybe it was the geek&#8217;s version of a <strong><a href="http://en.wikipedia.org/wiki/Freudian_slip">Freudian slip</a></strong>? Something in my brain probably wanted to reset itself to the happier pre-call state, but somehow that idea landed on the command line instead?</p>
 
 <p>In case you don&#8217;t know this (destructive) <strong><a href="http://git-scm.com/">git</a></strong> command, this is what it does:</p>
 
-<blockquote><p>&#8211;hard<br/>Resets the index and working tree. Any changes to tracked files in the working tree since <commit> are discarded.</p><footer><strong>git-reset documentation</strong> <cite><a href='http://git-scm.com/docs/git-reset'>git-scm.com/docs/git-reset/&hellip;</a></cite></footer></blockquote>
+<blockquote><p>&#8211;hard<br/>Resets the index and working tree. Any changes to tracked files in the working tree made since <commit> will be discarded.</p><footer><strong>git-reset documentation</strong> <cite><a href='http://git-scm.com/docs/git-reset'>git-scm.com/docs/git-reset/&hellip;</a></cite></footer></blockquote>
 
 
 <p>Okay, think about that for a second. The documentation says it loud and clear. Changes to tracked files since <strong>HEAD</strong>, which is the current commit to which I have added above but not committed, are <strong>discarded</strong>. Oops.</p>
 
-<p>I have no idea what I was thinking. My changes appeared to be lost forever. Not a surprise really when you think about the description above. But for me in that second it was like getting hide by a truck that came out of nowhere.</p>
+<p>I have no idea what I was thinking. My changes appeared to be lost forever. Not a surprise really when you think about the description above. But for me in that second it was like getting hit by a truck that came out of nowhere.</p>
 
 <p>So I really wanted the fruits of my previous and tedious labor back.</p>
 
-<p>I tried <code>git reflog</code> according to <strong><a href="http://stackoverflow.com/questions/5788037/recover-from-git-reset-hard">these instructions</a></strong> but that did not help, I did not find anything useful in the output. Luckily though, <strong><a href="http://git-scm.com/docs/git-fsck">fsck</a></strong> helped:</p>
+<p>I tried <code>git reflog</code> according to <strong><a href="http://stackoverflow.com/questions/5788037/recover-from-git-reset-hard">these instructions</a></strong>, but that did not help; I did not find anything useful in the output. Luckily though, <strong><a href="http://git-scm.com/docs/git-fsck">fsck</a></strong> helped:</p>
 
 <pre><code>git fsck --lost-found --verbose
 cd .git/lost-found/other/
@@ -122,17 +122,17 @@ find . -print | xargs grep someUniqueTextHere
 
 <h2>ClojureScript article</h2>
 
-<p>I found some time to put additional work into the article where I describe the recently added <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">ClojureScript client</a></strong> of my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. Initially I wanted to do more work on the application itself and specifically use <strong><a href="https://github.com/cognitect/transit-format">Transit</a></strong> instead of JSON parsing. But this application is fairly dependent on <strong>keywordized keys</strong> inside the representation of the tweets and Transit as of now does have a built-in way to keywordize the JSON property names so that would have been a bit of work. Totally doable, the only thing that keeps me from doing it is that I want to do some major redesign of the application. Then, that effort would likely be wasted. More on that soon.</p>
+<p>I found some time to put additional work into the article in which I describe the recently added <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">ClojureScript client</a></strong> of my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. Initially I wanted to do more work on the application itself and specifically use <strong><a href="https://github.com/cognitect/transit-format">Transit</a></strong> instead of JSON parsing. But this application is fairly dependent on <strong>keywordized keys</strong> inside the representation of the tweets, and Transit as of now does not have a built-in way to keywordize the JSON property names so that would have been a bit of work. Totally doable and the only thing that keeps me from actually doing it is that I want to do some major redesign of the application. Then, that effort would likely be wasted. More on that soon.</p>
 
 <h2>Octopress, one year later</h2>
 
-<p>I am using Octopress for generating my blog. It has served me alright, but I don&#8217;t like it a lot and I wouldn&#8217;t use it again.  I am just not enough of a Ruby guy to tinker around with it. I cannot even fix issues when I try to update it. The other night I wasted two precious hours on trying to get my installation current so that I would benefit from newer features, without success. And quite frankly I have no intentions of becoming a Ruby expert any time soon or ever.</p>
+<p>I am using Octopress to generate my blog. It has served me alright, but I don&#8217;t really like it a lot and probably wouldn&#8217;t use it again.  I am just not enough of a Ruby guy to tinker around with it. I cannot even fix issues when I try to update it. The other night I wasted two precious hours trying to get my installation current so that I would benefit from newer features. I didn&#8217;t succeed. Quite frankly, I have no intentions of becoming a Ruby expert any time soon or ever.</p>
 
-<p>Along those lines, I was thinking about rolling my own blogging engine. Yeah I know what you&#8217;re thinking. At some point every (technical) blogger will reach that stage where you want to create your own blogging engine. But hear me out, this one might be a little different. I am thinking about making use of <strong><a href="http://www.polymer-project.org">Polymer</a></strong> and <strong><a href="http://webcomponents.org">Web Components</a></strong>. Now that the Google robots run JavaScript, the blog would get indexed just fine, without pre-rendering for search engine visibility. Why not load the markdown directly from a web component handling the current post and then let that render itself? Polymer handles browser compatibility, but I do not care much about IE6 users and the like anyway. At the same time that would give me a chance to dive deeper into web components. The idea of a shadow DOM is just brilliant, and I hope web components will have the success they deserve. Finally a vendor-agnotic way of building web application.</p>
+<p>Along those lines, I was thinking about rolling my own blogging engine. Yeah I know what you&#8217;re thinking. At some point every (technical) blogger will reach that stage where you want to create your own blogging engine. But hear me out, this one might be a little different. I am thinking about making use of <strong><a href="http://www.polymer-project.org">Polymer</a></strong> and <strong><a href="http://webcomponents.org">Web Components</a></strong>. Now that the Google robots run JavaScript, the blog would get indexed just fine, without pre-rendering for search engine visibility. Why not load the markdown directly from a web component handling the current post and then let that render itself? Polymer handles browser compatibility, but I do not care much about IE6 users and the like anyway. At the same time that would give me a chance to delve deeper into web components. The idea of a shadow DOM is just brilliant, and I hope web components will have the success they deserve. Finally a vendor-agnotic way of building web applications.</p>
 
 <h2>Feeling good</h2>
 
-<p>I have a lot of fun writing stuff at the moment. I also do the same for myself. The first 25-30 minutes in the morning belong to me and me alone. Before even reading email, I fully focus on everything that comes to mind and write it down. It is a great way for gaining some clarity on what I want to do and where I want to go. The only thing that&#8217;s missing in the process is a decent and searchable way to organize the notes. That part needs work. But nonetheless, I am a happier person when I do this regurlarly. Highly recommended.</p>
+<p>I have a lot of fun writing stuff at the moment. I also write for myself. The first 25-30 minutes in the morning belong to me and me alone. Before reading any email, I focus on everything that comes to mind and write it down. It&#8217;s a great way to gain some clarity on what I want to do and where I want to go. The only thing that&#8217;s missing in the process is a decent and searchable way to organize the notes. That part needs work. But nonetheless, I am a happier person when I do this regularly. Highly recommended.</p>
 
 <h2>Mailing list: one and only one</h2>
 
@@ -140,15 +140,15 @@ find . -print | xargs grep someUniqueTextHere
 
 <h2>Book and gadget reviews</h2>
 
-<p>Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created a <strong><a href="/reviews">page for reviews</a></strong>. I also started writing about some electronic stuff that I own:.</p>
+<p>Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created a <strong><a href="/reviews">page for reviews</a></strong>. I also started writing about some electronic stuff that I own.</p>
 
 <h3>My audio setup</h3>
 
-<p>I recently kicked out a highend surround sound system in favor of a mixer, two active speakers and a pair of headphones. <strong><a href="/reviews/audio-setup">Find out why</a></strong>.</p>
+<p>I recently kicked out a high-end surround sound system in favor of a mixer, two active speakers and a pair of headphones. <strong><a href="/reviews/audio-setup">Find out why</a></strong>.</p>
 
 <h3>My camera, Sony A7</h3>
 
-<p>I can finally use my classic Zeiss and Leica prime lenses again thanks to this camera. Overall I am quite happy with it. This review is work in progress, but you can already read some of it <strong><a href="/reviews/sony-a7">here</a></strong>.</p>
+<p>I can finally use my classic Zeiss and Leica prime lenses again thanks to this camera. Overall I am quite happy with it. This review is a work in progress, but you can already read some of it <strong><a href="/reviews/sony-a7">here</a></strong>.</p>
 
 <p>Have a great week,
 Matthias</p>
