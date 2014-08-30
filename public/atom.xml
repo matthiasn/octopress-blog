@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-08-29T16:34:24+02:00</updated>
+  <updated>2014-08-30T11:07:04+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -867,7 +867,7 @@ Matthias</p>
     <link href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/"/>
     <updated>2014-07-17T08:30:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript</id>
-    <content type="html"><![CDATA[<p>Back in January I wanted to try out <strong><a href="https://github.com/swannodette/om">Om</a></strong>. Now I finally got around to doing so.</p>
+    <content type="html"><![CDATA[<p>Back in January I wanted to try out <strong><a href="https://github.com/swannodette/om">Om</a></strong>. Now, I finally got around to doing so.</p>
 
 <!-- more -->
 
@@ -882,9 +882,9 @@ Matthias</p>
 
 <p>For those of you who do not know, <strong><a href="https://github.com/swannodette/om">Om</a></strong> is a <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> wrapper around Facebook&#8217;s <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> library. I have covered <strong>ReactJS</strong> on this blog a few times, for example in the post mentioned in the twitter conversation above. <strong>ClojureScript</strong> is very similar to <strong><a href="http://clojure.org">Clojure</a></strong>, except that it targets the browser and not the <strong><a href="http://en.wikipedia.org/wiki/Java_virtual_machine">JVM</a></strong>. Like <strong><a href="http://www.scala-js.org">Scala.js</a></strong>, ClojureScript is compiled into <strong>JavaScript</strong>.</p>
 
-<p>Finally I got around to giving <strong>Om</strong> a spin and wrote my first application in <strong>ClojureScript</strong>. You can try it out <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><strong>here</strong></a>. Before, I had only read a little bit about Clojure and ClojureScript and I had also gone through <strong><a href="http://clojurekoans.com">clojurekoans</a></strong>. Then, just for the fun of it (and to see for myself if I could make it work), I wanted to write a new client for my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, this time in ClojureScript. BirdWatch is kind of a live search engine for tweets for an area of interest, with a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> retrieving search results from a server component, including updates to that search over a streaming connection using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. In the browser, some basic stats about specific tweets (like recent RTs) and about usage of words (wordcloud and trending barchart) plus a time series chart displaying the time distribution of recent tweets matching a query. The server side is written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong>, however that does not need to concern us for this article as the wire format is plain <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>.</p>
+<p>Finally I got around to giving <strong>Om</strong> a spin and wrote my first application in <strong>ClojureScript</strong>. You can try it out <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><strong>here</strong></a>. Before, I had only read a little bit about Clojure and ClojureScript and I had also gone through <strong><a href="http://clojurekoans.com">clojurekoans</a></strong>. Then, just for the fun of it (and to see for myself if I could make it work), I wanted to write a new client for my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, this time in ClojureScript. BirdWatch is kind of a live search engine to search for tweets in an area of interest, with a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> retrieving search results from a server component, including updates to that search over a streaming connection using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. In the browser, some basic stats are shown about specific tweets (like recent RTs) and the usage of words (wordcloud and trending barchart) plus a time series chart displaying the time distribution of recent tweets matching a query. The server side is written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong>, however that does not need to concern us for this article as the wire format is plain <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>.</p>
 
-<p>The UI of the new client is done in <strong><a href="https://github.com/swannodette/om">Om</a></strong> and the internal communication between application parts is realized with <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. All the data mangling is done in ClojureScript instead of using <strong><a href="http://square.github.io/crossfilter/">crossfilter.js</a></strong> as was is case with the ReactJS and the AngularJS versions. For more information about the server side and a JavaScript version of the client side application, I can recommend <a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a>. The description of the server side is still accurate, it has not changed in the process of writing this ClojureScript version. On the client side there are version using AngularJS, ReactJS and now ClojureScript and Om.</p>
+<p>The UI of the new client is done in <strong><a href="https://github.com/swannodette/om">Om</a></strong> and the internal communication between application parts is realized with <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. All the data mangling is done in ClojureScript instead of using <strong><a href="http://square.github.io/crossfilter/">crossfilter.js</a></strong> as was the case with the ReactJS and the AngularJS versions. For more information about the server side and a JavaScript version of the client side application, I recommend <a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a>. The description of the server side is still accurate; nothing changed while I was writing this ClojureScript version. On the client side there are version available using AngularJS, ReactJS and now ClojureScript and Om.</p>
 
 <p>This is how the UI of the application looks like now. I have also improved the application while writing this recent addition by</p>
 
@@ -895,13 +895,13 @@ Matthias</p>
 </ul>
 
 
-<p>Some of these changes have made it back into the ReactJS version so far, with the AngularJS version planned to follow.</p>
+<p>So far, some of these changes have made it back into the ReactJS version, with the AngularJS version planned to follow.</p>
 
 <p><a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="http://matthiasnehlsen.com/images/cljs-screenshot.png" /></a></p>
 
-<p>Click the image above to give this new client that was written in <strong>ClojureScript</strong> a try. Writing it worked surprisingly well and I have learned a lot in the process.</p>
+<p>Click the image above to give this new client, which was written in <strong>ClojureScript</strong> a try. Writing it worked surprisingly well and I have learned a lot in the process.</p>
 
-<p>EDIT July 24th, 2014: The <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">next article</a></strong> goes into detail on how this application is implemented.</p>
+<p>EDIT July 24th, 2014: The <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">next article</a></strong> outlines in detail how this application is implemented.</p>
 
 <p>Cheers,
 Matthias</p>
@@ -915,16 +915,16 @@ Matthias</p>
     <link href="http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/"/>
     <updated>2014-07-08T09:05:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup</id>
-    <content type="html"><![CDATA[<p>Hamburg is the second largest city in Germany, and as such it really should have an <strong>AngularJS Meetup</strong>. It did not have one until now, so I founded one.</p>
+    <content type="html"><![CDATA[<p>Hamburg is the second largest city in Germany, and as such it really should have an <strong>AngularJS Meetup</strong>. It hasn&#8217;t had one until now, so I founded one.</p>
 
 <!-- more -->
 
 
-<p>I have done server side development for the most part over the last seven months but I finally had a chance to write an internal web application at work using <strong><a href="https://angularjs.org">AngularJS</a></strong> and I was pleasantly surprised how much I enjoyed this process. AngularJS provides you with a really quite useful way of structuring an application with services, controllers, directives, centralized configuration and most importantly <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong> for wiring parts of an application together.</p>
+<p>I did server side development for the most of the last seven months but I finally had a chance to write an internal web application at work using <strong><a href="https://angularjs.org">AngularJS</a></strong> and I was pleasantly surprised how much I enjoyed the process. AngularJS provides you with quite a useful way of structuring an application with services, controllers, directives, centralized configuration and, most importantly, <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong> for wiring parts of an application together.</p>
 
-<p>While doing work on the AngularJS application I noticed that I did not really have enough people to talk to when it comes to single page applications and user experience so I started looking for a nearby <strong><a href="https://angularjs.org">AngularJS</a></strong> meetup.</p>
+<p>While working on the AngularJS application I noticed that I did not really have enough people to talk to when it came to single-page applications and user experience, so I started to look for a nearby <strong><a href="https://angularjs.org">AngularJS</a></strong> meetup.</p>
 
-<p>To my surprise, there was none in Hamburg yet. After all, <strong><a href="http://en.wikipedia.org/wiki/Hamburg">Hamburg</a></strong> is the second largest city in Germany with well over 2 million people when you include the suburbs. I do believe it should have such a meetup so I founded the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/">Hamburg AngularJS Meetup</a></strong>. Please do join if you agree with me that this meetup was still missing.</p>
+<p>To my surprise, there was none in Hamburg yet. After all, <strong><a href="http://en.wikipedia.org/wiki/Hamburg">Hamburg</a></strong> is the second largest city in Germany with well over 2 million people if you include the suburbs. I really believe it should have such a meetup so I founded the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/">Hamburg AngularJS Meetup</a></strong>. Please do join if you agree with me that Hamburg still lacks such a Meetup.</p>
 
 <p>A first Meetup is scheduled for <strong>Thursday, July 24th, 2014 at 7pm</strong>. There is no venue for the event yet, so please let me know if you would like to sponsor the meetup by providing a location or know anyone who can provide the space. There is also no agenda as of yet. Please let me know if you have anything AngularJS-related that you would like to talk about or that you are particularly interested in.</p>
 
@@ -970,16 +970,16 @@ Matthias</p>
     <link href="http://matthiasnehlsen.com/blog/2014/07/02/new-approach/"/>
     <updated>2014-07-02T11:58:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/07/02/new-approach</id>
-    <content type="html"><![CDATA[<p>So I have been suffering a little from writer&#8217;s block recently. Well, no, that is not exactly true. The problem was not getting started with a topic but rather sticking with it and continuing to work on it. But there might be a way to get back into the rhythm and that is by finishing something smaller.</p>
+    <content type="html"><![CDATA[<p>So, I have recently suffered from writer&#8217;s block. Well no, that&#8217;s not exactly true. The problem was not getting started with a topic, but rather sticking with it and continuing to work on it. But there may be a way to get back into the rhythm: finish a less complex project.</p>
 
 <!-- more -->
 
 
-<p>Looking at my past articles, I seem to have a tendency to go for the long form. While I do not find that wrong as such, I do want to be able to do both long and short articles. Ideally I would have a long article (or three) in the works but at the same time publish short ideas and random ramblings in the meantime. Sometimes with code, sometimes without.</p>
+<p>Looking at my past articles, I seem to have a tendency to go for the long form. While I don’t think there’s anything wrong in that per se, I do want write both long and short articles. Ideally I would have one long article (or three) in the works and at the same time publish short ideas and random ramblings in between. Sometimes with code, sometimes without.</p>
 
-<p><strong>So here&#8217;s to a new approach for this blog.</strong> I will still come out with large and (hopefully) profound articles from time to time, so nothing changes on that front. But in addition I will also more frequently post shorter notes. Or at least that&#8217;s the idea. Let&#8217;s see how it works.</p>
+<p><strong>So here&#8217;s to a new approach for this blog.</strong> I will still come up with large and (hopefully) profound articles from time to time, so no changes on that front. But in addition, I will also more frequently post shorter notes. Or at least that&#8217;s the idea. Let&#8217;s see how it works out.</p>
 
-<p>Regarding the existing newsletter, I am not exactly sure how to leverage that. As a subscriber, you have become accustomed to getting an email once or sometimes twice per month. I don&#8217;t want to spam you much more frequently all of a sudden. Maybe I should create another newsletter for the more frequent updates? I&#8217;m curious about your thoughts. For now I will just announce this change once and then keep using the current newsletter only for the more infrequent large articles.</p>
+<p>Regarding the existing newsletter, I am not exactly sure how to leverage that. As a subscriber, you have become accustomed to getting an email once or sometimes twice per month. I don&#8217;t want to spam you much more frequently all of a sudden. Maybe I should create another newsletter for the more frequent updates? I&#8217;m curious about your thoughts on this. For now, I will just announce this change once and then keep using the current newsletter only for the more infrequent long articles only.</p>
 
 <p>Cheers,
 Matthias</p>
