@@ -1,0 +1,373 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Weekly Update: Pomodoro, all-Clojure BirdWatch, Income - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="In this weekly update, I will be talking about why I started this blog in the first place, Pomodoro time management and the new Clojure and &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/09/03/weekly-update">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/reviews">Reviews</a></li>
+  <li><a href="/reading-lists">Reading Lists</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title">Weekly Update: Pomodoro, all-Clojure BirdWatch, Income</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-03T19:06:00+02:00" pubdate data-updated="true">09/03/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>In this weekly update, I will be talking about <strong>why I started this blog</strong> in the first place, <strong>Pomodoro time management</strong> and the new <strong>Clojure</strong> and <strong>ClojureScript</strong> version of my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application. There is a live version again, this time subscribing to all tweets containing the term <strong>Ferguson</strong>. Also, the results are in for the first month of <strong>blog monetization</strong> through affiliate links.</p>
+
+<!-- more -->
+
+
+<h2>Why I started this blog in the first place</h2>
+
+<p>Initially, when I started with this blog, I wanted to start exploring real-time information processing. My initial project was the <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application, which has evolved quite a bit since the first version. But then for a while I focused more on frameworks and libraries than on the underlying architectural principles. In part that was probably because I was not convinced I really had the right tools in my toolbox. Well, that has changed. It is a luxury to be using (roughly) the same language on both the server and the client, particularly when you want to quickly explore an idea end-to-end as a single developer.</p>
+
+<h2>Pomodoro time management</h2>
+
+<p>For a while now I have been using the <strong><a href="http://pomodorotechnique.com">Pomodoro technique</a></strong> for time management and it has served me <strong>extremely well</strong>. The main idea is to set a timer (such as the tomato-shaped kitchen timers) to an interval of a defined duration and then fully focus on a single task, with no distractions allowed whatsoever. The default duration of such an interval is <strong>25 minutes</strong> and while it is possible to adapt this according to your needs, I have found the 25 minutes to be perfect. Then, after the interval is up, you take a break of <strong>5 minutes</strong> every time or <strong>15 minutes</strong> after the successful completion of four of these Pomodoro intervals. I find that I am much <strong>more productive</strong> when I use this technique. It is also great <strong>against procrastination</strong>. It is usually easy to start something with just a single one of these 25 minute intervals and then keep at it every so many days. The reason I am mentioning this now is that in the next section I will be talking about an experiment on if it was possible to implement an entire real-time feature (both on the client and the server side) of the <strong>BirdWatch</strong> application in a single one of these intervals and the answer is <strong>yes</strong>. I finished <strong>76 seconds under</strong> the allotted time.</p>
+
+<h2>BirdWatch in Clojure and ClojureScript, #Ferguson</h2>
+
+<p>During the last two weeks, I finally got around to a rewrite of the <strong><a href="https://github.com/matthiasn/Birdwatch/tree/master/Clojure-Websockets">BirdWatch</a></strong> application so that it now uses <strong>Clojure</strong> on the server side and <strong>ClojureScript</strong> on the client side. During that process, I also changed the implementation of the bi-directional communication from using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> + <strong>REST API calls</strong> to using <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSockets</a></strong>. Since <strong><a href="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/">last week&#8217;s update</a></strong> I was able to tackle the remaining issues and today I proudly present the fully functional <strong><a href="https://github.com/matthiasn/Birdwatch/tree/master/Clojure-Websockets">all-Clojure version</a></strong>.</p>
+
+<p>Of course there is also a live version running on my server. This time I have not used the selection of software related terms that I have used previously but instead I have let my application subscribe to the term <strong>ferguson</strong>. This is because I was particularly interested in how the situation in <strong><a href="http://en.wikipedia.org/wiki/Ferguson,_Missouri">Ferguson, Missouri</a></strong> was (and is) developing. So what you see when you click the image below is an application that retrieves all tweets mentioning the term. This has been a very educating topic to follow during the process of writing this new version of the application. I am <strong>deeply disturbed</strong> by how much of a difference the color of your skin seems to make when it comes to how government authorities deal with you as a human being. More broadly, I am also very concerned about <strong>militarization</strong> of police forces in the USA and elsewhere in the world.</p>
+
+<p>Click the image or alternatively <strong><a href="http://birdwatch2.matthiasnehlsen.com/">here</a></strong> to open a live version of this application.</p>
+
+<p><a href="http://birdwatch2.matthiasnehlsen.com/" target="blank"><img class="left" src="/images/bw-ferguson.png" title="BirdWatch Screenshot for term Ferguson" alt="BirdWatch Screenshot for term Ferguson"></a></p>
+
+<p>In the Pomodoro time management section above I mentioned a little experiment on how much I could achieve in a single 25 minute <strong>Pomodoro</strong> time interval. Yesterday I had the idea that I wanted to know how many clients were connected to the live version of this application at any given time. Right after I had the idea, I thought, well, is this doable in a single Pomodoro interval? So I set the timer and started right away. All of the thoughts related to this feature, the implementation on both client and server, the testing (on Chrome, Firefox, Safari and Opera) and code documentation and prettification were done and there were still <strong>76 seconds left</strong> before my digital kitchen timer started ringing. Almost time to take a little nap. All that considering that I just started out with <strong>Clojure</strong> and that this is my first real application written in it, I have a hunch that I might have found the tools that I have been looking for all the time. Sure, this was not a very large feature, but the fact alone that it was possible to implement it in such a short time on both server and client without significant context switches in the brain bodes well for productivity.</p>
+
+<p><strong>What&#8217;s next?</strong> I will work on a series of articles describing the application architecture in detail. Also, I will put much more focus on a mobile version of the application. Currently, it does not work well on mobile devices. In order to alleviate performanceissues, I will move a good part of the computation for previous tweets to the server side. The layout needs some major rework for mobile as well. I&#8217;ll keep you posted.</p>
+
+<h2>Affiliate links results for the first month</h2>
+
+<p>A couple of weeks ago I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote</a></strong> about a tool for country-specific delivery of Amazon affiliate links. Now the results for the first month are in. I have made a whopping <strong>$44.37</strong>. Hmm, I will try to not spend it all at once, I promise. But to be honest, I don&#8217;t think the result is all that bad. Particularly considering that I have not written many reviews just yet. Eventually, it should be possible for the blog to finance itself, maybe even retroactively. I will try to write more quality reviews in the weeks to come, particularly also on gadgets. Then, by the time Santa climbs down the chimneys, there will hopefully be more clicks on those links and a better conversion rates. From all I have read about affiliate marketing, everyone who is doing it successfully reported on how much of a difference the holiday season makes. We will see.</p>
+
+<h2>Gadget Reviews</h2>
+
+<p>I still have not found the perfect travel lens for my <strong><a href="http://matthiasnehlsen.com/reviews/sony-a7/">Sony A7</a></strong> camera. One contender was the <strong>Zeiss Vario-Tessar T* FE 24-70mm f/4 ZA OSS</strong> but I ultimately decided to send back for a refund. <strong><a href="/reviews/zeiss-24-70">Read all about it here</a></strong>.</p>
+
+<h2>Conclusion</h2>
+
+<p>The last week was a lot of fun. I mostly focused on the <strong>Clojure</strong> and found that be be very rewarding. There is plenty of stuff I still want to do with this application and I am really looking forward to getting around to those features.</p>
+
+<p>Last week&#8217;s cliffhanger was a section on speed improvements on this blog. Today I will have to let you wait a little longer on that story. I was so busy writing <strong>Clojure</strong> that there was not time for this right now. But no worries, the speed improvements will be covered.</p>
+
+<p>Have a great remaining week,
+Matthias</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-03T19:06:00+02:00" pubdate data-updated="true">09/03/2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+  
+  
+  
+  <br />
+  
+  
+    <div class="fb-like" data-send="true" data-width="600" data-show-faces="false"></div>
+  
+  
+  <br />
+  <br />
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/08/25/weekly-update/" title="Previous Post: Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play">&laquo; Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="http://www.gravatar.com/avatar/3f6cb2a9b1057c35f284174063835d41?s=250" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/09/03/weekly-update/">Weekly Update: Pomodoro, all-Clojure BirdWatch, Income</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/25/weekly-update/">Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/17/weekly-update/">Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/10/weekly-update/">Weekly Update: AngularJS book, Geo-Lookup, Reading</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">Building a geo-aware link shortener with Play Framework</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+        <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=birdwatch&type=watch&count=true"
+          allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat">sse-chat</a>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-chat&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-perf">sse-perf</a>
+      <p>Reactive web application using Play Framework 2.1 for load testing Server Sent Event streams (or other HTTP connections that deliver information in chunks).</p>
+      <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=sse-perf&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+    </li>
+    <li><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a>&nbsp;
+        <p>Compilation of useful links and resources for learning Clojure and ClojureScript </p>
+        <iframe src="http://ghbtns.com/github-btn.html?user=matthiasn&repo=Clojure-Resources&type=watch&count=true"
+        allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe>
+      </li>
+  </ul>
+</section>
+<section>
+    <a name="signup"><h1>Subscribe</h1></a>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    
+    <br />
+  </div>
+</section>
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/narrow"> </SCRIPT>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+  
+  <script src="//use.typekit.net/rco1jij.js"></script>
+  <script>try{Typekit.load();} catch (e){}</script>
+
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-40261983-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  
+
+</body>
+</html>

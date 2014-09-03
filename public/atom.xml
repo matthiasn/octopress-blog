@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-03T10:24:03+02:00</updated>
+  <updated>2014-09-03T17:03:22+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,57 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: Pomodoro, all-Clojure BirdWatch, Income]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/"/>
+    <updated>2014-09-03T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/09/03/weekly-update</id>
+    <content type="html"><![CDATA[<p>In this weekly update, I will be talking about <strong>why I started this blog</strong> in the first place, <strong>Pomodoro time management</strong> and the new <strong>Clojure</strong> and <strong>ClojureScript</strong> version of my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application. There is a live version again, this time subscribing to all tweets containing the term <strong>Ferguson</strong>. Also, the results are in for the first month of <strong>blog monetization</strong> through affiliate links.</p>
+
+<!-- more -->
+
+
+<h2>Why I started this blog in the first place</h2>
+
+<p>Initially, when I started with this blog, I wanted to start exploring real-time information processing. My initial project was the <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application, which has evolved quite a bit since the first version. But then for a while I focused more on frameworks and libraries than on the underlying architectural principles. In part that was probably because I was not convinced I really had the right tools in my toolbox. Well, that has changed. It is a luxury to be using (roughly) the same language on both the server and the client, particularly when you want to quickly explore an idea end-to-end as a single developer.</p>
+
+<h2>Pomodoro time management</h2>
+
+<p>For a while now I have been using the <strong><a href="http://pomodorotechnique.com">Pomodoro technique</a></strong> for time management and it has served me <strong>extremely well</strong>. The main idea is to set a timer (such as the tomato-shaped kitchen timers) to an interval of a defined duration and then fully focus on a single task, with no distractions allowed whatsoever. The default duration of such an interval is <strong>25 minutes</strong> and while it is possible to adapt this according to your needs, I have found the 25 minutes to be perfect. Then, after the interval is up, you take a break of <strong>5 minutes</strong> every time or <strong>15 minutes</strong> after the successful completion of four of these Pomodoro intervals. I find that I am much <strong>more productive</strong> when I use this technique. It is also great <strong>against procrastination</strong>. It is usually easy to start something with just a single one of these 25 minute intervals and then keep at it every so many days. The reason I am mentioning this now is that in the next section I will be talking about an experiment on if it was possible to implement an entire real-time feature (both on the client and the server side) of the <strong>BirdWatch</strong> application in a single one of these intervals and the answer is <strong>yes</strong>. I finished <strong>76 seconds under</strong> the allotted time.</p>
+
+<h2>BirdWatch in Clojure and ClojureScript, #Ferguson</h2>
+
+<p>During the last two weeks, I finally got around to a rewrite of the <strong><a href="https://github.com/matthiasn/Birdwatch/tree/master/Clojure-Websockets">BirdWatch</a></strong> application so that it now uses <strong>Clojure</strong> on the server side and <strong>ClojureScript</strong> on the client side. During that process, I also changed the implementation of the bi-directional communication from using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> + <strong>REST API calls</strong> to using <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSockets</a></strong>. Since <strong><a href="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/">last week&#8217;s update</a></strong> I was able to tackle the remaining issues and today I proudly present the fully functional <strong><a href="https://github.com/matthiasn/Birdwatch/tree/master/Clojure-Websockets">all-Clojure version</a></strong>.</p>
+
+<p>Of course there is also a live version running on my server. This time I have not used the selection of software related terms that I have used previously but instead I have let my application subscribe to the term <strong>ferguson</strong>. This is because I was particularly interested in how the situation in <strong><a href="http://en.wikipedia.org/wiki/Ferguson,_Missouri">Ferguson, Missouri</a></strong> was (and is) developing. So what you see when you click the image below is an application that retrieves all tweets mentioning the term. This has been a very educating topic to follow during the process of writing this new version of the application. I am <strong>deeply disturbed</strong> by how much of a difference the color of your skin seems to make when it comes to how government authorities deal with you as a human being. More broadly, I am also very concerned about <strong>militarization</strong> of police forces in the USA and elsewhere in the world.</p>
+
+<p>Click the image or alternatively <strong><a href="http://birdwatch2.matthiasnehlsen.com/">here</a></strong> to open a live version of this application.</p>
+
+<p><a href="http://birdwatch2.matthiasnehlsen.com/" target="blank"><img class="left" src="http://matthiasnehlsen.com/images/bw-ferguson.png" title="BirdWatch Screenshot for term Ferguson" alt="BirdWatch Screenshot for term Ferguson"></a></p>
+
+<p>In the Pomodoro time management section above I mentioned a little experiment on how much I could achieve in a single 25 minute <strong>Pomodoro</strong> time interval. Yesterday I had the idea that I wanted to know how many clients were connected to the live version of this application at any given time. Right after I had the idea, I thought, well, is this doable in a single Pomodoro interval? So I set the timer and started right away. All of the thoughts related to this feature, the implementation on both client and server, the testing (on Chrome, Firefox, Safari and Opera) and code documentation and prettification were done and there were still <strong>76 seconds left</strong> before my digital kitchen timer started ringing. Almost time to take a little nap. All that considering that I just started out with <strong>Clojure</strong> and that this is my first real application written in it, I have a hunch that I might have found the tools that I have been looking for all the time. Sure, this was not a very large feature, but the fact alone that it was possible to implement it in such a short time on both server and client without significant context switches in the brain bodes well for productivity.</p>
+
+<p><strong>What&#8217;s next?</strong> I will work on a series of articles describing the application architecture in detail. Also, I will put much more focus on a mobile version of the application. Currently, it does not work well on mobile devices. In order to alleviate performanceissues, I will move a good part of the computation for previous tweets to the server side. The layout needs some major rework for mobile as well. I&#8217;ll keep you posted.</p>
+
+<h2>Affiliate links results for the first month</h2>
+
+<p>A couple of weeks ago I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote</a></strong> about a tool for country-specific delivery of Amazon affiliate links. Now the results for the first month are in. I have made a whopping <strong>$44.37</strong>. Hmm, I will try to not spend it all at once, I promise. But to be honest, I don&#8217;t think the result is all that bad. Particularly considering that I have not written many reviews just yet. Eventually, it should be possible for the blog to finance itself, maybe even retroactively. I will try to write more quality reviews in the weeks to come, particularly also on gadgets. Then, by the time Santa climbs down the chimneys, there will hopefully be more clicks on those links and a better conversion rates. From all I have read about affiliate marketing, everyone who is doing it successfully reported on how much of a difference the holiday season makes. We will see.</p>
+
+<h2>Gadget Reviews</h2>
+
+<p>I still have not found the perfect travel lens for my <strong><a href="http://matthiasnehlsen.com/reviews/sony-a7/">Sony A7</a></strong> camera. One contender was the <strong>Zeiss Vario-Tessar T* FE 24-70mm f/4 ZA OSS</strong> but I ultimately decided to send back for a refund. <strong><a href="http://matthiasnehlsen.com/reviews/zeiss-24-70">Read all about it here</a></strong>.</p>
+
+<h2>Conclusion</h2>
+
+<p>The last week was a lot of fun. I mostly focused on the <strong>Clojure</strong> and found that be be very rewarding. There is plenty of stuff I still want to do with this application and I am really looking forward to getting around to those features.</p>
+
+<p>Last week&#8217;s cliffhanger was a section on speed improvements on this blog. Today I will have to let you wait a little longer on that story. I was so busy writing <strong>Clojure</strong> that there was not time for this right now. But no worries, the speed improvements will be covered.</p>
+
+<p>Have a great remaining week,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play]]></title>
@@ -3825,49 +3876,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 <p>Okay, this concludes the explanation of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> toy project. Hope you enjoyed this rather long article. Please let me know if there is any need for clarification.</p>
 
 <p>Cheers,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[BirdWatch v0.2: Tweet Stream Analysis with AngularJS, ElasticSearch and Play Framework]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/"/>
-    <updated>2013-08-13T10:08:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play</id>
-    <content type="html"><![CDATA[<p>I am happy to get a huge update of the BirdWatch application out of the way. The changes are a lot more than what I would normally have wanted to work in for a single article, but then again there is enough interesting stuff going on in this new version that calls for multiple blog articles. Initially this application was only meant to be an exercise in streaming information to web clients. But along the way I noticed that this application can be useful and interesting beyond being a mere learning exercise. Let me explain what it has evolved to:</p>
-
-<!-- more -->
-
-
-<p>BirdWatch is an open-source real-time tweet search engine for a defined area of interest, and  I am running a <a target="_blank" href="http://birdwatch.matthiasnehlsen.com"><strong>public instance</strong></a> for software engineering related tweets. The application subscribes to all tweets containing at least one out of a set of terms (such as AngularJS, Java, JavaScript, MongoDB, Python, Scala, …). The application receives all those tweets immediately through the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong>. The limitation here is that the delivery is capped at one percent of all tweets. This is plenty for a well defined area of interest, considering that Twitter processes more than <strong><a href="http://articles.washingtonpost.com/2013-03-21/business/37889387_1_tweets-jack-dorsey-twitter">400 million tweets per day</a></strong>.</p>
-
-<p>Here is how it looks like:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/130812-screenshot.png" title="image" alt="images"></p>
-
-<p>As you can see above, there is now a search bar which allows you to narrow down the selection of tweets the application reasons about. Any search result is bookmarkable, making it easy not only to revisit the search at a later time but also to pass around the link. A link represents the result for the query at the time the link is opened, not at the time it is bookmarked. The application will then load a user-selectable amount of recent tweets matching the search criteria plus any new match for as long as the browser window is open.</p>
-
-<p>Here are some examples.</p>
-
-<p>You&#8217;re a Java developer and you&#8217;re looking for a new job? Try this search: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring)</strong></a></p>
-
-<p>You want to limit your job search to London? No problem. Here you go: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/(job%20OR%20hiring)%20java"><strong>java (job OR hiring) london</strong></a></p>
-
-<p>You&#8217;re interested in tweets about Python the language but not about <a target="_blank" href="http://www.youtube.com/watch?v=kQFKtI6gn9Y&list=TLbNXOyfwTL14"><strong>Monty Python</strong></a>: <a target="_blank" href="http://birdwatch.matthiasnehlsen.com/#/python%20-monty"><strong>python -monty</strong></a></p>
-
-<p>Well, you get the idea. <strong>AND</strong> is the standard operator, it is applied unless <strong>OR</strong> is specifically used between two terms.</p>
-
-<p>You can download the application and run it for a different area of your choosing. Personally, I&#8217;ve been running an instance that listens to tweets related to U.S. politics, an area I have been interested in ever since I lived in Washington DC in 2009/2010. Usually I have found that a quick look at the application before  watching video podcasts of my favorite political shows would show me what is then talked about in the shows. I may decide to run the application publicly for this interest area at some point as well, but for that I want to have more sophisticated analytics and charts in place. I have plenty of ideas in that area, but for now I want to get this out instead of working on the project by myself for another couple of weeks. I am also looking for contributions here, particularly in the area of great looking and useful charts.</p>
-
-<p>So how can this be improved in the future? A stream of tweets filtered by topic area is a rich data set; the current charts really only scratch the surface of what is possible here. I would like to visualize the most often mentioned links so that I can see at a glance, which newspaper articles and other links are most talked about. This analysis could even be weighted by how many followers the person tweeting about a link has. After all, more followers mean that more people will be exposed to the link. Also there could be some visualizations about how tweets develop over time. What are the characteristics of people retweeting something? Is it picked up by someone with many followers and then later on by many people with few followers? Or is it the other way around? Get involved, there are plenty of options on how to work with the data.</p>
-
-<p>You can find a brief overview of the technology in the project description on <a target="_blank" href="https://github.com/matthiasn/BirdWatch"><strong>Github</strong></a>.</p>
-
-<p>In the future I will probably write some articles that further explain different parts of the application. Let me know what you are particularly interested in.</p>
-
-<p>Alright, this is it for today. Until next time.
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
