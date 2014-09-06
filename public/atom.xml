@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-03T17:44:02+02:00</updated>
+  <updated>2014-09-07T00:29:36+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -51,7 +51,7 @@
 
 <p>Considering that I have just started out with Clojure and that this is my first real application written in it, I have a hunch that I may have found the tools that I have been looking for all the while. Sure, this was not a very large feature, but the fact alone that it was possible to implement it in such a short time on both server and client without significant context switches in the brain bodes well for productivity.</p>
 
-<p><strong>What&#8217;s next?</strong> I will work on a series of articles describing the application architecture in detail. Also, I will put much more focus on a mobile version of the application. Currently, it does not work well on mobile devices. In order to alleviate performanceissues, I will move a good part of the computation for previous tweets to the server side. The layout needs some major rework for mobile as well. I&#8217;ll keep you posted.</p>
+<p><strong>What&#8217;s next?</strong> I will work on a series of articles describing the application architecture in detail. Also, I will put much more focus on a mobile version of the application. Currently, it does not work well on mobile devices. In order to alleviate performance issues, I will move a good part of the computation for previous tweets to the server side. The layout needs some major rework for mobile as well. I&#8217;ll keep you posted.</p>
 
 <h2>Affiliate links results for the first month</h2>
 
