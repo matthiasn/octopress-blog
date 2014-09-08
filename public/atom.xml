@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-08T21:23:16+02:00</updated>
+  <updated>2014-09-09T01:13:57+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,57 +14,181 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Weekly Update: Making this blog load fast]]></title>
+    <title type="html"><![CDATA[Weekly Update: a turbo for this blog & more Clojure]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/08/weekly-update/"/>
     <updated>2014-09-08T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/08/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will discuss how I turned the load times for the blog you are reading right now <strong>from terrible to pretty good</strong>. In <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> numbers: before <strong>58/100</strong> for mobile, <strong>77/100</strong> for desktop, after <strong>94/100</strong> for mobile, <strong>96/100</strong> for desktop. In colors: from <strong>red and orange</strong> to <strong>green</strong>. Okay, that doesn&#8217;t mean anything so far. More concretely: on a bad mobile connection, the load time improved from <strong>32 seconds</strong> to a mere <strong>5 seconds</strong>. Now we&#8217;re talking. You would not have waited 32 seconds, and neither would I have. Also I have a status update on the <strong><a href="http://clojure.org/">Clojure</a></strong> version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong>.</p>
+    <content type="html"><![CDATA[<p>In this weekly update, I will discuss how I turned the load times for this blog <strong>from terrible to pretty good</strong>. In <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> numbers: before the optimization <strong style="color:#DD0000;">58/100</strong> for mobile, <strong style="color:#EE8800;">77/100</strong> for desktop, afterwards <strong style="color:#00AA66;">94/100</strong> for mobile, <strong style="color:#00AA66;">96/100</strong> for desktop. More concretely: on a bad mobile connection, the load time improved from <strong>32 seconds</strong> to a mere <strong>5 seconds</strong>. Now we&#8217;re talking. You would likely <strong>not have waited</strong> for 32 seconds, and neither would I have. Also, I have a status update on the <strong><a href="http://clojure.org/">Clojure</a></strong> version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong>.</p>
 
 <!-- more -->
 
 
 <h2>Making this page load fast, even on a pre-3G mobile connection</h2>
 
-<p>Some time ago I tried opening my blog on my smart phone and it took forever to load. I noticed that I did not even have a <strong>3G</strong> connection, but come on, I should be able to open the page even when only having an <strong><a href="http://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution">Edge</a></strong> connection with decent signal strength at your disposal. I ran Google&#8217;s <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> and that confirmed that things weren&#8217;t ideal:</p>
+<p>Some time ago I attempted opening my blog on my smart phone and, to my dismay, it took like forever to load. I noticed that I did not have a <strong><a href="http://en.wikipedia.org/wiki/3G">3G</a></strong> connection, but come on, you should be able to open the page even when only having an <strong><a href="http://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution">Edge</a></strong> connection with decent signal strength at your disposal. I was <strong>sad</strong>. Then I ran Google&#8217;s <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> and that tool confirmed that things weren&#8217;t ideal:</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed_before.png" title="pagespeed results before optimization" alt="pagespeed results before optimization"></p>
 
-<p><strong>Red</strong> for mobile. That&#8217;s exactly how I would describe the previous experience. Now, after a couple of simple changes, here is how things look now:</p>
+<p><strong style="color:#DD0000;">Red</strong> for mobile. That&#8217;s exactly how I would describe the previous experience. Now, after a couple of simple changes, here is how things look <strong>now</strong>:</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed_after.png" title="pagespeed results after optimization" alt="pagespeed results after optimization"></p>
 
-<p>Not only does that look better, it also makes all the difference in terms of the user experience. I have done a test with a friend on his friend&#8217;s smart phone. On there, there page had never been loaded before, so nothing was cached. We switched off the Wifi connection and disabled 3G so all that was left was four bars of an <strong>Edge</strong> connection. Initially, we loaded the new version and that took a mere <strong>5 seconds</strong> until the page was visible and properly styled except for the right web font. His reaction was, wow, that was fast, considering we we on a slow network. Next, we opened the old version prior to all optimizations, and that took <strong>32 seconds</strong> now.</p>
+<p>Not only does that decisively look better, it also makes <strong style="color:#00AA66;">all the difference</strong> in terms of the user experience. I have done a tiny experiment with a friend on his smart phone. On there, the blog had never been loaded before, so certainly nothing was cached. We switched off the Wifi connection and disabled 3G so all that remained was four bars of an <strong>Edge</strong> connection. Initially, we loaded the new and optimized version and that took a mere <strong>5 seconds</strong> until the page was visible and properly styled except for the right web font. His reaction was, <strong>wow, that was fast</strong>, considering that we were on a really sluggish network connection. Next, we opened the old version prior to all optimizations, and that took a prohibitive <strong>32 seconds</strong>. Let&#8217;s now have a look at what was necessary for this <strong style="color:#00AA66;">triumph</strong>.</p>
 
-<h3>Inlining the CSS</h3>
+<h3>Inlining the CSS / above-the-fold content</h3>
 
-<p>One of the complaints that PageSpeed Insights had was that the <strong>above-the-fold CSS</strong> was in a separate file. Above-the-fold is the portion of the page that needs to be fully loaded before any rendering can happen. You want this above-the-fold portion to load as fast as possible because any delay here will the visitor see a blank page for too long, which of course means that most people are leaving rather than staring at a blank page for ten seconds or longer. Funny enough, I think I read somewhere that people are even more impatient on mobile devices, despite the slower network connection. And it makes sense. On the desktop, I typically have twenty or more tabs open anyway. If something doesn&#8217;t load immediately, my attention will move to another application like mail or another tab. Good for a page if I move over to mail, then at least I will see the page when I came back to the browser. Another tab is worse as I probably won&#8217;t come back in a timely manner. But at least there&#8217;s a chance. On mobile, though, once I&#8217;m gone, I&#8217;m typically gone and likely won&#8217;t come back.</p>
+<p>One of the complaints that PageSpeed Insights uttered was that the <strong>above-the-fold CSS</strong> was in a separate file. <strong>Above-the-fold</strong> is the portion of the page that needs to be fully loaded before any rendering can happen. You want this above-the-fold portion to load as fast as possible because any delay here will keep the browser from rendering the page altogether, which of course means that most people are <strong>leaving</strong> rather than staring at a blank page for ten seconds or longer.</p>
+
+<p>Funny enough, I think I read somewhere that people tend to be even more impatient on mobile devices, despite the slower network connection. And it makes sense. On desktop, I typically have twenty or more tabs open anyway. If something doesn&#8217;t load immediately, my attention will either move to another application like mail or another tab. Good for a page if I move over to checking email, then at least I will see the page when I came back to the browser. Another tab is worse as I probably won&#8217;t come back in a timely manner or ever. But at least there&#8217;s a chance. On mobile, though, once I&#8217;m gone, I&#8217;m typically gone for good.</p>
+
+<p>In order to not hold up page loading by fetching the <code>screen.css</code> and being penalized with an additional <strong><a href="http://en.wikipedia.org/wiki/Round-trip_delay_time">round trip</a></strong>, I embedded the entire CSS in the header of each HTML file. While that incurred an extra <strong>39KB</strong>, in compressed files the difference was a mere <strong>7KB</strong>, which certainly loads faster than the extra round trip would take. This is particularly true on <strong>pre-LTE</strong> mobile which is notorious for long ping times. However, embedding CSS only works up to a certain size. While I don&#8217;t know the threshold, there comes a certain size where PageSpeed Insights starts complaining. But I suppose I can consider myself lucky that this fell within the range that is deemed acceptable.</p>
 
 <h3>Nginx instead of hosted page</h3>
 
-<p>Expiration</p>
+<p>Before, I was using a hosted web page where I had no real influence over how the files were served. Specifically, I had no control over <strong><a href="http://en.wikipedia.org/wiki/HTTP_compression">HTTP compression</a></strong> settings, <strong><a href="http://en.wikipedia.org/wiki/HTTP_ETag">ETags</a></strong> or <strong><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching">HTTP caching</a></strong>. In addition to that, it was also increasingly annoying to update the content because the only available method was an actual upload over good old <strong><a href="http://en.wikipedia.org/wiki/File_Transfer_Protocol">FTP</a></strong>. When I got started with the blog, that was bearable, but with an increasing number of files, specifically images, that started to take a few minutes. What I really wanted instead was to use either <strong><a href="http://en.wikipedia.org/wiki/Rsync">rsync</a></strong> or <strong><a href="http://git-scm.com/">git</a></strong>. I had a server already (the one used for example for serving <strong>BirdWatch</strong>) with <strong><a href="http://nginx.org">nginx</a></strong> running, so the first thing I did was move my blog over there and reconfigure the domain&#8217;s <strong><a href="http://en.wikipedia.org/wiki/Domain_Name_System">DNS</a></strong> settings. Here is the section of the <strong>nginx.conf</strong> that is responsible for serving the blog:</p>
+
+<figure class='code'><figcaption><span>nginx config nginx.conf </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>user www-data;
+</span><span class='line'>worker_processes 4;
+</span><span class='line'>pid /var/run/nginx.pid;
+</span><span class='line'>
+</span><span class='line'>events {
+</span><span class='line'>  worker_connections 15000;
+</span><span class='line'>}
+</span><span class='line'>
+</span><span class='line'>http {
+</span><span class='line'>  include       mime.types;
+</span><span class='line'>  default_type  application/octet-stream;
+</span><span class='line'>  charset UTF-8;
+</span><span class='line'>
+</span><span class='line'>  gzip_static on;
+</span><span class='line'>  gzip on;
+</span><span class='line'>  gzip_proxied any;
+</span><span class='line'>  gzip_types text/plain text/html text/css application/json application/javascri
+</span><span class='line'>pt application/xml application/xml+rss text/javascript;
+</span><span class='line'>  gzip_vary on;
+</span><span class='line'>
+</span><span class='line'>  server {
+</span><span class='line'>    listen       80;
+</span><span class='line'>    server_name  www.matthiasnehlsen.com;
+</span><span class='line'>    return       301 http://matthiasnehlsen.com$request_uri;
+</span><span class='line'>  }
+</span><span class='line'>
+</span><span class='line'>  server {
+</span><span class='line'>    listen       80;
+</span><span class='line'>    server_name  matthiasnehlsen.com;
+</span><span class='line'>    root /home/bw/octopress-blog/public;
+</span><span class='line'>
+</span><span class='line'>    location / {
+</span><span class='line'>      autoindex on;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    # Media: images, icons, video, audio, HTC
+</span><span class='line'>    location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$
+</span><span class='line'> {
+</span><span class='line'>      expires 1M;
+</span><span class='line'>      access_log off;
+</span><span class='line'>      add_header Cache-Control &quot;public&quot;;
+</span><span class='line'>    }
+</span><span class='line'>
+</span><span class='line'>    # CSS and Javascript
+</span><span class='line'>    location ~* \.(?:css|js)$ {
+</span><span class='line'>      expires 1y;
+</span><span class='line'>      access_log off;
+</span><span class='line'>      add_header Cache-Control &quot;public&quot;;
+</span><span class='line'>    }
+</span><span class='line'>  }
+</span><span class='line'>}
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m no expert in the subject of <strong>nginx configuration</strong>, but the above seems to be working well for what I am trying to do. If you are more knowledgeable and spot any nonsense in there, please let me know.</p>
+
+<h4>Expiration settings</h4>
 
 <p>For the configuration of nginx&#8217;s expiration settings, I used <strong><a href="https://github.com/h5bp/html5-boilerplate">html5-boilerplate</a></strong>&#8217;s <strong><a href="https://github.com/h5bp/server-configs-nginx/blob/master/h5bp/location/expires.conf">server-configs-nginx</a></strong> project as a template. The suggested settings in there worked well and I get no further complaints from <strong>PageSpeed Insight</strong> about caching of any resources that are under control of my <strong>nginx</strong> server. Obviously, there is little I can do about resources served from elsewhere.</p>
 
+<h4>Gzipping the content</h4>
+
+<p>The configuration above enables both static content compression and on-the-fly compression. Under heavy load, static compression is preferable where nginx serves the gzip version of a file, should it exist with the same name but with an appended <code>.gz</code>. If this file is not available, nginx instead compresses the content on-the-fly, resulting in a somewhat higher CPU utilization. I have gzipped some resources while others aren&#8217;t. I have never really seen high CPU utilization from nginx, therefore for me at this point, high nginx load due to compression is a luxury problem for which I would probably need to increase the number of visitors by an order of magnitude or two. But when that happens, I will probably look into pre-compression of more of the files again.</p>
+
 <h3>Move webfonts out of above-the-fold content</h3>
 
-<h2></h2>
+<h3></h3>
 
-<h2>Useful links</h2>
+<h3>Useful links</h3>
 
-<p>Here are some articles that I have found useful while making changes to this blog. Google has a few great resources available, for example on <strong><a href="https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery">Optimizing CSS Delivery</a></strong>, <strong><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#invalidating-and-updating-cached-responses">HTTP Caching</a></strong></p>
+<p>Here are a handful articles that I have found useful while making changes to this blog. Google has a few great resources available, for example on <strong><a href="https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery">Optimizing CSS Delivery</a></strong>, <strong><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#invalidating-and-updating-cached-responses">HTTP Caching</a></strong></p>
 
 <h2>BirdWatch in Clojure, ClojureScript and Om</h2>
 
-<p>I have done a lot of refactoring of the new version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> this past week. The application starts getting into the shape I want. The made the interesting discovery that there really <strong>aren&#8217;t any performance issues</strong> introduced by rewriting. The problem was really sitting in front of the screen. I was only accidentally calling the re-render of the WordCloud a few orders of magnitude more often than I should have. Considering that that is probably the most expensive operation in the entire client-side application, it is no wonder that the application was not responding in the way that I would have hoped. It is kind of amazing that it worked at all&#8230; I also did some preparations for moving the aggregation for previous tweets to the server. Specifically, the client side can now request missing tweets via WebSockets, and then render the full tweet once it is back. This isn&#8217;t useful yet, but it will be later. Once server-side aggregation is in place, there will be no need any more to transmit the entirety of the analyzed tweets to the client, which will either reduce the memory fingerprint by a lot when analyzing the same number of tweets, or enabling a <strong>much</strong> higher number of tweets for the same memory utilization.</p>
+<p>I have done a lot of refactoring of the new version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> this past week. The application architecture still feels like clay in my hands, but the sculpture is getting into a decent shape. I made the interesting discovery that there really <strong>weren&#8217;t any performance issues</strong> introduced by the <strong>Clojure</strong> rewrite. The problem was rather sitting in front of the screen. My initial version triggered a re-render of the word cloud <strong>a few orders of magnitude more often</strong> than what a reasonable and sane person would have done.</p>
+
+<p>Considering that the word cloud layout is probably the most expensive operation in the entire client-side application, it is no wonder that the application was not responding in the way that I would have hoped. It is kind of spectacular that it worked at all&#8230;</p>
+
+<p>I also did some preparations for moving the aggregation of previous tweets to the server. Specifically, the client side can now request missing tweets via <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSocket</a></strong> command messages, and then render the full tweet once it is back. This isn&#8217;t terribly useful yet, but it will be at a later stage. Once <strong>server-side aggregation</strong> is in place, there will be no need any longer to transmit all thousands of the analyzed tweets to the client. This should either reduce the memory fingerprint by a lot when analyzing the same number of tweets, or enable a <strong>much</strong> higher number of tweets for the same memory utilization. It shall also reduce page load times, potentiatally by a lot.</p>
 
 <h2>My Clojure Resources list</h2>
 
-<p>During my work on the <strong>Clojure</strong> application I described above, I am constantly adding new
-links to this <strong><a href="https://github.com/matthiasn/Clojure-Resources">list on GitHub</a></strong>. This week, I have again added articles I discovered and found useful. Maybe you find interesting stuff in there as well. Or you have a link, just let me know or, better yet, submit a <strong>pull request</strong> with the link and a short description.</p>
+<p>During my work on the <strong>Clojure</strong> application I described above, I am constantly adding fresh
+links to this list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. This week, I have once more added articles I discovered and found useful. Maybe you find interesting stuff in there as well. Or you have a link that you believe belongs in there. Just let me know or, better yet, submit a <strong>pull request</strong> with the link and a short comment.</p>
 
 <h2>Conclusion</h2>
 
-<p>Have a great remaining week,
+<p>I still have the desire to redesign the blog. But at least the load times aren&#8217;t terrible any longer so a redesign isn&#8217;t quite as urgent. Then, coding in <strong>Clojure</strong> was exciting and productive last week, with like <strong>35 commits</strong> so far this month. Things are finally settling down, which means that I will soon be able to start with a series of articles about this application. In that regard, please let me know if you have any ideas for features that would make the application more useful for you. It is already great that this little toy application of mine has received so much love (if love can be counted in GitHub stars) and I appreciate that a lot but it would even be more awesome if the application solved an actual problem. I would <strong>love to start a conversation</strong> (or two or three) here.</p>
+
+<p>Thanks and until next week,
 Matthias</p>
 ]]></content>
   </entry>
