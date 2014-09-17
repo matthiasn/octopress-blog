@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-15T16:40:38+02:00</updated>
+  <updated>2014-09-17T19:46:59+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,50 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: Clojure, Clojure, Clojure and a nasty cold]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/09/16/weekly-update/"/>
+    <updated>2014-09-16T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/09/16/weekly-update</id>
+    <content type="html"><![CDATA[<p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
+
+<!-- more -->
+
+
+<p><a href="http://birdwatch2.matthiasnehlsen.com" target="_blank"><img class="left" src="http://matthiasnehlsen.com/images/bw-clj.gif" title="BirdWatch in action" alt="BirdWatch in action"></a></p>
+
+<br />
+
+
+<p>Above you can see what the latest <strong>all-Clojure</strong> version looks like. I have added two features: <em>a)</em> aggregation and sorting by <strong>reach</strong> and <em>b)</em> a counter for the total number of tweets indexed, which is updated every ten seconds. You can see a live version by clicking on the animated GIF.</p>
+
+<h2>Componentizing BirdWatch</h2>
+
+<p>Over the weekend, I have componentized the server side of <strong><a href="https://github.com/matthiasn/birdwatch/">BirdWatch</a></strong>. In terms of functionality, I had been content with the earlier version, but in terms of the structure, I started to recognize something that I had <strong>learned to dread</strong>: an application where everything depended on everything. Okay, at least there were no circular dependencies (any more), but there were still way too many dependencies between namespaces, in a way that I had seen way too often in past projects to lull myself into being satisfied. I don&#8217;t even like real <strong><a href="http://en.wikipedia.org/wiki/Spaghetti">spaghetti</a></strong> all much much.</p>
+
+<p>The <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> offers help by allowing us to structure an application into components (and boundaries between them) and then wiring them together by means of <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong>. It took a moment or two to wrap my head around it, but once I had, I was convinced that I wanted to reap the benefits of <strong>DI</strong> and rewrite my application. The library&#8217;s description contains a fair warning that it is somewhat difficult to refactor an existing application to use the it throughout, but I can now say for sure that it can be done and that it&#8217;s worth it.</p>
+
+<p>As a result I have an application where ONLY the main namespace depends on the different components it wires together via dependency injection. Other than that, the different namespaces know nothing about each other. Communication between the different components takes places via <strong><a href="https://github.com/clojure/core.async">core.async channels</a></strong>, which all live in a single component. This component holding the channels is then injected into the other components as a dependency.</p>
+
+<p>I find this new architecture beautiful and I will surely write more about it soon. Until then, I could use <strong>your help</strong>. I am really just getting started with Clojure, with this being the first real application that I write in it. I would love to have more knowledgeable Clojurians review the code and point me at possible improvements. Right now I would especially appreciate that for the <strong><a href="https://github.com/matthiasn/BirdWatch/tree/master/Clojure-Websockets/src/clj/birdwatch">server-side code</a></strong>.</p>
+
+<h2>Are Clojure developers happier?</h2>
+
+<p>I recently read an article that <strong><a href="http://www.itworld.com/big-data/433057/clojure-developers-are-happiest-developers">Clojure developers are the happiest</a></strong> and while I cannot really say that the article provides hard evidence, I can say for sure that I for one enjoy programming in <strong><a href="http://clojure.org">Clojure</a></strong> more than I have enjoyed programming in other languages for a while. Also I have found the community really helpful. Yesterday, I had a problem I couldn&#8217;t figure out myself. After scratching my head for way too long, it only took a few minutes after joining the <strong><a href="http://clojure-log.n01se.net/date/2014-09-16.html">Clojure room</a></strong> on <strong>IRC</strong> until I was happily coding again.</p>
+
+<h2>Clojure Resources</h2>
+
+<p>I have recently liberated my accumulated list of bookmarks on Clojure-related stuff and since I have added every new link and useful link I have come across. I am now working on making it a habit of writing a sentence or two about all new resources I discover. In the past couple of days, I have been really happy to see that people seem to find this compilation useful. Please go check it out if you haven&#8217;t already: <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources on GitHub</a></strong>.</p>
+
+<h2>Closing remarks</h2>
+
+<p>Okay, back to bed, I need to get rid of this nasty cold ASAP. I have stuff to do, other than coughing. The bugs came without invitation last week and now they don&#8217;t seem inclined to leave. But on the upside, I went to the doctor today and he gave me a prescription for three different pharmaceuticals and assured me that I&#8217;ll likely survive.</p>
+
+<p>Have a great remaining week,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Weekly Update: PageSpeed Insights, optimizing Octopress & more Clojure]]></title>
@@ -2899,198 +2943,6 @@ Matthias</p>
 <p>I can report that this kind of build system and the live reload feature are also useful when building a single page application. In my new project which I have mentioned in the beginning I am taking the reload feature further by also using it for updating the data model. With that, page refreshes based on  data model changes become equally smooth as the CSS refreshes presented here. But more on that in future articles. As usual, you can find the code on <strong><a href="https://github.com/matthiasn/live-html5">GitHub</a></strong>.</p>
 
 <p>Cheers,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Using Crossfilter with AngularJS]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/09/15/using-crossfilter-with-angularjs/"/>
-    <updated>2013-09-15T20:40:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/09/15/using-crossfilter-with-angularjs</id>
-    <content type="html"><![CDATA[<p>So far I have found my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application nice to look at but not terribly useful as an original way of finding information. Let&#8217;s face it - the vast majority of tweets are not terribly useful. But there are some in there that are highly relevant. What are their characteristics? At the most basic level, they come from people with huge numbers of followers and / or have been re-tweeted a lot. It&#8217;s these tweets that have a large audience, not the ones from users with low follower counts. The latter make up the majority of the chatter, though. How do we find these more relevant tweets within an observation period?</p>
-
-<!-- more -->
-
-
-<p>I am running a private instance of this application which is listening to tweets on US politics. In this instance of the application I have been increasingly annoyed by an overwhelming amount of irrelevancy. I&#8217;d search for &#8220;Obama Syria&#8221; and get shiploads of tweets from crazies; finding the relevant stuff was next to impossible when I only had the result set sorted by time.</p>
-
-<p><strong><a href="http://square.github.io/crossfilter/">Crossfilter</a></strong> to the rescue. Over the weekend I finally had time to integrate it into the project. Now you will be able to sort tweets not only in natural order (by time) but also by the number of followers of the author</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/cf_followers.png" title="image" alt="images"></p>
-
-<p>or the number of times a particular tweet has been retweeted. As usual you can <strong><a href="http://birdwatch.matthiasnehlsen.com">try this out</a></strong>.</p>
-
-<p> <img class="left" src="http://matthiasnehlsen.com/images/cf_retweets.png" title="image" alt="images"></p>
-
-<p>The re-tweets sort order currently evaluates the number of total re-tweets during the entire lifecycle of the tweet, which makes this sort order somewhat biased towards older tweets that were re-tweeted a lot in the past but not necessarily proportionately often during the observation time, which is the time span between now (whenever looking at the page as searches are live) and the oldest tweet in the data set. One additional metric could be the number of retweets of a tweet during the observation period, not the total number. That should not be all that difficult using crossfilter.</p>
-
-<p>Let&#8217;s have a look at the source code. The <strong><a href="http://square.github.io/crossfilter/">Crossfilter</a></strong> object lives in an <strong><a href="http://angularjs.org">AngularJS</a></strong> service, which is a singleton within the application. The functionality is then exposed through exported functions for adding data, clearing the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> and retrieving items for the paginated tweets page.</p>
-
-<figure class='code'><figcaption><span>Crossfilter service</span><a href='https://github.com/matthiasn/BirdWatch/blob/ff861aa0df86c0c0ea2a078a0c3af50a6bc877b1/app/assets/javascripts/services/crossfilter.js'>crossfilter.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-<span class='line-number'>52</span>
-<span class='line-number'>53</span>
-<span class='line-number'>54</span>
-<span class='line-number'>55</span>
-<span class='line-number'>56</span>
-<span class='line-number'>57</span>
-<span class='line-number'>58</span>
-<span class='line-number'>59</span>
-<span class='line-number'>60</span>
-<span class='line-number'>61</span>
-<span class='line-number'>62</span>
-<span class='line-number'>63</span>
-<span class='line-number'>64</span>
-<span class='line-number'>65</span>
-<span class='line-number'>66</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="s1">&#39;use strict&#39;</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="c1">// crossfilter service</span>
-</span><span class='line'><span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;birdwatch.services&#39;</span><span class="p">).</span><span class="nx">service</span><span class="p">(</span><span class="s1">&#39;cf&#39;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">utils</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">exports</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// crossfilter object: browser side analytics library, holds array type data (w/incremental updates).</span>
-</span><span class='line'>    <span class="c1">// dimensions are fast queries on data, e.g. view sorted by followers_count or retweet_count of the original message</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">cf</span> <span class="o">=</span> <span class="nx">crossfilter</span><span class="p">([]);</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">tweetIdDim</span>   <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span> <span class="p">});</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">followersDim</span> <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">followers_count</span><span class="p">;</span> <span class="p">});</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">retweetsDim</span>  <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s2">&quot;retweeted_status&quot;</span><span class="p">))</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">originalIdDim</span>  <span class="o">=</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">dimension</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s2">&quot;retweeted_status&quot;</span><span class="p">))</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span> <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// freeze imposes filter on crossfilter that only shows anything older than and including the latest</span>
-</span><span class='line'>    <span class="c1">// tweet at the time of calling freeze. Accordingly unfreeze clears the filter</span>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">freeze</span>    <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">filter</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">id</span><span class="p">]);</span> <span class="p">};</span>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">unfreeze</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">filterAll</span><span class="p">();</span> <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">add</span>       <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span>     <span class="p">{</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span> <span class="p">};</span>                            <span class="c1">// add new items, as array</span>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">clear</span>     <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>         <span class="p">{</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">remove</span><span class="p">();</span> <span class="p">};</span>                             <span class="c1">// reset crossfilter</span>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">noItems</span>   <span class="o">=</span> <span class="kd">function</span><span class="p">()</span>         <span class="p">{</span> <span class="k">return</span> <span class="nx">cf</span><span class="p">.</span><span class="nx">size</span><span class="p">();</span> <span class="p">};</span>                        <span class="c1">// crossfilter size total</span>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">numPages</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">cf</span><span class="p">.</span><span class="nx">size</span><span class="p">()</span> <span class="o">/</span> <span class="nx">pageSize</span><span class="p">);</span> <span class="p">};</span>  <span class="c1">// number of pages</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// predicates</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">retweeted</span>     <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">hasOwnProperty</span><span class="p">(</span><span class="s2">&quot;retweeted_status&quot;</span><span class="p">);</span> <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// mapper functions</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">originalTweet</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">utils</span><span class="p">.</span><span class="nx">formatTweet</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">);</span> <span class="p">};</span>   <span class="c1">// returns original tweet</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">tweetId</span>       <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">;</span> <span class="p">};</span>                                    <span class="c1">// returns tweet id</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">retweetCount</span>  <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="nx">retweeted</span><span class="p">(</span><span class="nx">t</span><span class="p">))</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">;</span> <span class="p">}</span> <span class="k">else</span> <span class="k">return</span> <span class="mi">0</span> <span class="p">};</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">maxRetweets</span>   <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="nx">t</span><span class="p">.</span><span class="nx">retweet_count</span> <span class="o">=</span> <span class="nx">retweetCount</span><span class="p">(</span><span class="nx">_</span><span class="p">.</span><span class="nx">max</span><span class="p">(</span><span class="nx">originalIdDim</span><span class="p">.</span><span class="nx">filter</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nx">id</span><span class="p">).</span><span class="nx">top</span><span class="p">(</span><span class="mi">1000</span><span class="p">),</span>
-</span><span class='line'>            <span class="kd">function</span><span class="p">(</span><span class="nx">t</span><span class="p">){</span> <span class="k">return</span> <span class="nx">t</span><span class="p">.</span><span class="nx">retweeted_status</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">;</span> <span class="p">}));</span>
-</span><span class='line'>        <span class="nx">originalIdDim</span><span class="p">.</span><span class="nx">filterAll</span><span class="p">();</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">t</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// deliver tweets for current page. fetches all tweets up to the current page,</span>
-</span><span class='line'>    <span class="c1">// throws tweets for previous pages away.</span>
-</span><span class='line'>    <span class="nx">exports</span><span class="p">.</span><span class="nx">tweetPage</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">currentPage</span><span class="p">,</span> <span class="nx">pageSize</span><span class="p">,</span> <span class="nx">order</span><span class="p">,</span> <span class="nx">live</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">rest</span><span class="p">(</span><span class="nx">fetchTweets</span><span class="p">(</span><span class="nx">currentPage</span> <span class="o">*</span> <span class="nx">pageSize</span><span class="p">,</span> <span class="nx">order</span><span class="p">),</span> <span class="p">(</span><span class="nx">currentPage</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="nx">pageSize</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="c1">// fetch tweets from crossfilter dimension associated with particular sort order up to the current page,</span>
-</span><span class='line'>    <span class="c1">// potentially mapped and filtered</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">fetchTweets</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">,</span> <span class="nx">order</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>      <span class="k">if</span>      <span class="p">(</span><span class="nx">order</span> <span class="o">===</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>    <span class="p">{</span> <span class="k">return</span> <span class="nx">tweetIdDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">);</span> <span class="p">}</span>    <span class="c1">// latest: desc order of tweets by ID</span>
-</span><span class='line'>      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">order</span> <span class="o">===</span> <span class="s2">&quot;followers&quot;</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>          <span class="k">return</span> <span class="nx">followersDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="nx">pageSize</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">maxRetweets</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>   <span class="c1">// desc order of tweets by followers</span>
-</span><span class='line'>      <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">order</span> <span class="o">===</span> <span class="s2">&quot;retweets&quot;</span><span class="p">)</span> <span class="p">{</span>  <span class="c1">// descending order of tweets by total retweets of original message</span>
-</span><span class='line'>          <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">first</span><span class="p">(</span>               <span class="c1">// filtered to be unique, would appear for each retweet in window otherwise</span>
-</span><span class='line'>              <span class="nx">_</span><span class="p">.</span><span class="nx">uniq</span><span class="p">(</span><span class="nx">retweetsDim</span><span class="p">.</span><span class="nx">top</span><span class="p">(</span><span class="nx">cf</span><span class="p">.</span><span class="nx">size</span><span class="p">()).</span><span class="nx">filter</span><span class="p">(</span><span class="nx">retweeted</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">originalTweet</span><span class="p">),</span> <span class="kc">false</span><span class="p">,</span> <span class="nx">tweetId</span><span class="p">),</span> <span class="nx">pageSize</span><span class="p">);</span>
-</span><span class='line'>      <span class="p">}</span>
-</span><span class='line'>      <span class="k">else</span> <span class="p">{</span> <span class="k">return</span> <span class="p">[];</span> <span class="p">}</span>
-</span><span class='line'>    <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="k">return</span> <span class="nx">exports</span><span class="p">;</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Depending on the selected sort order different dimensions are used to generate the paginated tweets list. Sorting by time of tweeting is achieved with a dimension sorting by tweet IDs (which are in chronological order). Another dimension sorts tweets by the follower count of the tweet author. In this case, maxRetweets (mapper function) looks up all retweets within the data set in memory and sets the retweet count to the highest value found. The tweets with the highest number of retweets are found using the retweets dimension. Within this dimension multiple versions of the same original tweet are returned when the tweet has been retweeted multiple times during the observation period. The _.uniq function from <strong><a href="http://underscorejs.org/">underscore.js</a></strong> is used to filter out those duplicate entries. The descending order of retweet_count in the returned array from the dimension guarantees that the version of a retweet with the highest re-tweet count is found first and retained.</p>
-
-<p>The paginated data is generated by retrieving all items from the selected dimension up to the current page. The _.rest function from <strong><a href="http://underscorejs.org/">underscore.js</a></strong> then drops the items for all pages that come before the current page.</p>
-
-<p><strong><a href="http://angularjs.org">AngularJS</a></strong> then takes care of rendering a view by calling the tweetPage function from the crossfilter service every time the UI is updated. This means that the visual representation of the data is always up to date, with automatic updates for example when a tweet in the followers order is retweeted again. All that without having to manipulate the DOM directly, thanks to
-<strong><a href="http://angularjs.org">AngularJS</a></strong>.</p>
-
-<p>Evaluating the crossfilter dimension functions again and again can be problematic when tens of individual tweets per second arrive through the <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> connection with the server, though. In order to avoid evaluating the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> functions multiple times per second I use _.throttle in the registerCallback function in controllers.js:</p>
-
-<figure class='code'><figcaption><span>Insertion Cache inside Controller</span><a href='https://github.com/matthiasn/BirdWatch/blob/ff861aa0df86c0c0ea2a078a0c3af50a6bc877b1/app/assets/javascripts/controllers.js'>controllers.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">insertionCache</span> <span class="o">=</span> <span class="nx">insertionCache</span><span class="p">.</span><span class="nx">concat</span><span class="p">(</span><span class="nx">t</span><span class="p">);</span>    <span class="c1">// every received item is appended to insertionCache.</span>
-</span><span class='line'><span class="nx">_</span><span class="p">.</span><span class="nx">throttle</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>                       <span class="c1">// throttle because every insertion triggers expensive</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">wordCount</span><span class="p">.</span><span class="nx">insert</span><span class="p">(</span><span class="nx">insertionCache</span><span class="p">);</span>  <span class="c1">// $scope.apply(), insert cache once every 3 seconds,</span>
-</span><span class='line'>    <span class="nx">insertionCache</span> <span class="o">=</span> <span class="p">[];</span>                      <span class="c1">// then empty cache.</span>
-</span><span class='line'><span class="p">},</span> <span class="mi">3000</span><span class="p">)();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>By the way, you can now increase the number of pre-loaded tweets to up to 20,000 under <strong>settings</strong>. That may slow the application down, though. A lot of things aren&#8217;t perfect yet, but overall it seems to be working fine.</p>
-
-<p>Anyhow, I will go into more detail later. The source code for the entire application can be found on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>. My <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">previous article</a></strong> is the place to go for an explanation of the overall architecture of the application. It is a work in progress and I will get back to it in the next couple of days. For now I just wanted to give you a quick update on what I have been up to this weekend.</p>
-
-<p>Until next time,
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
