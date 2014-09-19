@@ -1,0 +1,21 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+
+  <!-- Define a clip path (circular) -->
+  <defs>
+    <clipPath id="myClipPath">
+	<circle r="50%" cx="50" cy="50" />
+</clipPath>
+  </defs>
+
+  <!-- Group for all the content in the SVG, to apply circular clip-path to -->
+  <g id="wholeThing" clip-path="url(#myClipPath)">
+    <!-- A rectangular background shape -->
+    <path fill="#FFaa00" d="M 0 0 L 100 0 L 100 100 L 0 100 L 0 0 z" />
+  
+    <!-- The group of stuff I want to move around inside the circle. Real code involves more items, hence the group element. -->
+    <g id="myGroup">
+      <circle r="25" fill="#00aaFF" cx="60" cy="90" />
+    </g><!-- /#myGroup -->
+  
+  </g><!-- /#wholeThing -->
+</svg><!-- /end SVG root. -->

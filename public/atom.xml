@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-17T19:46:59+02:00</updated>
+  <updated>2014-09-19T23:00:40+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,70 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: ]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/09/22/weekly-update/"/>
+    <updated>2014-09-22T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/09/22/weekly-update</id>
+    <content type="html"><![CDATA[<p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
+
+<!-- more -->
+
+
+
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"/></script>
+
+
+
+
+<script type="text/javascript">
+document.getElementById("bw-omni").addEventListener("load", function() {
+    var birdwatchAnim = new TimelineMax({'paused': true });
+
+    alert("hello")
+    var doc = this.getSVGDocument();
+     id4Graphic = doc.querySelector("#id4_Graphic");
+    
+    birdwatchAnim.add(new TweenMax(id4Graphic, 2.5, {
+        x: -250,
+        y: 250,
+       // opacity: 0.5,
+
+      //repeat: 1,
+      //yoyo: true
+    }));
+
+    TweenLite.to(id4Graphic, 10, {x:-150, y:400});
+    
+    //birdwatchAnim.play().repeat(1).repeatDelay(2);
+});    
+</script>
+
+
+
+
+<script language="javascript" type="text/javascript">
+  function resizeIframe(obj) {
+    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+  }
+</script>
+
+
+
+
+<iframe width="100%;" src="http://matthiasnehlsen.com/iframes/bw-anim/index.html" frameborder="0" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
+
+
+<h2>Closing remarks</h2>
+
+<p>Okay, back to bed, I need to get rid of this nasty cold ASAP. I have stuff to do, other than coughing. The bugs came without invitation last week and now they don&#8217;t seem inclined to leave. But on the upside, I went to the doctor today and he gave me a prescription for three different pharmaceuticals and assured me that I&#8217;ll likely survive.</p>
+
+<p>Have a great remaining week,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure, Clojure, Clojure and a nasty cold]]></title>
@@ -2838,114 +2902,6 @@ Matthias</p>
 
 <p>Cheers,
 Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[HTML5 Template with Live Reload and 100/100 PageSpeed]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/"/>
-    <updated>2013-11-23T18:36:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device</id>
-    <content type="html"><![CDATA[<p>A few weeks ago I started working on the follow-up to my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> project. This new project is another single page application based on <strong><a href="http://angularjs.org">AngularJS</a></strong>, but that is not part of the story I am going to tell you today at all. Instead, today I will talk about <strong>speed</strong>. As in, how long does it take for a web page to load, on a mobile device? I was doing some research by opening different websites under suboptimal conditions, such as 3G with only two to three bars, or even worse the dreaded <strong>E</strong> with four to five bars. Not terribly difficult to simulate, I only need to disable the Wifi and walk into different corners of my apartment for that. Opening my own blog made me sad: with the bad 3G connection it took like <strong>10 seconds</strong> for the index page to show anything at all. No way I would ever wait that long for any page to load. And I would quite likely not even try again. So I went on a quest to make this better. The result is of course on <strong><a href="https://github.com/matthiasn/live-html5">GitHub</a></strong>.</p>
-
-<!-- more -->
-
-
-<p>So what happens when the browser loads a page? First a DNS lookup takes place, translating the human-readable domain name into an IP address. Then that domain is contacted using an HTTP GET request for the particular URL. If no specific file is given in the request, a server will usually try to return a file named <strong>index.html</strong> inside the folder that maps to the request URL. This <strong>index.html</strong> then typically contains multiple links to stylesheets and scripts, all of which trigger the same cascade (minus the DNS lookup if subsequent requests point to the same domain). Many of the resources are blocking; the page will only display after they are loaded.</p>
-
-<p>We can examine the request behavior by looking at a timeline chart, like this one for the index page of this blog:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/gtmetrix-blog.png" title="image" alt="gtmetrix result for matthiasnehlsen.com"></p>
-
-<p>You will notice that the <strong>DOM loaded</strong> event fired after more than an entire second (the blue line), or a little less than 200ms after the blocking screen.css has finished loading.</p>
-
-<p>I have used <strong><a href="http://gtmetrix.com">GTmetrix</a></strong> for generating the charts. The numbers are comparable to what I can measure in Chrome Developer Tools, with a decent DSL subscription. So presumably they are much better than what a suboptimal mobile connection would yield.</p>
-
-<p>Now pre-LTE mobile networks have much longer network round-trip times than copper or fiber-based tethered networks, even under ideal conditions. And things of course do not degrade gracefully when the signal deteriorates.</p>
-
-<p>I wanted to know how much worse network round-trip times actually are on mobile networks, so I measured a <strong><a href="http://en.wikipedia.org/wiki/Ping_(networking_utility)">ping</a></strong> to the domain of this blog with a free iPhone app called <strong><a href="https://itunes.apple.com/us/app/network-ping-lite/id289967115">Ping Lite</a></strong>.</p>
-
-<p>As a baseline measurement, I did the ping over Wi-Fi + DSL and got around 55ms on average:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/iphone_ping_wlan.png" title="image" alt="iPhone ping wifi"></p>
-
-<p>Interestingly this is about 25ms slower than what I got with the command line ping on my Mac on the same network. I have no idea where this delay comes from, could be something in iOS or in the Ping Lite app. But it doesn&#8217;t really matter; a 25ms delay is not near as noticeable as the delay introduced by switching to a mobile network. Using 3G under ideal conditions (five bars) I consistently got a little less than 500ms:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/iphone_ping_3g.png" title="image" alt="iPhone ping 3G"></p>
-
-<p>That is much worse than the Wi-Fi connection indeed, particularly when multiple files need to be loaded; then these times really add up. Not a big surprise that the Edge connection is even worse, particularly in terms of consistency:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/iphone_ping_edge.png" title="image" alt="iPhone ping EDGE"></p>
-
-<p>Thinking about the timeline, it is not hard to imagine what influence the higher round-trip times will have on the <strong>DOM loaded</strong> event when potentially multiple blocking requests have to be completed before the browser renders the page.</p>
-
-<p>So what can be improved here? Three things came to my mind:</p>
-
-<ul>
-<li>Loading external stylesheets takes additional round trips. These are blocking and the page will only render when all the requests are completed. Stylesheets could in theory be loaded asynchronously, but a flash of unstyled content (FOUC) would then occur. Frankly, I&#8217;d rather not have the page load at all than subjecting anyone to that. But why not <strong>inline</strong> all of the CSS in the index.html file in the first place?</li>
-<li>No compression was used so far; that alone should cut down the time until <strong>DOM loaded</strong> by substantially shortening the gray portion of the timeline bars.</li>
-<li>The CSS seems fairly <strong>large</strong>; there is no way that 37.8KB of styling are necessary for what is rendered on the page. Add up the computed styles of every single element of the page and you will end up with a few Kilobytes at most. Everything else is dead weight.</li>
-</ul>
-
-
-<p>So I decided to try inlining custom CSS in the HTML file and then compressing the file using gzip. I was also interested in the fairly new CSS3 <strong><a href="https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Flexible_boxes">Flexbox Layout</a></strong>, so I decided to write the CSS based on flexbox by hand instead of using <strong><a href="http://getbootstrap.com">Bootstrap</a></strong>. That way I should be able to avoid loading tens of unnecessary stylesheet Kilobytes. You can find out more about flexbox in this great <strong><a href="http://css-tricks.com/snippets/css/a-guide-to-flexbox/">tutorial</a></strong>. Note that everything presented in this article would work equally well with <strong><a href="http://getbootstrap.com">Twitter Bootstrap</a></strong>, particularly when you work with the <strong><a href="https://github.com/twbs/bootstrap">Bootstrap LESS source</a>, and honestly there is no reason not to. LESS is a delight, I fand that it makes CSS more approachable from a developers perspective. LESS also makes it easy to only include the Bootstrap parts that are used on the page, making the download much smaller. On the other hand, the distribution version of a popular version from a </strong>CDN** (content delivery network) has the advantage that it will quite likely come from the browser cache, considering how ubiquously Bootstrap is used these days. It seems to be a good idea to avoid delivering the distribution version from your own server, particularly when uncompressed and not minified. Waiting for those extra almost 100 Kilobytes will drive visitors away.</p>
-
-<p>At the end, I find either option viable. What I want to avoid isI would just like to bri</p>
-
-<p>But if I decide to deliver the CSS myself, it should be as concise as possible.</p>
-
-<p>I set up a build system based on <strong><a href="http://gruntjs.com">grunt</a></strong> and started trying out flexbox. It turned out that my frustration tolerance for reloading the page on my mobile devices was so low that I shortly thereafter found myself working on a live <strong>CSS reload</strong> feature. After covering <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> more than once on this blog, I thought I might as well utilize SSE for notifying the browser about file system changes. Detecting file system changes is a solved problem, so all it took was transmitting the events to the browser and have a script on the client side initiate a page reload / refresh. To my surprise, SSE support has only <strong><a href="http://caniuse.com/eventsource">recently come to Android</a></strong>, requiring either the KitKat built-in browser, or Chrome for Android version 30. Things worked well with Chrome 30 on Jelly Bean and with mobile Safari on iOS 6 and 7. I cannot say anything about older versions or other browsers. Please report if things fail in your browser, or better submit a fix.</p>
-
-<p>For the CSS authoring I have chosen <strong><a href="http://lesscss.org">LESS</a></strong> because it makes the whole CSS authoring process a lot smoother. LESS mixins really help in getting rid of a lot of repetition. During the authoring of the page I am using browser-side LESS>>CSS compilation using <strong><a href="http://lesscss.org">less.js</a></strong>. That turned out to be an excellent choice. I stumbled upon the <strong>less.refresh()</strong> function, which has the awesome feature of refreshing the style <strong>without</strong> triggering an entire page reload.</p>
-
-<p>The refresh function combined with the file system refresh messages sent over the SSE connection
- With that feature, I could really focus on minute changes to the CSS without the page jumping at all, even on the mobile device. The video below will illustrate this nicely.</p>
-
-<p>Have a look what this means in practice:</p>
-
-<div class="video-container">
-    <iframe width="320" height="180" src="http://www.youtube.com/embed/mNxFQva-Shw"></iframe>
-</div>
-
-
-<p>Things look decent for flexbox in terms of <strong><a href="http://caniuse.com/flexbox">compatibility</a></strong>. In the mobile world, flexbox has been supported since Android 2.1 and iOS 3.1, and by now it is supported on at least the latest browser version on each platform, which should cover the vast majority of mobile devices out there. On the desktop side of things, flexbox has also been supported for a while on different platforms, even on IE since version 10. This is in contrast to SSE, which Microsoft apparently does not want to support at all. But there is one <strong>caveat</strong>: Flexbox exists in different versions, with the old ones prefixed. For -webkit, even different prefixed versions exist. In itself that is not a huge problem, particularly if you use <strong><a href="http://lesscss.org/#-mixins">LESS mixins</a></strong> so you do not have to continuously repeat yourself. But it is still a quite annoying because it means optimizing for different browser versions. Well, nothing new in the world of browser compatibility issues.</p>
-
-<p>I spent some time with the flexbox CSS and the layout of the sample index.html in the <strong><a href="https://github.com/matthiasn/live-html5">live-html5</a></strong> project looks fine to me when viewed with the latest versions of all major browsers, but I have not had the time to even out edges in older versions, particularly in Firefox and IE. If you see a problem there, please fix it and submit a pull request. Old browsers have not been the focus of my experiments much. No reason why they shouldn&#8217;t be supported by the template as well as possible though. Thanks!</p>
-
-<p>Anyways, so all that worked nicely, with a responsive layout with an <strong>aside</strong> element on the right side if the media query detects a wide browser page (e.g. desktop or iPad in landscape orientation) and a stacked layout otherwise. You have seen it in the video above, it is simple and seems to work fine. It is also <strong><a href="http://validator.w3.org/check?uri=http%3A%2F%2Fmatthiasn.github.io%2Flive-html5%2F&amp;charset=%28detect+automatically%29&amp;doctype=Inline&amp;group=0">valid HTML5</a></strong>.</p>
-
-<p>Finally, when I revisited the page speed issue, I implemented automatic CSS inlining, minification and compression. Grunt is great for that, unless you actually like mindless and repetitive tasks. Have a look at the <strong><a href="http://matthiasn.github.io/live-html5/">project description</a></strong> and <strong><a href="https://github.com/matthiasn/live-html5">code</a></strong> to find out more about the build task.</p>
-
-<p>Here is the final result of Google PageSpeed Insights after all the automated optimizations:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed-100.png" title="image" alt="pagespeed 100 result"></p>
-
-<p>Great, this is what I wanted to see. Let us have a look at timeline chart for the sample page now. Arguably the complexity of this page is higher than the blog index page, so I think this is a fair comparison:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/gtmetrix-live-html5.png" title="image" alt="gtmetrix result for optimized live-html5 page"></p>
-
-<p>The <strong>DOM loaded</strong> event now occurs after 86ms, which is more than 12 times faster than what we saw for the index page of the blog initially. It also happens after loading only 7.7KB. That will load much faster over a suboptimal mobile connection for sure. Note that the remaining two resources are not important for the perceived speed. All that matters is the HTML and the embedded styles. The picture is at the bottom of the page on a small screen anyways, and I bet no visitor will give up because a <strong><a href="http://fontawesome.io">font-awesome symbol</a></strong> renders with some delay.</p>
-
-<p>This concludes the quest for speed. The sample page loads as I wanted it to, with nothing less than a 100/100 score on Google PageSpeed Insights. Flexbox seems to work fine particularly for a mobile audience. Finally, the build system removes the pain of optimizing things by hand.</p>
-
-<p>I find the presented solutions particularly sweet as they work together. But you might find individual parts useful as well. I am particularly thinking about the live reload server / client pattern; it will work equally well in a project that uses Bootstrap or whatever. You are not even bound to LESS. You can still use less.js for loading and refreshing CSS without a page refresh. The refreshed CSS could equally well be generated by a <strong><a href="http://sass-lang.com">SASS</a></strong> based CSS build system watching file folders. Or you just edit plain old CSS by hand if that makes you feel good.</p>
-
-<p>In fact I have made the page refresh feature work with <strong><a href="http://www.playframework.com">Play Framework</a></strong>. For that the server.js will need to be started in whichever folder you want to watch and the script snippet needs do be loaded during development. The script would by default not be allowed to contact the <strong><a href="https://github.com/matthiasn/live-html5/blob/master/scripts/server.js">server.js</a></strong> backend because it runs on a different port. The <strong><a href="http://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a></strong> of the browser prohibits this. But an instance of nginx can run in front of both server and serve all resources on the same port, including the Server Sent Event stream. You can find the <strong><a href="https://github.com/matthiasn/live-html5/blob/master/conf/nginx.conf">nginx configuration file</a></strong> in the <strong>conf</strong> folder of the project. This even works with the partial CSS reload feature by loading the CSS file(s) as LESS and embedding the <strong><a href="http://lesscss.org">less.js</a></strong> script. I&#8217;d be happy to write an article about this, should the demand present itself.</p>
-
-<h2>Contributions</h2>
-
-<p>I am using this particular project to learn more about the technologies involved. Please submit pull requests wherever you see potential for improvements.</p>
-
-<h2>Outlook</h2>
-
-<p>In this article I have talked about some implementation details for an optimized delivery of a static page to mobile devices. Along the way I have also presented a convenience feature, the smooth live reload particularly for CSS but also for other resources.</p>
-
-<p>I can report that this kind of build system and the live reload feature are also useful when building a single page application. In my new project which I have mentioned in the beginning I am taking the reload feature further by also using it for updating the data model. With that, page refreshes based on  data model changes become equally smooth as the CSS refreshes presented here. But more on that in future articles. As usual, you can find the code on <strong><a href="https://github.com/matthiasn/live-html5">GitHub</a></strong>.</p>
-
-<p>Cheers,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
