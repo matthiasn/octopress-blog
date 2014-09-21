@@ -1,7 +1,7 @@
-document.getElementById("bw-omni").addEventListener("load", function() {
-    var birdwatchAnim = new TimelineMax({'paused': true });
+var doc = document.getElementById("bw-omni").getSVGDocument();
 
-    var doc = this.getSVGDocument();
+var birdwatchAnim = new TimelineMax({'paused': true });
+
     id4Graphic = doc.querySelector("#id4_Graphic"); // suppose our image contains a <rect>
     
     birdwatchAnim.add(new TweenMax(id4Graphic, 2.5, {
@@ -14,8 +14,7 @@ document.getElementById("bw-omni").addEventListener("load", function() {
     }));
 
     //TweenLite.to(id4Graphic, 10, {x:-150, y:400});
-    TweenLite.to(id4Graphic, 3, {x:-250, y:400});
+    TweenLite.to(id4Graphic, 3, {x:-150, y:400});
     //TweenLite.to(id4Graphic, 3, {x:-50, y:40});
     
     //birdwatchAnim.play().repeat(-1).repeatDelay(2);
-});
