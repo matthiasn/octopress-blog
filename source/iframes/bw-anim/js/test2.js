@@ -2,6 +2,8 @@ var doc = document.getElementById("bw-omni");
 var id4Graphic = doc.querySelector("#id4_Graphic");
 var id155Graphic = doc.querySelector("#id155_Graphic");
 
+//TweenLite.ticker.fps(30);
+
 var birdwatchAnim = new TimelineMax({'paused': true });
     
 birdwatchAnim.add(new TweenMax(id4Graphic, 2.5, {

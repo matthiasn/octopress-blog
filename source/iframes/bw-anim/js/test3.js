@@ -4,6 +4,7 @@ var id155Graphic = doc.querySelector("#id155_Graphic");
 
 var birdwatchAnim = new TimelineMax({'paused': true });
     
+TweenLite.ticker.fps(30);
 birdwatchAnim.add(new TweenMax(id4Graphic, 2.5, {
     x:-300, y:150
 }));
