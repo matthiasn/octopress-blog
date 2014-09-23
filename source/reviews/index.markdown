@@ -9,6 +9,7 @@ I like books and gadgets. Who doesn't? When it comes to books, I read a lot but 
 Regarding the gadgets, I usually have a gut feeling about the gadgets I buy. And usually, I also wish to share that opinion. I will just dump my thoughts here so I won’t have to annoy my friends with stuff they don’t care about. Maybe someone cares.
 
 ##Gadgets
+* **[Transcend Jetdrive Lite 350](/reviews/transcend-jetdrive-lite-350)**: an easy and cheap **extra 128GB** of storage space for my 2012 Retina Macbook.
 * **[My current audio setup](/reviews/audio-setup)**: a **Behringer XENYX X1222USB** mixer, **ADAM A7** active speakers and **Beyerdynamic DT-990** headphones.
 * **[Sony A7](/reviews/sony-a7)**: my current camera, a full-frame, mirrorless and compact camera that plays well with my classic Leica and Zeiss lenses.
 * **[Zeiss Vario-Tessar T* FE 24-70mm f/4 ZA OSS](/reviews/zeiss-24-70)**: a zoom lens for the camera above. I ultimately decided to send it back.
