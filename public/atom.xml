@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-20T02:07:32+02:00</updated>
+  <updated>2014-09-23T21:07:20+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,11 +14,11 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Weekly Update: ]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/09/22/weekly-update/"/>
-    <updated>2014-09-22T19:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/09/22/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
+    <title type="html"><![CDATA[Building a System in Clojure - Part 1]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
+    <updated>2014-09-24T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
+    <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: BirdWatch. This application subscribes to the Twitter Streaming API for all tweets that contain any of a number of terms and makes them searchable through storing them in ElasticSearch</p>
 
 <!-- more -->
 
@@ -38,11 +38,91 @@
 <iframe width="100%;" src="http://matthiasnehlsen.com/iframes/bw-anim/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
 
 
+<p>Let&#8217;s use a new demo, a term with a lot of traffic: <strong>LOVE</strong>. When tracking this term on the streaming API, I usually get around 75 tweets per second.</p>
+
+<p>That&#8217;s a lot, I wouldn&#8217;t want to try opening that page on mobile, necessarily. But how about a live search in that stream? Let&#8217;s filter out the tweets that contain the term birthday. With that, at the time of testing, I am down to two or three tweets per second:</p>
+
+<p>http://localhost:8888/#birthday</p>
+
+<p>Now if you are daring (and won&#8217;t complain about bandwidth usage), why not go to the search field and click the search button with an empty field. Now you&#8217;ll get all, which still works nicely and utilizes the CHrome helper so that it uses around 40% CPU on a quadcore 2012 retina macbook (where the available total is 800%, so it really only utilizes one virtual core to less than half). It would be interesting to simulate a higher load and see at how many messages per second Chrome maxes out the single JavaScript thread. One thing to note is that at around 50,000 tweets loaded, the application seems to come to a halt on the client side, with the server side unaffected. I suspect at one point I am currently just holding on to too much state. Let&#8217;s check at some point if that&#8217;s necessary for the specified functionality. I think not and I have an idea on how to solve this.</p>
+
+<p><strong>Remove disconnected UIDs from mapping atom!</strong></p>
+
+<p>Thanks and until next week,
+Matthias</p>
+
+<p>ARTICLE on the channels component
+Channels are sweet. Bounded mailboxes are poison</p>
+
+<p>Once we will have discussed the architecture in detail, next we can start observing the system under load. Of course, it would be interesting to have actual user load. But with or without actual load, we will want a way of generating / simulating load and then observe the system, identify the bottlenecks and remove them. For example the clients could be simulated by connecting a load generator via ZeroMQ or the like and deliver matches back to that application and check if they are as expected (correct, complete, timely). Also the Twitter stream could be simulated, for example by connecting to a load generator that either replays recorded tweets, with full control over the rate, or with artifical test cases, for which we could exactly specify the expectations on the output side.</p>
+
+<p>footnotes:
+I first discovered <strong>Clojure</strong> last summer and read quite a few articles on the language itself since. It wasn&#8217;t until this summer though that I tried building an application with it. At first I was lost as to how I could structure an application in it. I started rewriting my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> with Clojure on the server side and <strong>ClojureScript</strong> and <strong>Om</strong> on the client side. While that worked nicely, I ended up with something that I dreaded more than I dreaded the monsters under my bed when I was a kid and that was something where everything depended on everything. I have seen that too often to shrug it away and be okay with it.</p>
+
+<p>Then I found Stuart Sierra&#8217;s Component library and things started to look brighter again. It offers dependency injection, which, as I strongly believe, is crucial for building systems</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/"/>
+    <updated>2014-09-23T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/09/23/weekly-update</id>
+    <content type="html"><![CDATA[<p>This weekly update is mostly about my new article series, about animations for explaining complex topics and about how I just extended the useful lifespan of my <strong>2012 Retina Macbook</strong>.</p>
+
+<!-- more -->
+
+
+<h2>New article series: building systems in Clojure</h2>
+
+<p>Finally, here is my new series of articles about the rewrite of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application in <strong><a href="http://clojure.org">Clojure</a></strong>. There are really two aims. First of all, I want short articles that are a quick and informative read. Second, I want to illustrate what is going on by using <strong>animations</strong> (more about that in the next section). In the first installment this week, I introduce you to my approach towards <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong>. I personally believe that dependency injection is crucial for building larger applications as it allows proper decoupling between components. More about that in <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article one of the series</a></strong>.</p>
+
+<h2>Animations reloaded</h2>
+
+<p>Last year, I first used an animation in an article in order to illustrate information flow in an application. Here is how that looked like:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/bw_expl_anim.gif" title="birdwatch animated information flow" alt="birdwatch animated information flow"></p>
+
+<p>I still think that this animated illustration is a great way of showing what is going in the application. Here&#8217;s a link to the <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">full article</a></strong> if you like to convince yourself. There was only one catch with that animation and that was the amount of time it took to produce it. The tool chain for this animation was as follows:</p>
+
+<ul>
+<li>Drawing in <strong><a href="https://www.omnigroup.com/omnigraffle">OmniGraffle</a></strong></li>
+<li>Exporting <strong><a href="http://en.wikipedia.org/wiki/Portable_Network_Graphics">PNG</a></strong>s</li>
+<li>Animating the PNGs in <strong><a href="http://www.adobe.com/products/aftereffects.html">Adobe After Effects</a></strong></li>
+<li>Exporting the finished animation as uncompressed <strong><a href="http://en.wikipedia.org/wiki/QuickTime">Quicktime</a></strong> file</li>
+<li>Importing the Quicktime file into <strong><a href="http://www.adobe.com/products/photoshop.html">Adobe Photoshop</a></strong></li>
+<li>Exporting an animated <strong><a href="http://en.wikipedia.org/wiki/Graphics_Interchange_Format">GIF</a></strong> from Photoshop</li>
+</ul>
+
+
+<p>While all these tools are cool, the feedback loop was not quick as I liked because by the time I had the animated GIF and noticed I wanted to tweak something, I had to go all the way back back to After Effects. That was <strong>tedious</strong>.</p>
+
+<p>Now I have a new approach and that is by animating <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></strong>s using the <strong><a href="https://greensock.com/">Greensock library</a></strong>. With this, the feedback loop is as tight as adjusting a value in JavaScript and reload. Inspect, reiterate and so on until done. Much better. If there is enough interest, I can write about this later. For now this is just a <strong>very welcome addition</strong> to my toolbox, one which I intend to explore further over the next couple of articles before I would want to write about it. Here&#8217;s how an animation using this new approach looks like. Notice that unlike with an animated GIF, I can make this truly <strong>interactive</strong>:</p>
+
+<script language="javascript" type="text/javascript">
+  function resizeIframe(obj) {
+    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+    obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
+  }
+</script>
+
+
+
+
+<iframe width="100%;" src="http://matthiasnehlsen.com/iframes/bw-anim/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
+
+
+<h2>Freeing my SSD</h2>
+
+<p>The one computer I am doing all my work on is a <strong>2012 Retina Macbook with 16GB RAM and 512GB SSD</strong>. In terms of performance, I have no reason to upgrade this machine a single day before the extended warranty is up, considering the single digit percentages that the 2014 machines are faster. Only the drive space is not large enough, in part because of all the VMs that I like to have with me. Of course, that would have been a good excuse to buy a new Retina Macbook, but I try to use gadgets longer these days because that is just more <strong>sustainable</strong>. Just think about all the <strong><a href="http://en.wikipedia.org/wiki/Rare_earth_mineral">rare earth minerals</a></strong> that are needed to build a laptop or smart phone.</p>
+
+<p>The other day, in order to alleviate the shortage of disk space, I moved my 90GB iTunes library onto a <strong>128GB Transcend JetDrive Lite 350</strong> which fits exactly into the SD slot without protruding. Then, I just pointed to that new location by creating a symbolic link. <strong><a href="http://matthiasnehlsen.com/reviews/transcend-jetdrive-lite-350">read more in the reviews section</a></strong>. Now, I can go a while longer without constantly being close to a full disk.</p>
+
 <h2>Closing remarks</h2>
 
-<p>Okay, back to bed, I need to get rid of this nasty cold ASAP. I have stuff to do, other than coughing. The bugs came without invitation last week and now they don&#8217;t seem inclined to leave. But on the upside, I went to the doctor today and he gave me a prescription for three different pharmaceuticals and assured me that I&#8217;ll likely survive.</p>
+<p>Most importantly, please do check out the new <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article series</a></strong> that I just started. I hope you will find it useful and I am looking forward to your feedback. Then, there have been plenty of additions to my <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a></strong> repository on GitHub. You may want to check that out if you&#8217;re interested in Clojure at all.</p>
 
-<p>Have a great remaining week,
+<p>Until next week,
 Matthias</p>
 ]]></content>
   </entry>
@@ -528,18 +608,18 @@ Matthias</p>
     <link href="http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/"/>
     <updated>2014-08-10T22:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update</id>
-    <content type="html"><![CDATA[<p>I mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated it&#8217;s first contribution to running this blog. I also read a little more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
+    <content type="html"><![CDATA[<p>I have mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated its first contribution to running this blog. I have also read some more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
 
 <!-- more -->
 
 
-<p>This week I have been doing a lot of <strong><a href="http://angularjs.org">AngularJS</a></strong> work. I haven&#8217;t announced this much so far, but last year I have started co-authoring a book about <strong><a href="https://www.packtpub.com/web-development/angularjs-ui-development">AngularUI Development</a></strong>. This book will come out later this year and is scheduled to be out in November. Right now I am doing the finishing touches on the chapters that I wrote. I added quite a few pages to the first chapter about bootstrapping an <strong><a href="http://angularjs.org">AngularJS</a></strong> environment, in particular about AngularJS integration tests using <strong><a href="https://github.com/angular/protractor">Protractor</a></strong>. I am quite happy with how testability of AngularJS application is progressing. Protractor is really powerful and I am looking forward to implementing a comprehensive testing strategy at my current work project. Protractor looks like it will be up to the job. I will be interesting to integrate this into the overall <strong><a href="http://www.scala-lang.org">Scala</a></strong> / <strong><a href="http://www.playframework.com">Play Framework</a></strong> / <strong><a href="http://www.scala-sbt.org">SBT</a></strong> build chain, though. Maybe that&#8217;ll be an article for another day.</p>
+<p>I have been doing a lot of <strong><a href="http://angularjs.org">AngularJS</a></strong> work. I haven&#8217;t really talked about it yet, but last year I started co-authoring a book about <strong><a href="https://www.packtpub.com/web-development/angularjs-ui-development">AngularUI Development</a></strong>. The book is scheduled to be out in November this year. Right now, I am putting the finishing touches on the chapters that I wrote. I added quite a few pages to the first chapter about bootstrapping an <strong><a href="http://angularjs.org">AngularJS</a></strong> environment, in particular about AngularJS integration tests using <strong><a href="https://github.com/angular/protractor">Protractor</a></strong>. I am quite happy with the testability of AngularJS application is progressing. Protractor is really powerful and I am looking forward to implementing a comprehensive testing strategy for my current work project. Protractor looks like it will be up to the job. It will be interesting to integrate this into the overall <strong><a href="http://www.scala-lang.org">Scala</a></strong> / <strong><a href="http://www.playframework.com">Play Framework</a></strong> / <strong><a href="http://www.scala-sbt.org">SBT</a></strong> build chain, though. Maybe that&#8217;ll be an article for another day.</p>
 
-<p>Then earlier this week I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote about building</a></strong> an application for country-specific embedding of links for the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>, with the idea of having purchases on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a></strong> contribute to the running costs of this blog. Besides the time that I invest, I also rent a server for serving my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch application</a></strong> at <strong><a href="http://www.hetzner.de">Hetzner Online AG</a></strong>, spending <strong>€81</strong> per months. Today I am happy to report that in the first week, clicks on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon links</a></strong> have generated roughly <strong>$37</strong> in advertising fees aka revenue through orders in the <strong><a href="http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW">U.S. store</a></strong>. Sweet, thanks a lot to the purchasers, much appreciated. If that became the weekly average, the running costs for my server would be covered. Feels great that my baby, the blog, might be well on the way to paying its own rent. I will have to make my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> application more user friendly though; it is already annoying me a lot to store created links in code. But that&#8217;s on my list anyway; for this week the idea was to create a proof-of-concept and for that, storing the links in code was okay.</p>
+<p>Then, earlier this week, I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote about building</a></strong> an application for country-specific embedding of links for the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>, with the idea of having purchases on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a></strong> contribute to the running costs of this blog. Besides the time that I invest, I also rent a server for serving my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch application</a></strong> at <strong><a href="http://www.hetzner.de">Hetzner Online AG</a></strong>, that costs <strong>€81</strong> per month. Today I am happy to report that in the first week, clicks on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon links</a></strong> have generated roughly <strong>$37</strong> in advertising fees aka revenue through orders in the <strong><a href="http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW">U.S. store</a></strong>. Sweet - thanks a lot to the purchasers, much appreciated! If that became the weekly average, the running costs for my server would be covered. Feels great that my baby, the blog, may be well on the way to paying its own rent. I will have to make my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> application more user-friendly though; it is already annoying me a lot to store created links in code. But that&#8217;s on my list anyway; for this week the idea was to create a proof-of-concept and for that, storing the links in code was okay.</p>
 
-<p>Also I was able to read a little more in <strong><a href="https://twitter.com/unclebobmartin">Uncle Bob</a></strong>&#8217;s book, <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers (Robert C. Martin Series)</a></strong>. I enjoy this book a lot and I will make sure to share some thoughts soon. The main idea about sharing thoughts on what I read is that I read a lot but that I forget too much too soon. I have been planning on taking notes by chapter for the books I am reading for a while, but never really got around to that. By publishing those notes, I will be able to force myself to actually take good notes. First of all, I want to have these notes for my future reference so that I can more easily recap what I learned. If anyone else finds my notes useful, so much the better. More on that soon.</p>
+<p>I was also able to read a little more in <strong><a href="https://twitter.com/unclebobmartin">Uncle Bob</a></strong>&#8217;s book, <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers (Robert C. Martin Series)</a></strong>. I enjoy this book a lot and I will make sure to share some thoughts on it soon. The main idea about sharing thoughts on what I read is that though I read a lot, I also forget too much too fast. I have been meaning to take notes by chapter for a while now, but I have never really got around to doing it. If I publish my notes, I will be able to force myself to actually take notes. First of all, I want to keep them for my future reference so that I can more easily recap what I learned. If anyone else finds my notes useful, so much the better. More on that soon.</p>
 
-<p>Okay, that&#8217;s it for today. Next week I will stay busy with the book chapters for a good part, but I also want to try to get back to my work in progress <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">article about writing the BirdWatch client in ClojureScript</a></strong>.</p>
+<p>Okay, that&#8217;s it for today. Next week I&#8217;ll be busy with the book chapters, but I also want to try to get back to my work-in-progress <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">article about writing the BirdWatch client in ClojureScript</a></strong>.</p>
 
 <p>Have a great week,
 Matthias</p>
@@ -2829,49 +2909,6 @@ Matthias</p>
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[New Year's Resolution]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/"/>
-    <updated>2013-12-31T19:40:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution</id>
-    <content type="html"><![CDATA[<p>I never really thought much of New Year’s resolutions because I could never live up to them. 2013 was different though. One year ago my resolution was to start writing a blog and to create one or more open source projects, just for the fun of it. And this time I actually succeeded. So I thought I might continue with this resolution thing.</p>
-
-<!-- more -->
-
-
-<p>2013 has been pretty good for me, for the most part at least, except for the fact that my beloved bike was stolen from inside the apartment building two days ago, thanks to modern battery technology allowing for cordless angle grinders. But I am digressing. Usually I am a fan of powerful batteries. In terms of learning more about software, it has been great. I have started writing this blog and I have created my first ever open source project, <strong><a href="http://birdwatch.matthiasnehlsen.com/">BirdWatch</a></strong>, and it has been cool to build it and improve it. Along the way it has also been great to learn more about <strong><a href="http://www.scala-lang.org">Scala</a></strong>, <strong><a href="http://www.playframework.com">Play Framework</a></strong>, <strong><a href="http://angularjs.org">AngularJS</a></strong> and JavaScript in general.</p>
-
-<p>I have also written a few articles that I really like. Not all of them, of course, but there are a few. I find this particularly rewarding to watch after a good friend of mine, a journalist and professional writer, had set somewhat different expectations. I asked him early on how long it had taken him until he was completely satisfied with his output on a regular basis, like looking at an article the next day and not wanting to rewrite it for the umpteenth time. He said that it had taken him about seven years of writing professionally, full time. So I can either consider myself lucky that I am happy with a decent share of the articles, or maybe I just have low standards, or both.</p>
-
-<p>I also recently started working on an AngularJS based blogging engine, which I have not published yet. It offers live preview and animated code blocks, among other things. It is pretty much production ready, I find, I am just lacking the time to actually bring it to the point that I want to see it published. Or maybe I should just embrace the imperfection and publish it as is. Maybe there is someone who already finds it useful and wants to put some effort in it. One should be embarrassed of one&#8217;s first release anyways, right?</p>
-
-<p>Recently I started asking myself if working on a blogging engine may be some elaborate procrastination strategy on my part, in order to have an excuse to not actually write. Octopress works reasonably well, after all. On the other hand, I do not really like the authoring process all that much, particularly when it comes to embedding source code, which I find quite unsatisfying.</p>
-
-<p>I also finally started working on a book about three months ago, after having been approached by editors a few times who had read one or more of the articles that I also like. I will talk more about the content of the book in due course. Writing a book is an interesting endeavor and quite different from writing a blog.</p>
-
-<p>So what do I want to do differently in 2014 when it comes to the blog, book writing and authoring fun, open source toy projects?</p>
-
-<ul>
-<li><p>More frequent blog posts. I would like to publish stuff more often, even if that means shorter articles. I bet some readers will be happy with that; I know that my articles so far have not exactly been short. I am aiming for two fixed publications per month, maybe around the 5th and the 20th of each month, give or take. I am aware that this puts additional pressure on me, but I think it will be better to get into a good rhythm there.</p></li>
-<li><p>Morning pages. I have been introduced to this concept by the <strong><a href="http://pragprog.com/book/ahptl/pragmatic-thinking-and-learning">Pragmatic Programmer</a></strong> series and I have found it to be great to do an unfiltered first-thing-in-the-morning brain dump. I just don’t do it regularly enough yet. One point where I don’t agree with the concept as introduced in the book is that it needs to be on paper, not on screen. I find that restriction to be somewhat pointless because it ends up with me not ever looking at the output again. And I find that typing does not keep me from getting whatever idea out of my brain, into a form that is full-text searchable.</p></li>
-<li><p>Quite the contrary, I want the thoughts I write down not only to be searchable but also be tagged by both subject and people. That way I feel I could bundle thoughts better, particularly about ideas that are not concrete enough yet to have found their way into a to-do list. I would like to write a tool for doing so, maybe with an AngularJS frontend and backed by ElasticSearch. Could be another project on github, this time something I am actually using on a daily basis. But then again, this may just be one of these procrastination strategies. Time will tell.</p></li>
-<li><p>I want to check my own github profile less often. It is really cool to watch your projects receiving stars from other developers who find something useful or otherwise cool. But it can become quite addictive to check the github app on my smartphone to see if anything has changed, in particular when something has changed only recently. So less of that. Once a day or so is plenty.</p></li>
-<li><p>I need to become better at leaving work at work. As interesting as the engineering problems there might be, I should not think about them at all outside of work. I have plenty of other areas I want to focus on, like this blog, the book or one of my next toy projects.</p></li>
-<li><p>I need to make more time for physical exercise. I really perform better in all areas and I feel better when I have worked out three or four times per week. So I need to get back into that habit.</p></li>
-<li><p>I want to do more in <strong><a href="http://clojure.org">Clojure</a></strong>. I have spent some time with the language and it resonates really well with the way I am thinking.</p></li>
-<li><p>I want to <strong><a href="http://learnyouahaskell.com">learn me a Haskell for great good</a></strong>, just for the fun of it.</p></li>
-</ul>
-
-
-<p>Well, this is it for now. Let’s see how many of these I can actually put into practice. So many interesting things to explore, so little time.</p>
-
-<p>Have a great 2014, everyone.</p>
-
-<p>Cheers,
-Matthias</p>
 ]]></content>
   </entry>
   

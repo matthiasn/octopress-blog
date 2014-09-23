@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the Clojure version of &hellip;">
+  <meta name="description" content="This is the first of n articles about building systems in Clojure. In this series we will be looking at the Clojure rewrite of an application I wrote &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,7 +71,7 @@
 
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/09/22/weekly-update/">Weekly Update: </a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure - Part 1</a></h1>
     
     
       <p class="meta">
@@ -87,20 +87,63 @@
   
 
 
-<time datetime="2014-09-22T19:06:00+02:00" pubdate data-updated="true">09/22/2014</time>
+<time datetime="2014-09-24T19:06:00+02:00" pubdate data-updated="true">09/24/2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
+  <div class="entry-content"><p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: BirdWatch. This application subscribes to the Twitter Streaming API for all tweets that contain any of a number of terms and makes them searchable through storing them in ElasticSearch</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2014/09/22/weekly-update/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/09/23/weekly-update/">Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-09-23T19:06:00+02:00" pubdate data-updated="true">09/23/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>This weekly update is mostly about my new article series, about animations for explaining complex topics and about how I just extended the useful lifespan of my <strong>2012 Retina Macbook</strong>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/09/23/weekly-update/">Read on &rarr;</a>
     </footer>
   
 
@@ -352,7 +395,7 @@
   </header>
 
 
-  <div class="entry-content"><p>I mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated it&#8217;s first contribution to running this blog. I also read a little more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
+  <div class="entry-content"><p>I have mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated its first contribution to running this blog. I have also read some more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
 
 </div>
   
@@ -451,51 +494,6 @@
 
     </article>
   
-  
-    <article>
-      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/07/24/birdwatch-cljs-om/">BirdWatch with ClojureScript and Om explained</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-07-24T08:30:00+02:00" pubdate data-updated="true">07/24/2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p><strong>WORK IN PROGRESS</strong>, last update on August 18th, 2014</p>
-
-<p>I <strong><a href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/">wrote</a></strong> about having written my first actual application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and <strong><a href="https://github.com/swannodette/om">Om</a></strong>, a web client for my <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">BirdWatch</a></strong> application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om thus far. Then I want to start describing the implementation details. I am fully aware that what has come out of it thus far is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :)</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/07/24/birdwatch-cljs-om/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -514,7 +512,7 @@
 </section>
 <section>
   <h1>About Me</h1>
-  <p>Hello everyone. My name is Matthias Nehlsen and I am exploring functional programming, data visualization and real-time information processing.</p>
+  <p>Hi, my name is Matthias and I am a freelance full stack developer particularly interested in functional programming, data visualization and real-time information processing.</p>
 </section>
 
 <section>
@@ -522,7 +520,11 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/09/22/weekly-update/">Weekly Update: </a>
+        <a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure - Part 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/23/weekly-update/">Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD</a>
       </li>
     
       <li class="post">
@@ -535,10 +537,6 @@
     
       <li class="post">
         <a href="/blog/2014/09/03/weekly-update/">Weekly Update: Pomodoro, all-Clojure BirdWatch, Income</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/08/25/weekly-update/">Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play</a>
       </li>
     
   </ul>
