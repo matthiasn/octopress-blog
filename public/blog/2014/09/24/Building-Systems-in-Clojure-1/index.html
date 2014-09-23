@@ -91,7 +91,7 @@
   </header>
 
 
-<div class="entry-content"><p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: BirdWatch. This application subscribes to the Twitter Streaming API for all tweets that contain any of a number of terms and makes them searchable through storing them in ElasticSearch</p>
+<div class="entry-content"><p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>. This application subscribes to the Twitter Streaming API for all tweets that contain any of a number of terms and makes them searchable through storing them in ElasticSearch</p>
 
 <!-- more -->
 
@@ -117,7 +117,7 @@
 
 <p>http://localhost:8888/#birthday</p>
 
-<p>Now if you are daring (and won&#8217;t complain about bandwidth usage), why not go to the search field and click the search button with an empty field. Now you&#8217;ll get all, which still works nicely and utilizes the CHrome helper so that it uses around 40% CPU on a quadcore 2012 retina macbook (where the available total is 800%, so it really only utilizes one virtual core to less than half). It would be interesting to simulate a higher load and see at how many messages per second Chrome maxes out the single JavaScript thread. One thing to note is that at around 50,000 tweets loaded, the application seems to come to a halt on the client side, with the server side unaffected. I suspect at one point I am currently just holding on to too much state. Let&#8217;s check at some point if that&#8217;s necessary for the specified functionality. I think not and I have an idea on how to solve this.</p>
+<p>Now if you are daring (and won&#8217;t complain about bandwidth usage), why not go to the search field and click the search button with an empty field. Now you&#8217;ll get all, which still works nicely and utilizes the Chrome helper so that it uses around 40% CPU on a quadcore 2012 retina macbook (where the available total is 800%, so it really only utilizes one virtual core to less than half). It would be interesting to simulate a higher load and see at how many messages per second Chrome maxes out the single JavaScript thread. One thing to note is that at around 50,000 tweets loaded, the application seems to come to a halt on the client side, with the server side unaffected. I suspect at one point I am currently just holding on to too much state. Let&#8217;s check at some point if that&#8217;s necessary for the specified functionality. I think not and I have an idea on how to solve this.</p>
 
 <p><strong>Remove disconnected UIDs from mapping atom!</strong></p>
 

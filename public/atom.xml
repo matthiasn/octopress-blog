@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-23T21:07:20+02:00</updated>
+  <updated>2014-09-24T01:33:22+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,7 +18,7 @@
     <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
     <updated>2014-09-24T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
-    <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: BirdWatch. This application subscribes to the Twitter Streaming API for all tweets that contain any of a number of terms and makes them searchable through storing them in ElasticSearch</p>
+    <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>. This application subscribes to the Twitter Streaming API for all tweets that contain any of a number of terms and makes them searchable through storing them in ElasticSearch</p>
 
 <!-- more -->
 
@@ -44,7 +44,7 @@
 
 <p>http://localhost:8888/#birthday</p>
 
-<p>Now if you are daring (and won&#8217;t complain about bandwidth usage), why not go to the search field and click the search button with an empty field. Now you&#8217;ll get all, which still works nicely and utilizes the CHrome helper so that it uses around 40% CPU on a quadcore 2012 retina macbook (where the available total is 800%, so it really only utilizes one virtual core to less than half). It would be interesting to simulate a higher load and see at how many messages per second Chrome maxes out the single JavaScript thread. One thing to note is that at around 50,000 tweets loaded, the application seems to come to a halt on the client side, with the server side unaffected. I suspect at one point I am currently just holding on to too much state. Let&#8217;s check at some point if that&#8217;s necessary for the specified functionality. I think not and I have an idea on how to solve this.</p>
+<p>Now if you are daring (and won&#8217;t complain about bandwidth usage), why not go to the search field and click the search button with an empty field. Now you&#8217;ll get all, which still works nicely and utilizes the Chrome helper so that it uses around 40% CPU on a quadcore 2012 retina macbook (where the available total is 800%, so it really only utilizes one virtual core to less than half). It would be interesting to simulate a higher load and see at how many messages per second Chrome maxes out the single JavaScript thread. One thing to note is that at around 50,000 tweets loaded, the application seems to come to a halt on the client side, with the server side unaffected. I suspect at one point I am currently just holding on to too much state. Let&#8217;s check at some point if that&#8217;s necessary for the specified functionality. I think not and I have an idea on how to solve this.</p>
 
 <p><strong>Remove disconnected UIDs from mapping atom!</strong></p>
 
@@ -75,15 +75,15 @@ I first discovered <strong>Clojure</strong> last summer and read quite a few art
 
 <h2>New article series: building systems in Clojure</h2>
 
-<p>Finally, here is my new series of articles about the rewrite of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application in <strong><a href="http://clojure.org">Clojure</a></strong>. There are really two aims. First of all, I want short articles that are a quick and informative read. Second, I want to illustrate what is going on by using <strong>animations</strong> (more about that in the next section). In the first installment this week, I introduce you to my approach towards <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong>. I personally believe that dependency injection is crucial for building larger applications as it allows proper decoupling between components. More about that in <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article one of the series</a></strong>.</p>
+<p>Finally, here is the beginning of my new series of articles about the rewrite of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application in <strong><a href="http://clojure.org">Clojure</a></strong>. There are really two aims. First of all, I want short articles that are a quick and informative read, with easy to understand code. In addition, I want to illustrate what is going on by using <strong>animations</strong> (more about that in the next section). In this first installment, I introduce you to my approach towards <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong>. I personally believe that dependency injection is crucial for building larger applications as it allows proper decoupling between components. More about that in <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article one of the series</a></strong>.</p>
 
 <h2>Animations reloaded</h2>
 
-<p>Last year, I first used an animation in an article in order to illustrate information flow in an application. Here is how that looked like:</p>
+<p>Last year, I first used an animation in an article in order to illustrate information flow within an application. Here is how that looked like:</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/bw_expl_anim.gif" title="birdwatch animated information flow" alt="birdwatch animated information flow"></p>
 
-<p>I still think that this animated illustration is a great way of showing what is going in the application. Here&#8217;s a link to the <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">full article</a></strong> if you like to convince yourself. There was only one catch with that animation and that was the amount of time it took to produce it. The tool chain for this animation was as follows:</p>
+<p>I still think that this animated illustration is a great way of showing what is going in the application. Here&#8217;s a link to the <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">full article</a></strong> if you like to convince yourself. However, there is one catch with that animation and that was the amount of time it took to produce it. The tool chain for this animation was as follows:</p>
 
 <ul>
 <li>Drawing in <strong><a href="https://www.omnigroup.com/omnigraffle">OmniGraffle</a></strong></li>
@@ -95,9 +95,9 @@ I first discovered <strong>Clojure</strong> last summer and read quite a few art
 </ul>
 
 
-<p>While all these tools are cool, the feedback loop was not quick as I liked because by the time I had the animated GIF and noticed I wanted to tweak something, I had to go all the way back back to After Effects. That was <strong>tedious</strong>.</p>
+<p>All these tools are insanely powerful, however the feedback loop was not quick as I desired because by the time I had the animated GIF and noticed I wanted to tweak something, I had to go all the way back back to <strong>After Effects</strong>. That was <strong>tedious</strong>.</p>
 
-<p>Now I have a new approach and that is by animating <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></strong>s using the <strong><a href="https://greensock.com/">Greensock library</a></strong>. With this, the feedback loop is as tight as adjusting a value in JavaScript and reload. Inspect, reiterate and so on until done. Much better. If there is enough interest, I can write about this later. For now this is just a <strong>very welcome addition</strong> to my toolbox, one which I intend to explore further over the next couple of articles before I would want to write about it. Here&#8217;s how an animation using this new approach looks like. Notice that unlike with an animated GIF, I can make this truly <strong>interactive</strong>:</p>
+<p>Now I have a different approach and that is animating an <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></strong>s drawing directly using the <strong><a href="https://greensock.com/">Greensock library</a></strong>. With this, the feedback loop is as tight as adjusting a value in JavaScript and reload. Inspect, reiterate and so on until done. Much more agreeable. If there is enough interest, I can write about this approach later. For now, this is just a <strong>very welcome addition</strong> to my toolbox, one which I intend to explore further over the next couple of articles before I would want to write about it. Here&#8217;s how an animation using this new approach looks like. Notice that unlike with an animated GIF, we can make this truly <strong>interactive</strong>:</p>
 
 <script language="javascript" type="text/javascript">
   function resizeIframe(obj) {
@@ -114,13 +114,13 @@ I first discovered <strong>Clojure</strong> last summer and read quite a few art
 
 <h2>Freeing my SSD</h2>
 
-<p>The one computer I am doing all my work on is a <strong>2012 Retina Macbook with 16GB RAM and 512GB SSD</strong>. In terms of performance, I have no reason to upgrade this machine a single day before the extended warranty is up, considering the single digit percentages that the 2014 machines are faster. Only the drive space is not large enough, in part because of all the VMs that I like to have with me. Of course, that would have been a good excuse to buy a new Retina Macbook, but I try to use gadgets longer these days because that is just more <strong>sustainable</strong>. Just think about all the <strong><a href="http://en.wikipedia.org/wiki/Rare_earth_mineral">rare earth minerals</a></strong> that are needed to build a laptop or smart phone.</p>
+<p>The one computer I am doing all my work on is a <strong>2012 Retina Macbook with 16GB RAM and 512GB SSD</strong>. In terms of performance, I have no reason to upgrade this machine a single day before the extended warranty is up, considering the single digit percentages that the 2014 machines are faster. Only the drive space is not large enough, in part because of all the virtual machines that I like to have with me. Of course, that would have been a good excuse to buy a new Retina Macbook, but I try to use gadgets longer these days because that is just more <strong>sustainable</strong>. Think about all the <strong><a href="http://en.wikipedia.org/wiki/Rare_earth_mineral">rare earth minerals</a></strong> that are needed to build a laptop or smart phone, for example.</p>
 
-<p>The other day, in order to alleviate the shortage of disk space, I moved my 90GB iTunes library onto a <strong>128GB Transcend JetDrive Lite 350</strong> which fits exactly into the SD slot without protruding. Then, I just pointed to that new location by creating a symbolic link. <strong><a href="http://matthiasnehlsen.com/reviews/transcend-jetdrive-lite-350">read more in the reviews section</a></strong>. Now, I can go a while longer without constantly being close to a full disk.</p>
+<p>The other day, in order to alleviate this pending shortage of disk space, I moved my 90GB iTunes library onto a <strong>128GB Transcend JetDrive Lite 350</strong> which fits exactly into the SD slot without protruding. Then, I just pointed to that new location by creating a symbolic link. You can <strong><a href="http://matthiasnehlsen.com/reviews/transcend-jetdrive-lite-350">read more in the reviews section</a></strong>. Now, I can go a while longer without constantly being close to a full disk so that I don&#8217;t have to buy a new laptop.</p>
 
 <h2>Closing remarks</h2>
 
-<p>Most importantly, please do check out the new <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article series</a></strong> that I just started. I hope you will find it useful and I am looking forward to your feedback. Then, there have been plenty of additions to my <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a></strong> repository on GitHub. You may want to check that out if you&#8217;re interested in Clojure at all.</p>
+<p>Most importantly, please do check out the new <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article series</a></strong> that I just started. I hope you will find it useful and I am looking forward to your feedback. In addition, there have been plenty of new entries to my <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a></strong> repository on GitHub. You may want to check that out if you&#8217;re interested in Clojure at all. Finally, I bought a useful gadget that makes my digital life a little better.</p>
 
 <p>Until next week,
 Matthias</p>
