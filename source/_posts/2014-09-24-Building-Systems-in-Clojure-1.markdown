@@ -5,11 +5,15 @@ date: 2014-09-24 19:06
 comments: true
 categories: 
 ---
-This is the first of **n** articles about building **systems** in **[Clojure](http://clojure.org/)**. In this series we will be looking at the Clojure rewrite of an application I wrote last year: **[BirdWatch](https://github.com/matthiasn/BirdWatch)**. This application subscribes to the Twitter Streaming API for all tweets that contain one or more out of a set of terms and makes the tweets searchable through storing them in ElasticSearch. A live version of the Clojure version of this application is available here: **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)**.
+This is the first of **n** articles about building **systems** in **[Clojure](http://clojure.org/)**. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is **easy to understand and maintain**. Here is what I found.
 
 <!-- more -->
 
-In this first installment we will be looking at the basic architecture of the server side. Let's start with an animation to demontrate how things get wired up when the application initializes before we go into details.
+As an example for such a system, we will be looking at the Clojure rewrite of an application I wrote last year: **[BirdWatch](https://github.com/matthiasn/BirdWatch)**. This application subscribes to the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** for all tweets that contain one or more terms out of a set of terms and makes the tweets searchable through storing them in ElasticSearch. A live version of the Clojure version of this application is available here: **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)**.
+
+In this first installment we will be looking at the basic architecture of the server side. Let's start with an animation [^1] to demonstrate how components in the system get wired up when the application initializes before we go into details.
+
+<br/>
 
 <script language="javascript" type="text/javascript">
   function resizeIframe(obj) {
@@ -20,13 +24,16 @@ In this first installment we will be looking at the basic architecture of the se
 
 <iframe width="100%;" src="/iframes/bw-anim/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
 
+<br/>
+<br/>
+
 The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra's **component library**. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don't know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain **core.async** channels.
 
-In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that "spaghetti code", but I think that is not doing justice to spaghetti. Unlike bad code, I don't mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn't drain. You notice something in the sink, so you knee down to pull it out only to start screaming, "Oh my god, it's a dead rat" a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust. 
+In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that "spaghetti code", but I think that is not doing justice to spaghetti. Unlike bad code, I don't mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn't drain. You notice something in the sink, so you squat down to pull it out only to start screaming, "Oh my god, it's a dead rat" a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust. 
 
-This is where dependency injection comes in. Can we agree that we don't like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that object because of the implemented interface.
+This is where dependency injection comes in. Can we agree that we don't like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that something because of the implemented interface.
 
-Here, things are a little different because we don't really have objects. The components play the role of objects in dependency injection, but as a further way of decoupling, I wanted them to only communicate via **core.async** channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will look at the channels in much closer detail in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as wiring harnesses, like the one that connects the electronics of your car with your engine. The only way to interface with a modern engine (that doesn't have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable.
+Here, unlikey in object-oriented dependency injection, things are a little different because we don't really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via **core.async** channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as **wiring harnesses**, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn't have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.
 
 Let's have a look at how the initialization of the application we have already seen in the animation looks in code:
 
@@ -73,7 +80,7 @@ Let's have a look at how the initialization of the application we have already s
   (alter-var-root #'system component/start))
 {% endcodeblock %}
 
-I personally think this **reads really well**, even if you have never seen Clojure before in your life. Roughly the first half is concerned with imports and reading the configuration file. Next, we have the ````get-system```` function which declares which components depend on which other components. Finally, in the ````-main```` function, the system is started (plus the process ID logged and saved to a file). This is all you need to know about the entry point into the application. 
+I personally think this **reads really well**, even if you have never seen Clojure before in your life. Roughly the first half is concerned with imports and reading the configuration file. Next, we have the ````get-system```` function which declares, what components depend on what other components. The system is finally started in the ````-main```` function (plus the process ID logged and saved to a file). This is all there is to know about the application entry point. 
 
 Now, when we start the application, all the dependencies will be started in an order that the component library determines so that all dependencies are met. Here's the output of that startup process:
 
@@ -93,7 +100,7 @@ Now, when we start the application, all the dependencies will be started in an o
     16:46:32.377 [main] INFO  birdwatch.percolator - Starting Percolator Component
     16:46:32.380 [main] INFO  birdwatch.switchboard - Starting Switchboard Component
 
-Next week, we will look how these components wire a channel grid and look at how information flows through this grid.
+Next week, we will look at how these components wire a channel grid and how information flows through this grid.
 
 Once we have discussed the architecture in detail over the next couple of weeks, we can start observing the system under load. Of course, it would be interesting to have actual user load. But with or without actual load, we want to find a way of how to generate / simulate load and then observe the system, identify the bottlenecks and remove them. For example, the clients could be simulated by connecting a load generator via ZeroMQ or the like and deliver matches back to that application and check if they are as expected (correct, complete, timely). The Twitter stream could also be simulated, for example by connecting to a load generator that either replays recorded tweets, with full control over the rate, or with artificial test cases, for which we could exactly specify the expectations on the output side.
 
@@ -101,3 +108,5 @@ That's it for now. Would you like to be informed when the next article is out? J
 
 Cheers,
 Matthias
+
+[^1]: In case you are interested in the animation as such, you can check out the current **[weekly review](/blog/2014/09/23/weekly-update/)** in which I provide some background information.

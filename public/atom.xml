@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-24T16:53:02+02:00</updated>
+  <updated>2014-09-24T17:47:11+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,12 +18,19 @@
     <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
     <updated>2014-09-24T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
-    <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. In this series we will be looking at the Clojure rewrite of an application I wrote last year: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>. This application subscribes to the Twitter Streaming API for all tweets that contain one or more out of a set of terms and makes the tweets searchable through storing them in ElasticSearch. A live version of the Clojure version of this application is available here: <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong>.</p>
+    <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is <strong>easy to understand and maintain</strong>. Here is what I found.</p>
 
 <!-- more -->
 
 
-<p>In this first installment we will be looking at the basic architecture of the server side. Let&#8217;s start with an animation to demontrate how things get wired up when the application initializes before we go into details.</p>
+<p>As an example for such a system, we will be looking at the Clojure rewrite of an application I wrote last year: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>. This application subscribes to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> for all tweets that contain one or more terms out of a set of terms and makes the tweets searchable through storing them in ElasticSearch. A live version of the Clojure version of this application is available here: <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong>.</p>
+
+<p>In this first installment we will be looking at the basic architecture of the server side. Let&#8217;s start with an animation <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to demonstrate how components in the system get wired up when the application initializes before we go into details.</p>
+
+<br/>
+
+
+
 
 <script language="javascript" type="text/javascript">
   function resizeIframe(obj) {
@@ -38,13 +45,21 @@
 <iframe width="100%;" src="http://matthiasnehlsen.com/iframes/bw-anim/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
 
 
+
+
+<br/>
+
+
+<br/>
+
+
 <p>The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra&#8217;s <strong>component library</strong>. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don&#8217;t know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain <strong>core.async</strong> channels.</p>
 
-<p>In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that &#8220;spaghetti code&#8221;, but I think that is not doing justice to spaghetti. Unlike bad code, I don&#8217;t mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn&#8217;t drain. You notice something in the sink, so you knee down to pull it out only to start screaming, &#8220;Oh my god, it&#8217;s a dead rat&#8221; a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust.</p>
+<p>In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that &#8220;spaghetti code&#8221;, but I think that is not doing justice to spaghetti. Unlike bad code, I don&#8217;t mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn&#8217;t drain. You notice something in the sink, so you squat down to pull it out only to start screaming, &#8220;Oh my god, it&#8217;s a dead rat&#8221; a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust.</p>
 
-<p>This is where dependency injection comes in. Can we agree that we don&#8217;t like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that object because of the implemented interface.</p>
+<p>This is where dependency injection comes in. Can we agree that we don&#8217;t like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that something because of the implemented interface.</p>
 
-<p>Here, things are a little different because we don&#8217;t really have objects. The components play the role of objects in dependency injection, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will look at the channels in much closer detail in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as wiring harnesses, like the one that connects the electronics of your car with your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable.</p>
+<p>Here, unlikey in object-oriented dependency injection, things are a little different because we don&#8217;t really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as <strong>wiring harnesses</strong>, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.</p>
 
 <p>Let&#8217;s have a look at how the initialization of the application we have already seen in the animation looks in code:</p>
 
@@ -131,7 +146,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I personally think this <strong>reads really well</strong>, even if you have never seen Clojure before in your life. Roughly the first half is concerned with imports and reading the configuration file. Next, we have the <code>get-system</code> function which declares which components depend on which other components. Finally, in the <code>-main</code> function, the system is started (plus the process ID logged and saved to a file). This is all you need to know about the entry point into the application.</p>
+<p>I personally think this <strong>reads really well</strong>, even if you have never seen Clojure before in your life. Roughly the first half is concerned with imports and reading the configuration file. Next, we have the <code>get-system</code> function which declares, what components depend on what other components. The system is finally started in the <code>-main</code> function (plus the process ID logged and saved to a file). This is all there is to know about the application entry point.</p>
 
 <p>Now, when we start the application, all the dependencies will be started in an order that the component library determines so that all dependencies are met. Here&#8217;s the output of that startup process:</p>
 
@@ -152,7 +167,7 @@
 16:46:32.380 [main] INFO  birdwatch.switchboard - Starting Switchboard Component
 </code></pre>
 
-<p>Next week, we will look how these components wire a channel grid and look at how information flows through this grid.</p>
+<p>Next week, we will look at how these components wire a channel grid and how information flows through this grid.</p>
 
 <p>Once we have discussed the architecture in detail over the next couple of weeks, we can start observing the system under load. Of course, it would be interesting to have actual user load. But with or without actual load, we want to find a way of how to generate / simulate load and then observe the system, identify the bottlenecks and remove them. For example, the clients could be simulated by connecting a load generator via ZeroMQ or the like and deliver matches back to that application and check if they are as expected (correct, complete, timely). The Twitter stream could also be simulated, for example by connecting to a load generator that either replays recorded tweets, with full control over the rate, or with artificial test cases, for which we could exactly specify the expectations on the output side.</p>
 
@@ -160,6 +175,14 @@
 
 <p>Cheers,
 Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>In case you are interested in the animation as such, you can check out the current <strong><a href="http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/">weekly review</a></strong> in which I provide some background information.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
 ]]></content>
   </entry>
   
