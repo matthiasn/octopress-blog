@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-24T11:40:17+02:00</updated>
+  <updated>2014-09-24T13:34:20+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -79,7 +79,7 @@ I first discovered <strong>Clojure</strong> last summer and read quite a few art
 
 <h2>Animations reloaded</h2>
 
-<p>Last year, I first used an animation for the first time to illustrate information flow within an application. Here is how that looked like:</p>
+<p>Last year, I used an animation for the first time to illustrate the flow of information within an application. Here is how that looked like:</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/bw_expl_anim.gif" title="birdwatch animated information flow" alt="birdwatch animated information flow"></p>
 
@@ -97,7 +97,7 @@ I first discovered <strong>Clojure</strong> last summer and read quite a few art
 
 <p>All these tools are insanely powerful, however the feedback loop was not as quick as I desired because by the time I had the animated GIF and noticed that I wanted to tweak something, I had to go all the way back to <strong>After Effects</strong>. That was <strong>tedious</strong>.</p>
 
-<p>Now I have a different approach: I animate an <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></strong> drawing by using the <strong><a href="https://greensock.com/">Greensock library</a></strong>. The feedback loop is much shorter now as you can adjust a value in the JavaScript code and reload. Then inspect, reiterate and so on until you are done. Much more agreeable. If there is enough interest, I will write about this approach later. For now, it is just a <strong>very welcome addition</strong> to my toolbox; one which I intend to explore further in the next couple of articles before I may write about it. Here&#8217;s how an animation using this new approach looks like. Note that unlike when working with an animated GIF, we can make drawings truly <strong>interactive</strong>:</p>
+<p>Now I have a different approach: I animate an <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></strong> drawing by using the <strong><a href="https://greensock.com/">Greensock library</a></strong>. The feedback loop is much shorter now as you can adjust a value in the JavaScript code and reload. Then inspect, reiterate and so on until you are done. Much more agreeable. If there is enough interest, I will write about this approach later. For now, it is just a <strong>very welcome addition</strong> to my toolbox; one which I intend to explore further in the next couple of articles before I may decide to write about it. Here&#8217;s how an animation using this new approach looks like. Note that unlike when working with an animated GIF, we can make drawings truly <strong>interactive</strong>:</p>
 
 <script language="javascript" type="text/javascript">
   function resizeIframe(obj) {
@@ -114,9 +114,9 @@ I first discovered <strong>Clojure</strong> last summer and read quite a few art
 
 <h2>Freeing my SSD</h2>
 
-<p>The computer I do all my work on is a <strong>2012 Retina MacBook with 16GB RAM and 512GB SSD</strong>. In terms of performance, I have no reason at all to upgrade this machine before the extended warranty is up. The current offerings, after all, are only a few percent faster than the one I already own. The only real complaint I have is that the drive space is not large enough, in part because of all the virtual machines that I like to have with me. Of course, that would have been a good excuse to buy a new Retina MacBook, but I try to use gadgets longer these days because that is just more <strong>sustainable</strong>. Think about all the <strong><a href="http://en.wikipedia.org/wiki/Rare_earth_mineral">rare earth minerals</a></strong> that are needed to build a laptop or smart phone, for example.</p>
+<p>The computer I do all my work on is a <strong>2012 Retina MacBook with 16GB RAM and 512GB SSD</strong>. In terms of performance, I have no reason at all to upgrade this machine before the extended warranty is up. after all, the currently available MacBooks are only a few percent faster than the one I already own. The only real complaint I have is that the drive space is not large enough, in part because of all the virtual machines that I like to have with me. Of course, that would have been a good excuse to buy a new Retina MacBook, but I try to use gadgets longer these days because that is just more <strong>sustainable</strong>. Think about all the <strong><a href="http://en.wikipedia.org/wiki/Rare_earth_mineral">rare earth minerals</a></strong> that are needed to build a laptop or smart phone, for example.</p>
 
-<p>The other day, in order to alleviate the imminent shortage of disk space, I moved my 90GB iTunes library onto a <strong>128GB Transcend JetDrive Lite 350</strong> which fits exactly into the SD slot without protruding. Then, I just pointed to that new location by creating a symbolic link. You can <strong><a href="http://matthiasnehlsen.com/reviews/transcend-jetdrive-lite-350">read more in the reviews section</a></strong>. Now, I can go a while longer without constantly facing the threat of a full disk and I won&#8217;t have to buy a new laptop before some truly remarkable update to the MacBook line happens.</p>
+<p>The other day, in order to alleviate the imminent shortage of disk space, I moved my 90GB iTunes library onto a <strong>128GB Transcend JetDrive Lite 350</strong> which fits exactly into the SD slot without protruding. Then, I just pointed to that new location by creating a symbolic link. You can <strong><a href="http://matthiasnehlsen.com/reviews/transcend-jetdrive-lite-350">read more in the reviews section</a></strong>. Now, I can go a while longer without constantly facing the threat of a full disk and I won&#8217;t have to buy a new laptop before Apple comes up with some truly remarkable update for the MacBook line.</p>
 
 <h2>Closing remarks</h2>
 
