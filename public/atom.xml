@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-24T17:47:11+02:00</updated>
+  <updated>2014-09-25T14:58:44+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -167,7 +167,7 @@
 16:46:32.380 [main] INFO  birdwatch.switchboard - Starting Switchboard Component
 </code></pre>
 
-<p>Next week, we will look at how these components wire a channel grid and how information flows through this grid.</p>
+<p>Next week, we will look at how these components wire a channel grid and how information flows through this grid. You do not have to wait to see more code though, everything is on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong> already.</p>
 
 <p>Once we have discussed the architecture in detail over the next couple of weeks, we can start observing the system under load. Of course, it would be interesting to have actual user load. But with or without actual load, we want to find a way of how to generate / simulate load and then observe the system, identify the bottlenecks and remove them. For example, the clients could be simulated by connecting a load generator via ZeroMQ or the like and deliver matches back to that application and check if they are as expected (correct, complete, timely). The Twitter stream could also be simulated, for example by connecting to a load generator that either replays recorded tweets, with full control over the rate, or with artificial test cases, for which we could exactly specify the expectations on the output side.</p>
 

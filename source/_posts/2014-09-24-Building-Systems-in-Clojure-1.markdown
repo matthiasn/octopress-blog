@@ -100,7 +100,7 @@ Now, when we start the application, all the dependencies will be started in an o
     16:46:32.377 [main] INFO  birdwatch.percolator - Starting Percolator Component
     16:46:32.380 [main] INFO  birdwatch.switchboard - Starting Switchboard Component
 
-Next week, we will look at how these components wire a channel grid and how information flows through this grid.
+Next week, we will look at how these components wire a channel grid and how information flows through this grid. You do not have to wait to see more code though, everything is on **[GitHub](https://github.com/matthiasn/BirdWatch)** already.
 
 Once we have discussed the architecture in detail over the next couple of weeks, we can start observing the system under load. Of course, it would be interesting to have actual user load. But with or without actual load, we want to find a way of how to generate / simulate load and then observe the system, identify the bottlenecks and remove them. For example, the clients could be simulated by connecting a load generator via ZeroMQ or the like and deliver matches back to that application and check if they are as expected (correct, complete, timely). The Twitter stream could also be simulated, for example by connecting to a load generator that either replays recorded tweets, with full control over the rate, or with artificial test cases, for which we could exactly specify the expectations on the output side.
 
