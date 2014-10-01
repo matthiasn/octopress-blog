@@ -126,13 +126,13 @@
 <br/>
 
 
-<p>The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra&#8217;s <strong>component library</strong>. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don&#8217;t know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain <strong>core.async</strong> channels.</p>
+<p>The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don&#8217;t know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain <strong><a href="https://github.com/clojure/core.async">core.async</a></strong> channels.</p>
 
 <p>In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that &#8220;spaghetti code&#8221;, but I think that is not doing justice to spaghetti. Unlike bad code, I don&#8217;t mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn&#8217;t drain. You notice something in the sink, so you squat down to pull it out only to start screaming, &#8220;Oh my god, it&#8217;s a dead rat&#8221; a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust.</p>
 
 <p>This is where dependency injection comes in. Can we agree that we don&#8217;t like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that something because of the implemented interface.</p>
 
-<p>Here, unlikey in object-oriented dependency injection, things are a little different because we don&#8217;t really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as <strong>wiring harnesses</strong>, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.</p>
+<p>Here, unlike in object-oriented dependency injection, things are a little different because we don&#8217;t really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as <strong>wiring harnesses</strong>, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.</p>
 
 <p>Let&#8217;s have a look at how the initialization of the application we have already seen in the animation looks in code:</p>
 
@@ -348,6 +348,8 @@ Matthias</p>
         <a class="basic-alignment left" href="/blog/2014/09/23/weekly-update/" title="Previous Post: Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD">&laquo; Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD</a>
       
       
+        <a class="basic-alignment right" href="/blog/2014/10/01/Building-System-in-Clojure-2/" title="Next Post: Building a System in #Clojure - Part 2">Building a System in #Clojure - Part 2 &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -378,6 +380,10 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/10/01/Building-System-in-Clojure-2/">Building a System in #Clojure - Part 2</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure - Part 1</a>
       </li>
     
@@ -391,10 +397,6 @@ Matthias</p>
     
       <li class="post">
         <a href="/blog/2014/09/08/weekly-update/">Weekly Update: PageSpeed Insights, optimizing Octopress & more Clojure</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/09/03/weekly-update/">Weekly Update: Pomodoro, all-Clojure BirdWatch, Income</a>
       </li>
     
   </ul>
