@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-02T21:56:55+02:00</updated>
+  <updated>2014-10-02T22:21:16+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -19,6 +19,9 @@
     <updated>2014-10-01T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2</id>
     <content type="html"><![CDATA[<p><strong>TL;DR: transducers in Clojure, component lifecycle, more core.async. If any of that is of interest to you at all, you may want to read the following article.</strong></p>
+
+<!-- more -->
+
 
 <p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. Last week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
 

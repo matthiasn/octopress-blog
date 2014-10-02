@@ -7,6 +7,8 @@ categories:
 ---
 **TL;DR: transducers in Clojure, component lifecycle, more core.async. If any of that is of interest to you at all, you may want to read the following article.**
 
+<!-- more -->
+
 Hello and welcome back to this series of articles about building a system in **[Clojure](http://clojure.org/)**. Last week, we had a first look at dependency injection using the **[component library](https://github.com/stuartsierra/component)** combined with a hint of channel decoupling power. You may want to read **[that article first](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** if you haven’t done so already.
 
 In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for twitter’s **streaming data**. Since we haven’t done so already, we will also look at the lifecycle of a component. Before that, because this component happens to use them, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First, though, we will look at the problem at hand, without any language- or library-specific implementation details.
