@@ -96,6 +96,8 @@
 <!-- more -->
 
 
+<p><strong>Attention, Attention:</strong> This article is somewhat <strong>work in progress</strong> still. Right now I am working on animations for illustrating stuff. Come back in a day or two for those. Please <strong>provide feedback</strong> already wherever you see potential improvements.</p>
+
 <p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. Last week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
 
 <p>In this installment, we will look into the first component, the <strong>twitter client</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for twitter’s <strong>streaming data</strong>. Since we haven’t done so already, we will also look at the lifecycle of a component. Before that, because this component happens to use them, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. First, though, we will look at the problem at hand, without any language- or library-specific implementation details.</p>
@@ -431,8 +433,6 @@
 </span><span class='line'>               <span class="p">(</span><span class="nf">recur</span><span class="p">)))))</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>-></p>
 
 <p>I won&#8217;t go into much detail here as this watch loop is somewhat incidental to the problem of componentizing an application, but here&#8217;s a brief run-through. When the function is called, it starts the <strong>go-loop</strong> with code that runs in intervals. If the check determines that the last tweet ismore than a defined number of seconds ago (from configuration) and that the client is active, the client is restarted. For that, a function to stop the connection is called before it is started again. Here&#8217;s that function:</p>
 

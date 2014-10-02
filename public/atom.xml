@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-02T22:32:55+02:00</updated>
+  <updated>2014-10-02T23:16:51+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -22,6 +22,8 @@
 
 <!-- more -->
 
+
+<p><strong>Attention, Attention:</strong> This article is somewhat <strong>work in progress</strong> still. Right now I am working on animations for illustrating stuff. Come back in a day or two for those. Please <strong>provide feedback</strong> already wherever you see potential improvements.</p>
 
 <p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. Last week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
 
@@ -358,8 +360,6 @@
 </span><span class='line'>               <span class="p">(</span><span class="nf">recur</span><span class="p">)))))</span>
 </span></code></pre></td></tr></table></div></figure>
 
-
-<p>-></p>
 
 <p>I won&#8217;t go into much detail here as this watch loop is somewhat incidental to the problem of componentizing an application, but here&#8217;s a brief run-through. When the function is called, it starts the <strong>go-loop</strong> with code that runs in intervals. If the check determines that the last tweet ismore than a defined number of seconds ago (from configuration) and that the client is active, the client is restarted. For that, a function to stop the connection is called before it is started again. Here&#8217;s that function:</p>
 

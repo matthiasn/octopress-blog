@@ -9,6 +9,10 @@ categories:
 
 <!-- more -->
 
+**Attention, Attention:** This article is somewhat **work in progress** still. Right now I am working on animations for illustrating stuff. Come back in a day or two for those. Please **provide feedback** already wherever you see potential improvements.
+
+
+
 Hello and welcome back to this series of articles about building a system in **[Clojure](http://clojure.org/)**. Last week, we had a first look at dependency injection using the **[component library](https://github.com/stuartsierra/component)** combined with a hint of channel decoupling power. You may want to read **[that article first](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** if you haven’t done so already.
 
 In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for twitter’s **streaming data**. Since we haven’t done so already, we will also look at the lifecycle of a component. Before that, because this component happens to use them, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First, though, we will look at the problem at hand, without any language- or library-specific implementation details.
@@ -244,7 +248,6 @@ With this in place, we now have a component that establishes a connection to the
                  (start-twitter-conn! conf conn chunk-chan))
                (recur)))))
 {% endcodeblock %}
-->
 
 I won't go into much detail here as this watch loop is somewhat incidental to the problem of componentizing an application, but here's a brief run-through. When the function is called, it starts the **go-loop** with code that runs in intervals. If the check determines that the last tweet ismore than a defined number of seconds ago (from configuration) and that the client is active, the client is restarted. For that, a function to stop the connection is called before it is started again. Here's that function:
 
