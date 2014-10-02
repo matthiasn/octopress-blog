@@ -101,9 +101,9 @@
 
 <p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of 1% of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
-<p>From a technical standpoint, here is how that stream looks like:</p>
+<p>Here is how that stream looks like when each chunk is simply printed to the console:</p>
 
-<p>[insert animated GIF of the stream here]</p>
+<p><img class="left" src="/images/streaming-api.gif" title="animated gif of streaming API output" alt="animated gif of streaming API output"></p>
 
 <p>For reasons unbeknownst to me, tweets stopped respecting the chunk borders for the last half year. Instead, tweets occasionally span two or three chunks. This makes processing the tweets a little more complicated than we might wish for. One tweet per chunk is straightforward:</p>
 
