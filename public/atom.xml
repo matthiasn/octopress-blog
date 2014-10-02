@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-01T22:48:52+02:00</updated>
+  <updated>2014-10-02T02:46:55+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -22,33 +22,33 @@
 
 <p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. Last week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
 
-<p>In this installment, we will look into the first component, the twitter client<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for twitter’s streaming data. Since we haven’t done so already, we will also look at the lifecycle of a component. Then, because this component happens to use them, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. But first, we will look at the problem on hand, without any language- or library-specific implementation details.</p>
+<p>In this installment, we will look into the first component, the <strong>twitter client</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for twitter’s <strong>streaming data</strong>. Since we haven’t done so already, we will also look at the lifecycle of a component. Before that, because this component happens to use them, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. First, though, we will look at the problem at hand, without any language- or library-specific implementation details.</p>
 
 <h2>Twitter Client</h2>
 
-<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; just because I am interested in all these topics. As long as that subscription does not hit a hard ceiling of 1% of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of 1% of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of 1% of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
 <p>From a technical standpoint, here is how that stream looks like:</p>
 
 <p>[insert animated GIF of the stream here]</p>
 
-<p>For reasons unbeknownst to me, tweets have stopped respecting the chunk borders for the last half year. Instead, tweets occasionally span two or three chunks. This makes processing the tweets a little more complicated than we might wish for. One tweet per chunk is straightforward:</p>
+<p>For reasons unbeknownst to me, tweets stopped respecting the chunk borders for the last half year. Instead, tweets occasionally span two or three chunks. This makes processing the tweets a little more complicated than we might wish for. One tweet per chunk is straightforward:</p>
 
 <pre><code>Receive chunk -&gt; parse JSON into map -&gt; put on conveyor belt (channel)
 </code></pre>
 
-<p>That looks like functional programming, right? No state to be kept anywhere, just functions producing results that are passed into other functions. But as desirable as that sounds, it does not align with reality. Instead, we need logical reasoning and state. What is the instruction we would give a sentient being? Imagine that intelligent agent standing between two conveyor belts. Imagine that agent being you. Here we go:</p>
+<p>That looks like functional programming, right? No state to be kept anywhere, just functions producing results that are passed into other functions. But as desirable as that sounds, it does not align with reality. Instead, we need logical reasoning and state. What is the instruction we would give a sentient being? Imagine an intelligent agent standing between two conveyor belts. Imagine that agent being you. Here we go:</p>
 
 <p>“On your left side, there’s a conveyor belt that keeps delivering hundred dollar bills. Put all of them on the other conveyor belt. Some of them come out cut into multiple pieces. These fragments are in correct order. Scotch tape is over there.”</p>
 
-<p>Please let me know if that leaves out anything substantial. I think we would all know what to do. There is a space where you park fragments of not-yet-complete bills / tweets. Then, with every new fragment, you inspect if the bill is complete and if so, put it back together and pass it on. Let’s try that in code. First, we will need to introduce transducers though.</p>
+<p>I think we would all know what to do. There is a space where you park fragments of not-yet-complete bills / tweets. Then, with every new fragment, you inspect if the bill is complete and if so, put it back together and pass it on. Let’s try that in code. First, we will need to introduce <strong>transducers</strong> though.</p>
 
 <h2>Transducers</h2>
 
 <blockquote><p>Transducers are a powerful and composable way to build algorithmic transformations that you can reuse in many contexts, and they&#8217;re coming to Clojure core and core.async.</p><footer><strong>Rich Hickey</strong> <cite><a href='http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming'>Cognitect Blog, August 6, 2014</a></cite></footer></blockquote>
 
 
-<p>In a way, a transducer is the <strong>essence</strong> of a computation over data, without being bound to any kind of collection or data structure. Above, before had to concern ourselves with the incomplete fragment, there was one step of the computation that we could model as a transducer and that was the part where we wanted to parse JSON into a map data structure.</p>
+<p>In a way, a transducer is the <strong>essence</strong> of a computation over data, without being bound to any kind of collection or data structure. Above, before had to concern ourselves with the incomplete fragments, there was one step of the computation that we could <strong>model as a transducer</strong>: the part where we wanted to parse JSON into a map data structure.</p>
 
 <p>Imagine we wanted to transform a vector of JSON strings into a vector of such parsed maps. We could simply do this:</p>
 
@@ -57,9 +57,9 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, the above is bound to the data structure. That does not have to be the case though. Rich Hickey provides a good example in his transducers talk likening the above to having to tell the guys processing luggage at the airport the same instructions twice, once for trolleys and once more for conveyor belts, where in reality that should not matter.</p>
+<p>However, the above is bound to the data structure, in this case a vector. That does not have to be the case though. Rich Hickey provides a good example in his <strong><a href="https://www.youtube.com/watch?v=6mTbuzafcII">transducers talk</a></strong>, likening the above to having to tell the guys processing luggage at the airport the same instructions twice, once for trolleys and once more for conveyor belts, where in reality that should not matter.</p>
 
-<p>We could, for example, want to not only run the mapping function over every item in in a vector but also re-use the same on every item in a channel, stream or whatever.</p>
+<p>We could, for example, want to not only run the mapping function over every item in in a vector, but also re-use the same for every item in a channel, stream or whatever.</p>
 
 <p>With Clojure 1.7, we can now create such a transducing function by simply leaving out the data structure in order to create the transducing function:</p>
 
@@ -82,7 +82,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This may not look terribly useful so far. But this can also be applied to a channel. Say we want to create a channel that accepts JSON strings and transforms each message into a Clojure map. Simple:</p>
+<p>It may not look terribly useful so far. But this can also be applied to a channel. Say we want to create a channel that accepts JSON strings and transforms each message into a Clojure map. Simple:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">chan</span> <span class="mi">1</span> <span class="nv">xform</span><span class="p">)</span>
@@ -91,7 +91,7 @@
 
 <p>The above creates a channel with a buffer size of one that applies the transducer to every element.</p>
 
-<p>But this does not help for our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of state. But what if we want to see this aggregation process as a black box? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
+<p>But this does not help in our initial case here, where we know that some of the chunks are not complete, but instead have to be glued together with the next one or two pieces. For that, we will need some kind of state. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
 
 <p>Here’s how that looks like in code:</p>
 
@@ -115,11 +115,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Let&#8217;s go through this line by line. We have a private function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This is the function that will be applied to every step onwards. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragment. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
+<p>Let&#8217;s go through this line by line. We have a (private) function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step onwards. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragments. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
 
-<p>In the first line of the let binding, we use the <strong><a href="http://clojuredocs.org/clojure.core/-%3E">-> (thread-first)</a></strong> macro. This macro makes the code more legible by simple passing the result of each function call as the first argument of the next function. Here, specifically, we are 1) concatenating the buffer with the new chunk 2) adding newlines where missing<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, and 3) split the string into a sequence on the line breaks.</p>
+<p>In the first line of the let binding, we use the <strong><a href="http://clojuredocs.org/clojure.core/-%3E">-> (thread-first)</a></strong> macro. This macro makes the code more legible by simple passing the result of each function call as the first argument of the next function. Here, specifically, we are 1) concatenating the buffer with the new chunk, 2) adding newlines where missing<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>, and 3) split the string into a sequence on the line breaks.</p>
 
-<p>Now, we cannot process all those items in the sequence immediately. We know that all except for the last are complete, otherwise there would not have been another tweet to the right of them. But the last one is potentially not complete. Accordingly, we derive</p>
+<p>Now, we cannot process all those items in the resulting sequence immediately. We know that all except for the last are complete, otherwise there would not have been another tweet to the right of them. But the last one is potentially not complete. Accordingly, we derive</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)</span>
@@ -133,16 +133,16 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Finally, we let <strong>reduce</strong> call the <strong>step</strong> function for every item in</p>
+<p>Finally, we let <strong>reduce</strong> call the <strong>step</strong> function for every item in <strong>to-process</strong>:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="k">if </span><span class="nv">to-process</span> <span class="p">(</span><span class="nb">reduce </span><span class="nv">step</span> <span class="nv">r</span> <span class="nv">to-process</span><span class="p">)</span> <span class="nv">r</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>That way, only complete JSON strings are pushed down to the operation, whereas intermediate JSON string fragments are kept locally and not passed on until appropriate. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we already met above so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the JSON parser.</p>
+<p>That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we already met above, so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the <strong>JSON parser</strong>.</p>
 
-<p>There&#8217;s more to do before we can compose all transducers and attach that to the appropriate channel. Specifically, we can receive valid JSON from Twitter which is not a tweet. This for example happens when we get a notification that we lag behind in consuming the stream. In that case, I wanted to only pass the parsed map on if it likely was a tweet and otherwise log it as an error. This is quite simple if we agree on the existence of a <strong>:tweet</strong> key as the predicate for recognizing a tweet:</p>
+<p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach that to the appropriate channel. Specifically, we can receive valid JSON from Twitter which is not a tweet. This for example happens when we get a notification that we lag behind in consuming the stream. In that case, we only want to pass on the parsed map if it likely was a tweet and otherwise log it as an error. This is quite simple if we agree on the existence of a <strong>:tweet</strong> key as the <strong>predicate</strong> for recognizing a tweet:</p>
 
 <figure class='code'><figcaption><span>tweet? predicate function processing.clj</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -158,23 +158,240 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>What you can see above is that we are managing the function state in an atom. Read the footnotes to find out more if you like.  The atom is passed in initially when the returned function of arity 2 is created. That atom ref will not change over the lifecycle of the application. Only the value that we can dereference actually changes.<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup></p>
+<p>Next, we also want to log the count of tweets received since the application started. Let&#8217;s do this only for full thousands. We will need some kind of counter to keep track of the count. Let&#8217;s create another <strong>stateful transducer</strong>:</p>
 
-<p>This is where a stateful transducer helps. But first things first, what is a transducer? A transducer is the essence of a computation over data.</p>
+<figure class='code'><figcaption><span>stateful count transducer processing.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">log-count</span> <span class="p">[</span><span class="nv">last-received</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Stateful transducer, counts processed items and updating last-received atom. Logs progress every 1000 items.&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">cnt</span> <span class="p">(</span><span class="nf">atom</span> <span class="mi">0</span><span class="p">)]</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">swap!</span> <span class="nv">cnt</span> <span class="nv">inc</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">zero? </span><span class="p">(</span><span class="nf">mod</span> <span class="o">@</span><span class="nv">cnt</span> <span class="mi">1000</span><span class="p">))</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;processed&quot;</span> <span class="o">@</span><span class="nv">cnt</span> <span class="s">&quot;since startup&quot;</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">reset!</span> <span class="nv">last-received</span> <span class="p">(</span><span class="nf">t/now</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span> <span class="nv">x</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This transducer is comparable to the one we saw earlier, except that the local atom now holds the count. Initially, the counter is incremented and then, when the counter is divisible by 1000, the count is logged. Additonally, this function also resets the <strong>last-received</strong> timestamp. Of course, this could be factored out into a separate function, but I think this will do.</p>
+
+<p>Now, we can compose all these steps:</p>
+
+<figure class='code'><figcaption><span>composed transducer processing.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">process-chunk</span> <span class="p">[</span><span class="nv">last-received</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Creates composite transducer for processing tweet chunks. Last-received atom passed in for updates.&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">comp</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">streaming-buffer</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nb">map </span><span class="nv">json/read-json</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nb">filter </span><span class="nv">tweet?</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">log-count</span> <span class="nv">last-received</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above creates a composed function that takes the timestamp atom<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup> provided by the twitterclient component as an argument. We can now use this <strong>transducing function</strong> and apply it do different data structures. Here, we will create a channel with it that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.</p>
 
 <h2>Channels</h2>
 
-<p>We will only gradually cover channels as this series unfolds. For now, let us just reiterate what channel does. A core.async channel can be compared to a conveyor belt. You place something on that belt and whatever happens on the other side is not your problem. That way, we can build systems that consist of parts that do not depend on each other (except for having expectations about the data they receive). In this component, we are dealing with two such channels. The more straightforward one is the channel in the channels component. This component is the wiring harness between the the switchboard component and the twitterclient component<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>.</p>
+<p>We will only gradually cover channels as this series unfolds. For now, let us just reiterate what a channel does. A <strong>core.async channel</strong> can be compared to a <strong>conveyor belt</strong>. You place something on that belt and whatever happens on the other side is not your problem. That way, we can build systems that consist of parts that do not depend on each other (except for having expectations about the data they receive).</p>
 
-<h2>Transducers</h2>
+<p>In this component, we are dealing with two such channels. The more straightforward one is the channel in the <strong>channels component</strong>.</p>
 
-<h2>The component lifecycle</h2>
+<h2>Component lifecycle: the Twitterclient-Channels component</h2>
 
-<p>So last week, we have established that a component is some kind of an object. Hmm, are we not in this to get away from object-oriented programming? But not so fast, not all is bad with OO. In particular, most applications will need some state somewhere, and be it only for storing a database or long-lived HTTP connection.</p>
+<p>This component is the <strong>wiring harness</strong> between the <strong>switchboard</strong> component and the <strong>twitterclient</strong> component<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>. Here&#8217;s how the channels component looks like:</p>
+
+<figure class='code'><figcaption><span>Twitterclient-Channels component component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defrecord </span><span class="nv">Twitterclient-Channels</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="nv">component/Lifecycle</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">start</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Starting Twitterclient Channels Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:tweets</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)))</span> <span class="c1">; channel for new tweets received from streaming API</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">stop</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Stop Twitterclient Channels Component&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:tweets</span> <span class="nv">nil</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">new-twitterclient-channels</span> <span class="p">[]</span> <span class="p">(</span><span class="nf">map-&gt;Twitterclient-Channels</span> <span class="p">{}))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a really simple component. On startup, it associates a new channel to its own map, which is passed in under the name <strong>component</strong>, and logs it&#8217;s successful startup. When it shuts down, it replaces the <strong>:tweets</strong> component keys with <strong>nil</strong>.</p>
+
+<h2>Component lifecycle: the TwitterClient component</h2>
+
+<p>The other component, where all the tweet stream action is happening, is the <strong>TwitterClient</strong> component:</p>
+
+<figure class='code'><figcaption><span>Twitterclient component component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defrecord </span><span class="nv">Twitterclient</span> <span class="p">[</span><span class="nv">conf</span> <span class="nv">channels</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span> <span class="nv">watch-active</span><span class="p">]</span>
+</span><span class='line'>  <span class="nv">component/Lifecycle</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">start</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Starting Twitterclient Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">last-received</span> <span class="p">(</span><span class="nf">atom</span> <span class="p">(</span><span class="nf">t/epoch</span><span class="p">))</span>
+</span><span class='line'>               <span class="nv">chunk-chan</span> <span class="p">(</span><span class="nf">chan</span> <span class="mi">1</span> <span class="p">(</span><span class="nf">processing/process-chunk</span> <span class="nv">last-received</span><span class="p">))</span>
+</span><span class='line'>               <span class="nv">conn</span> <span class="p">(</span><span class="nf">atom</span> <span class="p">{})</span>
+</span><span class='line'>               <span class="nv">watch-active</span> <span class="p">(</span><span class="nf">atom</span> <span class="nv">false</span><span class="p">)]</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">http-client/start-twitter-conn!</span> <span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">pipe</span> <span class="nv">chunk-chan</span> <span class="p">(</span><span class="ss">:tweets</span> <span class="nv">channels</span><span class="p">)</span> <span class="nv">false</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">http-client/run-watch-loop</span> <span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span> <span class="nv">last-received</span> <span class="nv">watch-active</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:conn</span> <span class="nv">conn</span> <span class="ss">:chunk-chan</span> <span class="nv">chunk-chan</span> <span class="ss">:watch-active</span> <span class="nv">watch-active</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">stop</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Stopping Twitterclient Component&quot;</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">reset!</span> <span class="nv">watch-active</span> <span class="nv">false</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">http-client/stop-twitter-conn!</span> <span class="nv">conn</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:conn</span> <span class="nv">nil</span> <span class="ss">:chunk-chan</span> <span class="nv">nil</span> <span class="ss">:watch-active</span> <span class="nv">nil</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This component encapsulates the behavior of the twitter client. Initially, the <strong>last-received</strong> atom is created which holds a timestamp of the last received full tweet. We will meet this atom again when we are watching the twitter stream and restart it when inactivity periods have been too long. Next, <strong>chunk-chan</strong> is the channel that receives individual tweet string fragments from the chunked HTTP connection and passes tweets on as Clojure maps by virtue of applying the composed transducer we have discussed in detail above. <strong>conn</strong> is a reference to the current connection to Twitter. <strong>watch-active</strong> is a simple boolean that keeps track if the watch loop is supposed to keep running or not (more later). Next, we start the twitter client by calling a function from the <strong>http</strong> namespace:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">http-client/start-twitter-conn!</span> <span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here&#8217;s what that function does:</p>
+
+<figure class='code'><figcaption><span>start-twitter-conn! http.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">start-twitter-conn!</span> <span class="p">[</span><span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Starting Twitter client.&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">reset!</span> <span class="nv">conn</span> <span class="p">(</span><span class="nf">tas/statuses-filter</span>
+</span><span class='line'>                <span class="ss">:params</span> <span class="p">{</span><span class="ss">:track</span> <span class="p">(</span><span class="ss">:track</span> <span class="nv">conf</span><span class="p">)}</span>
+</span><span class='line'>                <span class="ss">:oauth-creds</span> <span class="p">(</span><span class="nf">creds</span> <span class="nv">conf</span><span class="p">)</span>
+</span><span class='line'>                <span class="ss">:callbacks</span> <span class="p">(</span><span class="nf">tweet-chunk-callback</span> <span class="nv">chunk-chan</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It basically resets the conn atom and thus replaces it with a new client (statuses-filter from the twitter.api.streaming namespace) with parameters from the application&#8217;s configuration and assigns a callback handler:</p>
+
+<figure class='code'><figcaption><span>tweet-chunk-callback http.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">tweet-chunk-callback</span> <span class="p">[</span><span class="nv">chunk-chan</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">tas/AsyncStreamingCallback.</span> <span class="o">#</span><span class="p">(</span><span class="nf">&gt;!!</span> <span class="nv">chunk-chan</span> <span class="p">(</span><span class="nb">str </span><span class="nv">%2</span><span class="p">))</span>
+</span><span class='line'>                               <span class="p">(</span><span class="nb">comp println </span><span class="nv">tch/response-return-everything</span><span class="p">)</span>
+</span><span class='line'>                               <span class="nv">tch/exception-print</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The only thing we need to concern ourselves with from the <strong>AsyncStreamingCallback</strong> is the first parameter, which is a function disguised as a macro. This function simply places every chunk on <strong>chunk-chan</strong>, which happens to be the channels that processes chunks into tweets.</p>
+
+<p>Back to the component. In the following line, <strong>chunk-chan</strong> is piped into the <strong>tweets</strong> channel from the channels component. That way, our processing chain for the twitter client is complete and processed tweets are put on the conveyor belt that is the only connection between the twitterclient component and the outside world. From here, we do not need to know at all what happens with the tweet on the other side of that conveyor belt.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">pipe</span> <span class="nv">chunk-chan</span> <span class="p">(</span><span class="ss">:tweets</span> <span class="nv">channels</span><span class="p">)</span> <span class="nv">false</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With this in place, we now have a component that establishes a connection to the <strong>streaming API</strong> and puts the received tweets on a channel. But what if the pipes and tubes of the Internet are occasionally clogged? In that case, we&#8217;d want to restart the connection. Let&#8217;s do this and make the client more resilient:</p>
+
+<figure class='code'><figcaption><span>tweet-chunk-callback http.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">run-watch-loop</span> <span class="p">[</span><span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span> <span class="nv">last-received</span> <span class="nv">watch-active</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;run loop watching the twitter client and restarting it if necessary&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">reset!</span> <span class="nv">watch-active</span> <span class="nv">true</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="p">(</span><span class="nf">timeout</span> <span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="ss">:tw-check-interval-sec</span> <span class="nv">conf</span><span class="p">)</span> <span class="mi">1000</span><span class="p">)))</span>
+</span><span class='line'>           <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">since-last-sec</span> <span class="p">(</span><span class="nf">t/in-seconds</span> <span class="p">(</span><span class="nf">t/interval</span> <span class="o">@</span><span class="nv">last-received</span> <span class="p">(</span><span class="nf">t/now</span><span class="p">)))</span>
+</span><span class='line'>                 <span class="nv">active</span> <span class="o">@</span><span class="nv">watch-active</span><span class="p">]</span>
+</span><span class='line'>             <span class="p">(</span><span class="nb">when </span><span class="nv">active</span>
+</span><span class='line'>               <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">since-last-sec</span> <span class="p">(</span><span class="ss">:tw-check-interval-sec</span> <span class="nv">conf</span><span class="p">))</span>
+</span><span class='line'>                 <span class="p">(</span><span class="nf">log/error</span> <span class="nv">since-last-sec</span> <span class="s">&quot;seconds since last tweet received&quot;</span><span class="p">)</span>
+</span><span class='line'>                 <span class="p">(</span><span class="nf">stop-twitter-conn!</span> <span class="nv">conn</span><span class="p">)</span>
+</span><span class='line'>                 <span class="p">(</span><span class="nf">&lt;!</span> <span class="p">(</span><span class="nf">timeout</span> <span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="ss">:tw-restart-wait</span> <span class="nv">conf</span><span class="p">)</span> <span class="mi">1000</span><span class="p">)))</span>
+</span><span class='line'>                 <span class="p">(</span><span class="nf">start-twitter-conn!</span> <span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span><span class="p">))</span>
+</span><span class='line'>               <span class="p">(</span><span class="nf">recur</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>-></p>
+
+<p>I won&#8217;t go into much detail here as this watch loop is somewhat incidental to the problem of componentizing an application, but here&#8217;s a brief run-through. When the function is called, it starts go loop with code that runs in intervals. If the check determines that the last tweet is longer ago than a defined number of seconds (from configuration) and that the client is active, the client is restarted. For that, a function for stopping the connection is called before it is started again. Here&#8217;s that function:</p>
+
+<figure class='code'><figcaption><span>stop-twitter-conn! http.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">stop-twitter-conn!</span> <span class="p">[</span><span class="nv">conn</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">m</span> <span class="p">(</span><span class="nb">meta </span><span class="o">@</span><span class="nv">conn</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">when </span><span class="nv">m</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Stopping Twitter client.&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">((</span><span class="ss">:cancel</span> <span class="nv">m</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Check out the <strong><a href="https://github.com/adamwynne/twitter-api">adamwynne/twitter-api on GitHub</a></strong> for more details on the twitter-api.</p>
+
+<p>Finally, in the <strong>stop</strong> part of the component lifecycle, <strong>watch-active</strong> is switched off, the client shut down and all component keys replaced by <strong>nil</strong>.</p>
+
+<p>Right after the component definitions, there is also function creating a component. This can take parameters like the application&#8217;s configuration:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">new-twitterclient</span> <span class="p">[</span><span class="nv">conf</span><span class="p">]</span> <span class="p">(</span><span class="nf">map-&gt;Twitterclient</span> <span class="p">{</span><span class="ss">:conf</span> <span class="nv">conf</span><span class="p">}))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Remember from the last article, where the components were fired up in order (in the animation)? The channels component is created first and then provided to the TwitterClient component. The component library wires all components together and starts them up in the right order. Eventually, this means that <strong>start</strong> is called on each component, but only after all dependencies are met.</p>
 
 <h2>Conclusion</h2>
 
-<p>Okay, this is it for today. In the next installment, will probably cover the switchboard component. Considering where the information flows next, that seems like a natural next step. I hope you found this useful. If you did, why don’t you subscribe to the newsletter so you don’t miss the next installment?</p>
+<p>Okay, this is it for today. We have seen how a component that starts and maintains a connection to the twitter streaming API and that delivers tweets on a channel is created and also started. There is a lot more to read around these subjects. Instead of providing all the links now, I&#8217;d rather refer you to my list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. There, you find a comprehensive list of all the articles I have come across while working on this application.</p>
+
+<p>In the next installment, we will probably cover the switchboard component. Considering where the information flows next, that seems like a natural next step.</p>
+
+<p>I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?</p>
 
 <p>Cheers,
 Matthias</p>
@@ -184,7 +401,7 @@ Matthias</p>
 <li id="fn:1">
 <p>I have only recently started with Clojure. It is not only entirely possible but also quite likely there are better ways of doing things. If so, please let me know, I want to learn stuff.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
 <li id="fn:2">
-<p>I know not much about the exact mechanism at play, actual numbers or delivery guarantees. It doesn’t matter much either for the purpose of this application. The interesting views focus on the most retweeted tweets. Now every retweet contains the original tweet under “retweeted_status”, with the current numbers such as retweet and favorite count for the moment in time it was retweeted. For popular one, we thus receive the original tweet many, many times over. So even if we missed as much half of all the tweets &ndash; which I find unlikely &ndash; the popular tweets would only be updated less often. Worst case: retweet count is off by one or two. I can live with that. In reality, for the current selection of terms, reaching the limit also hardly ever happens.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<p>I know not much about the exact mechanism at play, actual numbers or delivery guarantees. It doesn’t matter much either for the purpose of this application. The interesting views focus on the most retweeted tweets. Now every retweet contains the original tweet under “retweeted_status”, with the current numbers such as retweet and favorite count for the moment in time it was retweeted. For popular one, we thus receive the original tweet many, many times over. So even if we missed as much half of all the tweets &ndash; which I find unlikely &ndash; the popular tweets would only be updated less often. Worst case: retweet count is off by one or two. I can live with that. In reality, for the current selection of terms, reaching the limit also hardly ever happens. After all, 1% is still millions of tweets per day.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
 <p>After initial experimentation with a local volatile reference http://dev.clojure.org/jira/browse/CLJ-1512 I decided for a good old atom. The volatile! local reference trades off potential race conditions with speed. But there’s no performance issue when we at most process tweet chunks at most a few hundred times a second, so why bother? Worth to keep in mind though for when performance is an issue.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 <li id="fn:4">
