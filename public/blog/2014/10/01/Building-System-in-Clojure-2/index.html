@@ -287,15 +287,19 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">log-count</span> <span class="p">[</span><span class="nv">last-received</span><span class="p">]</span>
 </span><span class='line'>  <span class="s">&quot;Stateful transducer, counts processed items and updating last-received atom. Logs progress every 1000 items.&quot;</span>
 </span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
 </span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">cnt</span> <span class="p">(</span><span class="nf">atom</span> <span class="mi">0</span><span class="p">)]</span>
-</span><span class='line'>      <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
-</span><span class='line'>        <span class="p">(</span><span class="nf">swap!</span> <span class="nv">cnt</span> <span class="nv">inc</span><span class="p">)</span>
-</span><span class='line'>        <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">zero? </span><span class="p">(</span><span class="nf">mod</span> <span class="o">@</span><span class="nv">cnt</span> <span class="mi">1000</span><span class="p">))</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;processed&quot;</span> <span class="o">@</span><span class="nv">cnt</span> <span class="s">&quot;since startup&quot;</span><span class="p">))</span>
-</span><span class='line'>        <span class="p">(</span><span class="nf">reset!</span> <span class="nv">last-received</span> <span class="p">(</span><span class="nf">t/now</span><span class="p">))</span>
-</span><span class='line'>        <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span> <span class="nv">x</span><span class="p">)))))</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">fn </span>
+</span><span class='line'>        <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">([</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">swap!</span> <span class="nv">cnt</span> <span class="nv">inc</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">zero? </span><span class="p">(</span><span class="nf">mod</span> <span class="o">@</span><span class="nv">cnt</span> <span class="mi">1000</span><span class="p">))</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;processed&quot;</span> <span class="o">@</span><span class="nv">cnt</span> <span class="s">&quot;since startup&quot;</span><span class="p">))</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">reset!</span> <span class="nv">last-received</span> <span class="p">(</span><span class="nf">t/now</span><span class="p">))</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span> <span class="nv">x</span><span class="p">))))))</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
@@ -322,6 +326,31 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 
 
 <p>The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this <strong>transducing function</strong> and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.</p>
+
+<p>Let&#8217;s try it on a vector one more time to see what&#8217;s happening. For that, we take a different vector, with two JSON strings that contain the <strong>:text</strong> property and one that doesn&#8217;t.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">[</span><span class="s">&quot;{\&quot;text\&quot;&quot;</span> <span class="s">&quot;:\&quot;foo\&quot;}\n{\&quot;text\&quot;:&quot;</span> <span class="s">&quot;\&quot;bar\&quot;}&quot;</span> <span class="s">&quot;{\&quot;baz\&quot;:42}&quot;</span> <span class="s">&quot;{\&quot;bla\&quot;:42}&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The, we should see that the invalid one is logged and the other two are returned:</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+
+birdwatch.twitterclient.processing=&gt; (require '[clj-time.core :as t])
+nil
+
+birdwatch.twitterclient.processing=&gt; (def chunks ["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
+#'birdwatch.twitterclient.processing/chunks
+
+birdwatch.twitterclient.processing=&gt; (into [] (process-chunk (atom (t/epoch))) chunks)
+20:57:39.999 [nREPL-worker-1] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
+[{:text "foo"} {:text "bar"}]
+</code></pre>
+
+<p>Great, we have a composed transducer that works on vectors as expected and that should work on channels as well.</p>
 
 <h2>Channels</h2>
 
@@ -531,8 +560,6 @@ birdwatch.twitterclient.processing=&gt; (def c (chan 1 (streaming-buffer)))
 <p>In the next installment, we will probably cover the switchboard component. Considering where the information flows next, that seems like a natural next step.</p>
 
 <p>I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out? I will also let you know when this one is complete.</p>
-
-<p>lalala</p>
 
 <p>Cheers,
 Matthias</p>

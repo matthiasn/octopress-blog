@@ -125,10 +125,10 @@ Now we can check on the REPL if this will produce three complete JSON strings. I
 
     birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
     #<Namespace birdwatch.twitterclient.processing>
-
+    
     birdwatch.twitterclient.processing=> (def chunks ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"])
     #'birdwatch.twitterclient.processing/chunks
-
+    
     birdwatch.twitterclient.processing=> (into [] (streaming-buffer) chunks)
     ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
 
@@ -165,11 +165,13 @@ Next, we also want to log the count of tweets received since the application sta
   "Stateful transducer, counts processed items and updating last-received atom. Logs progress every 1000 items."
   (fn [step]
     (let [cnt (atom 0)]
-      (fn [r x] 
-        (swap! cnt inc)
-        (when (zero? (mod @cnt 1000)) (log/info "processed" @cnt "since startup"))
-        (reset! last-received (t/now))
-        (step r x)))))
+      (fn 
+        ([r] (step r))
+        ([r x]
+         (swap! cnt inc)
+         (when (zero? (mod @cnt 1000)) (log/info "processed" @cnt "since startup"))
+         (reset! last-received (t/now))
+         (step r x))))))
 {% endcodeblock %}
 
 This transducer is comparable to the one we saw earlier, except that the local atom now holds the count. Initially, the counter is incremented and then, when the counter is divisible by 1000, the count is logged. In addition, this function also resets the **last-received** timestamp. Of course, this could be factored out into a separate function, but I think this will do.
@@ -186,7 +188,30 @@ Now, we can compose all these steps:
    (log-count last-received)))
 {% endcodeblock %}
 
-The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this **transducing function** and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.
+The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this **transducing function** and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt. 
+
+Let's try it on a vector one more time to see what's happening. For that, we take a different vector, with two JSON strings that contain the **:text** property and one that doesn't. 
+
+{% codeblock lang:clojure %}
+["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
+{% endcodeblock %}
+
+The, we should see that the invalid one is logged and the other two are returned:
+
+    birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
+    #<Namespace birdwatch.twitterclient.processing>
+    
+    birdwatch.twitterclient.processing=> (require '[clj-time.core :as t])
+    nil
+    
+    birdwatch.twitterclient.processing=> (def chunks ["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
+    #'birdwatch.twitterclient.processing/chunks
+    
+    birdwatch.twitterclient.processing=> (into [] (process-chunk (atom (t/epoch))) chunks)
+    20:57:39.999 [nREPL-worker-1] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
+    [{:text "foo"} {:text "bar"}]
+
+Great, we have a composed transducer that works on vectors as expected and that should work on channels as well.
 
 ## Channels 
 We will only gradually cover channels as this series unfolds. For now, let us just reiterate what a channel does. A **core.async channel** can be compared to a **conveyor belt**. You place something on that belt and whatever happens on the other side is not your problem. That way, we can build systems that consist of parts that do not depend on each other (except for having expectations about the data they receive). 
@@ -330,8 +355,6 @@ Okay, this is it for today. We saw how a component that starts and maintains a c
 In the next installment, we will probably cover the switchboard component. Considering where the information flows next, that seems like a natural next step. 
 
 I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out? I will also let you know when this one is complete.
-
-lalala
 
 Cheers,
 Matthias
