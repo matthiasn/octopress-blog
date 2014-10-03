@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-03T15:01:25+02:00</updated>
+  <updated>2014-10-03T15:08:35+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -147,7 +147,7 @@
 
 <p>That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the <strong>JSON parser</strong>.</p>
 
-<p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. This is quite simple if we agree on the existence of a <strong>:tweet</strong> key as the <strong>predicate</strong> for recognizing a tweet:</p>
+<p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one <strong>key</strong> that all tweets have in common which does not seem to appear in any status messages from twitter: <strong>:text</strong>. We can thus use that key as the <strong>predicate</strong> for recognizing a tweet:</p>
 
 <figure class='code'><figcaption><span>tweet? predicate function processing.clj</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>

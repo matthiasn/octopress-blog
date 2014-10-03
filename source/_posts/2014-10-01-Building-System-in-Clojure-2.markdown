@@ -114,7 +114,7 @@ Finally, we have **reduce** call the **step** function for every item in **to-pr
 
 That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That's all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this **streaming-buffer** transducer runs first and passes its result to the **JSON parser**.
 
-There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. This is quite simple if we agree on the existence of a **:tweet** key as the **predicate** for recognizing a tweet:
+There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one **key** that all tweets have in common which does not seem to appear in any status messages from twitter: **:text**. We can thus use that key as the **predicate** for recognizing a tweet:
 
 {% codeblock tweet? predicate function lang:clojure processing.clj%}
 (defn- tweet? [data]
