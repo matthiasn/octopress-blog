@@ -115,9 +115,11 @@ Finally, we have **reduce** call the **step** function for every item in **to-pr
 
 That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That's all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this **streaming-buffer** transducer runs first and passes its result to the **JSON parser**.
 
-Let's create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here's the vector for testing:
+Let's create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here's the vector for the test:
 
+{% codeblock lang:clojure %}
 ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"]
+{% endcodeblock %}
 
 Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the **arity-1** (single argument) function is called a final time, which really only returns the aggregate at that point:
 

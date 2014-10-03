@@ -222,9 +222,12 @@
 
 <p>That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the <strong>JSON parser</strong>.</p>
 
-<p>Let&#8217;s create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here&#8217;s the vector for testing:</p>
+<p>Let&#8217;s create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here&#8217;s the vector for the test:</p>
 
-<p>[&#8220;{&#34;foo&#34;&#8221; &#8220;:1}\n{&#34;bar&#34;:&#8221; &#8220;42}&#8221; &#8220;{&#34;baz&#34;:42}&#8221; &#8220;{&#34;bla&#34;:42}&#8221;]</p>
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;&quot;</span> <span class="s">&quot;:1}\n{\&quot;bar\&quot;:&quot;</span> <span class="s">&quot;42}&quot;</span> <span class="s">&quot;{\&quot;baz\&quot;:42}&quot;</span> <span class="s">&quot;{\&quot;bla\&quot;:42}&quot;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
 
 <p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called a final time, which really only returns the aggregate at that point:</p>
 
