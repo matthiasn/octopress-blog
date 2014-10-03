@@ -90,9 +90,9 @@ Here’s how that looks like in code:
           (if to-process (reduce step r to-process) r))))))
 {% endcodeblock %}
 
-Let's go through this line by line. We have a (private) function named **streaming-buffer** that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom[^3] which we will use as a buffer to store incomplete tweet fragments. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk). 
+Let's go through this line by line. We have a (private) function named **streaming-buffer** that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom[^3] which we will use as a buffer to store incomplete tweet fragments[^4]. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk). 
 
-In the first line of the let binding, we use the **[-> (thread-first)](http://clojuredocs.org/clojure.core/-%3E)** macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we 1) concatenate the buffer with the new chunk, 2) add newlines where missing[^4], and 3) split the string into a sequence on the line breaks.
+In the first line of the let binding, we use the **[-> (thread-first)](http://clojuredocs.org/clojure.core/-%3E)** macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we **1)** concatenate the buffer with the new chunk, **2)** add newlines where missing[^5], and **3)** split the string into a sequence on the line breaks.
 
 Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been another tweet to the right of them. But the last one may not be complete. Accordingly, we derive
 
@@ -152,7 +152,7 @@ Now, we can compose all these steps:
    (log-count last-received)))
 {% endcodeblock %}
 
-The above creates a composed function that takes the timestamp atom[^5] provided by the TwitterClient component as an argument. We can now use this **transducing function** and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.
+The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this **transducing function** and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.
 
 ## Channels 
 We will only gradually cover channels as this series unfolds. For now, let us just reiterate what a channel does. A **core.async channel** can be compared to a **conveyor belt**. You place something on that belt and whatever happens on the other side is not your problem. That way, we can build systems that consist of parts that do not depend on each other (except for having expectations about the data they receive). 
@@ -276,6 +276,8 @@ In the next installment, we will probably cover the switchboard component. Consi
 
 I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out? I will also let you know when this one is complete.
 
+lalala
+
 Cheers,
 Matthias
 
@@ -284,11 +286,11 @@ Matthias
 
 [^2]: I don't know much about the exact mechanism at play, actual numbers or delivery guarantees. It anyhow doesn’t matter much for the purpose of this application. The interesting views focus on the most retweeted tweets. Now every retweet contains the original tweet under “retweeted_status”, with the current numbers such as retweet and favorite count for the moment in time it was retweeted. For popular ones, we thus receive the original tweet many, many times over. So even if we missed as much as half of all the tweets - which I consider unlikely - the popular tweets would only be updated less often. Worst case: retweet count is off by one or two. I can live with that. In reality, for the current selection of terms, reaching the limit also hardly ever happens. After all, 1% is still millions of tweets per day.
 
-[^3]: After initial experimentation with a **[local volatile reference](http://dev.clojure.org/jira/browse/CLJ-1512)**, I decided in favor of a good old atom. The **volatile!** local reference trades off potential race conditions with speed. But there’s no performance issue when we process tweet chunks a few hundred times a second utmost, so why bother and introduce a new concept? Worth to keep in mind, though, when performance is an issue.
+[^3]: **Atoms** are essential to Clojure’s **state model**. Essentially, you have this managed reference that is thread-safe. Whenever we dereference such an atom, we get the state of the world this very second. Then, when you pass the dereferenced value to other parts of the application, it still represents the immutable state of the world at that point in time. It cannot change. Next time I dereference that atom, I will get the new state of the world. Updates to atoms can only happen in transactions, meaning that no two can run at the same time. Thus, we won't have to chase crazy concurrency issues.
 
-[^4]: For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: ````(str/replace s #"\}\{" "}\r\n{"))````.
+[^4]: After initial experimentation with a **[local volatile reference](http://dev.clojure.org/jira/browse/CLJ-1512)**, I decided in favor of a good old atom. The **volatile!** local reference trades off potential race conditions with speed. But there’s no performance issue when we process tweet chunks a few hundred times a second utmost, so why bother and introduce a new concept? Worth to keep in mind, though, when performance is an issue.
 
-[^5]: Atoms are essential to Clojure’s state model. Essentially, you have this managed reference that is thread-safe. Whenever we dereference such an atom, we get the state of the world this very second. Then, when you pass the dereferenced value to other parts of the application, it still represents the immutable state of the world at that point in time. It cannot change. Next time I dereference that atom, I will get the new state of the world. Updates to atoms can only happen in transactions, meaning that no two can run at the same time. Thus, we won't have to chase crazy concurrency issues.
+[^5]: For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: ````(str/replace s #"\}\{" "}\r\n{"))````.
 
 [^6]: This wiring harness is kind of the interface of the component. All it provides, though, is a channel. However, what is put on that channel is not checked. Maybe a channel type that checks if a message validates against a schema - maybe provided by prismatic/schema – and if so, forwards the message and otherwise puts it on an error channel or calls an error function. That way, validation errors could be logged while valid messages would be processed as expected. That could actually happen in a filtering transducer. Such a transducer function would be free not only to check but also put mismatches on another channel or log an error.
 
