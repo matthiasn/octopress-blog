@@ -17,7 +17,7 @@ Hello and welcome back to this series of articles about building a system in **[
 In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for twitter’s **streaming data**. Since we haven’t done so already, we will also look at the lifecycle of a component. Before that, because this component happens to use them, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First, though, we will look at the problem at hand, without any language- or library-specific implementation details.
 
 ## Twitter Client
-Let’s start in **[hammock mode](https://www.youtube.com/watch?v=f84n5oFoZBc)**, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)** these terms at the moment happen to be "Ferguson", "ISIS", and "Ebola" - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of **1%** of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of 1% of what is tweeted at any moment in time. [^2]
+Let’s start in **[hammock mode](https://www.youtube.com/watch?v=f84n5oFoZBc)**, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)** these terms at the moment happen to be "Ferguson", "ISIS", and "Ebola" - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of **1%** of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of **1%** of what is tweeted at any moment in time. [^2]
 
 Here is how that stream looks like when each chunk is simply printed to the console:
 
@@ -75,7 +75,7 @@ It may not look terribly useful so far. But this can also be applied to a channe
 
 The above creates a channel with a buffer size of one that applies the transducer to every element.
 
-But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of state. But what if we want to see this aggregation process as a **black box**? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.
+But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of **state**. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a **black box**? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.
 
 Here’s how that looks like in code:
 
@@ -83,6 +83,7 @@ Here’s how that looks like in code:
 (defn- streaming-buffer []
   (fn [step]
     (let [buff (atom "")]
+      ([r] (step r))
       (fn [r x]
         (let [json-lines (-> (str @buff x) (insert-newline) (str/split-lines))
               to-process (butlast json-lines)]
@@ -113,6 +114,37 @@ Finally, we have **reduce** call the **step** function for every item in **to-pr
 {% endcodeblock %}
 
 That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That's all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this **streaming-buffer** transducer runs first and passes its result to the **JSON parser**.
+
+Let's create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here's the vector for testing:
+
+["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"]
+
+Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the **arity-1** (single argument) function is called a final time, which really only returns the aggregate at that point:
+
+    birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
+    #<Namespace birdwatch.twitterclient.processing>
+
+    birdwatch.twitterclient.processing=> (def chunks ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"])
+    #'birdwatch.twitterclient.processing/chunks
+
+    birdwatch.twitterclient.processing=> (into [] (streaming-buffer) chunks)
+    ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
+
+What somewhat confused me at first is what the step function actually was. Let's find out by printing it when the arity-1 function is called. We can modify the fourth line of **stream-buffer** like this:
+
+{% codeblock lang:clojure %}
+      ([r] (println step) (step r))
+{% endcodeblock %}
+
+Now when we run the same as above on the REPL, we see what the step function actually is:
+
+    birdwatch.twitterclient.processing=> (into [] (streaming-buffer) chunks)
+    #<core$conj_BANG_ clojure.core$conj_BANG_@5fd837a>
+    ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
+
+Interesting, the step function is **conj!** which, according to the **[source](https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208)**, adds **x** to a **transient collection**[^6].
+
+The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.
 
 There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one **key** that all tweets have in common which does not seem to appear in any status messages from twitter: **:text**. We can thus use that key as the **predicate** for recognizing a tweet:
 
@@ -160,7 +192,7 @@ We will only gradually cover channels as this series unfolds. For now, let us ju
 In this component, we are dealing with two such channels. The more straightforward one is the channel in the **channels component**.
 
 ## Component lifecycle: the TwitterClient-Channels component
-This component is the **wiring harness** between the **switchboard** component and the **TwitterClient** component[^6]. Here's how the channels component looks like:
+This component is the **wiring harness** between the **switchboard** component and the **TwitterClient** component[^7]. Here's how the channels component looks like:
 
 {% codeblock Twitterclient-Channels component lang:clojure component.clj%}
 (defrecord Twitterclient-Channels []
@@ -196,7 +228,28 @@ The other component, where all the tweet stream action is happening, is the **Tw
         (assoc component :conn nil :chunk-chan nil :watch-active nil)))
 {% endcodeblock %}
 
-This component encapsulates the behavior of the TwitterClient. Initially, the **last-received** atom is created, which holds a timestamp of the last-received full tweet. We will meet this atom again when we watch the twitter stream and restart it when inactivity periods have been too long. Next, **chunk-chan** is the channel that receives individual tweet string fragments from the chunked HTTP connection and passes tweets on as Clojure maps by virtue of applying the composed transducer we have discussed in detail above. **conn** is a reference to the current connection to Twitter. **watch-active** is a simple boolean that keeps track of whether the watch loop is supposed to keep running or not (more later). Next, we start the TwitterClient by calling a function from the **http** namespace:
+This component encapsulates the behavior of the TwitterClient. Initially, the **last-received** atom is created, which holds a timestamp of the last-received full tweet. We will meet this atom again when we watch the twitter stream and restart it when inactivity periods have been too long. 
+
+Next, **chunk-chan** is the channel that receives individual tweet string fragments from the chunked HTTP connection and passes tweets on as Clojure maps by virtue of applying the composed transducer we have discussed in detail above. Let' do a quick check what the step function is when the transducer is used on a channel. For that, let's print **step** again, just this time when the function is created as the arity-1 function will never be called on an infinite channel:
+
+{% codeblock lang:clojure %}
+(defn- streaming-buffer []
+  (fn [step] (println step)
+{% endcodeblock %}
+
+Now when we attach **streaming-buffer** to a channel, we will see what the step function is:
+
+    birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
+    #<Namespace birdwatch.twitterclient.processing>
+    birdwatch.twitterclient.processing=> (require '[clojure.core.async :as async :refer [chan]])
+    nil
+    birdwatch.twitterclient.processing=> (def c (chan 1 (streaming-buffer)))
+    #<protocols$add_BANG_ clojure.core.async.impl.protocols$add_BANG_@5a0f8c33>
+    #'birdwatch.twitterclient.processing/c
+
+Okay, **add!** is a function from core.async that **[appears to add an item to a buffer](https://github.com/clojure/core.async/blob/master/src/main/clojure/clojure/core/async/impl/protocols.clj#L35)** if that item is not nil. Makes sense.
+
+Back to the let-bindings in the component. **conn** is a reference to the current connection to Twitter. **watch-active** is a simple boolean that keeps track of whether the watch loop is supposed to keep running or not (more later). Next, we start the TwitterClient by calling a function from the **http** namespace:
 
 {% codeblock lang:clojure %}
 (http-client/start-twitter-conn! conf conn chunk-chan)
@@ -292,5 +345,7 @@ Matthias
 
 [^5]: For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: ````(str/replace s #"\}\{" "}\r\n{"))````.
 
-[^6]: This wiring harness is kind of the interface of the component. All it provides, though, is a channel. However, what is put on that channel is not checked. Maybe a channel type that checks if a message validates against a schema - maybe provided by prismatic/schema – and if so, forwards the message and otherwise puts it on an error channel or calls an error function. That way, validation errors could be logged while valid messages would be processed as expected. That could actually happen in a filtering transducer. Such a transducer function would be free not only to check but also put mismatches on another channel or log an error.
+[^6]: I assume the **transient** collection is used for performance reasons.
+
+[^7]: This wiring harness is kind of the interface of the component. All it provides, though, is a channel. However, what is put on that channel is not checked. Maybe a channel type that checks if a message validates against a schema - maybe provided by prismatic/schema – and if so, forwards the message and otherwise puts it on an error channel or calls an error function. That way, validation errors could be logged while valid messages would be processed as expected. That could actually happen in a filtering transducer. Such a transducer function would be free not only to check but also put mismatches on another channel or log an error.
 

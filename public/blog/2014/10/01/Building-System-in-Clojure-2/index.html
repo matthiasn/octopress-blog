@@ -104,7 +104,7 @@
 
 <h2>Twitter Client</h2>
 
-<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of 1% of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of <strong>1%</strong> of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
 <p>Here is how that stream looks like when each chunk is simply printed to the console:</p>
 
@@ -169,7 +169,7 @@
 
 <p>The above creates a channel with a buffer size of one that applies the transducer to every element.</p>
 
-<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of state. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
+<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of <strong>state</strong>. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
 
 <p>Here’s how that looks like in code:</p>
 
@@ -182,9 +182,11 @@
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
+<span class='line-number'>9</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">streaming-buffer</span> <span class="p">[]</span>
 </span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
 </span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buff</span> <span class="p">(</span><span class="nf">atom</span> <span class="s">&quot;&quot;</span><span class="p">)]</span>
+</span><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
 </span><span class='line'>      <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
 </span><span class='line'>        <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span> <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
 </span><span class='line'>              <span class="nv">to-process</span> <span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)]</span>
@@ -219,6 +221,40 @@
 
 
 <p>That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the <strong>JSON parser</strong>.</p>
+
+<p>Let&#8217;s create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here&#8217;s the vector for testing:</p>
+
+<p>[&#8220;{&#34;foo&#34;&#8221; &#8220;:1}\n{&#34;bar&#34;:&#8221; &#8220;42}&#8221; &#8220;{&#34;baz&#34;:42}&#8221; &#8220;{&#34;bla&#34;:42}&#8221;]</p>
+
+<p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called a final time, which really only returns the aggregate at that point:</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+
+birdwatch.twitterclient.processing=&gt; (def chunks ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"])
+#'birdwatch.twitterclient.processing/chunks
+
+birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
+["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
+</code></pre>
+
+<p>What somewhat confused me at first is what the step function actually was. Let&#8217;s find out by printing it when the arity-1 function is called. We can modify the fourth line of <strong>stream-buffer</strong> like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nb">println </span><span class="nv">step</span><span class="p">)</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now when we run the same as above on the REPL, we see what the step function actually is:</p>
+
+<pre><code>birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
+#&lt;core$conj_BANG_ clojure.core$conj_BANG_@5fd837a&gt;
+["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
+</code></pre>
+
+<p>Interesting, the step function is <strong>conj!</strong> which, according to the <strong><a href="https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208">source</a></strong>, adds <strong>x</strong> to a <strong>transient collection</strong><sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>.</p>
+
+<p>The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.</p>
 
 <p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one <strong>key</strong> that all tweets have in common which does not seem to appear in any status messages from twitter: <strong>:text</strong>. We can thus use that key as the <strong>predicate</strong> for recognizing a tweet:</p>
 
@@ -292,7 +328,7 @@
 
 <h2>Component lifecycle: the TwitterClient-Channels component</h2>
 
-<p>This component is the <strong>wiring harness</strong> between the <strong>switchboard</strong> component and the <strong>TwitterClient</strong> component<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>. Here&#8217;s how the channels component looks like:</p>
+<p>This component is the <strong>wiring harness</strong> between the <strong>switchboard</strong> component and the <strong>TwitterClient</strong> component<sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>. Here&#8217;s how the channels component looks like:</p>
 
 <figure class='code'><figcaption><span>Twitterclient-Channels component component.clj</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -354,7 +390,31 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>This component encapsulates the behavior of the TwitterClient. Initially, the <strong>last-received</strong> atom is created, which holds a timestamp of the last-received full tweet. We will meet this atom again when we watch the twitter stream and restart it when inactivity periods have been too long. Next, <strong>chunk-chan</strong> is the channel that receives individual tweet string fragments from the chunked HTTP connection and passes tweets on as Clojure maps by virtue of applying the composed transducer we have discussed in detail above. <strong>conn</strong> is a reference to the current connection to Twitter. <strong>watch-active</strong> is a simple boolean that keeps track of whether the watch loop is supposed to keep running or not (more later). Next, we start the TwitterClient by calling a function from the <strong>http</strong> namespace:</p>
+<p>This component encapsulates the behavior of the TwitterClient. Initially, the <strong>last-received</strong> atom is created, which holds a timestamp of the last-received full tweet. We will meet this atom again when we watch the twitter stream and restart it when inactivity periods have been too long.</p>
+
+<p>Next, <strong>chunk-chan</strong> is the channel that receives individual tweet string fragments from the chunked HTTP connection and passes tweets on as Clojure maps by virtue of applying the composed transducer we have discussed in detail above. Let&#8217; do a quick check what the step function is when the transducer is used on a channel. For that, let&#8217;s print <strong>step</strong> again, just this time when the function is created as the arity-1 function will never be called on an infinite channel:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">streaming-buffer</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span> <span class="p">(</span><span class="nb">println </span><span class="nv">step</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now when we attach <strong>streaming-buffer</strong> to a channel, we will see what the step function is:</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+birdwatch.twitterclient.processing=&gt; (require '[clojure.core.async :as async :refer [chan]])
+nil
+birdwatch.twitterclient.processing=&gt; (def c (chan 1 (streaming-buffer)))
+#&lt;protocols$add_BANG_ clojure.core.async.impl.protocols$add_BANG_@5a0f8c33&gt;
+#'birdwatch.twitterclient.processing/c
+</code></pre>
+
+<p>Okay, <strong>add!</strong> is a function from core.async that <strong><a href="https://github.com/clojure/core.async/blob/master/src/main/clojure/clojure/core/async/impl/protocols.clj#L35">appears to add an item to a buffer</a></strong> if that item is not nil. Makes sense.</p>
+
+<p>Back to the let-bindings in the component. <strong>conn</strong> is a reference to the current connection to Twitter. <strong>watch-active</strong> is a simple boolean that keeps track of whether the watch loop is supposed to keep running or not (more later). Next, we start the TwitterClient by calling a function from the <strong>http</strong> namespace:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">http-client/start-twitter-conn!</span> <span class="nv">conf</span> <span class="nv">conn</span> <span class="nv">chunk-chan</span><span class="p">)</span>
@@ -487,7 +547,9 @@ Matthias</p>
 <li id="fn:5">
 <p>For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: <code>(str/replace s #"\}\{" "}\r\n{"))</code>.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
 <li id="fn:6">
-<p>This wiring harness is kind of the interface of the component. All it provides, though, is a channel. However, what is put on that channel is not checked. Maybe a channel type that checks if a message validates against a schema &ndash; maybe provided by prismatic/schema – and if so, forwards the message and otherwise puts it on an error channel or calls an error function. That way, validation errors could be logged while valid messages would be processed as expected. That could actually happen in a filtering transducer. Such a transducer function would be free not only to check but also put mismatches on another channel or log an error.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<p>I assume the <strong>transient</strong> collection is used for performance reasons.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<li id="fn:7">
+<p>This wiring harness is kind of the interface of the component. All it provides, though, is a channel. However, what is put on that channel is not checked. Maybe a channel type that checks if a message validates against a schema &ndash; maybe provided by prismatic/schema – and if so, forwards the message and otherwise puts it on an error channel or calls an error function. That way, validation errors could be logged while valid messages would be processed as expected. That could actually happen in a filtering transducer. Such a transducer function would be free not only to check but also put mismatches on another channel or log an error.<a href="#fnref:7" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
