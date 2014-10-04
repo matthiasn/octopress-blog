@@ -1,0 +1,674 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>BirdWatch with ClojureScript and Om explained - Matthias Nehlsen</title>
+  <meta name="author" content="Matthias Nehlsen">
+
+  
+  <meta name="description" content="ABANDONED because of writing an all-Clojure version instead, not just ClojureScript on the client side. Last update on August 18th, 2014. There is a &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om">
+  <link href="/favicon.png" rel="icon">  
+  <style>
+  html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font:inherit;font-size:100%;vertical-align:baseline}html{line-height:1}ol,ul{list-style:none}table{border-collapse:collapse;border-spacing:0}caption,th,td{text-align:left;font-weight:normal;vertical-align:middle}q,blockquote{quotes:none}q:before,q:after,blockquote:before,blockquote:after{content:"";content:none}a img{border:none}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary{display:block}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section,summary{display:block}a{text-decoration:none;font-weight:600}body{font-weight:300}#fb-root{position:relative;top:50px}a{color:#1863a1}a:visited{color:#751590}a:focus{color:#0181eb}a:hover{color:#0181eb}a:active{color:#01579f}aside.sidebar a{color:#1863a1}aside.sidebar a:focus{color:#0181eb}aside.sidebar a:hover{color:#0181eb}aside.sidebar a:active{color:#01579f}a{-webkit-transition:color 0.3s;-moz-transition:color 0.3s;-o-transition:color 0.3s;transition:color 0.3s}html{background:#838385 url('/images/line-tile.png?1396207864') top left}body>div{background:#f2f2f2 url('/images/noise.png?1396207864') top left;border-bottom:1px solid #365d74}body>div>div{background:#f8f8f8 url('/images/noise.png?1396207864') top left;border-right:1px solid #e0e0e0}.heading,body>header h1,h1,h2,h3,h4,h5,h6{font-family:"tablet-gothic-compressed","Helvetica Neue",sans-serif}.sans,body,body>header h2,article header p.meta,article>footer,#content .blog-index footer,html .gist .gist-file .gist-meta,#blog-archives a.category,#blog-archives time,aside.sidebar section,body>footer{font-family:"tablet-gothic","Helvetica Neue",sans-serif}.serif,#content .blog-index a[rel=full-article]{font-family:"tablet-gothic","Helvetica Neue",sans-serif}.mono,pre,code,tt,p code,li code{font-family:Menlo,Monaco,"Andale Mono","lucida console","Courier New",monospace}body>header h1{font-size:2.2em;font-family:"tablet-gothic-compressed","Helvetica Neue",sans-serif;font-weight:normal;line-height:1.2em;margin-bottom:0.6667em}body>header h2{font-family:"tablet-gothic-compressed","Helvetica Neue",sans-serif}body{line-height:1.5em;color:#333}h1{font-size:1.6em;line-height:1.2em}@media only screen and (min-width: 992px){body{font-size:1.15em}h1{font-size:1.8em;line-height:1.2em}}h1,h2,h3,h4,h5,h6{text-rendering:optimizelegibility;margin-bottom:1em;font-weight:600}h2,section h1{font-size:1.4em}h3,section h2,section section h1{font-size:1.3em}h4,section h3,section section h2,section section section h1{font-size:1em}h5,section h4,section section h3{font-size:.9em}h6,section h5,section section h4,section section section h3{font-size:.8em}p,article blockquote,ul,ol{margin-bottom:1.5em}ul{list-style-type:disc}ul ul{list-style-type:circle;margin-bottom:0px}ul ul ul{list-style-type:square;margin-bottom:0px}ol{list-style-type:decimal}ol ol{list-style-type:lower-alpha;margin-bottom:0px}ol ol ol{list-style-type:lower-roman;margin-bottom:0px}ul,ul ul,ul ol,ol,ol ul,ol ol{margin-left:1.3em}ul ul,ul ol,ol ul,ol ol{margin-bottom:0em}strong{font-weight:bold}em{font-style:italic}sup,sub{font-size:0.8em;position:relative;display:inline-block}sup{top:-.5em}sub{bottom:-.5em}q{font-style:italic}q:before{content:"\201C"}q:after{content:"\201D"}em,dfn{font-style:italic}strong,dfn{font-weight:bold}del,s{text-decoration:line-through}abbr,acronym{border-bottom:1px dotted;cursor:help}sub,sup{line-height:0}hr{margin-bottom:0.2em}small{font-size:.8em}big{font-size:1.2em}article blockquote{font-style:italic;position:relative;font-size:1.2em;line-height:1.5em;padding-left:1em;border-left:4px solid rgba(170,170,170,0.5)}article blockquote cite{font-style:italic}article blockquote cite a{color:#aaa !important;word-wrap:break-word}article blockquote cite:before{content:'\2014';padding-right:.3em;padding-left:.3em;color:#aaa}@media only screen and (min-width: 992px){article blockquote{padding-left:1.5em;border-left-width:4px}}.pullquote-right:before,.pullquote-left:before{padding:0;border:none;content:attr(data-pullquote);float:right;width:45%;margin:.5em 0 1em 1.5em;position:relative;top:7px;font-size:1.4em;line-height:1.45em}.pullquote-left:before{float:left;margin:.5em 1.5em 1em 0}.force-wrap,article a,aside.sidebar a{white-space:-moz-pre-wrap;white-space:-pre-wrap;white-space:-o-pre-wrap;white-space:pre-wrap;word-wrap:break-word}.group,body>header,body>nav,body>footer,body #content>article,body #content>div>article,body #content>div>section,body div.pagination,aside.sidebar,#main,#content,.sidebar{*zoom:1}.group:after,body>header:after,body>nav:after,body>footer:after,body #content>article:after,body #content>div>section:after,body div.pagination:after,#main:after,#content:after,.sidebar:after{content:"";display:table;clear:both}body{-webkit-text-size-adjust:none;max-width:1200px;position:relative;margin:0 auto}body>header,body>nav,body>footer,body #content>article,body #content>div>article,body #content>div>section{padding-left:18px;padding-right:18px}@media only screen and (min-width: 480px){body>header,body>nav,body>footer,body #content>article,body #content>div>article,body #content>div>section{padding-left:25px;padding-right:25px}}@media only screen and (min-width: 768px){body>header,body>nav,body>footer,body #content>article,body #content>div>article,body #content>div>section{padding-left:35px;padding-right:35px}}@media only screen and (min-width: 992px){body>header,body>nav,body>footer,body #content>article,body #content>div>article,body #content>div>section{padding-left:55px;padding-right:55px}}body div.pagination{margin-left:18px;margin-right:18px}@media only screen and (min-width: 480px){body div.pagination{margin-left:25px;margin-right:25px}}@media only screen and (min-width: 768px){body div.pagination{margin-left:35px;margin-right:35px}}@media only screen and (min-width: 992px){body div.pagination{margin-left:55px;margin-right:55px}}body>header{font-size:1em;padding-top:1.5em;padding-bottom:1.5em}#content{overflow:hidden}#content>div,#content>article{width:100%}aside.sidebar{float:none;padding:0 18px 1px;background-color:#f7f7f7;border-top:1px solid #e0e0e0}.flex-content,article img,article video,article .flash-video,aside.sidebar img{max-width:100%;height:auto}.basic-alignment.left,article img.left,article video.left,article .left.flash-video,aside.sidebar img.left{float:left;margin-right:1.5em}.basic-alignment.right,article img.right,article video.right,article .right.flash-video,aside.sidebar img.right{float:right;margin-left:1.5em}.basic-alignment.center,article img.center,article video.center,article .center.flash-video,aside.sidebar img.center{display:block;margin:0 auto 1.5em}.basic-alignment.left,article img.left,article video.left,article .left.flash-video,aside.sidebar img.left,.basic-alignment.right,article img.right,article video.right,article .right.flash-video,aside.sidebar img.right{margin-bottom:.8em}.toggle-sidebar,.no-sidebar .toggle-sidebar{display:none}@media only screen and (min-width: 750px){body.sidebar-footer aside.sidebar{float:none;width:auto;clear:left;margin:0;padding:0 35px 1px;background-color:#f7f7f7;border-top:1px solid #eaeaea}body.sidebar-footer aside.sidebar section.odd,body.sidebar-footer aside.sidebar section.even{float:left;width:48%}body.sidebar-footer aside.sidebar section.odd{margin-left:0}body.sidebar-footer aside.sidebar section.even{margin-left:4%}body.sidebar-footer aside.sidebar.thirds section{width:30%;margin-left:5%}body.sidebar-footer aside.sidebar.thirds section.first{margin-left:0;clear:both}}body.sidebar-footer #content{margin-right:0px}body.sidebar-footer .toggle-sidebar{display:none}@media only screen and (min-width: 550px){body>header{font-size:1em}}@media only screen and (min-width: 750px){aside.sidebar{float:none;width:auto;clear:left;margin:0;padding:0 35px 1px;background-color:#f7f7f7;border-top:1px solid #eaeaea}aside.sidebar section.odd,aside.sidebar section.even{float:left;width:48%}aside.sidebar section.odd{margin-left:0}aside.sidebar section.even{margin-left:4%}aside.sidebar.thirds section{width:30%;margin-left:5%}aside.sidebar.thirds section.first{margin-left:0;clear:both}}@media only screen and (min-width: 768px){body{-webkit-text-size-adjust:auto}body>header{font-size:1.2em}#main{padding:0;margin:0 auto}#content{overflow:visible;margin-right:240px;position:relative}.no-sidebar #content{margin-right:0;border-right:0}.collapse-sidebar #content{margin-right:20px}#content>div,#content>article{padding-top:17.5px;padding-bottom:17.5px;float:left}aside.sidebar{width:210px;padding:0 15px 15px;background:none;clear:none;float:left;margin:0 -100% 0 0}aside.sidebar section{width:auto;margin-left:0}aside.sidebar section.odd,aside.sidebar section.even{float:none;width:auto;margin-left:0}.collapse-sidebar aside.sidebar{float:none;width:auto;clear:left;margin:0;padding:0 35px 1px;background-color:#f7f7f7;border-top:1px solid #eaeaea}.collapse-sidebar aside.sidebar section.odd,.collapse-sidebar aside.sidebar section.even{float:left;width:48%}.collapse-sidebar aside.sidebar section.odd{margin-left:0}.collapse-sidebar aside.sidebar section.even{margin-left:4%}.collapse-sidebar aside.sidebar.thirds section{width:30%;margin-left:5%}.collapse-sidebar aside.sidebar.thirds section.first{margin-left:0;clear:both}}@media only screen and (min-width: 992px){body>header{font-size:1.3em}#content{margin-right:300px}#content>div,#content>article{padding-top:27.5px;padding-bottom:27.5px}aside.sidebar{width:260px;padding:1.2em 20px 20px}.collapse-sidebar aside.sidebar{padding-left:55px;padding-right:55px}}@media only screen and (min-width: 768px){ul,ol{margin-left:0}}body>header{background:#3e6b85}body>header h1{display:inline-block;margin:0}body>header h1 a,body>header h1 a:visited,body>header h1 a:hover{color:#f4921e;text-decoration:none}body>header h2{margin:.2em 0 0;font-size:1em;color:#c5d2db;font-weight:normal}body>nav{position:relative;background-color:#c8d1db;background:url('/images/noise.png?1396207864'),-webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e1e6eb), color-stop(50%, #c8d1db), color-stop(100%, #a6b5c5));background:url('/images/noise.png?1396207864'),-webkit-linear-gradient(#e1e6eb,#c8d1db,#a6b5c5);background:url('/images/noise.png?1396207864'),-moz-linear-gradient(#e1e6eb,#c8d1db,#a6b5c5);background:url('/images/noise.png?1396207864'),-o-linear-gradient(#e1e6eb,#c8d1db,#a6b5c5);background:url('/images/noise.png?1396207864'),linear-gradient(#e1e6eb,#c8d1db,#a6b5c5);border-top:1px solid #f6f8f9;border-bottom:1px solid #7b91a9;padding-top:.35em;padding-bottom:.35em}body>nav form{-webkit-background-clip:padding;-moz-background-clip:padding;background-clip:padding-box;margin:0;padding:0}body>nav form .search{padding:.3em .5em 0;font-size:.85em;font-family:"tablet-gothic","Helvetica Neue",sans-serif;line-height:1.1em;width:95%;-webkit-border-radius:0.5em;-moz-border-radius:0.5em;-ms-border-radius:0.5em;-o-border-radius:0.5em;border-radius:0.5em;-webkit-background-clip:padding;-moz-background-clip:padding;background-clip:padding-box;-webkit-box-shadow:#ced6df 0 1px;-moz-box-shadow:#ced6df 0 1px;box-shadow:#ced6df 0 1px;background-color:#f6f8f9;border:1px solid #a9b7c7;color:#888}body>nav form .search:focus{color:#444;border-color:#80b1df;-webkit-box-shadow:#80b1df 0 0 4px,#80b1df 0 0 3px inset;-moz-box-shadow:#80b1df 0 0 4px,#80b1df 0 0 3px inset;box-shadow:#80b1df 0 0 4px,#80b1df 0 0 3px inset;background-color:#fff;outline:none}body>nav fieldset[role=search]{float:right;width:48%}body>nav fieldset.mobile-nav{float:left;width:48%}body>nav fieldset.mobile-nav select{width:100%;font-size:.8em;border:1px solid #888}body>nav ul{display:none}@media only screen and (min-width: 550px){body>nav{font-size:.9em}body>nav ul{margin:0;padding:0;border:0;overflow:hidden;*zoom:1;float:left;display:block;padding-top:.15em}body>nav ul li{list-style-image:none;list-style-type:none;margin-left:0;white-space:nowrap;display:inline;float:left;padding-left:0;padding-right:0}body>nav ul li:first-child,body>nav ul li.first{padding-left:0}body>nav ul li:last-child{padding-right:0}body>nav ul li.last{padding-right:0}body>nav ul.subscription{margin-left:.8em;float:right}body>nav ul.subscription li:last-child a{padding-right:0}body>nav ul li{margin:0}body>nav a{color:#596f88;font-family:"tablet-gothic","Helvetica Neue",sans-serif;float:left;text-decoration:none;font-size:1.1em;padding:.1em 0;line-height:1.5em}body>nav a:visited{color:#596f88}body>nav a:hover{color:#27303b}body>nav li+li{border-left:1px solid #a6b5c5;margin-left:.8em}body>nav li+li a{padding-left:.8em;border-left:1px solid #dee3e9}body>nav form{float:right;text-align:left;padding-left:.8em;width:175px}body>nav form .search{width:93%;font-size:.95em;line-height:1.2em}body>nav ul[data-subscription$=email]+form{width:97px}body>nav ul[data-subscription$=email]+form .search{width:91%}body>nav fieldset.mobile-nav{display:none}body>nav fieldset[role=search]{width:99%}}@media only screen and (min-width: 992px){body>nav form{width:215px}body>nav ul[data-subscription$=email]+form{width:147px}}.no-placeholder body>nav .search{background:#f6f8f9 url('/images/search.png?1396207864') 0.3em 0.25em no-repeat;text-indent:1.3em}@media only screen and (min-width: 550px){.maskImage body>nav ul[data-subscription$=email]+form{width:123px}}@media only screen and (min-width: 992px){.maskImage body>nav ul[data-subscription$=email]+form{width:173px}}.maskImage ul.subscription{position:relative;top:.2em}.maskImage ul.subscription li,.maskImage ul.subscription a{border:0;padding:0}.maskImage a[rel=subscribe-rss]{position:relative;top:0px;text-indent:-999999em;background-color:#dee3e9;border:0;padding:0}.maskImage a[rel=subscribe-rss],.maskImage a[rel=subscribe-rss]:after{-webkit-mask-image:url('/images/rss.png?1396207864');-moz-mask-image:url('/images/rss.png?1396207864');-ms-mask-image:url('/images/rss.png?1396207864');-o-mask-image:url('/images/rss.png?1396207864');mask-image:url('/images/rss.png?1396207864');-webkit-mask-repeat:no-repeat;-moz-mask-repeat:no-repeat;-ms-mask-repeat:no-repeat;-o-mask-repeat:no-repeat;mask-repeat:no-repeat;width:22px;height:22px}.maskImage a[rel=subscribe-rss]:after{content:"";position:absolute;top:-1px;left:0;background-color:#a0afc1}.maskImage a[rel=subscribe-rss]:hover:after{background-color:#91a3b7}.maskImage a[rel=subscribe-email]{position:relative;top:0px;text-indent:-999999em;background-color:#dee3e9;border:0;padding:0}.maskImage a[rel=subscribe-email],.maskImage a[rel=subscribe-email]:after{-webkit-mask-image:url('/images/email.png?1396207864');-moz-mask-image:url('/images/email.png?1396207864');-ms-mask-image:url('/images/email.png?1396207864');-o-mask-image:url('/images/email.png?1396207864');mask-image:url('/images/email.png?1396207864');-webkit-mask-repeat:no-repeat;-moz-mask-repeat:no-repeat;-ms-mask-repeat:no-repeat;-o-mask-repeat:no-repeat;mask-repeat:no-repeat;width:28px;height:22px}.maskImage a[rel=subscribe-email]:after{content:"";position:absolute;top:-1px;left:0;background-color:#a0afc1}.maskImage a[rel=subscribe-email]:hover:after{background-color:#91a3b7}article{padding-top:1em}article header{position:relative;padding-top:1.5em;padding-bottom:0.5em;margin-bottom:0.5em;background:none bottom left repeat-x}article header h1{margin:0}article header h1 a{text-decoration:none}article header h1 a:hover{text-decoration:none;color:steelblue}article header p{font-size:.9em;color:#aaa;margin:0}article header p.meta{text-transform:uppercase;position:absolute;top:0}@media only screen and (min-width: 768px){article header{margin-bottom:1em;padding-bottom:1em;background:none bottom left repeat-x}}article h2{padding-top:0.8em;background:none top left repeat-x}.entry-content article h2:first-child,article header+h2{padding-top:0}article h2:first-child,article header+h2{background:none}article .feature{padding-top:.5em;margin-bottom:1em;padding-bottom:1em;background:none bottom left repeat-x;font-size:2.0em;font-style:italic;line-height:1.3em}article img,article video,article .flash-video{-webkit-border-radius:0.3em;-moz-border-radius:0.3em;-ms-border-radius:0.3em;-o-border-radius:0.3em;border-radius:0.3em;-webkit-box-shadow:rgba(0,0,0,0.15) 0 1px 4px;-moz-box-shadow:rgba(0,0,0,0.15) 0 1px 4px;box-shadow:rgba(0,0,0,0.15) 0 1px 4px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:#fff 0.5em solid}article video,article .flash-video{margin:0 auto 1.5em}article video{display:block;width:100%}article .flash-video>div{position:relative;display:block;padding-bottom:56.25%;padding-top:1px;height:0;overflow:hidden}article .flash-video>div iframe,article .flash-video>div object,article .flash-video>div embed{position:absolute;top:0;left:0;width:100%;height:100%}article>footer{padding-bottom:2.5em;margin-top:2em}article>footer p.meta{margin-bottom:.8em;font-size:.85em;clear:both;overflow:hidden}.blog-index article+article{background:none top left repeat-x}#content .blog-index{padding-top:0;padding-bottom:0}#content .blog-index article{padding-top:2em}#content .blog-index article header{background:none;padding-bottom:0}#content .blog-index article h1{font-size:1.8em}#content .blog-index article h1 a{color:inherit}#content .blog-index article h1 a:hover{color:#0181eb}#content .blog-index a[rel=full-article]{background:#ebebeb;display:inline-block;padding:.4em .8em;margin-right:.5em;text-decoration:none;color:#6e6e6e;-webkit-transition:background-color 0.5s;-moz-transition:background-color 0.5s;-o-transition:background-color 0.5s;transition:background-color 0.5s}#content .blog-index a[rel=full-article]:hover{background:#0181eb;text-shadow:none;color:#f8f8f8}#content .blog-index footer{margin-top:1em}.separator,article>footer .byline+time:before,article>footer time+time:before,article>footer .comments:before,article>footer .byline ~ .categories:before{content:"\2022 ";padding:0 .4em 0 .2em;display:inline-block}#content div.pagination{text-align:center;font-size:.95em;position:relative;background:none top left repeat-x;padding-top:1.5em;padding-bottom:1.5em}#content div.pagination a{text-decoration:none;color:#aaa}#content div.pagination a.prev{position:absolute;left:0}#content div.pagination a.next{position:absolute;right:0}#content div.pagination a:hover{color:#0181eb}#content div.pagination a[href*=archive]:before,#content div.pagination a[href*=archive]:after{content:'\2014';padding:0 .3em}p.meta+.sharing{padding-top:1em;padding-left:0;background:none top left repeat-x}#fb-root{display:none}.highlight,html .gist .gist-file .gist-syntax .gist-highlight{border:1px solid #05232b !important}.highlight table td.code,html .gist .gist-file .gist-syntax .gist-highlight table td.code{width:100%}.highlight .line-numbers,html .gist .gist-file .gist-syntax .highlight .line_numbers{text-align:right;font-size:13px;line-height:1.45em;background:#073642 url('/images/noise.png?1396207864') top left !important;border-right:1px solid #00232c !important;-webkit-box-shadow:#083e4b -1px 0 inset;-moz-box-shadow:#083e4b -1px 0 inset;box-shadow:#083e4b -1px 0 inset;text-shadow:#021014 0 -1px;padding:.8em !important;-webkit-border-radius:0;-moz-border-radius:0;-ms-border-radius:0;-o-border-radius:0;border-radius:0}.highlight .line-numbers span,html .gist .gist-file .gist-syntax .highlight .line_numbers span{color:#586e75 !important}figure.code,.gist-file,pre{-webkit-box-shadow:rgba(0,0,0,0.06) 0 0 10px;-moz-box-shadow:rgba(0,0,0,0.06) 0 0 10px;box-shadow:rgba(0,0,0,0.06) 0 0 10px}figure.code .highlight pre,.gist-file .highlight pre,pre .highlight pre{-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none}.gist .highlight *::-moz-selection,figure.code .highlight *::-moz-selection{background:#386774;color:inherit;text-shadow:#002b36 0 1px}.gist .highlight *::-webkit-selection,figure.code .highlight *::-webkit-selection{background:#386774;color:inherit;text-shadow:#002b36 0 1px}.gist .highlight *::selection,figure.code .highlight *::selection{background:#386774;color:inherit;text-shadow:#002b36 0 1px}html .gist .gist-file{margin-bottom:1.8em;position:relative;border:none;padding-top:26px !important}html .gist .gist-file .highlight{margin-bottom:0}html .gist .gist-file .gist-syntax{border-bottom:0 !important;background:none !important}html .gist .gist-file .gist-syntax .gist-highlight{background:#002b36 !important}html .gist .gist-file .gist-syntax .highlight pre{padding:0}html .gist .gist-file .gist-meta{padding:.6em 0.8em;border:1px solid #083e4b !important;color:#586e75;font-size:.7em !important;background:#073642 url('/images/noise.png?1396207864') top left;line-height:1.5em}html .gist .gist-file .gist-meta a{color:#75878b !important;text-decoration:none}html .gist .gist-file .gist-meta a:hover{text-decoration:underline}html .gist .gist-file .gist-meta a:hover{color:#93a1a1 !important}html .gist .gist-file .gist-meta a[href*='#file']{position:absolute;top:0;left:0;right:-10px;color:#474747 !important}html .gist .gist-file .gist-meta a[href*='#file']:hover{color:#1863a1 !important}html .gist .gist-file .gist-meta a[href*=raw]{top:.4em}pre{background:#002b36 url('/images/noise.png?1396207864') top left;-webkit-border-radius:0.4em;-moz-border-radius:0.4em;-ms-border-radius:0.4em;-o-border-radius:0.4em;border-radius:0.4em;border:1px solid #05232b;line-height:1.45em;font-size:13px;margin-bottom:2.1em;padding:.8em 1em;color:#93a1a1;overflow:auto}h3.filename+pre{-moz-border-radius-topleft:0px;-webkit-border-top-left-radius:0px;border-top-left-radius:0px;-moz-border-radius-topright:0px;-webkit-border-top-right-radius:0px;border-top-right-radius:0px}p code,li code{display:inline-block;white-space:no-wrap;background:#fff;font-size:.8em;line-height:1.5em;color:#555;border:1px solid #ddd;-webkit-border-radius:0.4em;-moz-border-radius:0.4em;-ms-border-radius:0.4em;-o-border-radius:0.4em;border-radius:0.4em;padding:0 .3em;margin:-1px 0}p pre code,li pre code{font-size:1em !important;background:none;border:none}.pre-code,html .gist .gist-file .gist-syntax .highlight pre,.highlight code{font-family:Menlo,Monaco,"Andale Mono","lucida console","Courier New",monospace !important;overflow:scroll;overflow-y:hidden;display:block;padding:.8em;overflow-x:auto;line-height:1.45em;background:#002b36 url('/images/noise.png?1396207864') top left !important;color:#93a1a1 !important}.pre-code span,html .gist .gist-file .gist-syntax .highlight pre span,.highlight code span{color:#93a1a1 !important}.pre-code span,html .gist .gist-file .gist-syntax .highlight pre span,.highlight code span{font-style:normal !important;font-weight:normal !important}.pre-code .c,html .gist .gist-file .gist-syntax .highlight pre .c,.highlight code .c{color:#586e75 !important;font-style:italic !important}.pre-code .cm,html .gist .gist-file .gist-syntax .highlight pre .cm,.highlight code .cm{color:#586e75 !important;font-style:italic !important}.pre-code .cp,html .gist .gist-file .gist-syntax .highlight pre .cp,.highlight code .cp{color:#586e75 !important;font-style:italic !important}.pre-code .c1,html .gist .gist-file .gist-syntax .highlight pre .c1,.highlight code .c1{color:#586e75 !important;font-style:italic !important}.pre-code .cs,html .gist .gist-file .gist-syntax .highlight pre .cs,.highlight code .cs{color:#586e75 !important;font-weight:bold !important;font-style:italic !important}.pre-code .err,html .gist .gist-file .gist-syntax .highlight pre .err,.highlight code .err{color:#dc322f !important;background:none !important}.pre-code .k,html .gist .gist-file .gist-syntax .highlight pre .k,.highlight code .k{color:#cb4b16 !important}.pre-code .o,html .gist .gist-file .gist-syntax .highlight pre .o,.highlight code .o{color:#93a1a1 !important;font-weight:bold !important}.pre-code .p,html .gist .gist-file .gist-syntax .highlight pre .p,.highlight code .p{color:#93a1a1 !important}.pre-code .ow,html .gist .gist-file .gist-syntax .highlight pre .ow,.highlight code .ow{color:#2aa198 !important;font-weight:bold !important}.pre-code .gd,html .gist .gist-file .gist-syntax .highlight pre .gd,.highlight code .gd{color:#93a1a1 !important;background-color:#372c34 !important;display:inline-block}.pre-code .gd .x,html .gist .gist-file .gist-syntax .highlight pre .gd .x,.highlight code .gd .x{color:#93a1a1 !important;background-color:#4d2d33 !important;display:inline-block}.pre-code .ge,html .gist .gist-file .gist-syntax .highlight pre .ge,.highlight code .ge{color:#93a1a1 !important;font-style:italic !important}.pre-code .gh,html .gist .gist-file .gist-syntax .highlight pre .gh,.highlight code .gh{color:#586e75 !important}.pre-code .gi,html .gist .gist-file .gist-syntax .highlight pre .gi,.highlight code .gi{color:#93a1a1 !important;background-color:#1a412b !important;display:inline-block}.pre-code .gi .x,html .gist .gist-file .gist-syntax .highlight pre .gi .x,.highlight code .gi .x{color:#93a1a1 !important;background-color:#355720 !important;display:inline-block}.pre-code .gs,html .gist .gist-file .gist-syntax .highlight pre .gs,.highlight code .gs{color:#93a1a1 !important;font-weight:bold !important}.pre-code .gu,html .gist .gist-file .gist-syntax .highlight pre .gu,.highlight code .gu{color:#6c71c4 !important}.pre-code .kc,html .gist .gist-file .gist-syntax .highlight pre .kc,.highlight code .kc{color:#859900 !important;font-weight:bold !important}.pre-code .kd,html .gist .gist-file .gist-syntax .highlight pre .kd,.highlight code .kd{color:#268bd2 !important}.pre-code .kp,html .gist .gist-file .gist-syntax .highlight pre .kp,.highlight code .kp{color:#cb4b16 !important;font-weight:bold !important}.pre-code .kr,html .gist .gist-file .gist-syntax .highlight pre .kr,.highlight code .kr{color:#d33682 !important;font-weight:bold !important}.pre-code .kt,html .gist .gist-file .gist-syntax .highlight pre .kt,.highlight code .kt{color:#2aa198 !important}.pre-code .n,html .gist .gist-file .gist-syntax .highlight pre .n,.highlight code .n{color:#268bd2 !important}.pre-code .na,html .gist .gist-file .gist-syntax .highlight pre .na,.highlight code .na{color:#268bd2 !important}.pre-code .nb,html .gist .gist-file .gist-syntax .highlight pre .nb,.highlight code .nb{color:#859900 !important}.pre-code .nc,html .gist .gist-file .gist-syntax .highlight pre .nc,.highlight code .nc{color:#d33682 !important}.pre-code .no,html .gist .gist-file .gist-syntax .highlight pre .no,.highlight code .no{color:#b58900 !important}.pre-code .nl,html .gist .gist-file .gist-syntax .highlight pre .nl,.highlight code .nl{color:#859900 !important}.pre-code .ne,html .gist .gist-file .gist-syntax .highlight pre .ne,.highlight code .ne{color:#268bd2 !important;font-weight:bold !important}.pre-code .nf,html .gist .gist-file .gist-syntax .highlight pre .nf,.highlight code .nf{color:#268bd2 !important;font-weight:bold !important}.pre-code .nn,html .gist .gist-file .gist-syntax .highlight pre .nn,.highlight code .nn{color:#b58900 !important}.pre-code .nt,html .gist .gist-file .gist-syntax .highlight pre .nt,.highlight code .nt{color:#268bd2 !important;font-weight:bold !important}.pre-code .nx,html .gist .gist-file .gist-syntax .highlight pre .nx,.highlight code .nx{color:#b58900 !important}.pre-code .vg,html .gist .gist-file .gist-syntax .highlight pre .vg,.highlight code .vg{color:#268bd2 !important}.pre-code .vi,html .gist .gist-file .gist-syntax .highlight pre .vi,.highlight code .vi{color:#268bd2 !important}.pre-code .nv,html .gist .gist-file .gist-syntax .highlight pre .nv,.highlight code .nv{color:#268bd2 !important}.pre-code .mf,html .gist .gist-file .gist-syntax .highlight pre .mf,.highlight code .mf{color:#2aa198 !important}.pre-code .m,html .gist .gist-file .gist-syntax .highlight pre .m,.highlight code .m{color:#2aa198 !important}.pre-code .mh,html .gist .gist-file .gist-syntax .highlight pre .mh,.highlight code .mh{color:#2aa198 !important}.pre-code .mi,html .gist .gist-file .gist-syntax .highlight pre .mi,.highlight code .mi{color:#2aa198 !important}.pre-code .s,html .gist .gist-file .gist-syntax .highlight pre .s,.highlight code .s{color:#2aa198 !important}.pre-code .sd,html .gist .gist-file .gist-syntax .highlight pre .sd,.highlight code .sd{color:#2aa198 !important}.pre-code .s2,html .gist .gist-file .gist-syntax .highlight pre .s2,.highlight code .s2{color:#2aa198 !important}.pre-code .se,html .gist .gist-file .gist-syntax .highlight pre .se,.highlight code .se{color:#dc322f !important}.pre-code .si,html .gist .gist-file .gist-syntax .highlight pre .si,.highlight code .si{color:#268bd2 !important}.pre-code .sr,html .gist .gist-file .gist-syntax .highlight pre .sr,.highlight code .sr{color:#2aa198 !important}.pre-code .s1,html .gist .gist-file .gist-syntax .highlight pre .s1,.highlight code .s1{color:#2aa198 !important}.pre-code div .gd,html .gist .gist-file .gist-syntax .highlight pre div .gd,.highlight code div .gd,.pre-code div .gd .x,html .gist .gist-file .gist-syntax .highlight pre div .gd .x,.highlight code div .gd .x,.pre-code div .gi,html .gist .gist-file .gist-syntax .highlight pre div .gi,.highlight code div .gi,.pre-code div .gi .x,html .gist .gist-file .gist-syntax .highlight pre div .gi .x,.highlight code div .gi .x{display:inline-block;width:100%}.highlight,.gist-highlight{margin-bottom:1.8em;background:#002b36;overflow-y:hidden;overflow-x:auto}.highlight pre,.gist-highlight pre{background:none;-webkit-border-radius:0px;-moz-border-radius:0px;-ms-border-radius:0px;-o-border-radius:0px;border-radius:0px;border:none;padding:0;margin-bottom:0}pre::-webkit-scrollbar,.highlight::-webkit-scrollbar,.gist-highlight::-webkit-scrollbar{height:.5em;background:rgba(255,255,255,0.15)}pre::-webkit-scrollbar-thumb:horizontal,.highlight::-webkit-scrollbar-thumb:horizontal,.gist-highlight::-webkit-scrollbar-thumb:horizontal{background:rgba(255,255,255,0.2);-webkit-border-radius:4px;border-radius:4px}.highlight code{background:#000}figure.code{background:none;padding:0;border:0;margin-bottom:1.5em}figure.code pre{margin-bottom:0}figure.code figcaption{position:relative}figure.code .highlight{margin-bottom:0}.code-title,html .gist .gist-file .gist-meta a[href*='#file'],h3.filename,figure.code figcaption{text-align:center;font-size:13px;line-height:2em;text-shadow:#cbcccc 0 1px 0;color:#474747;font-weight:normal;margin-bottom:0;-moz-border-radius-topleft:5px;-webkit-border-top-left-radius:5px;border-top-left-radius:5px;-moz-border-radius-topright:5px;-webkit-border-top-right-radius:5px;border-top-right-radius:5px;font-family:"Helvetica Neue", Arial, "Lucida Grande", "Lucida Sans Unicode", Lucida, sans-serif;background:#aaa url('/images/code_bg.png?1396207864') top repeat-x;border:1px solid #565656;border-top-color:#cbcbcb;border-left-color:#a5a5a5;border-right-color:#a5a5a5;border-bottom:0}.download-source,html .gist .gist-file .gist-meta a[href*=raw],figure.code figcaption a{position:absolute;right:.8em;text-decoration:none;color:#666 !important;z-index:1;font-size:13px;text-shadow:#cbcccc 0 1px 0;padding-left:3em}.download-source:hover,html .gist .gist-file .gist-meta a[href*=raw]:hover,figure.code figcaption a:hover{text-decoration:underline}#archive #content>div,#archive #content>div>article{padding-top:0}#blog-archives{color:#aaa}#blog-archives article{padding:1em 0 1em;position:relative;background:none bottom left repeat-x}#blog-archives article:last-child{background:none}#blog-archives article footer{padding:0;margin:0}#blog-archives h1{color:#333;margin-bottom:.3em}#blog-archives h2{display:none}#blog-archives h1{font-size:1.5em}#blog-archives h1 a{text-decoration:none;color:inherit;font-weight:normal;display:inline-block}#blog-archives h1 a:hover{text-decoration:underline}#blog-archives h1 a:hover{color:#0181eb}#blog-archives a.category,#blog-archives time{color:#aaa}#blog-archives .entry-content{display:none}#blog-archives time{font-size:.9em;line-height:1.2em}#blog-archives time .month,#blog-archives time .day{display:inline-block}#blog-archives time .month{text-transform:uppercase}#blog-archives p{margin-bottom:1em}#blog-archives a,#blog-archives .entry-content a{color:inherit}#blog-archives a:hover,#blog-archives .entry-content a:hover{color:#0181eb}#blog-archives a:hover{color:#0181eb}@media only screen and (min-width: 550px){#blog-archives article{margin-left:5em}#blog-archives h2{margin-bottom:.3em;font-weight:normal;display:inline-block;position:relative;top:-1px;float:left}#blog-archives h2:first-child{padding-top:.75em}#blog-archives time{position:absolute;text-align:right;left:0em;top:1.8em}#blog-archives .year{display:none}#blog-archives article{padding-left:4.5em;padding-bottom:.7em}#blog-archives a.category{line-height:1.1em}}#content>.category article{margin-left:0;padding-left:6.8em}#content>.category .year{display:inline}.side-shadow-border,aside.sidebar section h1,aside.sidebar li{-webkit-box-shadow:#fff 0 1px;-moz-box-shadow:#fff 0 1px;box-shadow:#fff 0 1px}aside.sidebar{overflow:hidden;color:#595959}aside.sidebar section{font-size:.8em;line-height:1.4em;margin-bottom:1.5em}aside.sidebar section h1{margin:1.5em 0 0;padding-bottom:.2em;border-bottom:1px solid #e0e0e0}aside.sidebar section h1+p{padding-top:.4em}aside.sidebar img{-webkit-border-radius:0.3em;-moz-border-radius:0.3em;-ms-border-radius:0.3em;-o-border-radius:0.3em;border-radius:0.3em;-webkit-box-shadow:rgba(0,0,0,0.15) 0 1px 4px;-moz-box-shadow:rgba(0,0,0,0.15) 0 1px 4px;box-shadow:rgba(0,0,0,0.15) 0 1px 4px;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box;border:#fff 0.3em solid}aside.sidebar ul{margin-bottom:0.5em;margin-left:0}aside.sidebar li{list-style:none;padding:.5em 0;margin:0;border-bottom:1px solid #e0e0e0}aside.sidebar li p:last-child{margin-bottom:0}aside.sidebar a{color:inherit;-webkit-transition:color 0.5s;-moz-transition:color 0.5s;-o-transition:color 0.5s;transition:color 0.5s}aside.sidebar:hover a{color:#1863a1}aside.sidebar:hover a:hover{color:#0181eb}.aside-alt-link,#pinboard_linkroll .pin-tag{color:#8c8c8c}.aside-alt-link:hover,#pinboard_linkroll .pin-tag:hover{color:#0181eb}@media only screen and (min-width: 768px){.toggle-sidebar{outline:none;position:absolute;right:-10px;top:0;bottom:0;display:inline-block;text-decoration:none;color:#cecece;width:9px;cursor:pointer}.toggle-sidebar:hover{background:#e9e9e9;background:-webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, rgba(224,224,224,0.5)), color-stop(100%, rgba(224,224,224,0)));background:-webkit-linear-gradient(left, rgba(224,224,224,0.5),rgba(224,224,224,0));background:-moz-linear-gradient(left, rgba(224,224,224,0.5),rgba(224,224,224,0));background:-o-linear-gradient(left, rgba(224,224,224,0.5),rgba(224,224,224,0));background:linear-gradient(left, rgba(224,224,224,0.5),rgba(224,224,224,0))}.toggle-sidebar:after{position:absolute;right:-11px;top:0;width:20px;font-size:1.2em;line-height:1.1em;padding-bottom:.15em;-moz-border-radius-bottomright:0.3em;-webkit-border-bottom-right-radius:0.3em;border-bottom-right-radius:0.3em;text-align:center;background:#f8f8f8 url('/images/noise.png?1396207864') top left;border-bottom:1px solid #e0e0e0;border-right:1px solid #e0e0e0;content:"\00BB";text-indent:-1px}.collapse-sidebar .toggle-sidebar{text-indent:0px;right:-20px;width:19px}.collapse-sidebar .toggle-sidebar:hover{background:#e9e9e9}.collapse-sidebar .toggle-sidebar:after{border-left:1px solid #e0e0e0;text-shadow:#fff 0 1px;content:"\00AB";left:0px;right:0;text-align:center;text-indent:0;border:0;border-right-width:0;background:none}}.googleplus h1{-moz-box-shadow:none !important;-webkit-box-shadow:none !important;-o-box-shadow:none !important;box-shadow:none !important;border-bottom:0px none !important}.googleplus a{text-decoration:none;white-space:normal !important;line-height:32px}.googleplus a img{float:left;margin-right:0.5em;border:0 none}.googleplus-hidden{position:absolute;top:-1000em;left:-1000em}#pinboard_linkroll .pin-title,#pinboard_linkroll .pin-description{display:block;margin-bottom:.5em}#pinboard_linkroll .pin-tag{text-decoration:none}#pinboard_linkroll .pin-tag:hover{text-decoration:underline}#pinboard_linkroll .pin-tag:after{content:','}#pinboard_linkroll .pin-tag:last-child:after{content:''}.delicious-posts a.delicious-link{margin-bottom:.5em;display:block}.delicious-posts p{font-size:1em}body>footer{font-size:.8em;color:#f4921e;background-color:#3e6b85;background:url('/images/noise.png?1396207864'),-webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #4b81a1), color-stop(50%, #3e6b85), color-stop(100%, #2c4c5f));background:url('/images/noise.png?1396207864'),-webkit-linear-gradient(#4b81a1,#3e6b85,#2c4c5f);background:url('/images/noise.png?1396207864'),-moz-linear-gradient(#4b81a1,#3e6b85,#2c4c5f);background:url('/images/noise.png?1396207864'),-o-linear-gradient(#4b81a1,#3e6b85,#2c4c5f);background:url('/images/noise.png?1396207864'),linear-gradient(#4b81a1,#3e6b85,#2c4c5f);border-top:1px solid #5c93b3;position:relative;padding-top:1em;padding-bottom:1em;margin-bottom:3em;-moz-border-radius-bottomleft:0.4em;-webkit-border-bottom-left-radius:0.4em;border-bottom-left-radius:0.4em;-moz-border-radius-bottomright:0.4em;-webkit-border-bottom-right-radius:0.4em;border-bottom-right-radius:0.4em;z-index:1}body>footer a{color:#c5d2db}body>footer a:visited{color:#c5d2db}body>footer a:hover{color:#8c4f07}body>footer p:last-child{margin-bottom:0}#mc_embed_signup .mc-field-group>label{margin-top:8px;display:block}#mc_embed_signup input.email{width:100%;height:24px;margin-top:8px;font-size:14px}#mc_embed_signup input#mc-embedded-subscribe{background-color:#5DA423;border:1px solid #396516;width:auto;background:#3E6B85;border:1px solid #1E728C;-webkit-box-shadow:0 1px 0 rgba(255,255,255,0.5) inset;-moz-box-shadow:0 1px 0 rgba(255,255,255,0.5) inset;box-shadow:0 1px 0 rgba(255,255,255,0.5) inset;color:#C8D1DB;cursor:pointer;display:inline-block;font-size:14px;font-weight:bold;line-height:1;margin:8px 0 0 0;outline:none;padding:10px 20px 11px;position:relative;text-align:center;text-decoration:none;-webkit-transition:background-color 0.15s ease-in-out;-moz-transition:background-color 0.15s ease-in-out;-o-transition:background-color 0.15s ease-in-out;transition:background-color 0.15s ease-in-out}article ol,article ul{padding-left:2em}.video-container{position:relative;padding-bottom:56.25%;padding-top:30px;height:0;overflow:hidden}.video-container iframe,.video-container object,.video-container embed{position:absolute;top:0;left:0;width:100%;height:100%}.footnotes{font-size:14px;line-height:16px;color:#555}.footnotes p{margin:6px}sup,sub{font-size:0.7em;position:relative;display:inline-block}sup{top:-1.2em}
+
+  </style>
+  
+  <link href="/atom.xml" rel="alternate" title="Matthias Nehlsen" type="application/atom+xml">
+  
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Matthias Nehlsen</a></h1>
+  
+    <h2>Software, Data and Stuff</h2>
+    
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:matthiasnehlsen.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="/reviews">Reviews</a></li>
+  <li><a href="/reading-lists">Reading Lists</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title">BirdWatch with ClojureScript and Om explained</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-24T08:30:00+02:00" pubdate data-updated="true">07/24/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>ABANDONED</strong> because of writing an all-Clojure version instead, not just ClojureScript on the client side. Last update on August 18th, 2014. There is a <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">new series of articles</a></strong> about the all-Clojure version starting in 09/2014. You might still find useful information in this article though.</p>
+
+<p>I <strong><a href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/">wrote</a></strong> about having written my first actual application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and <strong><a href="https://github.com/swannodette/om">Om</a></strong>, a web client for my <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">BirdWatch</a></strong> application. You may want to start with that article to understand the background better. This week I first want to talk about my experience with ClojureScript and Om. Then I want to start describing the implementation details. I am fully aware that what has come out of it up until now is far from elegant in terms of pretty much everything. But in my defense, it does appear to work :)</p>
+
+<!-- more -->
+
+
+<p>Click the screenshot below to see a live version of the application:</p>
+
+<p><a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="/images/cljs-screenshot.png" /></a></p>
+
+<p>So, about my experience. I have been reading articles and books about <strong><a href="http://clojure.org">Clojure</a></strong> for a while and it really does seem to resonate with me. I like this whole <strong><a href="http://en.wikipedia.org/wiki/Homoiconicity">homoiconicity</a></strong> thing. Code and data are basically the same thing and thus share the same data structures. Code is really data, representing the <strong><a href="http://en.wikipedia.org/wiki/Abstract_syntax_tree">abstract syntax tree (AST)</a></strong> directly. Now my initial reaction to this concept was that it had to be rather low level to do so, but to my surprise the opposite turned out to be true with a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong>; you gain a tremendous amount of expressiveness. I also really like that <strong>a)</strong> Clojure introduces <strong><a href="http://clojure.org/data_structures">additional data structures</a></strong> besides the obvious <strong>list</strong>, i.e. Maps, Sets and Vectors and <strong>b)</strong> it is idiomatic to simply use those.</p>
+
+<p>Sure, there is something to be said about types and how <strong><a href="http://en.wikipedia.org/wiki/Type_safety">type safety</a></strong> makes working on large-scale applications less error-prone. But at the same time I have a hunch that the presence of hundreds of (case) classes complects an application in a way that idiomatic usage of a map does not. Have you seen this before, where you had cascades of only slightly differing data structures and the next step of a computation added only a little bit of data and called that a new thing, modeled as a different something? That can become difficult to reason about, particularly when there are no useful design documents outlining how one morphs into the other.</p>
+
+<p>But then again, I am somewhat afraid of the lack of compile time errors when I call a function with something of a wrong type. So as of now, that is an unresolved question for me. May my endeavor into Clojure and thus Lisp afford me with a more educated opinion on this matter. What I don&#8217;t like about strongly typed systems is that I have seen way too many runtime failures that <strong>a)</strong> the type system and the compiler did not catch and <strong>b)</strong> really came from the application being so incidentally complex that the consequences of changes were by all means (too) hard to grasp even for the most senior team members.</p>
+
+<p>I guess I really need some production experience with Clojure to be able to come up with a fair and substantial comparison of the different approaches. But the application I am talking about today is a start at least. And learning a new language has never hurt anyone, I guess.</p>
+
+<p>So, what’s the experience been like so far?</p>
+
+<p>Here are my perceived pros:</p>
+
+<ul>
+<li>When crafting functions in Clojure, I just feel more like playing an instrument. It feels more <strong>playful</strong>, in a good way.</li>
+<li>Code tends to be <strong>short</strong> and <strong>concise</strong>.</li>
+<li>The core of the language is <strong>easily understood</strong>, at least as far as my limited understanding goes.</li>
+<li><strong>Immutability</strong> is great, I have been a fan of immutable data structures for a while and Clojure makes it relatively hard to work with mutable state, which is good.</li>
+<li><strong>Om</strong> uses Facebook&#8217;s <strong>ReactJS</strong>, a UI rendering library that I have tried out previously and that I am somewhat familiar with.</li>
+<li><strong>Refactoring is fun</strong>, I have discovered that spotting repetitive parts among functions and then factoring these parts out into new and shared functions is not only easier compared to many other languages, but also pleasant.</li>
+<li><strong>Data structures</strong>: maps and sets and, by importing an external library in the case of this application, priority maps are a great thing to have, much nicer than only having JavaScript arrays and objects at your disposal.</li>
+<li><strong>Replacing external dependencies</strong> with newer versions generally seems to work in Clojure. This is the complete opposite of my experience in Scala, where a new version of pretty much anything oftentimes results in days of work. Over the last year things with Scala improved for sure, but they are nowhere near as smooth as they appear to be with Clojure.</li>
+<li>As to general data manipulation, I already feel I am becoming more <strong>productive</strong> with Clojure compared to JavaScript and <strong><a href="http://underscorejs.org">underscore</a></strong> <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.</li>
+</ul>
+
+
+<p>Here are some (somewhat minor) cons, as well:</p>
+
+<ul>
+<li>I don&#8217;t feel I have fully grasped Om yet, despite having worked with ReactJS before.</li>
+<li>Testing output. I have tried out <strong><a href="http://cemerick.com">Chas Emerick</a></strong>&#8217;s <strong><a href="https://github.com/cemerick/clojurescript.test">clojurescript.test</a></strong> and while it seems to do its job alright, the output is plain black and white. How am I supposed to do <strong><a href="http://www.jamesshore.com/Blog/Red-Green-Refactor.html">red-green refactoring</a></strong> with this? But seriously, this may be mostly cosmetic but still, I like to see green in my tests as that soothes my mind. When I see red in tests, my alertness level goes up. Black and white output elicits none of these emotions. Is there just anything wrong with my installation or vision that I don&#8217;t see colors in my test output?</li>
+<li>Performance. So far the application has been slower than the JavaScript counterpart in some areas. When processing preloaded tweets, the plain JavaScript version (used in the <strong><a href="http://birdwatch.matthiasnehlsen.com/angular/#/">AngularJS</a></strong> and <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">ReactJS</a></strong> clients) is probably ten times as fast. <strong>EDIT: that&#8217;s not actually true, it was due to a silly mistake of mine that ate a lot of CPU cycles. With that issues removed, I don&#8217;t notice substantial differences in speed.</strong> Click those previous links and see what I mean. The previous tweets are loaded by an Ajax call in chunks of 500 items and loading and processing each chunk takes maybe a second. Now when you open the <strong><a href="http://birdwatch.matthiasnehlsen.com/cljs/#*">ClojureScript version</a></strong>, you will see that it takes much longer to process the previous items. I might try out <strong><a href="https://github.com/cognitect/transit-cljs">Transit</a></strong> here, which seems very promising, not only for this application but as a wire format in general. I need to spend some time with it as it doesn&#8217;t allow automatic keywordization (yet?) and my application relies on a keywordized map. On the other hand, with some first-hand experience now, I think I&#8217;d rather go for a complete redesign that allows more flexibility. I&#8217;ll keep you posted. Thoughts about that will probably appear in a weekly review first.</li>
+<li>Application state in a single large map stored in an <strong><a href="http://clojure.org/atoms">atom</a></strong> can be cumbersome; I would not mind having something like objects or separate services here and there. I have looked at <strong><a href="http://stuartsierra.com">Stuart Sierra</a></strong>&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> and it does seem to offer a good approach to componentizing the application, but I have yet to find the time to try it out.</li>
+<li>Interacting with the state from inside Om is different than interacting with the state atom from other parts of the application. <strong><a href="https://github.com/Prismatic/om-tools">Om-tools</a></strong> seem to be an interesting way around this - will need to give that a try and see how it works.</li>
+</ul>
+
+
+<p>By the way, regarding performance, I have seen the same problems with my naïve Scala.js approach before. <strong>EDIT: I don&#8217;t know what the problem was there. The problems with performance in the ClojureScript version are solved.</strong> I have not played around with that one again since my first attempt back in January. That is mostly due to the lack of a ReactJS binding which is anywhere near as complete as Om. I&#8217;ll be happy to give it a try again once ReactJS support is comparable to Om. <strong>EDIT: probably not.</strong></p>
+
+<h1>Introduction to Clojure</h1>
+
+<p>First of all, you will need to understand a few very basic things about Clojure being a <strong><a href="http://en.wikipedia.org/wiki/Lisp_(programming_language)">Lisp</a></strong>. Feel free to skip this section if you know Clojure already. My aim is for you to be able to follow along even if you&#8217;ve never tried Clojure or a Lisp before. So the basic idea in a Lisp is the List (no wonder, as Lisp stands for List Programming), a <strong><a href="http://en.wikipedia.org/wiki/Singly_linked_list#Singly_linked_lists">singly linked list</a></strong>, to be precise. This list can hold both code and data. Let&#8217;s see how that looks like. You can try these examples out using the <strong><a href="http://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop">REPL</a></strong> in <strong><a href="http://leiningen.org">Leiningen</a></strong> by running <code>lein repl</code> from your command line.</p>
+
+<p>This is an empty list: <code>()</code> It evaluates to itself.</p>
+
+<p>When the list is not empty, the first item in the list will be evaluated as a function: <code>(some-function "a" "b")</code>
+Here, <em>some-function</em> will be called with the two arguments &#8220;a&#8221; and &#8220;b&#8221;. Example <code>(print "Hello World!")</code> Sweet, that is all there is to <strong><a href="http://en.wikipedia.org/wiki/Hello_world_program">Hello World</a></strong>.</p>
+
+<p>The first item in a list has to implement the <em>IFn</em> interface meaning it must be possible to call the item as a function. Try this: <code>("a" "b")</code>. Not surprisingly, the string &#8220;a&#8221; is not a function, causing this to fail. You can however <strong>quote</strong> the list to prevent evaluation, like this: <code>'("a" "b")</code>. Now we can use the list to store items without the first one being evaluated.</p>
+
+<p>Conveniently, Clojure also has a <strong>vector</strong> which is comparable to an array. You can use it in place of a quoted list, and in fact it is idiomatic to do so when we do not want the first item to be evaluated. Example <code>[1 2 3]</code></p>
+
+<p>When you want to name something, you have different options available. The first one is <strong>def</strong>; you can use this to name stuff in the top level of a namespace, for example <code>(def foo [1 2 3])</code> This will create a vector named <em>foo</em> which you can then refer to from elsewhere. After typing in the previous example, you will see that now you can just type <code>foo</code> in the REPL and get the vector we have defined previously.</p>
+
+<p>Or you can use the <strong>let-binding</strong> to name things locally, for example inside a function body, like this: <code>(let [bar [1 2 3]])</code> Here, you can only refer to <em>bar</em> inside the let form, meaning inside the pair of braces that enclose the let form. Let&#8217;s use <em>bar</em>: <code>(let [bar [1 2 3]] (print bar))</code> You should see the vector being printed in your REPL.</p>
+
+<p>Functions can be defined as follows: <code>(fn [a] (+ a 1))</code> with this, we have defined a function that adds 1 to the argument provided .
+You can use the above as an anonymous function like this: <code>((fn [a] (+ a 1)) 2)</code>. Remember that the first item in a list will be evaluated. This is what happens to be the anonymous function we have just defined. However, this can be a little clumsy. We can also store the function in a def: <code>(def add-one (fn [a] (+ a 1)))</code>; now we can call the function like this: <code>(add-one 2)</code>.</p>
+
+<p>However, this can even be simpler if we use the <strong>defn macro</strong>: <code>(defn add-one [a] (+ a 1))</code></p>
+
+<p>Sometimes, you may want to create a function in place using the anonymous function literal: <code>(#(+ % 1) 2)</code>. This does the same as the anonymous function in the first position of the list above, except that it is shorter. During compilation the <code>#(+ % 1)</code> expands into <code>(fn [a] (+ a 1))</code>, where the percent sign denotes the first argument. If there are multiple arguments, you use <em>%1</em>, <em>%2</em> and so on (1-based).</p>
+
+<p>No language would be complete if there wasn&#8217;t a way to make decisions and branch off accordingly. Of course, Clojure has constructs for flow control as well, most notably the <strong><a href="http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?)">if special form</a></strong>. It is really quite simple: <code>(if test then else?)</code>. The test will be evaluated first. Then based on the result, either <strong>then</strong> or <strong>else</strong> are yielded. Other constructs derive from it, such as the <strong><a href="http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/when">when macro</a></strong>.</p>
+
+<p>With these basic constructs you may already find yourself in the position to follow the subsequent source code. Clojure is not hard. Please let me know if you have problems following along. If so, it&#8217;s most likely not you but rather the fact that my intro wasn&#8217;t good enough.</p>
+
+<p>Of course, there&#8217;s a lot more to the language and plenty of stuff to learn when you are ready to delve deeper. As a next step, I suggest <strong><a href="http://learnxinyminutes.com/docs/clojure/">Learn Clojure in Y Minutes</a></strong>. There, you simply have more examples to follow along and play around with in your REPL.</p>
+
+<p>As another online resource, I have also found <strong><a href="http://www.braveclojure.com">Clojure for the Brave and True</a></strong> to be fun and helpful. Check it out. And if you like it, why not support the author and buy his ebook? You can then enjoy the book on your favorite ebook reader as well, and even if you read it on the web, you will ensure that the author can keep up the good work. Great feeling, I did the same.</p>
+
+<p>Another great resource is <strong><a href="http://r.matthiasnehlsen.com/joyclojure/link">Joy of Clojure, 2nd edition</a></strong>. Fun read and I learned a lot. I will revisit it and share some thoughts about it in the <strong><a href="/reviews">reviews section</a></strong> soon.</p>
+
+<h1>Application architecture</h1>
+
+<p>Let us now have a look at the implementation of the BirdWatch client.</p>
+
+<p>The most important part to understand is that the application state lives in one large <strong><a href="http://clojure.org/atoms">atom</a></strong>. When the application is started, this atom is populated with the return of a function that returns a map representing a clean slate version of the application state. Here is how that function looks like:</p>
+
+<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/util.cljs'>util.cljs (Lines 72 to 83)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">initial-state</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="s">&quot;function returning fresh application state&quot;</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:count</span> <span class="mi">0</span>
+</span><span class='line'>   <span class="ss">:n</span> <span class="mi">10</span>
+</span><span class='line'>   <span class="ss">:retweets</span> <span class="p">{}</span>
+</span><span class='line'>   <span class="ss">:tweets-map</span> <span class="p">{}</span>
+</span><span class='line'>   <span class="ss">:search-text</span> <span class="s">&quot;&quot;</span>
+</span><span class='line'>   <span class="ss">:page</span> <span class="mi">1</span>
+</span><span class='line'>   <span class="ss">:search</span> <span class="s">&quot;*&quot;</span>
+</span><span class='line'>   <span class="ss">:stream</span> <span class="nv">nil</span>
+</span><span class='line'>   <span class="ss">:sorted</span> <span class="ss">:by-rt-since-startup</span>
+</span><span class='line'>   <span class="ss">:by-followers</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-retweets</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-favorites</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-rt-since-startup</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:by-id</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)</span>
+</span><span class='line'>   <span class="ss">:words-sorted-by-count</span> <span class="p">(</span><span class="nf">priority-map-by</span> <span class="nv">&gt;</span><span class="p">)})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>All the keys in this map are <strong><a href="http://clojure.org/data_structures#Data%20Structures-Keywords">keywords</a></strong>. Keywords have the great property that we can use them as functions that take a map as an argument and that then return the value for this key. We will see that in action further below.</p>
+
+<p>Upon startup of the application, the function above is called for populating the state atom:</p>
+
+<figure class='code'><figcaption><span>Function returning initial application state</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 13 to 16)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="c1">;;; Application state in a single atom</span>
+</span><span class='line'><span class="c1">;;; Will be initialized with the map returned by util/initial-state.</span>
+</span><span class='line'><span class="c1">;;; Reset to a new clean slate when a new search is started.</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">app-state</span> <span class="p">(</span><span class="nf">atom</span> <span class="p">(</span><span class="nf">util/initial-state</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As we have learned above, <strong>def</strong> creates a thing with a name. This thing is conceptually <strong><a href="http://en.wikipedia.org/wiki/Immutable_object">immutable</a></strong>, at least we treat it that way, so I won&#8217;t call it a variable. The atom is always the same object, but it holds different versions over time. Then a reference to this <strong><a href="http://clojure.org/atoms">atom</a></strong> is passed around. When an update is desired, the map is dereferenced, an updated version is created using some function call and the result is then written back into the atom using a transaction. It is important to note that Clojure data structures are immutable. Immutability guarantees that you can pass data structures around without having to worry that whoever you pass it to might change the data. Data also does not become invalid. Instead, whatever version in time you get a hold on represents the definite state at the time that version was created. State changes only happen inside a transaction, in which a new and altered version of the state is passed back. The transaction part would also mean that no other process could alter state at the same time; in that case the later transaction would be retried until the first one has succeeded. This would be particularly useful when running in a multithreaded environment. However, the JavaScript code resulting from the ClojureScript compilation process runs in a single threaded event loop so only one thing at a same time can happen anyway. On the server side this property becomes more valuable, still.</p>
+
+<p>Having a function that provides an initial, clean state makes it trivial to reset the application state at a later point, we can simply swap the current state with the clean slate map.</p>
+
+<h2>Ingesting tweets</h2>
+
+<p>Tweets get into the system for further analysis in two ways. First, there is a Server Sent Event stream continuously delivering new matches to a query, with low latency (typically around a second between tweeting and having the tweet show up in the application). In addition, previous tweets are loaded. Both are triggered in the <strong>start-search</strong> function:</p>
+
+<figure class='code'><figcaption><span>start-search function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 49 to 59)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">start-search</span> <span class="p">[</span><span class="nv">app</span> <span class="nv">tweets-chan</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;initiate new search by starting SSE stream&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">search</span> <span class="p">(</span><span class="ss">:search-text</span> <span class="o">@</span><span class="nv">app</span><span class="p">)</span>
+</span><span class='line'>        <span class="nv">s</span> <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">search</span> <span class="s">&quot;&quot;</span><span class="p">)</span> <span class="s">&quot;*&quot;</span> <span class="nv">search</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">not </span><span class="p">(</span><span class="nb">nil? </span><span class="p">(</span><span class="ss">:stream</span> <span class="o">@</span><span class="nv">app</span><span class="p">)))</span> <span class="p">(</span><span class="nf">.close</span> <span class="p">(</span><span class="ss">:stream</span> <span class="o">@</span><span class="nv">app</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">reset!</span> <span class="nv">app</span> <span class="p">(</span><span class="nf">util/initial-state</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span> <span class="nb">assoc </span><span class="ss">:search</span> <span class="nv">s</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">aset </span><span class="nv">js/window</span> <span class="s">&quot;location&quot;</span> <span class="s">&quot;hash&quot;</span> <span class="p">(</span><span class="nf">js/encodeURIComponent</span> <span class="nv">s</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span> <span class="nb">assoc </span><span class="ss">:stream</span> <span class="p">(</span><span class="nf">js/EventSource.</span> <span class="p">(</span><span class="nb">str </span><span class="s">&quot;/tweetFeed?q=&quot;</span> <span class="nv">s</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">.addEventListener</span> <span class="p">(</span><span class="ss">:stream</span> <span class="o">@</span><span class="nv">app</span><span class="p">)</span> <span class="s">&quot;message&quot;</span> <span class="o">#</span><span class="p">(</span><span class="nf">receive-sse</span> <span class="nv">tweets-chan</span> <span class="nv">%</span><span class="p">)</span> <span class="nv">false</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">doall </span><span class="p">(</span><span class="nb">for </span><span class="p">[</span><span class="nv">x</span> <span class="p">(</span><span class="nb">range </span><span class="mi">5</span><span class="p">)]</span> <span class="p">(</span><span class="nf">ajax/prev-search</span> <span class="nv">s</span> <span class="mi">500</span> <span class="p">(</span><span class="nb">* </span><span class="mi">500</span> <span class="nv">x</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s go through this line by line. The <strong>defn</strong> macro denotes a function named <em>start-search</em> which takes two arguments, <em>app</em> for a reference to the application state and <em>tweets-chan</em>, a channel to put tweets onto. Channels are building blocks in <strong><a href="https://github.com/clojure/core.async">core.async</a></strong>. We will get to that in a little bit. For now, just think about a channel as a conveyor belt onto which one part of the application puts data. On the other end, another part of the application picks up the data, but the sender does not need to know about it. Broadly speaking, it is a sweet way to decouple parts of an application.</p>
+
+<p>The next line contains the description of the function, followed by a <strong><a href="http://clojure.org/special_forms#binding-forms">let binding</a></strong> where we first declare two local immutable values, both of which are available for the remainder of the function. The first one, <em>search</em>, retrieves the value for the key <em>:search-text</em> in the application state. <em>@app</em> dereferences the application state, giving us an immutable copy of the current app state. <code>(:search-text @app)</code> will run the keyword as a function with the state map as an argument, returning the value in the map. Next we declare <em>s</em> whose value can take two paths as decided by the <strong><a href="http://clojure.org/special_forms#Special%20Forms--(if%20test%20then%20else?)">if special form</a></strong>. The if form consists of three parts. There is a test: <code>(= search "")</code>. Not surprisingly at this point, <strong>=</strong> is a function that evaluates if the arguments passed to it are equal, returning either true or false. The <strong>if</strong> form then either returns the expression right after the test if the test evaluated to <em>true</em> or the subsequent one if it evaluated to <em>false</em>. What we are doing here is simply replace an empty string with an asterisk or otherwise just take the search string.</p>
+
+<p>Next, we close a previous Server Sent Event stream, should one exist. This is only required when we reset the application state as on initial startup, the value for the <em>:stream</em> key will be nil. Then we reset the application state by replacing it with a clean state. Then we swap the value for the <em>:search</em> key with the content of the local value <em>s</em>. Then we set the location hash to represent a URI encoded version of the search string.</p>
+
+<p>In the next line, we create a new EventSource object for the live stream of tweets and store it under the <em>:stream</em> key, to which we then attach a function as an event listener. We are using an anonymous function literal here because the <em>receive-sse</em> function takes two arguments (a channel and an event from the EventSource object) whereas the event listener requires a function that only takes a single argument. Then, finally, we call <em>ajax/prev-search</em> with 5 chunks of 500 results each, but we will look at that later. For now let&#8217;s focus on the <em>receive-sse</em> function:</p>
+
+<figure class='code'><figcaption><span>receive-sse function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 44 to 47)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">receive-sse</span> <span class="p">[</span><span class="nv">tweets-chan</span> <span class="nv">e</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;callback, called for each item (tweet) received by SSE stream&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">tweet</span> <span class="p">(</span><span class="nf">js-&gt;clj</span> <span class="p">(</span><span class="nf">JSON/parse</span> <span class="p">(</span><span class="nf">.-data</span> <span class="nv">e</span><span class="p">))</span> <span class="ss">:keywordize-keys</span> <span class="nv">true</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">put!</span> <span class="nv">tweets-chan</span> <span class="nv">tweet</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This is a function with two arguments, a channel and an event. In the <strong>let-binding</strong>, the event is parsed into a tweet. This reads inside out: <strong>1)</strong> get event data <strong>2)</strong> parse JSON into a JavaScript object <strong>3)</strong> convert the JavaScript object into a Clojure(Script) Map. Note that for the conversion into a Clojure Map, we can automatically have the keys converted into keywords using <em>:keywordize-keys true</em>. This is convenient as we can later use the keywords as functions to retrieve values for the respective key. Then the <em>tweet</em> from the let binding is <em>put!</em> onto the <em>tweets-chan</em>, which represents the aforementioned conveyor belt, where we do not need to worry about who picks up the items on the other end.</p>
+
+<p>Now is a good time to talk a little more about those channels. Channels are brought to Clojure by importing the <strong><a href="https://github.com/clojure/core.async">core.async</a></strong> library. <strong>Core async</strong> is modeled after channels in the <strong><a href="http://golang.org">Go programming language</a></strong>, which implement <strong><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">Communicating Sequential Processes</a></strong> or <strong>CSP</strong> for short. You really should watch <strong><a href="http://www.infoq.com/presentations/clojure-core-async">Rick Hickey&#8217;s talk about core.async</a></strong> now if you haven&#8217;t done so already. The same goes for the following talk from 2012 by Rob Pike, who played a key role in the development of Go: <strong><a href="https://www.youtube.com/watch?v=f6kdp27TYZs">Go Concurrency Patterns</a></strong>.</p>
+
+<p>I am really only scratching the surface of what can be achieved with CSP, but it does seem like a useful abstraction to decouple parts of an application. Besides the aforementioned <em>tweets-chan</em> there also is a channel for previous tweets retrieved using Ajax calls (we will cover that part next):</p>
+
+<figure class='code'><figcaption><span>Channels</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/core.cljs'>core.cljs (lines 37 to 44)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="c1">;;; Channels for handling information flow in the application.</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">tweets-chan</span> <span class="p">(</span><span class="nf">chan</span> <span class="mi">10000</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">prev-tweets-chan</span> <span class="p">(</span><span class="nf">chan</span> <span class="mi">10000</span><span class="p">))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span>
+</span><span class='line'> <span class="p">(</span><span class="k">let </span><span class="p">[[</span><span class="nv">t</span> <span class="nv">chan</span><span class="p">]</span> <span class="p">(</span><span class="nf">alts!</span> <span class="p">[</span><span class="nv">tweets-chan</span> <span class="nv">prev-tweets-chan</span><span class="p">]</span> <span class="ss">:priority</span><span class="p">)]</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">tweets/add-tweet</span> <span class="nv">t</span> <span class="nv">app-state</span> <span class="nv">word-cloud</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">recur</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, two channels have been defined. Then, inside the <em>go-block</em>, <em>alts!</em> with <em>:priority</em> takes one of the items from the two channels, with priority on the first one. That is because live tweets should always be processed immediately whereas previous results can wait. With this item <em>t</em> taken from one of the channels, the <em>add-tweet</em> function in the <em>tweets</em> namespace is called. Finally, the go-loop runs continuously using <em>recur</em>.</p>
+
+<p>Before looking at the <em>tweets</em> namespace, let&#8217;s have a quick look at the Ajax call performed in the <em>start-search</em> function above:</p>
+
+<figure class='code'><figcaption><span>prev-search</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs'>ajax.cljs (lines 35 to 40)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">prev-search</span> <span class="p">[</span><span class="nv">query-string</span> <span class="nv">size</span> <span class="nv">from</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">json-xhr</span>
+</span><span class='line'>    <span class="p">{</span><span class="ss">:method</span> <span class="ss">:post</span>
+</span><span class='line'>     <span class="ss">:url</span> <span class="s">&quot;/tweets/search&quot;</span>
+</span><span class='line'>     <span class="ss">:data</span> <span class="p">(</span><span class="nf">query</span> <span class="nv">query-string</span> <span class="nv">size</span> <span class="nv">from</span><span class="p">)</span>
+</span><span class='line'>     <span class="ss">:on-complete</span> <span class="o">#</span><span class="p">(</span><span class="nf">put!</span> <span class="nv">ajax-results-chan</span> <span class="nv">%</span><span class="p">)}))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, we see a function that takes a query string, the expected number of items in the result and an offset. It then calls <em>json-xhr</em> from the imported <strong><a href="http://docs.closure-library.googlecode.com/git/class_goog_net_XhrIo.html">goog.net.XhrIo</a></strong> with a map specifying method, url, data and an event handler. <strong>XhrIo</strong> comes with <strong><a href="https://developers.google.com/closure/compiler/">Google&#8217;s Closure Compiler</a></strong> that is used in the ClojureScript to JavaScript compilation process.</p>
+
+<p>The query itself is generated by the <em>query</em> function in the same namespace:</p>
+
+<figure class='code'><figcaption><span>Ajax</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs'>ajax.cljs (lines 19 to 23)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">query</span> <span class="p">[</span><span class="nv">query-string</span> <span class="nv">size</span> <span class="nv">from</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">{</span><span class="ss">:size</span> <span class="nv">size</span> <span class="ss">:from</span> <span class="nv">from</span>
+</span><span class='line'>   <span class="ss">:sort</span> <span class="p">{</span><span class="ss">:id</span> <span class="s">&quot;desc&quot;</span><span class="p">}</span>
+</span><span class='line'>   <span class="ss">:query</span> <span class="p">{</span><span class="ss">:query_string</span> <span class="p">{</span><span class="ss">:default_field</span> <span class="s">&quot;text&quot;</span> <span class="ss">:default_operator</span> <span class="s">&quot;AND&quot;</span>
+</span><span class='line'>                          <span class="ss">:query</span> <span class="p">(</span><span class="nb">str </span><span class="s">&quot;(&quot;</span> <span class="nv">query-string</span> <span class="s">&quot;) AND lang:en&quot;</span><span class="p">)}}})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This function generates the map with the properties required for the ElasticSearch query on the server side. This query will eventually go on the wire as JSON.</p>
+
+<p>Then finally, as an event handler, there is an anonymous function literal that puts the result onto another channel for the Ajax results:</p>
+
+<figure class='code'><figcaption><span>Ajax results channel and Go Loop</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/ajax.cljs'>ajax.cljs (lines 11 to 17)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">ajax-results-chan</span> <span class="p">(</span><span class="nf">chan</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">parsed</span> <span class="p">(</span><span class="nf">js-&gt;clj</span> <span class="p">(</span><span class="nf">JSON/parse</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">ajax-results-chan</span><span class="p">))</span> <span class="ss">:keywordize-keys</span> <span class="nv">true</span><span class="p">)]</span>
+</span><span class='line'>           <span class="p">(</span><span class="nb">doseq </span><span class="p">[</span><span class="nv">t</span> <span class="p">(</span><span class="ss">:hits</span> <span class="p">(</span><span class="ss">:hits</span> <span class="nv">parsed</span><span class="p">))]</span>
+</span><span class='line'>             <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">= </span><span class="mi">0</span> <span class="p">(</span><span class="nf">mod</span> <span class="p">(</span><span class="ss">:_id</span> <span class="nv">t</span><span class="p">)</span> <span class="mi">200</span><span class="p">))</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="p">(</span><span class="nf">timeout</span> <span class="mi">10</span><span class="p">)))</span>
+</span><span class='line'>             <span class="p">(</span><span class="nf">put!</span> <span class="nv">cljs-om.core/prev-tweets-chan</span> <span class="p">(</span><span class="ss">:_source</span> <span class="nv">t</span><span class="p">)))</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">recur</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Above, the JSON for each item on the channel is parsed into a Clojure(Script) data structure, where <em>parsed</em> is a vector. Then, each item in that vector is <em>put!</em> onto the <em>prev-tweets-chan</em>. Here, the value for the <em>:_source</em> key is used here as that is where ElasticSearch stores the original item. One thing to note here is the usage of a <strong><a href="https://clojure.github.io/core.async/#clojure.core.async/timeout">timeout</a></strong> roughly every 200 tweets. I have introduced this in order to occasionally return control to the <strong><a href="http://blog.carbonfive.com/2013/10/27/the-javascript-event-loop-explained/">JavaScript Event Loop</a></strong> so that <strong>a)</strong> the UI gets rendered and <strong>b)</strong> the event listener for tweets from the Server Sent Event stream can do its thing. Otherwise, the application just appears to halt until all previous tweets have been processed, which is really annoying. But this seems rather hacky, I would be really curious about solving this problem more elegantly.</p>
+
+<p>With the preloading of tweets using Ajax calls covered, we can now proceed to the processing of tweets inside the <em>tweets</em> namespace. As we have seen before with the go loop alternating between channels, <em>add-tweet</em> is called for each tweet coming into the application:</p>
+
+<figure class='code'><figcaption><span>add-tweet function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 33 to 42)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">add-tweet</span> <span class="p">[</span><span class="nv">tweet</span> <span class="nv">app</span> <span class="nv">word-cloud</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;increment counter, add tweet to tweets map and to sorted sets by id and by followers&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">state</span> <span class="o">@</span><span class="nv">app</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span> <span class="nb">assoc </span><span class="ss">:count</span> <span class="p">(</span><span class="nb">inc </span><span class="p">(</span><span class="ss">:count</span> <span class="nv">state</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">add-to-tweets-map</span> <span class="nv">app</span> <span class="ss">:tweets-map</span> <span class="p">(</span><span class="nf">util/format-tweet</span> <span class="nv">tweet</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">util/swap-pmap</span> <span class="nv">app</span> <span class="ss">:by-followers</span> <span class="p">(</span><span class="nb">keyword </span><span class="p">(</span><span class="ss">:id_str</span> <span class="nv">tweet</span><span class="p">))</span> <span class="p">(</span><span class="ss">:followers_count</span> <span class="p">(</span><span class="ss">:user</span> <span class="nv">tweet</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">util/swap-pmap</span> <span class="nv">app</span> <span class="ss">:by-id</span> <span class="p">(</span><span class="nb">keyword </span><span class="p">(</span><span class="ss">:id_str</span> <span class="nv">tweet</span><span class="p">))</span> <span class="p">(</span><span class="ss">:id</span> <span class="nv">tweet</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">add-rt-status</span> <span class="nv">app</span> <span class="nv">tweet</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">wc/process-tweet</span> <span class="nv">app</span> <span class="p">(</span><span class="ss">:text</span> <span class="nv">tweet</span><span class="p">))</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">. </span><span class="nv">word-cloud</span> <span class="p">(</span><span class="nf">redraw</span> <span class="p">(</span><span class="nf">clj-&gt;js</span> <span class="p">(</span><span class="nf">wc/get-words</span> <span class="nv">app</span> <span class="mi">250</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First of all, for each new tweet, the counter inside the application state is swapped with the number incremented by one. Then, <em>add-to-tweets-map</em> is called (described below), which as the name suggests adds the current tweet to the map that is found under the <em>:tweets-map</em> key in the application state. Before being added, each tweet is also processed; in that step, for example, user mentions and links are replaced with the correct HTML representation.</p>
+
+<p>For a better understanding: the application allows displaying the tweets in different sort orders. Priority maps are used for maintaining the sort order. These priority maps contain nothing more than the ID of the tweet and whatever that specific map is sorted on, i.e. the number of followers. The full tweets are stored in one map with the ID of a tweet as the key and the tweet itself as the value. For displaying a sorted list of tweets in the UI, a sorted vector from the priority map is mapped by looking up each item in <em>:tweets-map</em> and using that item instead of the sorted value.</p>
+
+<p>Here is how a tweet is added to the application state:</p>
+
+<figure class='code'><figcaption><span>add-to-tweets-map function</span><a href='https://github.com/matthiasn/BirdWatch/blob/2d1fbc587506a954b0d9f7e302a978fd93c04ecd/clients/cljs-om/src/cljs_om/tweets.cljs'>tweets.cljs (lines 11 to 15)</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">add-to-tweets-map</span> <span class="p">[</span><span class="nv">app</span> <span class="nv">tweets-map</span> <span class="nv">tweet</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;adds tweet to tweets-map&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">swap!</span> <span class="nv">app</span>
+</span><span class='line'>         <span class="nv">assoc-in</span> <span class="p">[</span><span class="nv">tweets-map</span> <span class="p">(</span><span class="nb">keyword </span><span class="p">(</span><span class="ss">:id_str</span> <span class="nv">tweet</span><span class="p">))]</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">util/format-tweet</span> <span class="nv">tweet</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The function above takes the application state, the keyword under which the tweets-map can be found in the application state and a tweet to be added. It then swaps the application state with a new version into which the tweet is added after undergoing the <em>format-tweet</em> treatment. Note that <em>assoc-in</em> takes a vector that describes the path to the item being added or changed. The string representation of the tweet ID is converted to a keyword so that it can be used as a lookup function later (as previously described). Let&#8217;s assume we have a tweet with ID string &#8220;12345&#8221;. The path passed to <em>assoc-in</em> will then look like this: [:tweets-map :12345]. Afterwards, the map stored under the <em>:tweets-map</em> key will have a new key <em>:12345</em> with the formatted tweet as the associated value. A call to this function will also replace an already existing item.</p>
+
+<p><strong>TO BE CONTINUED</strong></p>
+
+<h1>Summary</h1>
+
+<p>Overall I find working with Clojure(Script) and Om pleasant. Working and thinking in Clojure is a lot of fun. I have heard people complain about all the parentheses in Lisp but I do not share that sentiment. Quite the opposite, I find that <strong><a href="http://en.wikipedia.org/wiki/S-expression">s-expressions</a></strong> and the associated <strong><a href="http://en.wikipedia.org/wiki/Polish_notation">prefix notation</a></strong> add a lot of clarity without having to learn any additional, language-specific rules.</p>
+
+<p>However I still need to understand how to improve the structure of an application in Clojure(Script). I am still not completely happy with the current architecture of the application described in this post. But that will hopefully improve.</p>
+
+<p>Please comment and suggest any improvement you can think of, including typos and difficult to understand sentences. This is a work in progress and an early draft at that. Any help is certainly much appreciated.</p>
+
+<p>Cheers,
+Matthias</p>
+
+<p>Check out my <strong><a href="/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Actually I should mention <strong><a href="http://lodash.com">Lo-Dash</a></strong> instead of <strong>underscore</strong>. I use it as a drop-in replacement for underscore for one reason in particular: <strong><a href="http://lodash.com/docs#cloneDeep">_.cloneDeep</a></strong>. The ability to deep clone a data structure makes developing an undo functionality much, much, much easier. Not as trivial as with <strong><a href="http://swannodette.github.io/2013/12/31/time-travel/">ClojureScript</a></strong> or with <strong><a href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/">Scala.js</a></strong>, but not difficult either.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Matthias Nehlsen</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-07-24T08:30:00+02:00" pubdate data-updated="true">07/24/2014</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/" data-via="matthiasnehlsen" data-counturl="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/" >Tweet</a>
+  
+
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+
+  
+  
+  
+  
+  <br />
+  
+  
+    <div class="fb-like" data-send="true" data-width="600" data-show-faces="false"></div>
+  
+  
+  <br />
+  <br />
+  
+  
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+  
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+  
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/07/17/BirdWatch-in-ClojureScript/" title="Previous Post: BirdWatch client using ClojureScript and Om">&laquo; BirdWatch client using ClojureScript and Om</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/08/01/weekly-update/" title="Next Post: Weekly Update: Buying time, AngularJS Meetup, Mountains">Weekly Update: Buying time, AngularJS Meetup, Mountains &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    
+<section>
+	<span>
+		<img src="/images/mn2013.jpg" alt="Gravatar of Matthias Nehlsen " title="Gravatar of Matthias Nehlsen" />
+	</span>
+</section>
+<section>
+  <h1>About Me</h1>
+  <p>Hi, my name is Matthias and I am a freelance full stack developer particularly interested in functional programming, data visualization and real-time information processing.</p>
+</section>
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/10/04/weekly-update/">Weekly Update: Staging server for this blog</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure - Part 1</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/23/weekly-update/">Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/16/weekly-update/">Weekly Update: Clojure, Clojure, Clojure and a nasty cold</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/09/08/weekly-update/">Weekly Update: PageSpeed Insights, optimizing Octopress & more Clojure</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>GitHub Repos</h1>
+  <ul id="gh_repos">
+    <li><a href="https://github.com/matthiasn/birdwatch/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/birdwatch#stargazers_count">BirdWatch</a>
+      <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/sse-chat/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/sse-chat#stargazers_count">sse-chat</a>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/Clojure-Resources/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/Clojure-Resources#stargazers_count">Clojure-Resources</a>
+        <p>Compilation of useful links and resources for learning Clojure and ClojureScript </p>
+      </li>
+  </ul>
+</section>
+
+<script async defer id="github-bjs" src="https://buttons.github.io/buttons.js"></script>
+<section>
+    <a name="signup"><h1>Subscribe</h1></a>
+    <div id="mc_embed_signup">
+      <form action="http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&amp;id=eb7a7193c5" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate>
+        <div class="mc-field-group">
+          <label for="mce-EMAIL">Enter your email to receive updates</label>
+          <input type="email" value="" name="EMAIL" class="required email" id="mce-EMAIL" placeholder="you@email.com" />
+        </div>
+        <div id="mce-responses" class="clear">
+          <div class="response" id="mce-error-response" style="display:none"></div>
+          <div class="response" id="mce-success-response" style="display:none"></div>
+        </div>
+      <div class="clear"><input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="button"></div>
+    </form>
+    
+    <br />
+  </div>
+</section>
+<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/narrow"> </SCRIPT>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo">
+
+<script type="text/javascript">
+      var disqus_shortname = 'matthiasnehlsen';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/';
+        var disqus_url = 'http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+<p>
+  Copyright &copy; 2014 - Matthias Nehlsen -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+</footer>
+  
+  
+  <script src="//use.typekit.net/rco1jij.js"></script>
+  <script>try{Typekit.load();} catch (e){}</script>
+
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-40261983-1', 'auto');
+  ga('send', 'pageview');
+</script>
+
+
+  
+
+</body>
+</html>
