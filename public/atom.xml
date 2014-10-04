@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-09-30T14:55:42+02:00</updated>
+  <updated>2014-10-04T18:53:13+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,35 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: Staging server for this blog]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/"/>
+    <updated>2014-10-04T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update</id>
+    <content type="html"><![CDATA[<p>This weekly update is mostly about organizational isssues around publishing articles and getting feedback for unfinished articles.</p>
+
+<!-- more -->
+
+
+<h2>Test environment for my blog</h2>
+
+<p>This week, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series for a getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators, so that was a little less than ideal on my part. Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.</p>
+
+<p>So I came up with something different: a <strong>staging server</strong>. Just like I would want a test environment when developing an application, I also want a test environment for new articles. So I&#8217;ve pulled the unfinished article from master for now and put the unfinished article here:</p>
+
+<p><strong><a href="http://staging.matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2/">http://staging.matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2/</a></strong></p>
+
+<p>I&#8217;d love to get more feedback still. But what I got so far was also very helpful. Right now I am working on illustrating the mechanisms with some illustrations and I expect to be done with everything on Monday. I will also probably split the article in two as the current article is probably a little long.</p>
+
+<h2>Closing remarks</h2>
+
+<p>Most importantly, check out the new <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article series</a></strong> that I just started. I hope you will find it useful and I am looking forward to your feedback. In addition, there have been plenty of new entries to my <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a></strong> repository on GitHub. You may want to check that out if you&#8217;re interested in Clojure at all. Finally, I bought a useful gadget that makes my digital life a little better.</p>
+
+<p>Until next week,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a System in Clojure - Part 1]]></title>
@@ -2667,362 +2696,6 @@ It is great to only have to think about components and then be able to build you
 <p>I hope you found this useful; as always let me know what you think.</p>
 
 <p>Until next time,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Play Framework and Facebook's React library]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/"/>
-    <updated>2014-01-05T23:30:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library</id>
-    <content type="html"><![CDATA[<p>Over the holidays I discovered Facebook&#8217;s <strong><a href="http://facebook.github.io/react">React</a></strong>, an interesting library for generating reactive user interfaces. I wanted to try it out in a real-world application, and I thought of one such application I still had running as a demo: <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, a little chat application I wrote last summer to learn how to make <strong><a href="http://www.playframework.com/">Play Framework</a></strong> and <strong><a href="http://angularjs.org/">AngularJS</a></strong> cooperate in a very basic way. So I thought, why not rewrite the client side using <strong><a href="http://facebook.github.io/react">React</a></strong>, offering the exact same functionality as the <strong><a href="http://angularjs.org/">AngularJS</a></strong> version. Both are also available in the new version with no changes to the backend code except for the added route, as both versions can be accessed in parallel.</p>
-
-<!-- more -->
-
-
-<p>The constraint of making it behave exactly like the AngularJS version was a great practice and it actually only took me an afternoon to complete. Touching the existing demo version also had me notice that the live version of it had been up for like 4 months or so, without any trouble. I have the same experience with my <strong><a href="http://birdwatch.matthiasnehlsen.com/#/">BirdWatch</a></strong> application. Kudos to the Play Framework and Akka developers for enabling such reliable server systems.</p>
-
-<p>Here&#8217;s the new version using <strong>React</strong> instead of <strong>AngularJS</strong>:</p>
-
-<iframe width="420" height="475" src="http://sse-chat.matthiasnehlsen.com/react" frameborder="0"></iframe>
-
-
-<p>You can open the AngularJS version of the demo inside the <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">article from last summer</a></strong> in another browser and communicate between the two, they share the same backend. Romeo and Juliet are having a chat in room 1, but hey, why not. Better than you just chatting with yourself. You can learn more about the server side in the previous article. In this article we will look exclusively at the web client. Here&#8217;s an overview of the architecture with React:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/react-sse-chat.png" title="image" alt="images"></p>
-
-<p>So what is different with the <strong>React</strong> library? It offers a <strong>declarative</strong> approach just like AngularJS, but it is subtantially different in many quite interesting ways:</p>
-
-<ul>
-<li><strong>Components</strong> are the basic building blocks, they encapsulate markup and logic together in one place.</li>
-<li>Components receive <strong>immutable</strong> data (called <strong>props</strong>) from parent elements.</li>
-<li>Components can have state if necessary.</li>
-<li>React <strong>prefers immutable</strong> props over mutable state wherever possible, making state changes much easier to reason about.</li>
-<li>Each component knows how to <strong>render itself</strong>.</li>
-<li>Components can have other components as children. They can pass their own state or props to these as immutable props.</li>
-<li>The entire DOM is rendered into a (fast) <strong>virtual DOM</strong> with every change made. Changes can either come from mutated state or from parent elements as immutable props.</li>
-<li>This virtual DOM is then <strong>diffed</strong> against a representation of the current DOM, with the actual DOM only being manipulated where new and old versions differ.</li>
-<li>Data coming from business logic outside will not be touched; React can work with <strong>immutable data</strong> thoughout.</li>
-<li>Hierarchical components, props, state, handlers. That&#8217;s pretty much it, no more rather unintuitive concepts to understand.</li>
-</ul>
-
-
-<h2>How is it different from AngularJS?</h2>
-
-<p>What I find most intriguing here is how React can work with immutable data. AngularJS, on the other hand needs to modify data that is used in <strong>$scope</strong> in order to keep track of changes.</p>
-
-<p>I tried to use AngularJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> a few months back and I ran into a problem with <strong><a href="http://stackoverflow.com/questions/19863873/angularjs-infinite-digest-loop-when-no-scope-changes">infinite digest loops (StackOverflow)</a></strong>, something I quite honestly didn&#8217;t want to know about. So the problem seemed to be, and please correct me if I&#8217;m wrong, that ClojureScript was handing a shiny new data structure to AngularJS over and over again in order to guarantee immutability internally, just like Underscore generated a new data structure on every call to filter (see the StackOverflow discussion cited above). Angular needs to modify data in order to keep track of updates though, resulting in an infinite cycle that it fortunately is clever enough to stop after a few iterations. Let&#8217;s have a quick look at what Angular does with data. It needs to mark individual elements in a collection with a <strong>hashKey</strong> property in order to keep track of their changes:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/ng-hash-key.png" title="image" alt="images"></p>
-
-<p>Now that&#8217;s a problem when the data is considered immutable. I assume ClojureScript delivered fresh JavaScript objects from the ClojureScript data structures at the edge of the application where I called a function from Angular, with the result being that on subsequent calls the hashKey was always missing, making Angular upset. Let&#8217;s emulate this behavior by getting the data for the ng-repeat from a function call that is guaranteed to deliver an array consisting of shiny new objects on every call:</p>
-
-<figure class='code'><figcaption><span>Causing an Infinite Digest Loop in Angular</span><a href='https://github.com/matthiasn/sse-chat/blob/e0b55172eede0f265cedf03cde46ae6b39639e82/app/assets/javascripts/controllers.js'>controllers.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'>    <span class="kd">var</span> <span class="nx">msgs</span> <span class="o">=</span> <span class="p">[];</span>
-</span><span class='line'>    <span class="nx">$scope</span><span class="p">.</span><span class="nx">msgs</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msgs</span><span class="p">)),</span> <span class="mi">3</span><span class="p">);</span>
-</span><span class='line'>    <span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Note that we also need to change the index.html to have the ng-repeat get the data from a function call, but just follow the link in the code block above to see the full source code for the branch I have created. With these changes in place, every subsequent call to the <strong><em>msgs</em></strong> function will be an array with newly generated objects, causing the following error on every single change to the application state, each of which triggers the digest cycle:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/ng-digest.png" title="image" alt="images"></p>
-
-<p>Note that the error output in the browser console is 23KB in size, even when using the minified production version of Angular, so I can only assume this is real problem.</p>
-
-<p>Now in my daytime job I mostly write Scala code and I really like the peace of mind that immutability can give us, so I&#8217;d rather not have to depend on letting the UI part of the web application modify the data model just to keep track of changes. I want to further explore immutability in the browser, for example by using ClojureScript or the younger <strong><a href="http://www.scala-js.org/">Scala.js</a></strong>, which also allows working with immutable data structures. I have only played around a little bit with the latter, but it certainly is an interesting approach.</p>
-
-<p>A nice example of working with immutable data (from ClojureScript) and React is David Nolen&#8217;s great <strong><a href="https://github.com/swannodette/om">Om library</a></strong>. Immutability allows for amazing features like a simple undo functionality, even saving the entire history of state mutation during the lifecycle of the application. It shouldn&#8217;t be too difficult to achieve the same in Scala.js, for example by modelling the application state as an immutable data structure and then pushing each version into an array that is then used as a stack. Pop the last state and render what you can peek at, undo done. Conceptually this is really simple to think about iff (if and only if) your UI rendering code requires no state of its own and simply renders an immutable data structure, which React is capable of.</p>
-
-<h2>Source code time</h2>
-
-<p>Let&#8217;s now have a look at the actual source code of the new React based client written in JavaScript and <strong><a href="http://facebook.github.io/react/docs/jsx-in-depth.html">JSX</a></strong>. JSX is a JavaScript XML syntax, which is transformed into plain old JavaScript using a preprocessor. It makes writing DOM elements simpler, however there is no need to use it; instead we can write a React application in (somewhat clunkier) JavaScript code directly instead. It is recommended to do the conversion on the server side, for example in a grunt task, but there is a client-side script for development as well. I chose to ignore the recommendation in this demo for simplicity; your browser will handle the conversion just fine. However for a commercial product I would certainly follow the recommendation to make the client side loading experience as smooth as possible.</p>
-
-<p>The HTML for our app becomes very simple. In this application it is called react.scala.html, but that&#8217;s really only because it made the hookup to a route easier, otherwise there is no good reason to use a play/scala template here:</p>
-
-<figure class='code'><figcaption><span>react.scala.html</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/app/views/react.scala.html'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;body&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">&quot;chat-app&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//fb.me/react-0.8.0.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//fb.me/JSXTransformer-0.8.0.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;script </span><span class="na">type=</span><span class="s">&quot;text/jsx&quot;</span> <span class="na">src=</span><span class="s">&quot;assets/js/react-app.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</span><span class='line'><span class="nt">&lt;/body&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>All we do above is provide a DOM element hosting the application markup plus loading the necessary scripts. All the interesting stuff happens inside <strong>react.app.js</strong>, which is loaded last. Let us go through, component by component, starting from the top of the hierarchy with the <strong>ChatApp</strong> component:</p>
-
-<figure class='code'><figcaption><span>ChatApp component</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js'>react-app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** randomly generate initial user name */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">initialName</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="s2">&quot;Jane Doe #&quot;</span> <span class="o">+</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nb">Math</span><span class="p">.</span><span class="nx">random</span><span class="p">()</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** ChatApp is the main component in this application, it holds all state, which is passed down to child components</span>
-</span><span class='line'><span class="cm"> *  only as immutable props */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">ChatApp</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">getInitialState</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="p">{</span> <span class="nx">data</span><span class="o">:</span> <span class="p">[],</span> <span class="nx">room</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">initialName</span><span class="p">()</span> <span class="p">};</span>  <span class="c1">// creates initial application state</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">componentWillMount</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">room</span><span class="p">);</span>  <span class="c1">// called on initial render of the application</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleNameChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">name</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">});</span>  <span class="c1">// update name state with new value in text box</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleRoomChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">room</span><span class="o">:</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">});</span>  <span class="c1">// update room state with the newly selected value</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span>  <span class="c1">// re-initialize SSE stream with new room</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">addMsg</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">));</span>  <span class="c1">// push message into state.data array</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">setState</span><span class="p">({</span><span class="nx">data</span><span class="o">:</span> <span class="nx">_</span><span class="p">.</span><span class="nx">last</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">data</span><span class="p">,</span> <span class="mi">4</span><span class="p">)});</span>  <span class="c1">// replace state.data with up to last 5 entries</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">listen</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">chatFeed</span><span class="p">;</span>            <span class="c1">// holds SSE streaming connection for chat messages for current room</span>
-</span><span class='line'>        <span class="k">return</span> <span class="kd">function</span><span class="p">(</span><span class="nx">room</span><span class="p">)</span> <span class="p">{</span>   <span class="c1">// returns function that takes room as argument</span>
-</span><span class='line'>            <span class="k">if</span> <span class="p">(</span><span class="nx">chatFeed</span><span class="p">)</span> <span class="p">{</span> <span class="nx">chatFeed</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span> <span class="p">}</span>    <span class="c1">// if initialized, close before starting new connection</span>
-</span><span class='line'>            <span class="nx">chatFeed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/chatFeed/room&quot;</span> <span class="o">+</span> <span class="nx">room</span><span class="p">);</span>       <span class="c1">// (re-)initializes connection</span>
-</span><span class='line'>            <span class="nx">chatFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">addMsg</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>  <span class="c1">// attach addMsg event handler</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>    <span class="p">}(),</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">NameRoomBox</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">handleNameChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleNameChange</span><span class="p">}</span>
-</span><span class='line'>                <span class="nx">handleRoomChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleRoomChange</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">MsgList</span> <span class="nx">data</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">data</span><span class="p">}</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">SaySomethingBox</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="nx">room</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">state</span><span class="p">.</span><span class="nx">room</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In this simple example, the ChatApp component is where most of the application logic lives in. I would probably prefer if it lived somewhere completely outside of React in more complex applications, for example in ClojureScript or Scala.js code, or in well-organized JavaScript code using underscore. Then not even the top element of the React application would need to have state at all. But in this simple example it should suffice to keep everything together in the top-level React component. So what goes on in said component?</p>
-
-<ul>
-<li>Inside the <strong><em>getInitialState function</em></strong>, the <strong>initial state</strong> is provided.</li>
-<li>The <strong><em>listen</em></strong> function initiates the SSE connection for the current chat room, potentially closing an already established connection. It is organized as an enclosing function that is immediately called upon initialization of the component. That initial call sets up a chatFeed var and returns another function that henceforth lives inside the <strong><em>listen</em></strong> property of the component. This function can then be called when an open connection to the SSE stream for the current room is desired.</li>
-<li>The <strong><em>addMsg</em></strong> function mutates component state by calling <strong>this.setState</strong>.</li>
-<li>The <strong><em>handleRoomChange</em></strong> and <strong>handleNameChange</strong> functions modify <strong>room</strong> and <strong>name</strong> state. <strong><em>handleRoomChange</em></strong> also calls listen again to re-establish the SSE stream for the new room.</li>
-<li>The <strong><em>componentWillMount</em></strong> function establishes the SSE connection by calling <strong><em>listen(room)</em></strong>, once, upon initialization of the component.</li>
-</ul>
-
-
-<p>Next let&#8217;s look at the first child component of the single <strong>ChatApp</strong> component.</p>
-
-<figure class='code'><figcaption><span>NameRoomBox component</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js'>react-app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** name and room selection component */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">NameRoomBox</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">roomOpts</span><span class="o">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">].</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">room</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="o">&lt;</span><span class="nx">option</span> <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="nx">room</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Room</span> <span class="p">{</span><span class="nx">room</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/option&gt; }),</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;header&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="nx">Your</span> <span class="nx">Name</span><span class="o">:</span> <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">name</span><span class="o">=</span><span class="s2">&quot;user&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;userField&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span>
-</span><span class='line'>                <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">handleNameChange</span><span class="p">}</span><span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">select</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;roomSelect&quot;</span> <span class="nx">onChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">handleRoomChange</span><span class="p">}</span> <span class="nx">value</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">room</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>                <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">roomOpts</span><span class="p">}</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="err">/select&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In the <strong>NameRoomBox</strong> component, only two things actually happen:</p>
-
-<ul>
-<li>The <strong>roomOpts</strong> property is initialized with a list of all 5 room <option> elements. The JSX transpiler thankfully does this for us.</li>
-<li>The <strong><em>render</em></strong> function returns a <code>&lt;div&gt;</code> with an <code>&lt;input&gt;</code> for the name and a <code>&lt;select&gt;</code> for the room inside, using the <code>&lt;option&gt;</code>elements created in the first step. It also attaches the handler functions provided inside <strong>props</strong> to respond to user input.</li>
-</ul>
-
-
-<p>The next component inside <strong>ChatApp</strong> is the <strong>MsgList</strong> component:</p>
-
-<figure class='code'><figcaption><span>MsgList component</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js'>react-app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** chat messages list component, renders all ChatMsg items (above) */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">MsgList</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">msgNodes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="o">&lt;</span><span class="nx">ChatMsg</span> <span class="nx">user</span><span class="o">=</span><span class="p">{</span><span class="nx">msg</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span> <span class="nx">time</span><span class="o">=</span><span class="p">{</span><span class="nx">msg</span><span class="p">.</span><span class="nx">time</span><span class="p">}</span> <span class="nx">text</span><span class="o">=</span><span class="p">{</span><span class="nx">msg</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;chat&quot;</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">msgNodes</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <strong>MsgList</strong> component only has one function: <strong><em>render</em></strong>, which takes the array of messages provided as props and maps it into individual <strong>ChatMsg</strong> components, which we will look at next:</p>
-
-<figure class='code'><figcaption><span>ChatMsg component</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js'>react-app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** single chat message component */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">ChatMsg</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;msg &quot;</span> <span class="o">+</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span> <span class="o">===</span> <span class="s2">&quot;Juliet&quot;</span> <span class="o">?</span> <span class="s2">&quot;juliet&quot;</span> <span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span> <span class="o">!==</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span> <span class="o">?</span> <span class="s2">&quot;others&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">)}</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">time</span><span class="p">}</span><span class="o">&lt;</span><span class="nx">br</span><span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">strong</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span> <span class="nx">says</span><span class="o">:</span> <span class="o">&lt;</span><span class="err">/strong&gt;</span>
-</span><span class='line'>            <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">text</span><span class="p">}</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The <strong>ChatMsg</strong> component above only knows how to render itself. Depending on the name of the user sending a message, it is rendered in different colors by assigning the element different CSS classes. Now the last component to look at is the <strong>SaySomethingBox</strong>:</p>
-
-<figure class='code'><figcaption><span>SaySomethingBox component</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js'>react-app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** chat message input component*/</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">SaySomethingBox</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">handleSubmit</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">msg</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">text</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">value</span><span class="p">,</span> <span class="nx">user</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
-</span><span class='line'>            <span class="nx">time</span><span class="o">:</span> <span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">()).</span><span class="nx">toUTCString</span><span class="p">(),</span> <span class="nx">room</span><span class="o">:</span> <span class="s2">&quot;room&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">room</span> <span class="p">};</span>
-</span><span class='line'>        <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span><span class="nx">url</span><span class="o">:</span> <span class="s2">&quot;/chat&quot;</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msg</span><span class="p">),</span>
-</span><span class='line'>            <span class="nx">contentType</span><span class="o">:</span><span class="s2">&quot;application/json; charset=utf-8&quot;</span><span class="p">,</span> <span class="nx">dataType</span><span class="o">:</span><span class="s2">&quot;json&quot;</span><span class="p">});</span>
-</span><span class='line'>        <span class="k">this</span><span class="p">.</span><span class="nx">refs</span><span class="p">.</span><span class="nx">text</span><span class="p">.</span><span class="nx">getDOMNode</span><span class="p">().</span><span class="nx">value</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">;</span> <span class="c1">// empty text field</span>
-</span><span class='line'>        <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'>    <span class="p">},</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;footer&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">form</span> <span class="nx">onSubmit</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleSubmit</span><span class="p">}</span><span class="o">&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;textField&quot;</span> <span class="nx">ref</span><span class="o">=</span><span class="s2">&quot;text&quot;</span> <span class="nx">placeholder</span><span class="o">=</span><span class="s2">&quot;Say something&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;input-block-level&quot;</span> <span class="o">/&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;button&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;btn btn-primary&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Submit&quot;</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleSubmit</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="err">/form&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>     <span class="p">);}</span>
-</span><span class='line'><span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>In the <strong>SaySomethingBox</strong> component, two things happen:
-+ The <strong><em>render</em></strong> function renders the UI and attaches the <strong><em>handleSubmit</em></strong> function to the events fired by either submitting the form by pressing enter inside the <code>&lt;input&gt;</code> element or clicking the submit button.
-+ The <strong><em>handleSubmit</em></strong> function POSTs the text in the <code>&lt;input&gt;</code> field to the server using jQuery&#8217;s <code>$.ajax</code> function. It uses the <strong>name</strong> and <strong>room</strong> from <strong>props</strong> to construct the JSON message. The message POSTing logic could just as well live inside the top level component, maybe it should, but I don&#8217;t feel like changing it right now.</p>
-
-<p>That&#8217;s pretty much it, with one last function call to get the whole application started:</p>
-
-<figure class='code'><figcaption><span>React.renderComponent</span><a href='https://github.com/matthiasn/sse-chat/blob/6ee4f3de7076c2a9ac39ab75f62d95062df04ede/public/js/react-app.js'>react-app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** render top-level ChatApp component */</span>
-</span><span class='line'><span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">ChatApp</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;chat-app&#39;</span><span class="p">));</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Conclusion</h2>
-
-<p><strong><a href="http://facebook.github.io/react">React</a></strong> offers an intriguing way of rendering potentially immutable data into a virtual DOM with every single change of the data. This virtual DOM will then be diffed against the current DOM (or, more likely, the previous version of the virtual DOM, but just guessing there) and then only the changes are performed on the real DOM, limiting the supposedly slow DOM manipulations to an absolute minimum. I have yet to convince myself about this, but reportedly this whole process is very fast, allowing for 60 FPS even in a mobile WebView, with JavaScript performaning a lot worse than in &#8220;real&#8221; browsers such as Mobile Safari, Mobile Chrome and any recent Desktop browser. React is also conceptually very simple; there are not a lot of things to understand. However I do feel that I need to develop better ideas on how to structure a larger application.</p>
-
-<p>So far all this may sound like a lot of praise for React, but let me emphasize where <strong>AngularJS</strong> really has the edge at this point:</p>
-
-<ul>
-<li>Workable best practices for organizing large applications.</li>
-<li>Many more online resources. I don&#8217;t feel much love for Angular&#8217;s own documentation, but at least there are plenty of great tutorials and blog articles about it out there.</li>
-<li>Reasonably mature support for automated building and testing.</li>
-</ul>
-
-
-<p>So, will I continue using AngularJS? <strong>Yes</strong>. Am I curious about doing more with React? <strong>Another yes</strong>. I need a larger project in order to experience React in a more complex setting. Oh, there&#8217;s one project that comes to mind, but that&#8217;s a story for another day. Before I forget: you can find the source code for the application on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>.</p>
-
-<p>Cheers,
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
