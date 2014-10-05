@@ -9,38 +9,6 @@
     <link rel="stylesheet" href="https://codepen.io/assets/libs/fullpage/jquery-ui.css">
 
     <style>
-        body {
-        }
-
-        #play-pause, #slower-faster{
-            position: relative;
-            left: 20px;
-            height:42px;
-            top:28px;
-            width:65px;
-            font-weight:bold;
-        }
-
-        #slider{
-            width: 50%;
-            left:180px;
-        }
-
-        .ui-slider .ui-slider-handle {
-            width: 40px !important;
-            margin-left: -20px !important;
-            height:40px !important;
-            margin-top:-10px !important;
-        }
-
-        :focus { 
-            outline: none;
-        }
-
-        .ui-widget-content {
-            background: #999999;
-        }
-
     </style>
 </head>
 
@@ -73,28 +41,28 @@
     </font-face>
 </defs>
 <g stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
-    <g id="count" opacity="0">
+    <g id="count">
         <path id="count-box" d="M 697.32283 377.00787 L 697.32283 377.00787 L 810.70866 377.00787 L 867.40157 320.31496 L 810.70866 263.62205 L 697.32283 263.62205 L 754.01574 320.31496 Z" fill="white"/>
         <path d="M 697.32283 377.00787 L 697.32283 377.00787 L 810.70866 377.00787 L 867.40157 320.31496 L 810.70866 263.62205 L 697.32283 263.62205 L 754.01574 320.31496 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
         <text transform="translate(737.41683 268.62205)" fill="black">
             <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".34" y="12">log-count</tspan>
         </text>
     </g>
-    <g id="filter" opacity="0">
+    <g id="filter">
         <path id="filter-box" d="M 583.937 377.00787 L 583.937 377.00787 L 697.32283 377.00787 L 754.01574 320.31496 L 697.32283 263.62205 L 583.937 263.62205 L 640.6299 320.31496 Z" fill="white"/>
         <path d="M 583.937 377.00787 L 583.937 377.00787 L 697.32283 377.00787 L 754.01574 320.31496 L 697.32283 263.62205 L 583.937 263.62205 L 640.6299 320.31496 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
         <text transform="translate(617.531 268.62205)" fill="black">
             <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".396" y="12">filter tweet?</tspan>
         </text>
     </g>
-    <g id="map" opacity="0">
+    <g id="map">
         <path id="map-box" d="M 470.55118 377.00787 L 470.55118 377.00787 L 583.937 377.00787 L 640.6299 320.31496 L 583.937 263.62205 L 470.55118 263.62205 L 527.2441 320.31496 Z" fill="white"/>
         <path d="M 470.55118 377.00787 L 470.55118 377.00787 L 583.937 377.00787 L 640.6299 320.31496 L 583.937 263.62205 L 470.55118 263.62205 L 527.2441 320.31496 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
         <text transform="translate(512.14517 268.62205)" fill="black">
             <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".172" y="12">map json</tspan>
         </text>
     </g>
-    <g id="stream" opacity="0">
+    <g id="stream">
         <path id="stream-box" d="M 357.16535 377.00787 L 357.16535 377.00787 L 470.55118 377.00787 L 527.2441 320.31496 L 470.55118 263.62205 L 357.16535 263.62205 L 413.85827 320.31496 Z" fill="white"/>
         <path d="M 357.16535 377.00787 L 357.16535 377.00787 L 470.55118 377.00787 L 527.2441 320.31496 L 470.55118 263.62205 L 357.16535 263.62205 L 413.85827 320.31496 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
         <text transform="translate(385.75935 268.62205)" fill="black">
@@ -110,11 +78,11 @@
             <tspan font-family="Helvetica Neue" font-size="16" font-weight="bold" x=".336" y="16">Composed Transducer</tspan>
         </text>
         <g id="chunk">
-            <path d="M 277.12598 303.30708 L 369.17323 303.30708 C 371.93465 303.30708 374.17323 305.54566 374.17323 308.30708 L 374.17323 326.65354 C 374.17323 329.41497 371.93465 331.65354 369.17323 331.65354 L 277.12598 331.65354 C 274.36456 331.65354 272.12598 329.41497 272.12598 326.65354 L 272.12598 308.30708 C 272.12598 305.54566 274.36456 303.30708 277.12598 303.30708 Z" fill="white"/>
-            <path d="M 277.12598 303.30708 L 369.17323 303.30708 C 371.93465 303.30708 374.17323 305.54566 374.17323 308.30708 L 374.17323 326.65354 C 374.17323 329.41497 371.93465 331.65354 369.17323 331.65354 L 277.12598 331.65354 C 274.36456 331.65354 272.12598 329.41497 272.12598 326.65354 L 272.12598 308.30708 C 272.12598 305.54566 274.36456 303.30708 277.12598 303.30708 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
-            <text transform="translate(277.12598 310.98031)" fill="black">
-                <tspan font-family="Helvetica" font-size="11" font-weight="bold" x="14.2401745" y="10">tweet chunk</tspan>
-            </text>
+           <path d="M 277.12598 303.30708 L 349.3307 303.30708 C 352.09213 303.30708 354.3307 305.54566 354.3307 308.30708 L 354.3307 326.65354 C 354.3307 329.41497 352.09213 331.65354 349.3307 331.65354 L 277.12598 331.65354 C 274.36456 331.65354 272.12598 329.41497 272.12598 326.65354 L 272.12598 308.30708 C 272.12598 305.54566 274.36456 303.30708 277.12598 303.30708 Z" fill="white"/>
+           <path d="M 277.12598 303.30708 L 349.3307 303.30708 C 352.09213 303.30708 354.3307 305.54566 354.3307 308.30708 L 354.3307 326.65354 C 354.3307 329.41497 352.09213 331.65354 349.3307 331.65354 L 277.12598 331.65354 C 274.36456 331.65354 272.12598 329.41497 272.12598 326.65354 L 272.12598 308.30708 C 272.12598 305.54566 274.36456 303.30708 277.12598 303.30708 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+           <text transform="translate(277.12598 310.98031)" fill="black">
+              <tspan font-family="Helvetica" font-size="11" font-weight="bold" x="4.3189147" y="10" textLength="63.566895">tweet chunk</tspan>
+           </text>
         </g>
     </g>
 </g>
@@ -140,27 +108,36 @@
 
     var chunk  = $("#chunk");
 
-    var birdwatchAnim = new TimelineMax({repeatDelay: 3, repeat:-1});
+    var birdwatchAnim = new TimelineMax({ repeatDelay: 3, repeat:-1 });
+
+    var chunkAnim = new TimelineMax({ repeat:2 })
+        .add(TweenMax.fromTo(chunk, 1, { x: "-100", opacity:0 }, { x: "+=248", opacity:1, ease:Power4.easeOut }))
+        .add(TweenMax.to(chunk, 1, { opacity:0 }))
+        ;
 
     var flowAnim = new TimelineMax({repeat:20});
 
     flowAnim
         .add(TweenMax.to(streamBox, 1, { fill:"#ffdf4d", ease:Power4.easeIn }))
-        .add(TweenMax.to(streamBox, 1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
-        .add(TweenMax.to(mapBox,    1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
-        .add(TweenMax.to(mapBox,    1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
-        .add(TweenMax.to(filterBox, 1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
-        .add(TweenMax.to(filterBox, 1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
-        .add(TweenMax.to(countBox,  1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
-        .add(TweenMax.to(countBox,  1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1");
+        .add(chunkAnim, "-=0.5")
+        .add(TweenMax.to(streamBox, 0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(TweenMax.to(mapBox,    0.5, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=0.5")
+        .add(TweenMax.to(mapBox,    0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(TweenMax.to(filterBox, 0.5, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=0.5")
+        .add(TweenMax.to(filterBox, 0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(TweenMax.to(countBox,  0.5, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=0.5")
+        .add(TweenMax.to(countBox,  0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        ;
 
     birdwatchAnim
-        .add(TweenMax.to(stream,      1, { opacity:1, ease:Power4.easeIn }))
-        .add(TweenMax.to(map,         1, { opacity:1, ease:Power4.easeIn }))
-        .add(TweenMax.to(filter,      1, { opacity:1, ease:Power4.easeIn }))
-        .add(TweenMax.to(count,       1, { opacity:1, ease:Power4.easeIn }))
-        .add(flowAnim);
+        .add(TweenMax.from(stream,  1, { opacity:0, ease:Power4.easeIn }))
+        .add(TweenMax.from(map,     1, { opacity:0, ease:Power4.easeIn }))
+        .add(TweenMax.from(filter,  1, { opacity:0, ease:Power4.easeIn }))
+        .add(TweenMax.from(count,   1, { opacity:0, ease:Power4.easeIn }))
+        .add(flowAnim)
+        ;
 
+    birdwatchAnim.timeScale(1.5);
     birdwatchAnim.play();
 })();
 </script>

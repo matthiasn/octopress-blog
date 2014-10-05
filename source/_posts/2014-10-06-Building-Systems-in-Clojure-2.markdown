@@ -5,10 +5,18 @@ date: 2014-10-06 19:06
 comments: true
 categories: 
 ---
-**TL;DR:** This article covers the usage of **transducers** in Clojure, spiced up with some **core.async**. Here's a graphical representation of the article's content:
+**TL;DR:** This article covers the usage of **transducers** in Clojure, spiced up with some **core.async**. Here's a animation that shows the information flow of the **composed transducer** that we are going to build in this article:
 
+<script language="javascript" type="text/javascript">
+  function resizeIframe(obj) {
+    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+    obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
+  }
+</script>
+<iframe width="100%;" src="/iframes/clj-system2/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
 
-
+<br/>
+<br/>
 
 If any of that is of interest to you at all (or you want to see more animations like the one above), you may want to **read** the following article.
 
