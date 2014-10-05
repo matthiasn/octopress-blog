@@ -1,16 +1,13 @@
 ---
 layout: post
 title: "Building a System in #Clojure - Part 2"
-date: 2014-10-01 19:06
+date: 2014-10-06 19:06
 comments: true
 categories: 
 ---
 **TL;DR: transducers** in Clojure, **component lifecycle**, more **core.async**. If any of that is of interest to you at all, you may want to **read** the following article.
 
 <!-- more -->
-
-**Attention, Attention:** This article is somewhat **work in progress** still. Right now I am working on animations for illustrating stuff. Come back in a day or two for those. Please **provide feedback** already wherever you see potential improvements.
-
 
 Hello and welcome back to this series of articles about building a system in **[Clojure](http://clojure.org/)**. Last week, we had a first look at dependency injection using the **[component library](https://github.com/stuartsierra/component)** combined with a hint of channel decoupling power. You may want to read **[that article first](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** if you haven’t done so already.
 
