@@ -5,7 +5,7 @@ date: 2014-10-01 19:06
 comments: true
 categories: 
 ---
-**TL;DR: transducers in Clojure, component lifecycle, more core.async. If any of that is of interest to you at all, you may want to read the following article.**
+**TL;DR: transducers** in Clojure, **component lifecycle**, more **core.async**. If any of that is of interest to you at all, you may want to **read** the following article.
 
 <!-- more -->
 
@@ -354,7 +354,7 @@ Okay, this is it for today. We saw how a component that starts and maintains a c
 
 In the next installment, we will probably cover the switchboard component. Considering where the information flows next, that seems like a natural next step. 
 
-I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out? I will also let you know when this one is complete.
+I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?
 
 Cheers,
 Matthias
