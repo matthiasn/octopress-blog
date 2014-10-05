@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>BirdWatch Components</title>
+    <title>Transducers</title>
     <meta name="description" content="BirdWatch Components">
     <meta name="author" content="Matthias Nehlsen">
     <link rel="stylesheet" href="https://codepen.io/assets/libs/fullpage/jquery-ui.css">
@@ -125,44 +125,44 @@
 <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"/></script>
 
 <script>
+(function () {
+    var doc = document.getElementById("bw-omni");
 
-var doc = document.getElementById("bw-omni");
+    var stream = $("#stream");
+    var filter = $("#filter");
+    var map    = $("#map");
+    var count  = $("#count");
 
-var stream = $("#stream");
-var filter = $("#filter");
-var map    = $("#map");
-var count  = $("#count");
+    var streamBox = $("#stream-box");
+    var filterBox = $("#filter-box");
+    var mapBox    = $("#map-box");
+    var countBox  = $("#count-box");
 
-var streamBox = $("#stream-box");
-var filterBox = $("#filter-box");
-var mapBox    = $("#map-box");
-var countBox  = $("#count-box");
+    var chunk  = $("#chunk");
 
-var chunk  = $("#chunk");
+    var birdwatchAnim = new TimelineMax({repeatDelay: 3, repeat:-1});
 
-var birdwatchAnim = new TimelineMax({repeatDelay: 3, repeat:-1});
+    var flowAnim = new TimelineMax({repeat:20});
 
-var flowAnim = new TimelineMax({repeat:20});
+    flowAnim
+        .add(TweenMax.to(streamBox, 1, { fill:"#ffdf4d", ease:Power4.easeIn }))
+        .add(TweenMax.to(streamBox, 1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
+        .add(TweenMax.to(mapBox,    1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
+        .add(TweenMax.to(mapBox,    1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
+        .add(TweenMax.to(filterBox, 1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
+        .add(TweenMax.to(filterBox, 1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
+        .add(TweenMax.to(countBox,  1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
+        .add(TweenMax.to(countBox,  1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1");
 
-flowAnim
-    .add(TweenMax.to(streamBox, 1, { fill:"#ffdf4d", ease:Power4.easeIn }))
-    .add(TweenMax.to(streamBox, 1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
-    .add(TweenMax.to(mapBox,    1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
-    .add(TweenMax.to(mapBox,    1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
-    .add(TweenMax.to(filterBox, 1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
-    .add(TweenMax.to(filterBox, 1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1")
-    .add(TweenMax.to(countBox,  1, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=1")
-    .add(TweenMax.to(countBox,  1, { fill:"#ffffff", ease:Power4.easeIn }), "+=1");
+    birdwatchAnim
+        .add(TweenMax.to(stream,      1, { opacity:1, ease:Power4.easeIn }))
+        .add(TweenMax.to(map,         1, { opacity:1, ease:Power4.easeIn }))
+        .add(TweenMax.to(filter,      1, { opacity:1, ease:Power4.easeIn }))
+        .add(TweenMax.to(count,       1, { opacity:1, ease:Power4.easeIn }))
+        .add(flowAnim);
 
-birdwatchAnim
-    .add(TweenMax.to(stream,      1, { opacity:1, ease:Power4.easeIn }))
-    .add(TweenMax.to(map,         1, { opacity:1, ease:Power4.easeIn }))
-    .add(TweenMax.to(filter,      1, { opacity:1, ease:Power4.easeIn }))
-    .add(TweenMax.to(count,       1, { opacity:1, ease:Power4.easeIn }))
-    .add(flowAnim);
-
-birdwatchAnim.play();
-
+    birdwatchAnim.play();
+})();
 </script>
 </body>
 </html>
