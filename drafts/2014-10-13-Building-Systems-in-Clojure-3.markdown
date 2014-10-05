@@ -1,22 +1,19 @@
 ---
 layout: post
-title: "Building a System in #Clojure - Part 2"
+title: "Building a System in #Clojure - Part 3"
 date: 2014-10-06 19:06
 comments: true
 categories: 
 ---
-**TL;DR:** This article covers the usage of **transducers** in Clojure, spiced up with some **core.async**. Here's a graphical representation of the article's content:
+**This article will change completely as some of the content is covered in the previous article already**.
 
-
-
-
-If any of that is of interest to you at all (or you want to see more animations like the one above), you may want to **read** the following article.
+**TL;DR: transducers** in Clojure, **component lifecycle**, more **core.async**. If any of that is of interest to you at all, you may want to **read** the following article.
 
 <!-- more -->
 
 Hello and welcome back to this series of articles about building a system in **[Clojure](http://clojure.org/)**. Last week, we had a first look at dependency injection using the **[component library](https://github.com/stuartsierra/component)** combined with a hint of channel decoupling power. You may want to read **[that article first](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** if you haven’t done so already.
 
-In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for twitter’s **streaming data**. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.
+In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for twitter’s **streaming data**. Since we haven’t done so already, we will also look at the lifecycle of a component. Before that, because this component happens to use them, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First, though, we will look at the problem at hand, without any language- or library-specific implementation details.
 
 ## Twitter Client
 Let’s start in **[hammock mode](https://www.youtube.com/watch?v=f84n5oFoZBc)**, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)** these terms at the moment happen to be "Ferguson", "ISIS", and "Ebola" - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of **1%** of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of **1%** of what is tweeted at any moment in time. [^2]
@@ -215,10 +212,146 @@ The, we should see that the invalid one is logged and the other two are returned
 
 Great, we have a composed transducer that works on vectors as expected and that should work on channels as well.
 
-## Conclusion
-Okay, this is it for today. We saw how we can process tweets from the twitter streaming API in a way that is generic and that can be used on different kinds of data structures. Next week, we will see how this ic actually used in the **TwitterClient** component.
+## Channels 
+We will only gradually cover channels as this series unfolds. For now, let us just reiterate what a channel does. A **core.async channel** can be compared to a **conveyor belt**. You place something on that belt and whatever happens on the other side is not your problem. That way, we can build systems that consist of parts that do not depend on each other (except for having expectations about the data they receive). 
 
-There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I'd rather refer you to my list of **[Clojure Resources on GitHub](https://github.com/matthiasn/Clojure-Resources)**. There, you'll find a comprehensive list of all the articles I came across while working on this application.
+In this component, we are dealing with two such channels. The more straightforward one is the channel in the **channels component**.
+
+## Component lifecycle: the TwitterClient-Channels component
+This component is the **wiring harness** between the **switchboard** component and the **TwitterClient** component[^7]. Here's how the channels component looks like:
+
+{% codeblock Twitterclient-Channels component lang:clojure component.clj%}
+(defrecord Twitterclient-Channels []
+  component/Lifecycle
+  (start [component] (log/info "Starting Twitterclient Channels Component")
+         (assoc component :tweets (chan))) ; channel for new tweets received from streaming API
+  (stop [component] (log/info "Stop Twitterclient Channels Component")
+        (assoc component :tweets nil)))
+
+(defn new-twitterclient-channels [] (map->Twitterclient-Channels {}))
+{% endcodeblock %}
+
+This is a really simple component. On startup, it associates a new channel to its own map, which is passed in under the name **component** and logs its successful startup. When it shuts down, it replaces the **:tweets** component keys with **nil**.
+
+## Component lifecycle: the TwitterClient component
+The other component, where all the tweet stream action is happening, is the **TwitterClient** component:
+
+{% codeblock Twitterclient component lang:clojure component.clj%}
+(defrecord Twitterclient [conf channels conn chunk-chan watch-active]
+  component/Lifecycle
+  (start [component] (log/info "Starting Twitterclient Component")
+         (let [last-received (atom (t/epoch))
+               chunk-chan (chan 1 (processing/process-chunk last-received))
+               conn (atom {})
+               watch-active (atom false)]
+           (http-client/start-twitter-conn! conf conn chunk-chan)
+           (pipe chunk-chan (:tweets channels) false)
+           (http-client/run-watch-loop conf conn chunk-chan last-received watch-active)
+           (assoc component :conn conn :chunk-chan chunk-chan :watch-active watch-active)))
+  (stop [component] (log/info "Stopping Twitterclient Component")
+        (reset! watch-active false)
+        (http-client/stop-twitter-conn! conn)
+        (assoc component :conn nil :chunk-chan nil :watch-active nil)))
+{% endcodeblock %}
+
+This component encapsulates the behavior of the TwitterClient. Initially, the **last-received** atom is created, which holds a timestamp of the last-received full tweet. We will meet this atom again when we watch the twitter stream and restart it when inactivity periods have been too long. 
+
+Next, **chunk-chan** is the channel that receives individual tweet string fragments from the chunked HTTP connection and passes tweets on as Clojure maps by virtue of applying the composed transducer we have discussed in detail above. Let' do a quick check what the step function is when the transducer is used on a channel. For that, let's print **step** again, just this time when the function is created as the arity-1 function will never be called on an infinite channel:
+
+{% codeblock lang:clojure %}
+(defn- streaming-buffer []
+  (fn [step] (println step)
+{% endcodeblock %}
+
+Now when we attach **streaming-buffer** to a channel, we will see what the step function is:
+
+    birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
+    #<Namespace birdwatch.twitterclient.processing>
+    birdwatch.twitterclient.processing=> (require '[clojure.core.async :as async :refer [chan]])
+    nil
+    birdwatch.twitterclient.processing=> (def c (chan 1 (streaming-buffer)))
+    #<protocols$add_BANG_ clojure.core.async.impl.protocols$add_BANG_@5a0f8c33>
+    #'birdwatch.twitterclient.processing/c
+
+Okay, **add!** is a function from core.async that **[appears to add an item to a buffer](https://github.com/clojure/core.async/blob/master/src/main/clojure/clojure/core/async/impl/protocols.clj#L35)** if that item is not nil. Makes sense.
+
+Back to the let-bindings in the component. **conn** is a reference to the current connection to Twitter. **watch-active** is a simple boolean that keeps track of whether the watch loop is supposed to keep running or not (more later). Next, we start the TwitterClient by calling a function from the **http** namespace:
+
+{% codeblock lang:clojure %}
+(http-client/start-twitter-conn! conf conn chunk-chan)
+{% endcodeblock %}
+
+Here's what that function does:
+
+{% codeblock start-twitter-conn! lang:clojure http.clj%}
+(defn start-twitter-conn! [conf conn chunk-chan]
+  (log/info "Starting Twitter client.")
+  (reset! conn (tas/statuses-filter
+                :params {:track (:track conf)}
+                :oauth-creds (creds conf)
+                :callbacks (tweet-chunk-callback chunk-chan))))
+{% endcodeblock %}
+
+It basically resets the conn atom and replaces it with a new client (statuses-filter from the twitter.api.streaming namespace) with parameters from the application's configuration and assigns a callback handler:
+
+{% codeblock tweet-chunk-callback lang:clojure http.clj%}
+(defn- tweet-chunk-callback [chunk-chan]
+  (tas/AsyncStreamingCallback. #(>!! chunk-chan (str %2))
+                               (comp println tch/response-return-everything)
+                               tch/exception-print))
+{% endcodeblock %}
+
+The only thing we need to concern ourselves with regarding the **AsyncStreamingCallback** is the first parameter which is a function disguised as a macro. This function simply places every chunk on **chunk-chan**, which happens to be the channel that processes chunks into tweets.
+
+Back to the component. In the following line, **chunk-chan** is piped into the **tweets** channel from the channels component. That way, our processing chain for the TwitterClient is complete, and processed tweets are put on the conveyor belt that is the only connection between the TwitterClient component and the outside world.  From here, we do not need to concern ourselves with what happens with the tweet on the other side of that conveyor belt.
+
+{% codeblock lang:clojure %}
+(pipe chunk-chan (:tweets channels) false)
+{% endcodeblock %}
+
+With this in place, we now have a component that establishes a connection to the **streaming API** and puts the received tweets on a channel. But what if the pipes and tubes of the Internet are occasionally clogged? In that case we will want to restart the connection. Let's do it and make the client more resilient:
+
+{% codeblock tweet-chunk-callback lang:clojure http.clj%}
+(defn run-watch-loop [conf conn chunk-chan last-received watch-active]
+  "run loop watching the twitter client and restarting it if necessary"
+  (reset! watch-active true)
+  (go-loop [] (<! (timeout (* (:tw-check-interval-sec conf) 1000)))
+           (let [since-last-sec (t/in-seconds (t/interval @last-received (t/now)))
+                 active @watch-active]
+             (when active
+               (when (> since-last-sec (:tw-check-interval-sec conf))
+                 (log/error since-last-sec "seconds since last tweet received")
+                 (stop-twitter-conn! conn)
+                 (<! (timeout (* (:tw-restart-wait conf) 1000)))
+                 (start-twitter-conn! conf conn chunk-chan))
+               (recur)))))
+{% endcodeblock %}
+
+I won't go into much detail here as this watch loop is somewhat incidental to the problem of componentizing an application, but here's a brief run-through. When the function is called, it starts the **go-loop** with code that runs in intervals. If the check determines that the last tweet ismore than a defined number of seconds ago (from configuration) and that the client is active, the client is restarted. For that, a function to stop the connection is called before it is started again. Here's that function:
+
+{% codeblock stop-twitter-conn! lang:clojure http.clj%}
+(defn stop-twitter-conn! [conn]
+  (let [m (meta @conn)]
+    (when m (log/info "Stopping Twitter client.")
+      ((:cancel m)))))
+{% endcodeblock %}
+
+Check out the **[adamwynne/twitter-api on GitHub](https://github.com/adamwynne/twitter-api)** for more details on the twitter-api.
+
+Finally, in the **stop** part of the component lifecycle, **watch-active** is switched off, the client shut down, and all component keys replaced by **nil**.
+
+Right below the component definitions, there are also functions for creating the respective components. This can take parameters like the application's configuration:
+
+{% codeblock lang:clojure %}
+(defn new-twitterclient [conf] (map->Twitterclient {:conf conf}))
+{% endcodeblock %}
+
+Remember from the last article, where the components were fired up in order (in the animation)? The channels component is created first and then provided to the TwitterClient component. The component library wires all components together and starts them up in the right order. Eventually, this means that **start** is called on each component but only after all dependencies are met.
+
+## Conclusion
+Okay, this is it for today. We saw how a component that starts and maintains a connection to the twitter streaming API and that delivers tweets on a channel is created and started. There is a lot more reading material available on these subjects. Instead of providing all the links now, I'd rather refer you to my list of **[Clojure Resources on GitHub](https://github.com/matthiasn/Clojure-Resources)**. There, you'll find a comprehensive list of all the articles I came across while working on this application.
+
+In the next installment, we will probably cover the switchboard component. Considering where the information flows next, that seems like a natural next step. 
 
 I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?
 
@@ -237,3 +370,6 @@ Matthias
 [^5]: For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: ````(str/replace s #"\}\{" "}\r\n{"))````.
 
 [^6]: I assume the **transient** collection is used for performance reasons.
+
+[^7]: This wiring harness is kind of the interface of the component. All it provides, though, is a channel. However, what is put on that channel is not checked. Maybe a channel type that checks if a message validates against a schema - maybe provided by prismatic/schema – and if so, forwards the message and otherwise puts it on an error channel or calls an error function. That way, validation errors could be logged while valid messages would be processed as expected. That could actually happen in a filtering transducer. Such a transducer function would be free not only to check but also put mismatches on another channel or log an error.
+
