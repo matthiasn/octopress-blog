@@ -5,21 +5,24 @@ date: 2014-10-04 19:06
 comments: true
 categories: 
 ---
-This weekly update is mostly about organizational isssues around publishing articles and getting feedback for unfinished articles.
+This weekly update is mostly about organizational issues around publishing articles and getting feedback for unfinished articles.
 
 <!-- more -->
 
-## Test environment for my blog
-This week, I published the unfinished second article in the **Writing a System in Clojure** series for a getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators, so that was a little less than ideal on my part. Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.
+The other day, I published the unfinished second article in the **Writing a System in Clojure** series for getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators that notice and pick up new content nonetheless, so that was a little less than ideal on my part.
 
-So I came up with something different: a **staging server**. Just like I would want a test environment when developing an application, I also want a test environment for new articles. So I've pulled the unfinished article from master for now and put the unfinished article here:
+Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.
 
-**[http://staging.matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2/](http://staging.matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2/)**
+So I came up with something different: a **staging server**. Just like I would want a test environment when developing an application, I also want a test environment for new articles. So I've removed the unfinished article from master for now and put the unfinished article here:
 
-I'd love to get more feedback still. But what I got so far was also very helpful. Right now I am working on illustrating the mechanisms with some illustrations and I expect to be done with everything on Monday. I will also probably split the article in two as the current article is probably a little long.
+**[http://staging.matthiasnehlsen.com/](http://staging.matthiasnehlsen.com/)**
 
-## Closing remarks
-Most importantly, check out the new **[article series](/blog/2014/09/24/Building-Systems-in-Clojure-1/)** that I just started. I hope you will find it useful and I am looking forward to your feedback. In addition, there have been plenty of new entries to my **[Clojure-Resources](https://github.com/matthiasn/Clojure-Resources)** repository on GitHub. You may want to check that out if you're interested in Clojure at all. Finally, I bought a useful gadget that makes my digital life a little better.
+The implementation of this staging server took like 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for **staging.matthiasnehlsen.com**, and modify the **nginx** configuration so that the staging URL point to that new directory.
 
-Until next week,
+I got very helpful feedback so far, so at least publishing the unfinished article was still worth it. Right now I am working on illustrating the new article with some animations. I expect to be done with everything on Monday. I will also probably split the article in two as the current article is a little too long for my taste.
+
+## Conclusion
+While this little modification is probably not terribly useful for you, I feel like it will be much more convenient for my workflow. You can also check out the staging server to see new articles in the works. Just note that sharing links may or may not lead to **404's** later on as there is no guarantee whatsoever that those links will last. If they end up in master, they should, but the may well not.
+
+Thats all for now. Have a great week,
 Matthias

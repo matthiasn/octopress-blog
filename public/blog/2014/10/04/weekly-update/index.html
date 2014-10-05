@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="This weekly update is mostly about organizational isssues around publishing articles and getting feedback for unfinished articles. Test environment &hellip;">
+  <meta name="description" content="This weekly update is mostly about organizational issues around publishing articles and getting feedback for unfinished articles. The other day, I &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,26 +91,28 @@
   </header>
 
 
-<div class="entry-content"><p>This weekly update is mostly about organizational isssues around publishing articles and getting feedback for unfinished articles.</p>
+<div class="entry-content"><p>This weekly update is mostly about organizational issues around publishing articles and getting feedback for unfinished articles.</p>
 
 <!-- more -->
 
 
-<h2>Test environment for my blog</h2>
+<p>The other day, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series for getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators that notice and pick up new content nonetheless, so that was a little less than ideal on my part.</p>
 
-<p>This week, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series for a getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators, so that was a little less than ideal on my part. Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.</p>
+<p>Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.</p>
 
-<p>So I came up with something different: a <strong>staging server</strong>. Just like I would want a test environment when developing an application, I also want a test environment for new articles. So I&#8217;ve pulled the unfinished article from master for now and put the unfinished article here:</p>
+<p>So I came up with something different: a <strong>staging server</strong>. Just like I would want a test environment when developing an application, I also want a test environment for new articles. So I&#8217;ve removed the unfinished article from master for now and put the unfinished article here:</p>
 
-<p><strong><a href="http://staging.matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2/">http://staging.matthiasnehlsen.com/blog/2014/10/01/Building-System-in-Clojure-2/</a></strong></p>
+<p><strong><a href="http://staging.matthiasnehlsen.com/">http://staging.matthiasnehlsen.com/</a></strong></p>
 
-<p>I&#8217;d love to get more feedback still. But what I got so far was also very helpful. Right now I am working on illustrating the mechanisms with some illustrations and I expect to be done with everything on Monday. I will also probably split the article in two as the current article is probably a little long.</p>
+<p>The implementation of this staging server took like 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for <strong>staging.matthiasnehlsen.com</strong>, and modify the <strong>nginx</strong> configuration so that the staging URL point to that new directory.</p>
 
-<h2>Closing remarks</h2>
+<p>I got very helpful feedback so far, so at least publishing the unfinished article was still worth it. Right now I am working on illustrating the new article with some animations. I expect to be done with everything on Monday. I will also probably split the article in two as the current article is a little too long for my taste.</p>
 
-<p>Most importantly, check out the new <strong><a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">article series</a></strong> that I just started. I hope you will find it useful and I am looking forward to your feedback. In addition, there have been plenty of new entries to my <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a></strong> repository on GitHub. You may want to check that out if you&#8217;re interested in Clojure at all. Finally, I bought a useful gadget that makes my digital life a little better.</p>
+<h2>Conclusion</h2>
 
-<p>Until next week,
+<p>While this little modification is probably not terribly useful for you, I feel like it will be much more convenient for my workflow. You can also check out the staging server to see new articles in the works. Just note that sharing links may or may not lead to <strong>404&#8217;s</strong> later on as there is no guarantee whatsoever that those links will last. If they end up in master, they should, but the may well not.</p>
+
+<p>Thats all for now. Have a great week,
 Matthias</p>
 </div>
 
