@@ -112,18 +112,18 @@
 <br/>
 
 
-<p>If any of that is of interest to you at all (or you want to see more animations like the one above), you may want to <strong>read</strong> the following article.</p>
+<p>If any of that is of interest to you at all (or if you want to see more animations like the one above), you may want to <strong>read</strong> the following article.</p>
 
 <!-- more -->
 
 
 <p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. The other week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
 
-<p>In this installment, we will look into the first component, the <strong>twitter client</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for twitter’s <strong>streaming data</strong>. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.</p>
+<p>In this installment, we will look into the first component, the <strong>twitter client</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for Twitter’s <strong><a href="https://dev.twitter.com/streaming/overview">streaming data</a></strong>. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.</p>
 
 <h2>Twitter Client</h2>
 
-<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of <strong>1%</strong> of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the Twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of <strong>1%</strong> of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
 <p>Here is how that stream looks like when each chunk is simply printed to the console:</p>
 
@@ -188,7 +188,7 @@
 
 <p>The above creates a channel with a buffer size of one that applies the transducer to every element.</p>
 
-<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of <strong>state</strong>. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. Also, as Rich Hickey mentioned in his StrangeLoop talk, there is no space in the machinery to keep state. What if one such transducer could have local state though that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
+<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of <strong>state</strong>. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. Also, as Rich Hickey mentioned in his StrangeLoop talk, there is no space in the machinery to keep state. What if one such transducer could have local state even if that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
 
 <p>Here’s how that looks like in code:</p>
 
@@ -214,7 +214,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Let&#8217;s go through this line by line. We have a (private) function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don&#8217;t have to use <strong>atoms</strong> here if we want to squeeze out the last bit of performance but I find it simpler to not introduce another yet concept unless strictly necessary<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
+<p>Let&#8217;s go through this line by line. We have a (private) function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don&#8217;t have to use <strong>atoms</strong> here if we want to squeeze out the last bit of performance, but I find it easier not to introduce yet another concept unless absoletely necessary<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
 
 <p>In the first line of the let binding, we use the <strong><a href="http://clojuredocs.org/clojure.core/-%3E">-> (thread-first)</a></strong> macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we <strong>1)</strong> concatenate the buffer with the new chunk, <strong>2)</strong> add newlines where missing<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>, and <strong>3)</strong> split the string into a sequence on the line breaks.</p>
 
@@ -241,14 +241,14 @@
 
 <p>That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the <strong>JSON parser</strong>.</p>
 
-<p>Let&#8217;s create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here&#8217;s the vector for the test:</p>
+<p>Let&#8217;s create a vector of JSON fragments and try it out. We have already established that transducers can be used on different data structures, it therefore should work equally well on a vector. Here&#8217;s the vector for the test:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;&quot;</span> <span class="s">&quot;:1}\n{\&quot;bar\&quot;:&quot;</span> <span class="s">&quot;42}&quot;</span> <span class="s">&quot;{\&quot;baz\&quot;:42}&quot;</span> <span class="s">&quot;{\&quot;bla\&quot;:42}&quot;</span><span class="p">]</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called a final time, which really only returns the aggregate at that point:</p>
+<p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called one last time, which really only returns the aggregate at that point:</p>
 
 <pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
 #&lt;Namespace birdwatch.twitterclient.processing&gt;
@@ -267,18 +267,18 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now when we run the same as above on the REPL, we see what the step function actually is:</p>
+<p>Now when we run the same as above on the REPL, we can see what the step function actually is:</p>
 
 <pre><code>birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 #&lt;core$conj_BANG_ clojure.core$conj_BANG_@5fd837a&gt;
 ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
 </code></pre>
 
-<p>Interesting, the step function is <strong>conj!</strong> which, according to the <strong><a href="https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208">source</a></strong>, adds <strong>x</strong> to a <strong>transient collection</strong><sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>.</p>
+<p>Interestingly, the step function is <strong>conj!</strong> which according to the <strong><a href="https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208">source</a></strong> adds <strong>x</strong> to a <strong>transient collection</strong><sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>.</p>
 
 <p>The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.</p>
 
-<p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one <strong>key</strong> that all tweets have in common which does not seem to appear in any status messages from twitter: <strong>:text</strong>. We can thus use that key as the <strong>predicate</strong> for recognizing a tweet:</p>
+<p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one <strong>key</strong> that all tweets have in common, which does not seem to appear in any status messages from Twitter: <strong>:text</strong>. We can thus use that key as the <strong>predicate</strong> for recognizing a tweet:</p>
 
 <figure class='code'><figcaption><span>tweet? predicate function processing.clj</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -346,14 +346,14 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 
 <p>The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this <strong>transducing function</strong> and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.</p>
 
-<p>Let&#8217;s try it on a vector one more time to see what&#8217;s happening. For that, we take a different vector, with two JSON strings that contain the <strong>:text</strong> property and one that doesn&#8217;t.</p>
+<p>Let&#8217;s try the composed transducer on a vector to see what&#8217;s happening. For that, we create a vector with two JSON strings that contain the <strong>:text</strong> property and two that don&#8217;t.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">[</span><span class="s">&quot;{\&quot;text\&quot;&quot;</span> <span class="s">&quot;:\&quot;foo\&quot;}\n{\&quot;text\&quot;:&quot;</span> <span class="s">&quot;\&quot;bar\&quot;}&quot;</span> <span class="s">&quot;{\&quot;baz\&quot;:42}&quot;</span> <span class="s">&quot;{\&quot;bla\&quot;:42}&quot;</span><span class="p">])</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The, we should see that the invalid one is logged and the other two are returned:</p>
+<p>Then we should see that the invalid one is logged and the other two are returned (the final one at that point still in the buffer):</p>
 
 <pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
 #&lt;Namespace birdwatch.twitterclient.processing&gt;
@@ -366,7 +366,7 @@ birdwatch.twitterclient.processing=&gt; (into [] (process-chunk (atom (t/epoch))
 [{:text "foo"} {:text "bar"}]
 </code></pre>
 
-<p>Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey, this should work equally well on channels. But let&#8217;s not take his word for it and instead try it out:</p>
+<p>Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let&#8217;s not take his word for it and instead try it out:</p>
 
 <pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
 #&lt;Namespace birdwatch.twitterclient.processing&gt;
@@ -395,11 +395,11 @@ birdwatch.twitterclient.processing=&gt; (put! c (chunks 4))
 16:44:32.539 [nREPL-worker-2] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
 </code></pre>
 
-<p>Excellent, same output. In case you&#8217;re not familiar with <strong>core.async channels</strong> yet: above we have created a channel with the same transducer attached as in the previous example, then we have created a <strong>go-loop</strong> for consuming the channel and finally, we have <strong>put!</strong> the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we&#8217;ll cover this topic in much more detail.</p>
+<p>Excellent, same output. In case you&#8217;re not familiar with <strong>core.async channels</strong> yet: above we created a channel with the same transducer attached as in the previous example, then we created a <strong>go-loop</strong> to consume the channel and finally, we <strong>put!</strong> the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we&#8217;ll cover this topic in much more detail.</p>
 
 <h2>Conclusion</h2>
 
-<p>Okay, this is it for today. We saw how we can process tweets from the twitter streaming API in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.</p>
+<p>Okay, this is it for today. We saw how we can process tweets from the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.</p>
 
 <p>There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I&#8217;d rather refer you to my list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. There, you&#8217;ll find a comprehensive list of all the articles I came across while working on this application.</p>
 

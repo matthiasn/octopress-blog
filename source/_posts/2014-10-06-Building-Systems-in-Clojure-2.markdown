@@ -18,16 +18,16 @@ categories:
 <br/>
 <br/>
 
-If any of that is of interest to you at all (or you want to see more animations like the one above), you may want to **read** the following article.
+If any of that is of interest to you at all (or if you want to see more animations like the one above), you may want to **read** the following article.
 
 <!-- more -->
 
 Hello and welcome back to this series of articles about building a system in **[Clojure](http://clojure.org/)**. The other week, we had a first look at dependency injection using the **[component library](https://github.com/stuartsierra/component)** combined with a hint of channel decoupling power. You may want to read **[that article first](http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/)** if you haven’t done so already.
 
-In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for twitter’s **streaming data**. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.
+In this installment, we will look into the first component, the **twitter client**[^1]. It seems like the natural component to start with as it is our application’s point of entry for Twitter’s **[streaming data](https://dev.twitter.com/streaming/overview)**. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a **[recent addition](http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming)** to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.
 
 ## Twitter Client
-Let’s start in **[hammock mode](https://www.youtube.com/watch?v=f84n5oFoZBc)**, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the twitter API. Very briefly, the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)** these terms at the moment happen to be "Ferguson", "ISIS", and "Ebola" - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of **1%** of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of **1%** of what is tweeted at any moment in time. [^2]
+Let’s start in **[hammock mode](https://www.youtube.com/watch?v=f84n5oFoZBc)**, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the Twitter API. Very briefly, the **[Twitter Streaming API](https://dev.twitter.com/docs/streaming-apis)** allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under **[http://birdwatch2.matthiasnehlsen.com](http://birdwatch2.matthiasnehlsen.com/#*)** these terms at the moment happen to be "Ferguson", "ISIS", and "Ebola" - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of **1%** of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of **1%** of what is tweeted at any moment in time. [^2]
 
 Here is how that stream looks like when each chunk is simply printed to the console:
 
@@ -85,7 +85,7 @@ It may not look terribly useful so far. But this can also be applied to a channe
 
 The above creates a channel with a buffer size of one that applies the transducer to every element.
 
-But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of **state**. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a **black box**? Then, the aggregation cannot really have outside state. Also, as Rich Hickey mentioned in his StrangeLoop talk, there is no space in the machinery to keep state. What if one such transducer could have local state though that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.
+But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of **state**. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a **black box**? Then, the aggregation cannot really have outside state. Also, as Rich Hickey mentioned in his StrangeLoop talk, there is no space in the machinery to keep state. What if one such transducer could have local state even if that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.
 
 Here’s how that looks like in code:
 
@@ -101,7 +101,7 @@ Here’s how that looks like in code:
           (if to-process (reduce step r to-process) r))))))
 {% endcodeblock %}
 
-Let's go through this line by line. We have a (private) function named **streaming-buffer** that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom[^3] which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don't have to use **atoms** here if we want to squeeze out the last bit of performance but I find it simpler to not introduce another yet concept unless strictly necessary[^4]. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk). 
+Let's go through this line by line. We have a (private) function named **streaming-buffer** that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom[^3] which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don't have to use **atoms** here if we want to squeeze out the last bit of performance, but I find it easier not to introduce yet another concept unless absoletely necessary[^4]. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk). 
 
 In the first line of the let binding, we use the **[-> (thread-first)](http://clojuredocs.org/clojure.core/-%3E)** macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we **1)** concatenate the buffer with the new chunk, **2)** add newlines where missing[^5], and **3)** split the string into a sequence on the line breaks.
 
@@ -125,13 +125,13 @@ Finally, we have **reduce** call the **step** function for every item in **to-pr
 
 That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That's all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this **streaming-buffer** transducer runs first and passes its result to the **JSON parser**.
 
-Let's create a vector of JSON fragment and try it out. We already established that transducers can used on different data structures, thus it should work equally well on a vector. Here's the vector for the test:
+Let's create a vector of JSON fragments and try it out. We have already established that transducers can be used on different data structures, it therefore should work equally well on a vector. Here's the vector for the test:
 
 {% codeblock lang:clojure %}
 ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"]
 {% endcodeblock %}
 
-Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the **arity-1** (single argument) function is called a final time, which really only returns the aggregate at that point:
+Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the **arity-1** (single argument) function is called one last time, which really only returns the aggregate at that point:
 
     birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
     #<Namespace birdwatch.twitterclient.processing>
@@ -148,17 +148,17 @@ What somewhat confused me at first is what the step function actually was. Let's
       ([r] (println step) (step r))
 {% endcodeblock %}
 
-Now when we run the same as above on the REPL, we see what the step function actually is:
+Now when we run the same as above on the REPL, we can see what the step function actually is:
 
     birdwatch.twitterclient.processing=> (into [] (streaming-buffer) chunks)
     #<core$conj_BANG_ clojure.core$conj_BANG_@5fd837a>
     ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
 
-Interesting, the step function is **conj!** which, according to the **[source](https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208)**, adds **x** to a **transient collection**[^6].
+Interestingly, the step function is **conj!** which according to the **[source](https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208)** adds **x** to a **transient collection**[^6].
 
 The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.
 
-There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one **key** that all tweets have in common which does not seem to appear in any status messages from twitter: **:text**. We can thus use that key as the **predicate** for recognizing a tweet:
+There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one **key** that all tweets have in common, which does not seem to appear in any status messages from Twitter: **:text**. We can thus use that key as the **predicate** for recognizing a tweet:
 
 {% codeblock tweet? predicate function lang:clojure processing.clj%}
 (defn- tweet? [data]
@@ -200,13 +200,13 @@ Now, we can compose all these steps:
 
 The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this **transducing function** and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt. 
 
-Let's try it on a vector one more time to see what's happening. For that, we take a different vector, with two JSON strings that contain the **:text** property and one that doesn't. 
+Let's try the composed transducer on a vector to see what's happening. For that, we create a vector with two JSON strings that contain the **:text** property and two that don't. 
 
 {% codeblock lang:clojure %}
 ["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
 {% endcodeblock %}
 
-The, we should see that the invalid one is logged and the other two are returned:
+Then we should see that the invalid one is logged and the other two are returned (the final one at that point still in the buffer):
 
     birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
     #<Namespace birdwatch.twitterclient.processing>
@@ -218,7 +218,7 @@ The, we should see that the invalid one is logged and the other two are returned
     20:57:39.999 [nREPL-worker-1] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
     [{:text "foo"} {:text "bar"}]
 
-Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey, this should work equally well on channels. But let's not take his word for it and instead try it out:
+Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let's not take his word for it and instead try it out:
 
     birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
     #<Namespace birdwatch.twitterclient.processing>
@@ -246,10 +246,10 @@ Great, we have a composed transducer that works on vectors as expected. Accordin
     birdwatch.twitterclient.processing=> (put! c (chunks 4))
     16:44:32.539 [nREPL-worker-2] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
 
-Excellent, same output. In case you're not familiar with **core.async channels** yet: above we have created a channel with the same transducer attached as in the previous example, then we have created a **go-loop** for consuming the channel and finally, we have **put!** the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we'll cover this topic in much more detail.
+Excellent, same output. In case you're not familiar with **core.async channels** yet: above we created a channel with the same transducer attached as in the previous example, then we created a **go-loop** to consume the channel and finally, we **put!** the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we'll cover this topic in much more detail.
 
 ## Conclusion
-Okay, this is it for today. We saw how we can process tweets from the twitter streaming API in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.
+Okay, this is it for today. We saw how we can process tweets from the **[Twitter Streaming API](https://dev.twitter.com/streaming/overview)** in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.
 
 There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I'd rather refer you to my list of **[Clojure Resources on GitHub](https://github.com/matthiasn/Clojure-Resources)**. There, you'll find a comprehensive list of all the articles I came across while working on this application.
 
