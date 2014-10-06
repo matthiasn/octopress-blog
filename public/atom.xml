@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-05T19:18:19+02:00</updated>
+  <updated>2014-10-07T01:21:56+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,16 +14,379 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Weekly Update: Staging server for this blog]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/"/>
-    <updated>2014-10-04T19:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update</id>
-    <content type="html"><![CDATA[<p>This weekly update is mostly about organizational issues around publishing articles and getting feedback for unfinished articles.</p>
+    <title type="html"><![CDATA[Building a System in #Clojure 2 - Transducers]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/"/>
+    <updated>2014-10-06T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2</id>
+    <content type="html"><![CDATA[<p><strong>TL;DR:</strong> This article covers the usage of <strong>Transducers</strong> in Clojure, spiced up with some <strong>core.async</strong>. Here&#8217;s an animation that shows the information flow of the <strong>composed transducer</strong> that we are going to build in this article:</p>
+
+<script language="javascript" type="text/javascript">
+  function resizeIframe(obj) {
+    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
+    obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
+  }
+</script>
+
+
+<iframe width="100%;" src="http://matthiasnehlsen.com/iframes/clj-system2/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
+
+
+
+
+<br/>
+
+
+<br/>
+
+
+<p>If any of that is of interest to you at all (or if you want to see more animations like the one above), you may want to <strong>read</strong> the following article.</p>
 
 <!-- more -->
 
 
-<p>The other day, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series for getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators that notice and pick up new content nonetheless, so that was a little less than ideal on my part.</p>
+<p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. The other week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
+
+<p>In this installment, we will look into the first component, the <strong>twitter client</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for Twitter’s <strong><a href="https://dev.twitter.com/streaming/overview">streaming data</a></strong>. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.</p>
+
+<h2>Twitter Client</h2>
+
+<p>Let’s start in <strong><a href="https://www.youtube.com/watch?v=f84n5oFoZBc">hammock mode</a></strong>, without code. What is the problem we are trying to solve? It all starts with the tweet stream from the Twitter API. Very briefly, the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> allows us to subscribe to a (near) real time stream of tweets that contain one or more terms out of a set of terms. In the live instance under <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong> these terms at the moment happen to be &#8220;Ferguson&#8221;, &#8220;ISIS&#8221;, and &#8220;Ebola&#8221; - I am interested in all these topics. As long as that subscription does not hit a hard ceiling of <strong>1%</strong> of all the tweets flowing through twitter’s system, we can be sure that we will retrieve all of them. Otherwise the stream will be throttled to a maximum of <strong>1%</strong> of what is tweeted at any moment in time. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p>Here is how that stream looks like when each chunk is simply printed to the console:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/streaming-api.gif" title="animated gif of streaming API output" alt="animated gif of streaming API output"></p>
+
+<p>For reasons unbeknownst to me, tweets stopped respecting the chunk borders for the last half year. Instead, tweets occasionally span two or three chunks. This makes processing the tweets a little more complicated than we might wish for. One tweet per chunk is straightforward:</p>
+
+<pre><code>Receive chunk -&gt; parse JSON into map -&gt; put on conveyor belt (channel)
+</code></pre>
+
+<p>That looks like functional programming, right? No state to be kept anywhere, just functions producing results that are passed into other functions. But as desirable as that sounds, it does not align with reality. Instead, we need logical reasoning and state. What is the instruction we would give a sentient being? Imagine an intelligent agent standing between two conveyor belts. Imagine that agent being you. Here we go:</p>
+
+<p>“On your left side, there’s a conveyor belt that keeps delivering hundred dollar bills. Put all of them on the other conveyor belt. Some of them come out cut into multiple pieces. These fragments are in correct order. Scotch tape is over there.”</p>
+
+<p>I think we would all know what to do. There is a space where you park fragments of not-yet-complete bills / tweets. Then, with every new fragment, you inspect if the bill is complete and if so, put it back together and pass it on. Let’s try that in code. First, we will need to introduce <strong>transducers</strong> though.</p>
+
+<h2>Transducers</h2>
+
+<blockquote><p>Transducers are a powerful and composable way to build algorithmic transformations that you can reuse in many contexts, and they&#8217;re coming to Clojure core and core.async.</p><footer><strong>Rich Hickey</strong> <cite><a href='http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming'>Cognitect Blog, August 6, 2014</a></cite></footer></blockquote>
+
+
+<p>In a way, a transducer is the <strong>essence</strong> of a computation over data, without being bound to any kind of collection or data structure. Above, before we had to concern ourselves with the incomplete fragments, there was one step of the computation that we could <strong>model as a transducer</strong>: the part where we wanted to parse JSON into a map data structure.</p>
+
+<p>Imagine we wanted to transform a vector of JSON strings into a vector of such parsed maps. We could simply do this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">map </span><span class="nv">json/read-json</span> <span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;:1}&quot;</span> <span class="s">&quot;{\&quot;bar\&quot;:42}&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>However, the above is bound to the data structure, in this case a vector. That should not have to be the case, though. Rich Hickey provides a good example in his <strong><a href="https://www.youtube.com/watch?v=6mTbuzafcII">transducers talk</a></strong>, likening the above to having to tell the guys processing luggage at the airport the same instructions twice, once for trolleys and again for conveyor belts, where in reality that should not matter.</p>
+
+<p>We could, for example, not only run the mapping function over every item in a vector but also reuse the same function on every item in a channel, stream or whatever.</p>
+
+<p>With Clojure 1.7, we can now create such a transducing function by simply leaving out the data structure:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">xform</span> <span class="p">(</span><span class="nb">map </span><span class="nv">json/read-json</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now, we can apply this transducing function to different kinds of data structures that are transducible processes. For example, we could transform all entries from a vector into another vector, like so:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">into </span><span class="p">[]</span> <span class="nv">xform</span> <span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;:1}&quot;</span> <span class="s">&quot;{\&quot;bar\&quot;:42}&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Or into a sequence, like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">sequence</span> <span class="nv">xform</span> <span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;:1}&quot;</span> <span class="s">&quot;{\&quot;bar\&quot;:42}&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It may not look terribly useful so far. But this can also be applied to a channel. Say, we want to create a channel that accepts JSON strings and transforms each message into a Clojure map. Simple:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">chan</span> <span class="mi">1</span> <span class="nv">xform</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above creates a channel with a buffer size of one that applies the transducer to every element.</p>
+
+<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of <strong>state</strong>. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. Also, as Rich Hickey mentioned in his StrangeLoop talk, there is no space in the machinery to keep state. What if one such transducer could have local state even if that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
+
+<p>Here’s how that looks like in code:</p>
+
+<figure class='code'><figcaption><span>stateful streaming-buffer transducer processing.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">streaming-buffer</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buff</span> <span class="p">(</span><span class="nf">atom</span> <span class="s">&quot;&quot;</span><span class="p">)]</span>
+</span><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>        <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>                             <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span>
+</span><span class='line'>                             <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
+</span><span class='line'>              <span class="nv">to-process</span> <span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)]</span>
+</span><span class='line'>          <span class="p">(</span><span class="nf">reset!</span> <span class="nv">buff</span> <span class="p">(</span><span class="nb">last </span><span class="nv">json-lines</span><span class="p">))</span>
+</span><span class='line'>          <span class="p">(</span><span class="k">if </span><span class="nv">to-process</span> <span class="p">(</span><span class="nb">reduce </span><span class="nv">step</span> <span class="nv">r</span> <span class="nv">to-process</span><span class="p">)</span> <span class="nv">r</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s go through this line by line. We have a (private) function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don&#8217;t have to use <strong>atoms</strong> here if we want to squeeze out the last bit of performance, but I find it easier not to introduce yet another concept unless absoletely necessary<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
+
+<p>In the first line of the let binding, we use the <strong><a href="http://clojuredocs.org/clojure.core/-%3E">-> (thread-first)</a></strong> macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we <strong>1)</strong> concatenate the buffer with the new chunk, <strong>2)</strong> add newlines where missing<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>, and <strong>3)</strong> split the string into a sequence on the line breaks.</p>
+
+<p>Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been a subsequent tweet. But the last one may not be complete. Accordingly, we derive</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>under the name <strong>to-process</strong>. Then, we reset the buffer to whatever is in that last string:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nf">reset!</span> <span class="nv">buff</span> <span class="p">(</span><span class="nb">last </span><span class="nv">json-lines</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, we have <strong>reduce</strong> call the <strong>step</strong> function for every item in <strong>to-process</strong>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="k">if </span><span class="nv">to-process</span> <span class="p">(</span><span class="nb">reduce </span><span class="nv">step</span> <span class="nv">r</span> <span class="nv">to-process</span><span class="p">)</span> <span class="nv">r</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>That way, only complete JSON strings are pushed down to the next operation, whereas intermediate JSON string fragments are kept locally and not passed on until certainly complete. That&#8217;s all that was needed to make the tweets whole again. Next, we compose this with the JSON parsing transducer we have already met above so that this <strong>streaming-buffer</strong> transducer runs first and passes its result to the <strong>JSON parser</strong>.</p>
+
+<p>Let&#8217;s create a vector of JSON fragments and try it out. We have already established that transducers can be used on different data structures, it therefore should work equally well on a vector. Here&#8217;s the vector for the test:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;&quot;</span> <span class="s">&quot;:1}\n{\&quot;bar\&quot;:&quot;</span> <span class="s">&quot;42}&quot;</span> <span class="s">&quot;{\&quot;baz\&quot;:42}&quot;</span> <span class="s">&quot;{\&quot;bla\&quot;:42}&quot;</span><span class="p">]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost because we would only check its completeness once there is a following tweet<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called one last time, which really only returns the aggregate at that point:</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+
+birdwatch.twitterclient.processing=&gt; (def chunks ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"])
+#'birdwatch.twitterclient.processing/chunks
+
+birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
+["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
+</code></pre>
+
+<p>What somewhat confused me at first is what the step function actually was. Let&#8217;s find out by printing it when the arity-1 function is called. We can modify the fourth line of <strong>stream-buffer</strong> like this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nb">println </span><span class="nv">step</span><span class="p">)</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now when we run the same as above on the REPL, we can see what the step function actually is:</p>
+
+<pre><code>birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
+#&lt;core$conj_BANG_ clojure.core$conj_BANG_@5fd837a&gt;
+["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
+</code></pre>
+
+<p>Interestingly, the step function is <strong>conj!</strong> which according to the <strong><a href="https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208">source</a></strong> adds <strong>x</strong> to a <strong>transient collection</strong><sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>.</p>
+
+<p>The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.</p>
+
+<p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one <strong>key</strong> that all tweets have in common, which does not seem to appear in any status messages from Twitter: <strong>:text</strong>. We can thus use that key as the <strong>predicate</strong> for recognizing a tweet:</p>
+
+<figure class='code'><figcaption><span>tweet? predicate function processing.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">tweet?</span> <span class="p">[</span><span class="nv">data</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Checks if data is a tweet. If so, pass on, otherwise log error.&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">text</span> <span class="p">(</span><span class="ss">:text</span> <span class="nv">data</span><span class="p">)]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">when-not </span><span class="nv">text</span> <span class="p">(</span><span class="nf">log/error</span> <span class="s">&quot;error-msg&quot;</span> <span class="nv">data</span><span class="p">))</span>
+</span><span class='line'>    <span class="nv">text</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Next, we also want to log the count of tweets received since the application started. Let&#8217;s do this only for full thousands. We will need some kind of counter to keep track of the count. Let&#8217;s create another <strong>stateful transducer</strong>:</p>
+
+<figure class='code'><figcaption><span>stateful count transducer processing.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">log-count</span> <span class="p">[</span><span class="nv">last-received</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Stateful transducer, counts processed items and updating last-received atom. Logs progress every 1000 items.&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">cnt</span> <span class="p">(</span><span class="nf">atom</span> <span class="mi">0</span><span class="p">)]</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">fn </span>
+</span><span class='line'>        <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">([</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">swap!</span> <span class="nv">cnt</span> <span class="nv">inc</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">zero? </span><span class="p">(</span><span class="nf">mod</span> <span class="o">@</span><span class="nv">cnt</span> <span class="mi">1000</span><span class="p">))</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;processed&quot;</span> <span class="o">@</span><span class="nv">cnt</span> <span class="s">&quot;since startup&quot;</span><span class="p">))</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">reset!</span> <span class="nv">last-received</span> <span class="p">(</span><span class="nf">t/now</span><span class="p">))</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span> <span class="nv">x</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This transducer is comparable to the one we saw earlier, except that the local atom now holds the count. Initially, the counter is incremented and then, when the counter is divisible by 1000, the count is logged. In addition, this function also resets the <strong>last-received</strong> timestamp. Of course, this could be factored out into a separate function, but I think this will do.</p>
+
+<p>Now, we can compose all these steps:</p>
+
+<figure class='code'><figcaption><span>composed transducer processing.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">process-chunk</span> <span class="p">[</span><span class="nv">last-received</span><span class="p">]</span>
+</span><span class='line'>  <span class="s">&quot;Creates composite transducer for processing tweet chunks. Last-received atom passed in for updates.&quot;</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">comp</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">streaming-buffer</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nb">map </span><span class="nv">json/read-json</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nb">filter </span><span class="nv">tweet?</span><span class="p">)</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">log-count</span> <span class="nv">last-received</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The above creates a composed function that takes the timestamp atom provided by the TwitterClient component as an argument. We can now use this <strong>transducing function</strong> and apply it to different data structures. Here, we use it to create a channel that takes tweet chunk fragments and delivers parsed tweets on the other side of the conveyor belt.</p>
+
+<p>Let&#8217;s try the composed transducer on a vector to see what&#8217;s happening. For that, we create a vector with two JSON strings that contain the <strong>:text</strong> property and two that don&#8217;t.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">[</span><span class="s">&quot;{\&quot;text\&quot;&quot;</span> <span class="s">&quot;:\&quot;foo\&quot;}\n{\&quot;text\&quot;:&quot;</span> <span class="s">&quot;\&quot;bar\&quot;}&quot;</span> <span class="s">&quot;{\&quot;baz\&quot;:42}&quot;</span> <span class="s">&quot;{\&quot;bla\&quot;:42}&quot;</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then we should see that the invalid one is logged and the other two are returned (the final one at that point still in the buffer):</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+
+birdwatch.twitterclient.processing=&gt; (def chunks ["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
+#'birdwatch.twitterclient.processing/chunks
+
+birdwatch.twitterclient.processing=&gt; (into [] (process-chunk (atom (t/epoch))) chunks)
+20:57:39.999 [nREPL-worker-1] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
+[{:text "foo"} {:text "bar"}]
+</code></pre>
+
+<p>Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let&#8217;s not take his word for it and instead try it out. First, here&#8217;s my attempt to visualize the usage of a transducer in a channel. To make things easier, no errors occur.</p>
+
+<iframe width="100%;" src="http://matthiasnehlsen.com/iframes/clj-system2/channel.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
+
+
+<p>Now for a simple example in the REPL:</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+
+birdwatch.twitterclient.processing=&gt; (def chunks ["{\"text\"" ":\"foo\"}\r\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
+#'birdwatch.twitterclient.processing/chunks
+
+birdwatch.twitterclient.processing=&gt; (require '[clojure.core.async :as async :refer [chan go-loop &lt;! put!]])
+nil
+
+birdwatch.twitterclient.processing=&gt; (def c (chan 1 (process-chunk (atom (t/now)))))
+#'birdwatch.twitterclient.processing/c
+
+birdwatch.twitterclient.processing=&gt; (go-loop [] (println (&lt;! c)) (recur))
+#&lt;ManyToManyChannel clojure.core.async.impl.channels.ManyToManyChannel@2f924b3f&gt;
+
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 0))
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 1))
+{:text foo}
+
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 2))
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 3))
+{:text bar}
+
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 4))
+16:44:32.539 [nREPL-worker-2] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
+</code></pre>
+
+<p>Excellent, same output. In case you&#8217;re not familiar with <strong>core.async channels</strong> yet: above we created a channel with the same transducer attached as in the previous example, then we created a <strong>go-loop</strong> to consume the channel and finally, we <strong>put!</strong> the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we&#8217;ll cover this topic in much more detail.</p>
+
+<h2>Conclusion</h2>
+
+<p>Okay, this is it for today. We saw how we can process tweets from the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.</p>
+
+<p>There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I&#8217;d rather refer you to my list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. There, you&#8217;ll find a comprehensive list of all the articles I came across while working on this application.</p>
+
+<p>I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?</p>
+
+<p>Cheers,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I only recently started with Clojure. It may be possible an also quite likely that there are better ways of doing things. If so, please let me know, I want to learn stuff.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>I don&rsquo;t know much about the exact mechanism at play, actual numbers or delivery guarantees. It anyhow doesn’t matter much for the purpose of this application. The interesting views focus on the most retweeted tweets. Now every retweet contains the original tweet under “retweeted_status”, with the current numbers such as retweet and favorite count for the moment in time it was retweeted. For popular ones, we thus receive the original tweet many, many times over. So even if we missed as much as half of all the tweets &ndash; which I consider unlikely &ndash; the popular tweets would only be updated less often. Worst case: retweet count is off by one or two. I can live with that. In reality, for the current selection of terms, reaching the limit also hardly ever happens. After all, 1% is still millions of tweets per day.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p><strong>Atoms</strong> are essential to Clojure’s <strong>state model</strong>. Essentially, you have this managed reference that is thread-safe. Whenever we dereference such an atom, we get the state of the world this very second. Then, when you pass the dereferenced value to other parts of the application, it still represents the immutable state of the world at that point in time. It cannot change. Next time I dereference that atom, I will get the new state of the world. Updates to atoms can only happen in transactions, meaning that no two can run at the same time. Thus, we won&rsquo;t have to chase crazy concurrency issues.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>After initial experimentation with a <strong><a href="http://dev.clojure.org/jira/browse/CLJ-1512">local volatile reference</a></strong>, I decided in favor of a good old atom. The <strong>volatile!</strong> local reference trades off potential race conditions with speed. But there’s no performance issue when we process tweet chunks a few hundred times a second utmost, so why bother and introduce a new concept? Worth to keep in mind, though, when performance is an issue.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: <code>(str/replace s #"\}\{" "}\r\n{"))</code>.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
+<li id="fn:6">
+<p>One could probably check if the buffer contains a valid and complete JSON string when the arity-1 function is called, and if so, pass it on. Considering though that in this application we are interested in a stream that does not have an end, I omitted this step.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<li id="fn:7">
+<p>I assume the <strong>transient</strong> collection is used for performance reasons.<a href="#fnref:7" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: Staging server for this blog]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/"/>
+    <updated>2014-10-04T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update</id>
+    <content type="html"><![CDATA[<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+This weekly update is mostly about organizational issues around publishing articles and getting feedback for unfinished articles.</p>
+
+<!-- more -->
+
+
+<h1>The other day, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series for getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators that notice and pick up new content nonetheless, so that was a little less than ideal on my part.</h1>
+
+<p>This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles.</p>
+
+<!-- more -->
+
+
+<p>The other day, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series to get some preliminary feedback but without announcing the article just yet. What I did not think about, though, was that RSS aggregators notice and pick up new content nonetheless, so that was a little less than perfect on my part.</p>
+
+<blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><p>2014-10-05-clojure-system-2</p></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote>
 
 <p>Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.</p>
 
@@ -31,7 +394,8 @@
 
 <p><strong><a href="http://staging.matthiasnehlsen.com/">http://staging.matthiasnehlsen.com/</a></strong></p>
 
-<p>The implementation of this staging server took like 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for <strong>staging.matthiasnehlsen.com</strong>, and modify the <strong>nginx</strong> configuration so that the staging URL point to that new directory.</p>
+<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
+The implementation of this staging server took like 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for <strong>staging.matthiasnehlsen.com</strong>, and modify the <strong>nginx</strong> configuration so that the staging URL point to that new directory.</p>
 
 <p>I got very helpful feedback so far, so at least publishing the unfinished article was still worth it. Right now I am working on illustrating the new article with some animations. I expect to be done with everything on Monday. I will also probably split the article in two as the current article is a little too long for my taste.</p>
 
@@ -39,13 +403,25 @@
 
 <p>While this little modification is probably not terribly useful for you, I feel like it will be much more convenient for my workflow. You can also check out the staging server to see new articles in the works. Just note that sharing links may or may not lead to <strong>404&#8217;s</strong> later on as there is no guarantee whatsoever that those links will last. If they end up in master, they should, but the may well not.</p>
 
-<p>Thats all for now. Have a great week,
-Matthias</p>
+<h1>Thats all for now. Have a great week,</h1>
+
+<p>The implementation of the staging server took some 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for <strong>staging.matthiasnehlsen.com</strong>, and modify the <strong>nginx</strong> configuration so that the staging URL points to that new directory.</p>
+
+<p>I have already got very helpful feedback, so at least publishing the unfinished article was still it. Right now I am working on adding some animations to the new article. I expect to have everything completed by Monday. I will probably split the article in two as the current article is a little too long for my taste.</p>
+
+<h2>Conclusion</h2>
+
+<p>While this little modification is probably not terribly useful for you, I believe it will be much more convenient for my workflow. You can also check out the staging server to see new articles in the works. Just note that sharing links may or may not lead to <strong>404&#8217;s</strong> later on as there is no guarantee whatsoever that those links will last. They should end up in master, but they may well not.</p>
+
+<p>That&#8217;s all for now. Have a great week,</p>
+
+<blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><p>2014-10-05-clojure-system-2
+Matthias</p></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote>
 ]]></content>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Building a System in Clojure - Part 1]]></title>
+    <title type="html"><![CDATA[Building a System in #Clojure 1 - Overview]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
     <updated>2014-09-24T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
@@ -84,13 +460,13 @@ Matthias</p>
 <br/>
 
 
-<p>The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra&#8217;s <strong>component library</strong>. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don&#8217;t know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain <strong>core.async</strong> channels.</p>
+<p>The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don&#8217;t know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain <strong><a href="https://github.com/clojure/core.async">core.async</a></strong> channels.</p>
 
 <p>In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that &#8220;spaghetti code&#8221;, but I think that is not doing justice to spaghetti. Unlike bad code, I don&#8217;t mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn&#8217;t drain. You notice something in the sink, so you squat down to pull it out only to start screaming, &#8220;Oh my god, it&#8217;s a dead rat&#8221; a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust.</p>
 
 <p>This is where dependency injection comes in. Can we agree that we don&#8217;t like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that something because of the implemented interface.</p>
 
-<p>Here, unlikey in object-oriented dependency injection, things are a little different because we don&#8217;t really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as <strong>wiring harnesses</strong>, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.</p>
+<p>Here, unlike in object-oriented dependency injection, things are a little different because we don&#8217;t really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as <strong>wiring harnesses</strong>, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.</p>
 
 <p>Let&#8217;s have a look at how the initialization of the application we have already seen in the animation looks in code:</p>
 
@@ -2173,531 +2549,6 @@ Matthias</p>
 <p>Okay, that&#8217;s all for this article. Initially I wanted it to be about replacing <strong>AngularJS</strong> with <strong>ReactJS</strong>, but then I did not have enough time left before my vacation and after running into this problem. So that article is next, probably some time later this month.</p>
 
 <p>Cheers,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Scala.js and ReactJS]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/"/>
-    <updated>2014-01-24T12:45:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs</id>
-    <content type="html"><![CDATA[<p>In this article I will present a simple reactive web application using <strong><a href="http://www.scala-js.org">Scala.js</a></strong> and <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side. It is based on <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>, an application I initially wrote for demonstrating the use of <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">AngularJS with Play Framework</a></strong>. I then rewrote the client for an article about <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">using ReactJS on the client side</a></strong>. In the latest version now, there is an additional client that connects to the same server and utilizes Scala.js to build the web client. I recently gave a talk about this at Ping Conference in Budapest, <strong><a href="http://m.ustream.tv/recorded/42780242">check it out</a></strong> if you&#8217;re interested. I discovered ReactJS through <strong><a href="http://swannodette.github.io/2013/12/17/the-future-of-javascript-mvcs/">David Nolen&#8217;s blog</a></strong> and his excellent <strong><a href="https://github.com/swannodette/om">OM library</a></strong> which combines ReactJS with <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong>. His <strong><a href="http://swannodette.github.io/2013/12/31/time-travel/">second article on Om</a></strong> also inspired me to try out an <strong>undo</strong> functionality with the immutable data structures that Scala.js has to offer. For learning more about ReactJS, I recommend going through the <strong><a href="http://facebook.github.io/react/docs/tutorial.html">tutorial</a></strong> and also reading my last <strong><a href="http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/">blog post</a></strong>.</p>
-
-<!-- more -->
-
-
-<h1>Why would someone want Scala on the client in the first place?</h1>
-
-<p>Great question, I am glad you asked. A couple of things come to my mind:</p>
-
-<ul>
-<li><p>If you work with Scala on the server side, you will be familiar with its powerful collection library. You will be able to use it instead of wrapping your head around stuff like <strong><a href="http://underscorejs.org">underscore</a></strong>. Nothing wrong with underscore, it just adds to the things we have to think about when writing an application.</p></li>
-<li><p>JavaScript, while being powerful in its own right, is quite different from Scala. If you are working in Scala on the backend anyways, you can avoid context switches. These inevitably occur when going back and forth between Scala and JavaScript.</p></li>
-<li><p>Immutable data structures are powerful and make reasoning about an application much more straightforward. Implementing an <strong>undo</strong> functionality becomes almost trivial with this approach.</p></li>
-</ul>
-
-
-<p>Here is the new client in action. Note that <strong>undo</strong> will revert the application state by one step (including name changes and such). <strong>Undo all</strong> will go through all steps until the beginning of time at a fast pace.</p>
-
-<iframe width="420" height="600" src="http://sse-chat.matthiasnehlsen.com/react-scalajs-opt" frameborder="0"></iframe>
-
-
-
-
-<br />
-
-
-<br />
-
-
-<h1>Architectural Overview</h1>
-
-<p>The server side has stayed the same with the different clients. All clients (AngularJS, ReactJS, ReactJS and Scala.js) co-exist in the same project on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. I would like to refer you to <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong> if you want to learn more about the server side. From the client&#8217;s perspective, there is a <strong><a href="https://developer.mozilla.org/en-US/docs/Server-sent_events/Using_server-sent_events">Server Sent Event</a></strong> stream of messages for a particular chat room that the client subscribes to via an <strong><a href="http://www.w3.org/TR/2011/WD-eventsource-20110208/">EventSource</a></strong> object. New messages are POSTed using an <strong><a href="http://de.wikipedia.org/wiki/XMLHttpRequest">XmlHttpRequest</a></strong> object (facilitated by <strong><a href="http://jquery.com/">jQuery</a></strong>). Users can change their names, they can select the chat room and they can submit messages to the chat room they are connected to. Romeo and Juliet are having a conversation in room 1, just to make it a little more interesting to watch.</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/sse-chat-scalajs.png"></p>
-
-<p>Application state is represented by a Scala <strong><a href="http://www.scala-lang.org/old/node/107">Case Class</a></strong>. A case class object stores the current name of the user, the name of the room and the last 4 messages. The undo functionality is modeled through a <strong>Stack</strong>. Each time information changes, a copy of the head of the stack is made and a new version of the application state with the desired change is pushed on top of the stack. Thus going back in time becomes easy: the combination of pop and peek will go back one step in time. Remember that a <strong><a href="http://en.wikibooks.org/wiki/Data_Structures/Stacks_and_Queues">Stack</a></strong> is a <strong>LIFO</strong> (last-in-first-out) data structure that typically offers <em>push</em> for putting a new item on top of a stack, <em>pop</em> for removing the top element (with potentially consuming it) and <em>peek</em> or <em>top</em> for accessing the top element without removing it. In Scala&#8217;s stack <em>peek</em> is called <em>head</em> as a more general abstract term to get the first element of a collection.</p>
-
-<p>Application state, in its current version, is passed to ReactJS for full render every single time something changes. This may sound like a lot of overhead if React completely re-rendered the DOM every single time. Luckily, it does not need to do that. Instead it utilizes a fast <strong><a href="http://facebook.github.io/react/index.html">Virtual DOM</a></strong>. It then diffs subsequent version of this virtual DOM and only manipulates the actual browser DOM where changes have occurred. This is really fast. If you run the chat app demo above for a while (or interact with it multiple times) so that the stack contains sufficient elements (hundreds), you should see changes in the browser at a full <strong>60 frames per second</strong>.</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/undo-all-60fps.png" title="images" alt="images"></p>
-
-<p>React&#8217;s rendering performance can still be optimized, ut it runs fine at 60 fps as it is. <strong>Tip: You want 60fps</strong> in your application all the time, otherwise the user may experience jerky and overall unpleasant scrolling if anything that happens takes longer than the time between each frame. For 60fps that means every action must be finished within 16ms, preferably faster.</p>
-
-<h1>Source Code</h1>
-
-<p>So without further ado, let&#8217;s have a look at how to implement the client side chat functionality. What I suggest here is probably far from ideal, but it&#8217;s a start. Please let me know about improvements you think should be made, ideally as a pull request.</p>
-
-<p>First we will look at the main application logic:</p>
-
-<figure class='code'><figcaption><span>Main Application</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/SseChat.scala'>SseChat.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** current version of application state modeled as immutable case class */</span>
-</span><span class='line'><span class="k">case</span> <span class="k">class</span> <span class="nc">AppState</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">msgs</span><span class="k">:</span> <span class="kt">Vector</span><span class="o">[</span><span class="kt">ChatMsgTrait</span><span class="o">])</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">object</span> <span class="nc">App</span> <span class="o">{</span>
-</span><span class='line'>  <span class="cm">/** Application state history modeled as stack. New versions of state get pushed onto stack.</span>
-</span><span class='line'><span class="cm">   *  Previous states are available with a combination of pop and peek (called head in Scala implementation) */</span>
-</span><span class='line'>  <span class="k">val</span> <span class="n">stack</span> <span class="k">=</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">AppState</span><span class="o">](</span><span class="nc">InterOp</span><span class="o">.</span><span class="n">triggerReact</span><span class="o">)</span>
-</span><span class='line'>  <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">Utils</span><span class="o">.</span><span class="n">getInitialState</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** undo state change by popping stack and trigger rendering (which reads the head) */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">undo</span><span class="o">(</span><span class="n">all</span><span class="k">:</span> <span class="kt">Boolean</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="k">if</span> <span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="n">stack</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** perform undo repeatedly until only initial element left, with interval duration between steps */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">undo</span><span class="o">()</span>
-</span><span class='line'>      <span class="nc">InterOp</span><span class="o">.</span><span class="n">setTimeout</span><span class="o">(</span> <span class="o">()</span> <span class="k">=&gt;</span> <span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="o">),</span> <span class="n">interval</span><span class="o">)</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="cm">/** functions generating new version of state which are then pushed onto stack using updateState() */</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setUser</span><span class="o">(</span><span class="n">name</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">user</span> <span class="k">=</span> <span class="n">name</span><span class="o">))</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">addMsg</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span> <span class="k">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">msgs</span> <span class="k">=</span> <span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">msgs</span><span class="o">.</span><span class="n">takeRight</span><span class="o">(</span><span class="mi">3</span><span class="o">)</span> <span class="o">:+</span> <span class="n">msg</span><span class="o">))</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setRoom</span><span class="o">(</span><span class="n">newRoom</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">stack</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">copy</span><span class="o">(</span><span class="n">room</span> <span class="k">=</span> <span class="n">newRoom</span><span class="o">))</span>
-</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">listen</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">room</span><span class="o">,</span> <span class="nc">InterOp</span><span class="o">.</span><span class="n">addMsg</span> <span class="k">_</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">main</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">listen</span><span class="o">(</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">room</span><span class="o">,</span> <span class="nc">InterOp</span><span class="o">.</span><span class="n">addMsg</span> <span class="k">_</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>First of all, the following is happening:</p>
-
-<ul>
-<li><p>There is a case class for capturing each individual step of the application state.</p></li>
-<li><p>A stack takes care of managing a history of application states. This stack is aware of changes. When such a change occurs, it will call the function specified upon initialization, in this case <em>InterOp.triggerReact</em>.</p></li>
-<li><p>Undo pops the application state representation on top of the stack, causing <em>triggerReact</em> with the previous state.</p></li>
-<li><p><em>UndoAll</em> steps through the entire history until application startup.</p></li>
-<li><p>Setters obtain the top of the stack, copy and modify it and push the result on top of the stack (again causing a re-render).</p></li>
-<li><p>Finally, in <em>main</em>  the application is initialized by starting the SSE connection.</p></li>
-</ul>
-
-
-<p>Next there is the <strong>InterOp</strong> file:</p>
-
-<figure class='code'><figcaption><span>InterOp</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/InterOp.scala'>InterOp.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">import</span> <span class="nn">scala.scalajs.js</span>
-</span><span class='line'><span class="k">import</span> <span class="nn">js.Dynamic.</span><span class="o">{</span> <span class="n">global</span> <span class="k">=&gt;</span> <span class="n">g</span> <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">trait</span> <span class="nc">ChatMsgTrait</span> <span class="k">extends</span> <span class="n">js</span><span class="o">.</span><span class="nc">Object</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">var</span> <span class="n">text</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">var</span> <span class="n">user</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">var</span> <span class="n">time</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">var</span> <span class="n">room</span><span class="k">:</span> <span class="kt">js.String</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** Scala representation of SseChatApp JavaScript object holding the JS side of the app */</span>
-</span><span class='line'><span class="k">object</span> <span class="nc">SseChatApp</span> <span class="k">extends</span> <span class="n">js</span><span class="o">.</span><span class="nc">Object</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">submitMessage</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">listen</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">,</span> <span class="n">handler</span><span class="k">:</span> <span class="kt">js.Function1</span><span class="o">[</span><span class="kt">ChatMsgTrait</span>, <span class="kt">Unit</span><span class="o">])</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setUserProps</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setRoomProps</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setMsgsProps</span><span class="o">(</span><span class="n">msgs</span><span class="k">:</span> <span class="kt">js.Array</span><span class="o">[</span><span class="kt">ChatMsgTrait</span><span class="o">])</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setStackSizeProps</span><span class="o">(</span><span class="n">stackSize</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setApp</span><span class="o">(</span><span class="n">interOp</span><span class="k">:</span> <span class="kt">InterOp.</span><span class="k">type</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">???</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** methods of this object are individually exported in startup.js (to avoid having the closure compiler rename them) */</span>
-</span><span class='line'><span class="k">object</span> <span class="nc">InterOp</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">addMsg</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">addMsg</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">triggerReact</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">state</span> <span class="k">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span>
-</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setUserProps</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="n">user</span><span class="o">)</span>
-</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setRoomProps</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="n">room</span><span class="o">)</span>
-</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setMsgsProps</span><span class="o">(</span><span class="n">state</span><span class="o">.</span><span class="n">msgs</span><span class="o">.</span><span class="n">toArray</span><span class="o">[</span><span class="kt">ChatMsgTrait</span><span class="o">])</span>
-</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">setStackSizeProps</span><span class="o">(</span><span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">size</span><span class="o">.</span><span class="n">toString</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setUser</span><span class="o">(</span><span class="n">user</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">setUser</span><span class="o">(</span><span class="n">user</span><span class="o">.</span><span class="n">toString</span><span class="o">)</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setRoom</span><span class="o">(</span><span class="n">room</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">setRoom</span><span class="o">(</span><span class="n">room</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">submitMsg</span><span class="o">(</span><span class="n">msg</span><span class="k">:</span> <span class="kt">ChatMsgTrait</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">msg</span><span class="o">.</span><span class="n">room</span> <span class="k">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">room</span>
-</span><span class='line'>    <span class="n">msg</span><span class="o">.</span><span class="n">user</span> <span class="k">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">stack</span><span class="o">.</span><span class="n">peek</span><span class="o">.</span><span class="n">user</span>
-</span><span class='line'>    <span class="nc">SseChatApp</span><span class="o">.</span><span class="n">submitMessage</span><span class="o">(</span><span class="n">msg</span><span class="o">)</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">undo</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">undo</span><span class="o">()</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="k">:</span> <span class="kt">String</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="nc">App</span><span class="o">.</span><span class="n">undoAll</span><span class="o">(</span><span class="n">interval</span><span class="o">.</span><span class="n">toInt</span><span class="o">)</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">setTimeout</span><span class="o">(</span><span class="n">fn</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">,</span> <span class="n">millis</span><span class="k">:</span> <span class="kt">Int</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">setTimeout</span><span class="o">(</span><span class="n">fn</span><span class="o">,</span> <span class="n">millis</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let&#8217;s go through this file step by step:</p>
-
-<ul>
-<li><p><strong>ChatMsgTrait</strong> represents an individual message.</p></li>
-<li><p>The <strong>SseChatApp</strong> object represents a JavaScript object outside the Scala.js application. This makes the specified functions available from Scala.js code.</p></li>
-<li><p>The <strong>InterOp</strong> object itself contains functions that are exported so that they are accessible from the outside world. We will look at the export mechanism below. As an example of such an exported function, <em>setUser</em> allows the ReactJS application to call the App.setRoom function.</p></li>
-</ul>
-
-
-<p>Next we have the change-aware stack implementation:</p>
-
-<figure class='code'><figcaption><span>Stack implementation</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/src/main/scala/com/matthiasnehlsen/sseChat/ChangeAwareStack.scala'>ChangeAwareStack.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="k">package</span> <span class="nn">com.matthiasnehlsen.sseChat</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">import</span> <span class="nn">scala.collection.mutable.Stack</span>
-</span><span class='line'><span class="c1">// custom stack implementation based on mutable Stack for any type T</span>
-</span><span class='line'><span class="c1">// takes callback function argument, which it will call on changes with the current head after the change</span>
-</span><span class='line'><span class="k">class</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">Stack</span><span class="o">[</span><span class="kt">T</span><span class="o">]</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">push</span><span class="o">(</span><span class="n">elem</span><span class="k">:</span> <span class="kt">T</span><span class="o">)</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="k">super</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="n">elem</span><span class="o">)</span>
-</span><span class='line'>    <span class="n">onChange</span><span class="o">()</span>
-</span><span class='line'>    <span class="n">res</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">override</span> <span class="k">def</span> <span class="n">pop</span><span class="o">()</span> <span class="k">=</span> <span class="o">{</span>
-</span><span class='line'>    <span class="k">val</span> <span class="n">res</span> <span class="k">=</span> <span class="k">super</span><span class="o">.</span><span class="n">pop</span><span class="o">()</span>
-</span><span class='line'>    <span class="n">onChange</span><span class="o">()</span>
-</span><span class='line'>    <span class="n">res</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="k">def</span> <span class="n">peek</span> <span class="k">=</span> <span class="k">super</span><span class="o">.</span><span class="n">head</span>  <span class="c1">// convenience method since stack implementation does not implement peek()</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="k">object</span> <span class="nc">ChangeAwareStack</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">def</span> <span class="n">apply</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="k">:</span> <span class="o">()</span> <span class="o">=&gt;</span> <span class="nc">Unit</span><span class="o">)</span> <span class="k">=</span> <span class="k">new</span> <span class="nc">ChangeAwareStack</span><span class="o">[</span><span class="kt">T</span><span class="o">](</span><span class="n">onChange</span><span class="o">)</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This implementation is straightforward:</p>
-
-<ul>
-<li><p><strong>ChangeAwareStack[T]</strong> extends <strong>scala.collection.mutable.Stack[T]</strong> and takes a function that is called when the data on the stack changes.</p></li>
-<li><p><em>push</em> and <em>pop</em> are overridden, calling the function each overrides plus additionally calling the onChange functions.</p></li>
-<li><p><em>peek</em> is just another name for <em>head</em>.</p></li>
-<li><p>Finally a companion object allows instantiation without using <strong>new</strong>.</p></li>
-</ul>
-
-
-<p>Functions from the <strong>InterOp</strong> object are then exported with specified names; this happens in order to protect their respective names. Otherwise, the <strong><a href="https://developers.google.com/closure/compiler/">Google Closure Compiler</a></strong> would rename them. Without exporting the functions, they would also not be publicly accessible at all after the closure compiler optimization phase.</p>
-
-<figure class='code'><figcaption><span>Exported Functions</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/scala-js/js/startup.js'>startup.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">ScalaJS</span><span class="p">.</span><span class="nx">modules</span><span class="p">.</span><span class="nx">com_matthiasnehlsen_sseChat_App</span><span class="p">().</span><span class="nx">main</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">ScalaApp</span> <span class="o">=</span> <span class="p">{};</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span> <span class="o">=</span> <span class="nx">ScalaJS</span><span class="p">.</span><span class="nx">modules</span><span class="p">.</span><span class="nx">com_matthiasnehlsen_sseChat_InterOp</span><span class="p">();</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;setUser&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">setUser__T__V</span><span class="p">;</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;setRoom&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">setRoom__T__V</span><span class="p">;</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;undo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">undo__V</span><span class="p">;</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;undoAll&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">undoAll__T__V</span><span class="p">;</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;submitMsg&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">addMsg__Lcom_matthiasnehlsen_sseChat_ChatMsgTrait__V</span><span class="p">;</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">[</span><span class="s2">&quot;triggerReact&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">InterOp</span><span class="p">.</span><span class="nx">triggerReact__V</span><span class="p">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nb">window</span><span class="p">[</span><span class="s1">&#39;ScalaApp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ScalaApp</span><span class="p">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Besides naming the exported functions by putting them in an object on the global scope, there is also a call to the <em>main</em> method of the Scala.js application. Personally, I am not terribly happy with putting anything at all on the global scope. Right now I have two global objects, one for the React side of things and one for the exported functions from the Scala.js application. This could quite easily be brought down to one by exporting the functions as properties of the same object used by the ReactJS application. I am just too lazy to do this right now. Please let me know if you have any ideas on how to reduce this to zero objects on the global scope.</p>
-
-<p>Now let&#8217;s have a look at an excerpt of the ReactJS application, written in JSX. Please note that for simplicity reasons I am running the JSX to JavaScript in your browser. You don&#8217;t want to do that in a production system.</p>
-
-<figure class='code'><figcaption><span>ReactJS application (excerpt)</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-app-scalajs.js'>react-app-scalajs.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** undo component*/</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">UndoBox</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">handleUndo</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">undo</span><span class="p">();</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleUndoAll</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">undoAll</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;undo&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;button&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;btn&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Undo&quot;</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleUndo</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">input</span> <span class="nx">type</span><span class="o">=</span><span class="s2">&quot;button&quot;</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;btn&quot;</span> <span class="nx">value</span><span class="o">=</span><span class="s2">&quot;Undo All&quot;</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleUndoAll</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span> <span class="nx">Stack</span> <span class="nx">size</span><span class="o">:</span>  <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">undoSize</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>     <span class="p">);}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** ChatApp is the main component in this application, it holds all state, which is passed down to child components</span>
-</span><span class='line'><span class="cm"> *  only as immutable props */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">ChatApp</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">handleNameChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">setUser</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">)</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleRoomChange</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">.</span><span class="nx">setRoom</span><span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">.</span><span class="nx">value</span><span class="p">);</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">UndoBox</span> <span class="nx">scalaApp</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">}</span> <span class="nx">undoSize</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">stackSize</span><span class="p">}</span><span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">NameRoomBox</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span> <span class="nx">handleNameChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleNameChange</span><span class="p">}</span>
-</span><span class='line'>            <span class="nx">room</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">room</span><span class="p">}</span> <span class="nx">handleRoomChange</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleRoomChange</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">MsgList</span> <span class="nx">data</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">msgs</span><span class="p">}</span> <span class="nx">name</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">user</span><span class="p">}</span><span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">SaySomethingBox</span> <span class="nx">scalaApp</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">scalaApp</span><span class="p">}</span><span class="o">/&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** render top-level ChatApp component */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">tlComp</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">ChatApp</span> <span class="nx">scalaApp</span><span class="o">=</span><span class="p">{</span><span class="nx">ScalaApp</span><span class="p">}</span><span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;chat-app&#39;</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** pass props to top level component */</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span> <span class="nx">tlComp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span> <span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** application ready, call initial trigger so that name and room get loaded without receiving message */</span>
-</span><span class='line'><span class="nx">ScalaApp</span><span class="p">.</span><span class="nx">triggerReact</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p><strong>UndoBox</strong> is one of the application&#8217;s components, handling the undo functionality described above. All it does is assigning handlers to the buttons, in which the functions passed in as props are called.</p></li>
-<li><p><strong>ChatApp</strong> is the main component of the application, it wires together the individual components and passes through the individual props.</p></li>
-<li><p><strong>tlComp</strong> is the rendered top level component. In this call, we specify where to render the component and we also pass in the handler functions as props.</p></li>
-<li><p><em>SseChat.setProps</em> is the function that passes props to the top level component. Once the JSX is compiled and initialized, this will replace the placeholder function inside react-interop.js.</p></li>
-<li><p>At the end of the file, <em>ScalaApp.triggerReact</em> is called. This is done only to render the initial state (with a random name) independent of a message sent by the server. It just makes the initial rendering a bit smoother; otherwise it will not be needed.</p></li>
-</ul>
-
-
-<p>Finally, we have some JavaScript code for interoperability and communication with the server side:</p>
-
-<figure class='code'><figcaption><span>ReactJS application (excerpt)</span><a href='https://github.com/matthiasn/sse-chat/blob/71081d0978eed13cf1e1a896c3c69e011bcbff15/public/js/react-interop.js'>react-interop.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">SseChatApp</span> <span class="o">=</span> <span class="nx">SseChatApp</span> <span class="o">||</span> <span class="p">{};</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">listen</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">chatFeed</span><span class="p">;</span> <span class="c1">// holds SSE streaming connection for chat messages for current room</span>
-</span><span class='line'>    <span class="k">return</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">room</span><span class="p">,</span> <span class="nx">handler</span><span class="p">)</span> <span class="p">{</span> <span class="c1">// returns function that takes room as argument</span>
-</span><span class='line'>        <span class="k">if</span> <span class="p">(</span><span class="nx">chatFeed</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">chatFeed</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span>
-</span><span class='line'>        <span class="p">}</span> <span class="c1">// if initialized, close before starting new connection</span>
-</span><span class='line'>        <span class="nx">chatFeed</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EventSource</span><span class="p">(</span><span class="s2">&quot;/chatFeed/&quot;</span> <span class="o">+</span> <span class="nx">room</span><span class="p">);</span> <span class="c1">// (re-)initializes connection</span>
-</span><span class='line'>        <span class="nx">chatFeed</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="nx">handler</span><span class="p">(</span><span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">data</span><span class="p">));</span>
-</span><span class='line'>        <span class="p">},</span> <span class="kc">false</span><span class="p">);</span> <span class="c1">// attach addMsg event handler</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">}();</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** POST chat message */</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">submitMessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">$</span><span class="p">.</span><span class="nx">ajax</span><span class="p">({</span> <span class="nx">url</span><span class="o">:</span> <span class="s2">&quot;/chat&quot;</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="nx">data</span><span class="o">:</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">msg</span><span class="p">),</span>
-</span><span class='line'>        <span class="nx">contentType</span><span class="o">:</span> <span class="s2">&quot;application/json; charset=utf-8&quot;</span><span class="p">,</span> <span class="nx">dataType</span><span class="o">:</span> <span class="s2">&quot;json&quot;</span> <span class="p">});</span>
-</span><span class='line'><span class="p">};</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** placeholder until replaced with real implementation upon compiling / initializing JSX */</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{};</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/**</span>
-</span><span class='line'><span class="cm"> * individual setProps because otherwise the closure compiler renamed function names on application state</span>
-</span><span class='line'><span class="cm"> * case class object (would be more elegant with a single case class object)</span>
-</span><span class='line'><span class="cm"> */</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setUserProps</span>      <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">user</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">user</span><span class="o">:</span> <span class="nx">user</span> <span class="p">});</span> <span class="p">};</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setRoomProps</span>      <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">room</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">room</span><span class="o">:</span> <span class="nx">room</span> <span class="p">});</span> <span class="p">};</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setMsgsProps</span>      <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msgs</span><span class="p">)</span>      <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">msgs</span><span class="o">:</span> <span class="nx">msgs</span> <span class="p">});</span> <span class="p">};</span>
-</span><span class='line'><span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setStackSizeProps</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">stackSize</span><span class="p">)</span> <span class="p">{</span> <span class="nx">SseChatApp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span> <span class="nx">stackSize</span><span class="o">:</span> <span class="nx">stackSize</span> <span class="p">});</span> <span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<ul>
-<li><p><em>listen</em> is a function that is called for establishing a Server Sent Event connection to the server. Upon file loading, a self calling function closes over the ChatFeed variable so that it becomes accessible (and cancellable) on subsequent calls. This self-call then returns the actual function that allows establishing (and replacing) a connection to the stream for a particular room.</p></li>
-<li><p><em>submitMsg</em> <strong>POST</strong>s a message to the server.</p></li>
-<li><p>There are multiple functions setting props in the top level ReactJS component, such as <em>SseChatApp.setMsgsProps</em>. <em>SseChatApp.setProps</em> is a placeholder, it gets replaced once the JSX compiler has run and the ReactJS application has been loaded (see above).</p></li>
-</ul>
-
-
-<h1>Conclusion</h1>
-
-<p>Scala.js is an interesting approach for client side development and certainly a technology to watch, particularly when you are working with <strong><a href="http://www.scala-lang.org/">Scala</a></strong> on the server side anyhow. It is still in the experimental phase, so I probably won&#8217;t have the Next Big Thing depend on it yet, but it may get there if there is enough interest in the community.</p>
-
-<p><strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> is a library I already fully recommend. Working with it has been a breeze so far and it took a lot less time to get familiar with its features in comparison to <strong><a href="http://angularjs.org/">AngularJS</a></strong>. Its approach to immutable data is very natural for a functional programmer.
-It is great to only have to think about components and then be able to build your application around that in the way you like it, instead of being forced to stick to a prescribed way of doing things.</p>
-
-<p>I hope you found this useful; as always let me know what you think.</p>
-
-<p>Until next time,
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
