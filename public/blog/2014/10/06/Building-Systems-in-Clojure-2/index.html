@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Building a System in #Clojure - Part 2 - Matthias Nehlsen</title>
+  <title>Building a System in #Clojure 2 - Transducers - Matthias Nehlsen</title>
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="TL;DR: This article covers the usage of transducers in Clojure, spiced up with some core.async. Here&#8217;s a animation that shows the information &hellip;">
+  <meta name="description" content="TL;DR: This article covers the usage of Transducers in Clojure, spiced up with some core.async. Here&#8217;s an animation that shows the information &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -68,7 +68,7 @@
 
   <header>
     
-      <h1 class="entry-title">Building a System in #Clojure - Part 2</h1>
+      <h1 class="entry-title">Building a System in #Clojure 2 - Transducers</h1>
     
     
       <p class="meta">
@@ -91,7 +91,7 @@
   </header>
 
 
-<div class="entry-content"><p><strong>TL;DR:</strong> This article covers the usage of <strong>transducers</strong> in Clojure, spiced up with some <strong>core.async</strong>. Here&#8217;s a animation that shows the information flow of the <strong>composed transducer</strong> that we are going to build in this article:</p>
+<div class="entry-content"><p><strong>TL;DR:</strong> This article covers the usage of <strong>Transducers</strong> in Clojure, spiced up with some <strong>core.async</strong>. Here&#8217;s an animation that shows the information flow of the <strong>composed transducer</strong> that we are going to build in this article:</p>
 
 <script language="javascript" type="text/javascript">
   function resizeIframe(obj) {
@@ -117,7 +117,7 @@
 <!-- more -->
 
 
-<p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. Last week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
+<p>Hello and welcome back to this series of articles about building a system in <strong><a href="http://clojure.org/">Clojure</a></strong>. The other week, we had a first look at dependency injection using the <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> combined with a hint of channel decoupling power. You may want to read <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">that article first</a></strong> if you haven’t done so already.</p>
 
 <p>In this installment, we will look into the first component, the <strong>twitter client</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. It seems like the natural component to start with as it is our application’s point of entry for twitter’s <strong>streaming data</strong>. We will have to discuss the lifecycle of the component at some point, but that can also happen next week. Today, we will look at transducers, a <strong><a href="http://blog.cognitect.com/blog/2014/8/6/transducers-are-coming">recent addition</a></strong> to Clojure. First of all, though, we will look at the problem at hand, without any language- or library-specific implementation details.</p>
 
@@ -154,7 +154,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>However, the above is bound to the data structure, in this case a vector. That does not have to be the case, though. Rich Hickey provides a good example in his <strong><a href="https://www.youtube.com/watch?v=6mTbuzafcII">transducers talk</a></strong>, likening the above to having to tell the guys processing luggage at the airport the same instructions twice, once for trolleys and again for conveyor belts, where in reality that should not matter.</p>
+<p>However, the above is bound to the data structure, in this case a vector. That should not have to be the case, though. Rich Hickey provides a good example in his <strong><a href="https://www.youtube.com/watch?v=6mTbuzafcII">transducers talk</a></strong>, likening the above to having to tell the guys processing luggage at the airport the same instructions twice, once for trolleys and again for conveyor belts, where in reality that should not matter.</p>
 
 <p>We could, for example, not only run the mapping function over every item in a vector but also reuse the same function on every item in a channel, stream or whatever.</p>
 
@@ -165,7 +165,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now, we can apply this transducing function to different kinds of data structures. For example, we could transform all entries from a vector into another vector, like so:</p>
+<p>Now, we can apply this transducing function to different kinds of data structures that are transducible processes. For example, we could transform all entries from a vector into another vector, like so:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">into </span><span class="p">[]</span> <span class="nv">xform</span> <span class="p">[</span><span class="s">&quot;{\&quot;foo\&quot;:1}&quot;</span> <span class="s">&quot;{\&quot;bar\&quot;:42}&quot;</span><span class="p">])</span>
@@ -188,7 +188,7 @@
 
 <p>The above creates a channel with a buffer size of one that applies the transducer to every element.</p>
 
-<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of <strong>state</strong>. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. What if one such transducer could have local state that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
+<p>But this does not help in our initial case here, where we know that some of the chunks are not complete but instead have to be glued together with the next one or two pieces. For that, we will need some kind of <strong>state</strong>. In the example above, that would be the space where we place fragments of a hundred dollar bill. But what if we want to see this aggregation process as a <strong>black box</strong>? Then, the aggregation cannot really have outside state. Also, as Rich Hickey mentioned in his StrangeLoop talk, there is no space in the machinery to keep state. What if one such transducer could have local state though that is contained and not accessible from the outside? It turns out this is where stateful transducers can help.</p>
 
 <p>Here’s how that looks like in code:</p>
 
@@ -214,7 +214,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Let&#8217;s go through this line by line. We have a (private) function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragments<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
+<p>Let&#8217;s go through this line by line. We have a (private) function named <strong>streaming-buffer</strong> that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup> which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don&#8217;t have to use <strong>atoms</strong> here if we want to squeeze out the last bit of performance but I find it simpler to not introduce another yet concept unless strictly necessary<sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup>. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk).</p>
 
 <p>In the first line of the let binding, we use the <strong><a href="http://clojuredocs.org/clojure.core/-%3E">-> (thread-first)</a></strong> macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we <strong>1)</strong> concatenate the buffer with the new chunk, <strong>2)</strong> add newlines where missing<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>, and <strong>3)</strong> split the string into a sequence on the line breaks.</p>
 
@@ -358,9 +358,6 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 <pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
 #&lt;Namespace birdwatch.twitterclient.processing&gt;
 
-birdwatch.twitterclient.processing=&gt; (require '[clj-time.core :as t])
-nil
-
 birdwatch.twitterclient.processing=&gt; (def chunks ["{\"text\"" ":\"foo\"}\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
 #'birdwatch.twitterclient.processing/chunks
 
@@ -369,11 +366,40 @@ birdwatch.twitterclient.processing=&gt; (into [] (process-chunk (atom (t/epoch))
 [{:text "foo"} {:text "bar"}]
 </code></pre>
 
-<p>Great, we have a composed transducer that works on vectors as expected and that should work on channels as well.</p>
+<p>Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey, this should work equally well on channels. But let&#8217;s not take his word for it and instead try it out:</p>
+
+<pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
+#&lt;Namespace birdwatch.twitterclient.processing&gt;
+
+birdwatch.twitterclient.processing=&gt; (def chunks ["{\"text\"" ":\"foo\"}\r\n{\"text\":" "\"bar\"}" "{\"baz\":42}" "{\"bla\":42}"])
+#'birdwatch.twitterclient.processing/chunks
+
+birdwatch.twitterclient.processing=&gt; (require '[clojure.core.async :as async :refer [chan go-loop &lt;! put!]])
+nil
+
+birdwatch.twitterclient.processing=&gt; (def c (chan 1 (process-chunk (atom (t/now)))))
+#'birdwatch.twitterclient.processing/c
+
+birdwatch.twitterclient.processing=&gt; (go-loop [] (println (&lt;! c)) (recur))
+#&lt;ManyToManyChannel clojure.core.async.impl.channels.ManyToManyChannel@2f924b3f&gt;
+
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 0))
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 1))
+{:text foo}
+
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 2))
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 3))
+{:text bar}
+
+birdwatch.twitterclient.processing=&gt; (put! c (chunks 4))
+16:44:32.539 [nREPL-worker-2] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
+</code></pre>
+
+<p>Excellent, same output. In case you&#8217;re not familiar with <strong>core.async channels</strong> yet: above we have created a channel with the same transducer attached as in the previous example, then we have created a <strong>go-loop</strong> for consuming the channel and finally, we have <strong>put!</strong> the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we&#8217;ll cover this topic in much more detail.</p>
 
 <h2>Conclusion</h2>
 
-<p>Okay, this is it for today. We saw how we can process tweets from the twitter streaming API in a way that is generic and that can be used on different kinds of data structures. Next week, we will see how this ic actually used in the <strong>TwitterClient</strong> component.</p>
+<p>Okay, this is it for today. We saw how we can process tweets from the twitter streaming API in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.</p>
 
 <p>There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I&#8217;d rather refer you to my list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. There, you&#8217;ll find a comprehensive list of all the articles I came across while working on this application.</p>
 
@@ -521,7 +547,7 @@ Matthias</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/10/06/Building-Systems-in-Clojure-2/">Building a System in #Clojure - Part 2</a>
+        <a href="/blog/2014/10/06/Building-Systems-in-Clojure-2/">Building a System in #Clojure 2 - Transducers</a>
       </li>
     
       <li class="post">
@@ -529,7 +555,7 @@ Matthias</p>
       </li>
     
       <li class="post">
-        <a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure - Part 1</a>
+        <a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in #Clojure 1 - Overview</a>
       </li>
     
       <li class="post">

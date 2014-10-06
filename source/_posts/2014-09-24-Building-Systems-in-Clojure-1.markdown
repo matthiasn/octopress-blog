@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Building a System in Clojure - Part 1"
+title: "Building a System in #Clojure 1 - Overview"
 date: 2014-09-24 19:06
 comments: true
 categories: 
