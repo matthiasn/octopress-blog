@@ -77,7 +77,7 @@
         <text transform="translate(496.9995 234.27953)" fill="black">
             <tspan font-family="Helvetica Neue" font-size="16" font-weight="bold" x=".336" y="16">Composed Transducer</tspan>
         </text>
-        <g id="chunk">
+        <g id="chunk" opacity="0.01">
            <path d="M 277.12598 303.30708 L 349.3307 303.30708 C 352.09213 303.30708 354.3307 305.54566 354.3307 308.30708 L 354.3307 326.65354 C 354.3307 329.41497 352.09213 331.65354 349.3307 331.65354 L 277.12598 331.65354 C 274.36456 331.65354 272.12598 329.41497 272.12598 326.65354 L 272.12598 308.30708 C 272.12598 305.54566 274.36456 303.30708 277.12598 303.30708 Z" fill="white"/>
            <path d="M 277.12598 303.30708 L 349.3307 303.30708 C 352.09213 303.30708 354.3307 305.54566 354.3307 308.30708 L 354.3307 326.65354 C 354.3307 329.41497 352.09213 331.65354 349.3307 331.65354 L 277.12598 331.65354 C 274.36456 331.65354 272.12598 329.41497 272.12598 326.65354 L 272.12598 308.30708 C 272.12598 305.54566 274.36456 303.30708 277.12598 303.30708 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
            <text transform="translate(277.12598 310.98031)" fill="black">
@@ -111,8 +111,10 @@
     var birdwatchAnim = new TimelineMax({ repeatDelay: 3, repeat:-1 });
 
     var chunkAnim = new TimelineMax({ repeat:2 })
-        .add(TweenMax.fromTo(chunk, 1, { x: "-100", opacity:0 }, { x: "+=248", opacity:1, ease:Power4.easeOut }))
-        .add(TweenMax.to(chunk, 1, { opacity:0 }))
+        .add(TweenMax.to(chunk, 0.01, { x:-100 }))
+        .add(TweenMax.to(chunk, 0.01, { opacity:1 }))
+        .add(TweenMax.to(chunk, 1, { x: "+=248", ease:Power4.easeOut }))
+        .add(TweenMax.to(chunk, 1, { opacity:0.01 }))
         ;
 
     var flowAnim = new TimelineMax({repeat:20});

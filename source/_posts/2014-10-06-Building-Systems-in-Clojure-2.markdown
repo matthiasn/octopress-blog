@@ -95,7 +95,9 @@ Here’s how that looks like in code:
     (let [buff (atom "")]
       ([r] (step r))
       (fn [r x]
-        (let [json-lines (-> (str @buff x) (insert-newline) (str/split-lines))
+        (let [json-lines (-> (str @buff x)
+                             (insert-newline)
+                             (str/split-lines))
               to-process (butlast json-lines)]
           (reset! buff (last json-lines))
           (if to-process (reduce step r to-process) r))))))
@@ -105,7 +107,7 @@ Let's go through this line by line. We have a (private) function named **streami
 
 In the first line of the let binding, we use the **[-> (thread-first)](http://clojuredocs.org/clojure.core/-%3E)** macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we **1)** concatenate the buffer with the new chunk, **2)** add newlines where missing[^5], and **3)** split the string into a sequence on the line breaks.
 
-Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been another tweet to the right of them. But the last one may not be complete. Accordingly, we derive
+Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been a subsequent tweet. But the last one may not be complete. Accordingly, we derive
 
 {% codeblock lang:clojure %}
 (butlast json-lines)
@@ -131,7 +133,7 @@ Let's create a vector of JSON fragments and try it out. We have already establis
 ["{\"foo\"" ":1}\n{\"bar\":" "42}" "{\"baz\":42}" "{\"bla\":42}"]
 {% endcodeblock %}
 
-Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the **arity-1** (single argument) function is called one last time, which really only returns the aggregate at that point:
+Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost because we would only check its completeness once there is a following tweet[^6]. Once the collection to process is empty, the **arity-1** (single argument) function is called one last time, which really only returns the aggregate at that point:
 
     birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
     #<Namespace birdwatch.twitterclient.processing>
@@ -154,7 +156,7 @@ Now when we run the same as above on the REPL, we can see what the step function
     #<core$conj_BANG_ clojure.core$conj_BANG_@5fd837a>
     ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
 
-Interestingly, the step function is **conj!** which according to the **[source](https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208)** adds **x** to a **transient collection**[^6].
+Interestingly, the step function is **conj!** which according to the **[source](https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208)** adds **x** to a **transient collection**[^7].
 
 The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.
 
@@ -218,7 +220,11 @@ Then we should see that the invalid one is logged and the other two are returned
     20:57:39.999 [nREPL-worker-1] ERROR birdwatch.twitterclient.processing - error-msg {:baz 42}
     [{:text "foo"} {:text "bar"}]
 
-Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let's not take his word for it and instead try it out:
+Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let's not take his word for it and instead try it out. First, here's my attempt to visualize the usage of a transducer in a channel. To make things easier, no errors occur.
+
+<iframe width="100%;" src="/iframes/clj-system2/channel.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
+
+Now for a simple example in the REPL:
 
     birdwatch.main=> (in-ns 'birdwatch.twitterclient.processing)
     #<Namespace birdwatch.twitterclient.processing>
@@ -269,4 +275,6 @@ Matthias
 
 [^5]: For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: ````(str/replace s #"\}\{" "}\r\n{"))````.
 
-[^6]: I assume the **transient** collection is used for performance reasons.
+[^6]: One could probably check if the buffer contains a valid and complete JSON string when the arity-1 function is called, and if so, pass it on. Considering though that in this application we are interested in a stream that does not have an end, I omitted this step.
+
+[^7]: I assume the **transient** collection is used for performance reasons.

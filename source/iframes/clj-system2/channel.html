@@ -1,0 +1,165 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Transducers</title>
+    <meta name="description" content="BirdWatch Components">
+    <meta name="author" content="Matthias Nehlsen">
+    <link rel="stylesheet" href="https://codepen.io/assets/libs/fullpage/jquery-ui.css">
+
+    <style>
+        
+    </style>
+</head>
+
+<body>
+
+<svg viewBox="133 272 1058 193" width="100%" height="100%" id="bw-omni">
+    <metadata>
+        Produced by OmniGraffle 6.0.5 
+        <dc:date>2014-10-06 20:41Z</dc:date>
+    </metadata>
+    <defs>
+        <font-face font-family="Helvetica Neue" font-size="12" panose-1="2 0 8 3 0 0 0 9 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="975.0061" descent="-216.99524" font-weight="bold">
+            <font-face-src>
+                <font-face-name name="HelveticaNeue-Bold"/>
+            </font-face-src>
+        </font-face>
+        <filter id="Shadow" filterUnits="userSpaceOnUse">
+            <feGaussianBlur in="SourceAlpha" result="blur" stdDeviation="2.18"/>
+            <feOffset in="blur" result="offset" dx="0" dy="2"/>
+            <feFlood flood-color="black" flood-opacity=".5" result="flood"/>
+            <feComposite in="flood" in2="offset" operator="in"/>
+        </filter>
+        <font-face font-family="Helvetica Neue" font-size="16" panose-1="2 0 8 3 0 0 0 9 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="975.0061" descent="-216.99524" font-weight="bold">
+            <font-face-src>
+                <font-face-name name="HelveticaNeue-Bold"/>
+            </font-face-src>
+        </font-face>
+        <font-face font-family="Helvetica" font-size="11" units-per-em="1000" underline-position="-75.683594" underline-thickness="49.316406" slope="0" x-height="532.22656" cap-height="719.72656" ascent="770.01953" descent="-229.98047" font-weight="bold">
+            <font-face-src>
+                <font-face-name name="Helvetica-Bold"/>
+            </font-face-src>
+        </font-face>
+    </defs>
+    <g stroke="none" stroke-opacity="1" stroke-dasharray="none" fill="none" fill-opacity="1">
+        <title>Canvas 1</title>
+        <g id="count">
+            <path id="count-box" d="M 680.31496 425.19685 L 680.31496 425.19685 L 793.7008 425.19685 L 850.3937 368.50393 L 793.7008 311.81102 L 680.31496 311.81102 L 737.00787 368.50393 Z" fill="white"/>
+            <path d="M 680.31496 425.19685 L 680.31496 425.19685 L 793.7008 425.19685 L 850.3937 368.50393 L 793.7008 311.81102 L 680.31496 311.81102 L 737.00787 368.50393 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+            <text transform="translate(720.40895 316.81102)" fill="black">
+                <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".34" y="12">log-count</tspan>
+            </text>
+        </g>
+        <g id="filter">
+            <path id="filter-box" d="M 566.92913 425.19685 L 566.92913 425.19685 L 680.31496 425.19685 L 737.00787 368.50393 L 680.31496 311.81102 L 566.92913 311.81102 L 623.62204 368.50393 Z" fill="white"/>
+            <path d="M 566.92913 425.19685 L 566.92913 425.19685 L 680.31496 425.19685 L 737.00787 368.50393 L 680.31496 311.81102 L 566.92913 311.81102 L 623.62204 368.50393 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+            <text transform="translate(600.52313 316.81102)" fill="black">
+                <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".396" y="12">filter tweet?</tspan>
+            </text>
+        </g>
+        <g id="map">
+            <path id="map-box" d="M 453.5433 425.19685 L 453.5433 425.19685 L 566.92913 425.19685 L 623.62204 368.50393 L 566.92913 311.81102 L 453.5433 311.81102 L 510.23622 368.50393 Z" fill="white"/>
+            <path d="M 453.5433 425.19685 L 453.5433 425.19685 L 566.92913 425.19685 L 623.62204 368.50393 L 566.92913 311.81102 L 453.5433 311.81102 L 510.23622 368.50393 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+            <text transform="translate(495.1373 316.81102)" fill="black">
+                <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".172" y="12">map json</tspan>
+            </text>
+        </g>
+        <g id="stream">
+           <path id="stream-box" d="M 340.15748 425.19685 L 340.15748 425.19685 L 453.5433 425.19685 L 510.23622 368.50393 L 453.5433 311.81102 L 340.15748 311.81102 L 396.8504 368.50393 Z" fill="#ffffff"/>
+            <path d="M 340.15748 425.19685 L 340.15748 425.19685 L 453.5433 425.19685 L 510.23622 368.50393 L 453.5433 311.81102 L 340.15748 311.81102 L 396.8504 368.50393 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+            <text transform="translate(368.75147 316.81102)" fill="black">
+                <tspan font-family="Helvetica Neue" font-size="12" font-weight="bold" x=".356" y="12">stream-buffer</tspan>
+            </text>
+        </g>
+        <g>
+            <title>Layer 1</title>
+            <g>
+                <xl:use xl:href="#id608_Graphic" filter="url(#Shadow)"/>
+                <xl:use xl:href="#id625_Graphic" filter="url(#Shadow)"/>
+            </g>
+            <path d="M 255.11811 283.46457 L 340.15748 368.50393 L 255.11811 453.5433 L 963.7795 453.5433 L 1048.8189 368.50393 L 963.7795 283.46457 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+            <text transform="translate(429.49163 288.1378)" fill="black">
+                <tspan font-family="Helvetica Neue" font-size="16" font-weight="bold" x=".18" y="16">Channel with composed Transducer</tspan>
+            </text>
+            <g id="chunk" opacity="0.01">
+                <path d="M 155.23622 351.49606 L 227.44094 351.49606 C 230.20237 351.49606 232.44094 353.73464 232.44094 356.49606 L 232.44094 374.84252 C 232.44094 377.60394 230.20237 379.84252 227.44094 379.84252 L 155.23622 379.84252 C 152.4748 379.84252 150.23622 377.60394 150.23622 374.84252 L 150.23622 356.49606 C 150.23622 353.73464 152.4748 351.49606 155.23622 351.49606 Z" fill="white"/>
+                <path d="M 155.23622 351.49606 L 227.44094 351.49606 C 230.20237 351.49606 232.44094 353.73464 232.44094 356.49606 L 232.44094 374.84252 C 232.44094 377.60394 230.20237 379.84252 227.44094 379.84252 L 155.23622 379.84252 C 152.4748 379.84252 150.23622 377.60394 150.23622 374.84252 L 150.23622 356.49606 C 150.23622 353.73464 152.4748 351.49606 155.23622 351.49606 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+                <text transform="translate(155.23622 359.16929)" fill="black">
+                    <tspan font-family="Helvetica" font-size="11" font-weight="bold" x="4.3189147" y="10" textLength="63.566895">tweet chunk</tspan>
+                </text>
+            </g>
+            <g id="tweet" opacity="0.01">
+                <path d="M 1096.3386 354.3307 L 1168.5433 354.3307 C 1171.3047 354.3307 1173.5433 356.56928 1173.5433 359.3307 L 1173.5433 377.67716 C 1173.5433 380.43859 1171.3047 382.67716 1168.5433 382.67716 L 1096.3386 382.67716 C 1093.57715 382.67716 1091.3386 380.43859 1091.3386 377.67716 L 1091.3386 359.3307 C 1091.3386 356.56928 1093.57715 354.3307 1096.3386 354.3307 Z" fill="white"/>
+                <path d="M 1096.3386 354.3307 L 1168.5433 354.3307 C 1171.3047 354.3307 1173.5433 356.56928 1173.5433 359.3307 L 1173.5433 377.67716 C 1173.5433 380.43859 1171.3047 382.67716 1168.5433 382.67716 L 1096.3386 382.67716 C 1093.57715 382.67716 1091.3386 380.43859 1091.3386 377.67716 L 1091.3386 359.3307 C 1091.3386 356.56928 1093.57715 354.3307 1096.3386 354.3307 Z" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+                <text transform="translate(1096.3386 362.00393)" fill="black">
+                    <tspan font-family="Helvetica" font-size="11" font-weight="bold" x="22.043524" y="10" textLength="28.117676">tweet</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>
+
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"/></script>
+
+<script>
+(function () {
+    var doc = document.getElementById("bw-omni");
+
+    var stream = $("#stream");
+    var filter = $("#filter");
+    var map    = $("#map");
+    var count  = $("#count");
+
+    var streamBox = $("#stream-box");
+    var filterBox = $("#filter-box");
+    var mapBox    = $("#map-box");
+    var countBox  = $("#count-box");
+
+    var chunk  = $("#chunk");
+    var tweet  = $("#tweet");
+
+    var birdwatchAnim = new TimelineMax({ repeatDelay: 3, repeat:-1 });
+
+    var chunkAnim = new TimelineMax({ repeat:2 })
+        .add(TweenMax.to(chunk, 0.01, { x:-100 }))
+        .add(TweenMax.to(chunk, 0.01, { opacity:1 }))
+        .add(TweenMax.to(chunk, 1, { x: "+=352", ease:Power4.easeOut }))
+        .add(TweenMax.to(chunk, 1, { opacity:0.01 }))
+        ;
+
+    var tweetAnim = new TimelineMax()
+        .add(TweenMax.to(tweet, 0.01, { x:"-=575" }))
+        .add(TweenMax.to(tweet, 1, { opacity:1 }))
+        .add(TweenMax.to(tweet, 3, { x: "+=700", ease:Power1.easeIn }))
+        .add(TweenMax.to(tweet, 1, { opacity:0.01 }))
+        ;
+
+    var flowAnim = new TimelineMax({repeat:20});
+
+    flowAnim
+        .add(TweenMax.to(streamBox, 2, { fill:"#ffdf4d", ease:Power4.easeIn }))
+        .add(chunkAnim, "-=1.5")
+        .add(TweenMax.to(streamBox, 0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(TweenMax.to(mapBox,    0.5, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=0.5")
+        .add(TweenMax.to(mapBox,    0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(TweenMax.to(filterBox, 0.5, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=0.5")
+        .add(TweenMax.to(filterBox, 0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(TweenMax.to(countBox,  0.5, { fill:"#ffdf4d", ease:Power4.easeIn }), "-=0.5")
+        .add(TweenMax.to(countBox,  0.5, { fill:"#ffffff", ease:Power4.easeIn }), "+=0.5")
+        .add(tweetAnim, "-=3.8")
+        ;
+
+    birdwatchAnim
+        .add(flowAnim)
+        ;
+
+    birdwatchAnim.timeScale(1.5);
+    birdwatchAnim.play();
+})();
+</script>
+</body>
+</html>

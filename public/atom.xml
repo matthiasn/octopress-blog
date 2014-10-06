@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-06T19:44:51+02:00</updated>
+  <updated>2014-10-07T01:19:28+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -129,12 +129,16 @@
 <span class='line-number'>7</span>
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">streaming-buffer</span> <span class="p">[]</span>
 </span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
 </span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buff</span> <span class="p">(</span><span class="nf">atom</span> <span class="s">&quot;&quot;</span><span class="p">)]</span>
 </span><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
 </span><span class='line'>      <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
-</span><span class='line'>        <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span> <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>                             <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span>
+</span><span class='line'>                             <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
 </span><span class='line'>              <span class="nv">to-process</span> <span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)]</span>
 </span><span class='line'>          <span class="p">(</span><span class="nf">reset!</span> <span class="nv">buff</span> <span class="p">(</span><span class="nb">last </span><span class="nv">json-lines</span><span class="p">))</span>
 </span><span class='line'>          <span class="p">(</span><span class="k">if </span><span class="nv">to-process</span> <span class="p">(</span><span class="nb">reduce </span><span class="nv">step</span> <span class="nv">r</span> <span class="nv">to-process</span><span class="p">)</span> <span class="nv">r</span><span class="p">))))))</span>
@@ -145,7 +149,7 @@
 
 <p>In the first line of the let binding, we use the <strong><a href="http://clojuredocs.org/clojure.core/-%3E">-> (thread-first)</a></strong> macro. This macro makes the code more legible by simply passing the result of each function call as the first argument of the next function. Here, specifically, we <strong>1)</strong> concatenate the buffer with the new chunk, <strong>2)</strong> add newlines where missing<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup>, and <strong>3)</strong> split the string into a sequence on the line breaks.</p>
 
-<p>Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been another tweet to the right of them. But the last one may not be complete. Accordingly, we derive</p>
+<p>Now, we cannot immediately process all those items in the resulting sequence. We know that all are complete except for the last one as otherwise there would not have been a subsequent tweet. But the last one may not be complete. Accordingly, we derive</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)</span>
@@ -175,7 +179,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called one last time, which really only returns the aggregate at that point:</p>
+<p>Now we can check on the REPL if this will produce three complete JSON strings. It is expected here that the last one is lost because we would only check its completeness once there is a following tweet<sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>. Once the collection to process is empty, the <strong>arity-1</strong> (single argument) function is called one last time, which really only returns the aggregate at that point:</p>
 
 <pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
 #&lt;Namespace birdwatch.twitterclient.processing&gt;
@@ -201,7 +205,7 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 ["{\"foo\":1}" "{\"bar\":42}" "{\"baz\":42}"]
 </code></pre>
 
-<p>Interestingly, the step function is <strong>conj!</strong> which according to the <strong><a href="https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208">source</a></strong> adds <strong>x</strong> to a <strong>transient collection</strong><sup id="fnref:6"><a href="#fn:6" rel="footnote">6</a></sup>.</p>
+<p>Interestingly, the step function is <strong>conj!</strong> which according to the <strong><a href="https://github.com/clojure/clojure/blob/clojure-1.7.0-alpha2/src/clj/clojure/core.clj#L3208">source</a></strong> adds <strong>x</strong> to a <strong>transient collection</strong><sup id="fnref:7"><a href="#fn:7" rel="footnote">7</a></sup>.</p>
 
 <p>The step function is different when we use the transducer on a channel, but more about that when we use it in that scenario.</p>
 
@@ -293,7 +297,12 @@ birdwatch.twitterclient.processing=&gt; (into [] (process-chunk (atom (t/epoch))
 [{:text "foo"} {:text "bar"}]
 </code></pre>
 
-<p>Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let&#8217;s not take his word for it and instead try it out:</p>
+<p>Great, we have a composed transducer that works on vectors as expected. According to Rich Hickey this should work equally well on channels. But let&#8217;s not take his word for it and instead try it out. First, here&#8217;s my attempt to visualize the usage of a transducer in a channel. To make things easier, no errors occur.</p>
+
+<iframe width="100%;" src="http://matthiasnehlsen.com/iframes/clj-system2/channel.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
+
+
+<p>Now for a simple example in the REPL:</p>
 
 <pre><code>birdwatch.main=&gt; (in-ns 'birdwatch.twitterclient.processing)
 #&lt;Namespace birdwatch.twitterclient.processing&gt;
@@ -348,7 +357,9 @@ Matthias</p>
 <li id="fn:5">
 <p>For whatever reason, the changed behavior of the streaming API also entails that not all tweets are followed by a line break, only most of them. A tiny helper function inserts those missing linebreaks where they are missing between two tweets: <code>(str/replace s #"\}\{" "}\r\n{"))</code>.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
 <li id="fn:6">
-<p>I assume the <strong>transient</strong> collection is used for performance reasons.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<p>One could probably check if the buffer contains a valid and complete JSON string when the arity-1 function is called, and if so, pass it on. Considering though that in this application we are interested in a stream that does not have an end, I omitted this step.<a href="#fnref:6" rev="footnote">&#8617;</a></p></li>
+<li id="fn:7">
+<p>I assume the <strong>transient</strong> collection is used for performance reasons.<a href="#fnref:7" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
