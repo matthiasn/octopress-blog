@@ -9,8 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-This weekly update is mostly about organizational issues around publishing articles and getting feedback for &hellip;">
+  <meta name="description" content="This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles. The other &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -92,39 +91,18 @@ This weekly update is mostly about organizational issues around publishing artic
   </header>
 
 
-<div class="entry-content"><p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-This weekly update is mostly about organizational issues around publishing articles and getting feedback for unfinished articles.</p>
-
-<!-- more -->
-
-
-<h1>The other day, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series for getting some preliminary feedback, but without announcing the article just yet. What I did not think about though was RSS aggregators that notice and pick up new content nonetheless, so that was a little less than ideal on my part.</h1>
-
-<p>This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles.</p>
+<div class="entry-content"><p>This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles.</p>
 
 <!-- more -->
 
 
 <p>The other day, I published the unfinished second article in the <strong>Writing a System in Clojure</strong> series to get some preliminary feedback but without announcing the article just yet. What I did not think about, though, was that RSS aggregators notice and pick up new content nonetheless, so that was a little less than perfect on my part.</p>
 
-<blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><p>2014-10-05-clojure-system-2</p></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote>
-
 <p>Ideally, I should have a different way of publishing unfinished stuff in order to get feedback and then only have finalized articles on this blog.</p>
 
 <p>So I came up with something different: a <strong>staging server</strong>. Just like I would want a test environment when developing an application, I also want a test environment for new articles. So I&#8217;ve removed the unfinished article from master for now and put the unfinished article here:</p>
 
 <p><strong><a href="http://staging.matthiasnehlsen.com/">http://staging.matthiasnehlsen.com/</a></strong></p>
-
-<p>&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD
-The implementation of this staging server took like 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for <strong>staging.matthiasnehlsen.com</strong>, and modify the <strong>nginx</strong> configuration so that the staging URL point to that new directory.</p>
-
-<p>I got very helpful feedback so far, so at least publishing the unfinished article was still worth it. Right now I am working on illustrating the new article with some animations. I expect to be done with everything on Monday. I will also probably split the article in two as the current article is a little too long for my taste.</p>
-
-<h2>Conclusion</h2>
-
-<p>While this little modification is probably not terribly useful for you, I feel like it will be much more convenient for my workflow. You can also check out the staging server to see new articles in the works. Just note that sharing links may or may not lead to <strong>404&#8217;s</strong> later on as there is no guarantee whatsoever that those links will last. If they end up in master, they should, but the may well not.</p>
-
-<h1>Thats all for now. Have a great week,</h1>
 
 <p>The implementation of the staging server took some 5 minutes. All I had to do was clone the directory on the server, check out a different branch in the cloned directory, create a new DNS entry for <strong>staging.matthiasnehlsen.com</strong>, and modify the <strong>nginx</strong> configuration so that the staging URL points to that new directory.</p>
 
@@ -134,10 +112,8 @@ The implementation of this staging server took like 5 minutes. All I had to do w
 
 <p>While this little modification is probably not terribly useful for you, I believe it will be much more convenient for my workflow. You can also check out the staging server to see new articles in the works. Just note that sharing links may or may not lead to <strong>404&#8217;s</strong> later on as there is no guarantee whatsoever that those links will last. They should end up in master, but they may well not.</p>
 
-<p>That&#8217;s all for now. Have a great week,</p>
-
-<blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><blockquote><p>2014-10-05-clojure-system-2
-Matthias</p></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote></blockquote>
+<p>That&#8217;s all for now. Have a great week,
+Matthias</p>
 </div>
 
 
