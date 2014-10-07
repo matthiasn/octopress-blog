@@ -192,8 +192,7 @@
 
 <p>Here’s how that looks like in code:</p>
 
-<figure class='code'><figcaption><span>stateful streaming-buffer transducer processing.clj</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>stateful streaming-buffer transducer</span><a href='https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj'>processing.clj</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -208,7 +207,7 @@
 </span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
 </span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buff</span> <span class="p">(</span><span class="nf">atom</span> <span class="s">&quot;&quot;</span><span class="p">)]</span>
 </span><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
-</span><span class='line'>      <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>      <span class="p">([</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
 </span><span class='line'>        <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span>
 </span><span class='line'>                             <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span>
 </span><span class='line'>                             <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
@@ -284,8 +283,7 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 
 <p>There&#8217;s more to do before we can <strong>compose all transducers</strong> and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one <strong>key</strong> that all tweets have in common, which does not seem to appear in any status messages from Twitter: <strong>:text</strong>. We can thus use that key as the <strong>predicate</strong> for recognizing a tweet:</p>
 
-<figure class='code'><figcaption><span>tweet? predicate function processing.clj</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>tweet? predicate function</span><a href='https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj'>processing.clj</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -300,8 +298,7 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 
 <p>Next, we also want to log the count of tweets received since the application started. Let&#8217;s do this only for full thousands. We will need some kind of counter to keep track of the count. Let&#8217;s create another <strong>stateful transducer</strong>:</p>
 
-<figure class='code'><figcaption><span>stateful count transducer processing.clj</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>stateful count transducer</span><a href='https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj'>processing.clj</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
@@ -330,8 +327,7 @@ birdwatch.twitterclient.processing=&gt; (into [] (streaming-buffer) chunks)
 
 <p>Now, we can compose all these steps:</p>
 
-<figure class='code'><figcaption><span>composed transducer processing.clj</span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>composed transducer</span><a href='https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj'>processing.clj</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>

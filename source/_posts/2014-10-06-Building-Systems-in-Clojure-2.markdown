@@ -89,12 +89,12 @@ But this does not help in our initial case here, where we know that some of the 
 
 Here’s how that looks like in code:
 
-{% codeblock stateful streaming-buffer transducer lang:clojure processing.clj%}
+{% codeblock stateful streaming-buffer transducer lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
 (defn- streaming-buffer []
   (fn [step]
     (let [buff (atom "")]
       ([r] (step r))
-      (fn [r x]
+      ([r x]
         (let [json-lines (-> (str @buff x)
                              (insert-newline)
                              (str/split-lines))
@@ -162,7 +162,7 @@ The step function is different when we use the transducer on a channel, but more
 
 There's more to do before we can **compose all transducers** and attach them to the appropriate channel. Specifically, we can receive valid JSON from Twitter, which is not a tweet. This happens, for example, when we get a notification that we lag behind in consuming the stream. In that case we only want to pass on the parsed map if it is likely that it was a tweet and otherwise log it as an error. There is one **key** that all tweets have in common, which does not seem to appear in any status messages from Twitter: **:text**. We can thus use that key as the **predicate** for recognizing a tweet:
 
-{% codeblock tweet? predicate function lang:clojure processing.clj%}
+{% codeblock tweet? predicate function lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
 (defn- tweet? [data]
   "Checks if data is a tweet. If so, pass on, otherwise log error."
   (let [text (:text data)]
@@ -172,7 +172,7 @@ There's more to do before we can **compose all transducers** and attach them to 
 
 Next, we also want to log the count of tweets received since the application started. Let's do this only for full thousands. We will need some kind of counter to keep track of the count. Let's create another **stateful transducer**:
 
-{% codeblock stateful count transducer lang:clojure processing.clj%}
+{% codeblock stateful count transducer lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
 (defn- log-count [last-received]
   "Stateful transducer, counts processed items and updating last-received atom. Logs progress every 1000 items."
   (fn [step]
@@ -190,7 +190,7 @@ This transducer is comparable to the one we saw earlier, except that the local a
 
 Now, we can compose all these steps:
 
-{% codeblock composed transducer lang:clojure processing.clj%}
+{% codeblock composed transducer lang:clojure https://github.com/matthiasn/BirdWatch/blob/f39a5692e4733784124d0f0930202d4270762d77/Clojure-Websockets/src/clj/birdwatch/twitterclient/processing.clj processing.clj%}
 (defn process-chunk [last-received]
   "Creates composite transducer for processing tweet chunks. Last-received atom passed in for updates."
   (comp
