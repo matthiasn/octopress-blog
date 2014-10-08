@@ -4,6 +4,7 @@ title: "Building a System in #Clojure 2 - Transducers"
 date: 2014-10-06 19:06
 comments: true
 categories: 
+nosharing: true
 ---
 **TL;DR:** This article covers the usage of **Transducers** in Clojure, spiced up with some **core.async**. Here's an animation that shows the information flow of the **composed transducer** that we are going to build in this article:
 
@@ -264,6 +265,31 @@ I hope you found this useful. If you did, why don’t you subscribe to the <a hr
 Cheers,
 Matthias
 
+<div class="sharing">
+  <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="http://platform.twitter.com/widgets/tweet_button.2df3b13213b70e6d91180bf64c17db20.en.html#_=1412769297267&amp;count=horizontal&amp;counturl=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;size=m&amp;text=Building%20a%20System%20in%20%23Clojure%202%20-%20Transducers%20-%20Matthias%20Nehlsen&amp;url=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;via=matthiasnehlsen" class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-horizontal" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 107px; height: 20px;"></iframe>
+
+  <div id="___plusone_0" style="text-indent: 0px; margin: 0px; padding: 0px; background-color: transparent; border-style: none; float: none; line-height: normal; font-size: 1px; vertical-align: baseline; display: inline-block; width: 90px; height: 20px; background-position: initial initial; background-repeat: initial initial;"><iframe frameborder="0" hspace="0" marginheight="0" marginwidth="0" scrolling="no" style="position: static; top: 0px; width: 90px; margin: 0px; border-style: none; left: 0px; visibility: visible; height: 20px;" tabindex="0" vspace="0" width="100%" id="I0_1412769297421" name="I0_1412769297421" src="https://apis.google.com/u/0/se/0/_/+1/fastbutton?usegapi=1&amp;size=medium&amp;origin=http%3A%2F%2Fmatthiasnehlsen.com&amp;url=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2&amp;gsrc=3p&amp;ic=1&amp;jsh=m%3B%2F_%2Fscs%2Fapps-static%2F_%2Fjs%2Fk%3Doz.gapi.en.eZie-eg_6M4.O%2Fm%3D__features__%2Fam%3DAQ%2Frt%3Dj%2Fd%3D1%2Ft%3Dzcms%2Frs%3DAItRSTOh4SCUosWCqh1KPQ0Sr-K9eQ0Nsg#_methods=onPlusOne%2C_ready%2C_close%2C_open%2C_resizeMe%2C_renderstart%2Concircled%2Cdrefresh%2Cerefresh%2Conload&amp;id=I0_1412769297421&amp;parent=http%3A%2F%2Fmatthiasnehlsen.com&amp;pfname=&amp;rpctoken=39213785" data-gapiattached="true" title="+1"></iframe></div>
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+</div>
+
+<br>
 
 [^1]: I only recently started with Clojure. It may be possible an also quite likely that there are better ways of doing things. If so, please let me know, I want to learn stuff.
 
