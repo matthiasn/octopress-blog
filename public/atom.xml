@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-08T14:07:34+02:00</updated>
+  <updated>2014-10-10T11:51:43+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -129,18 +129,16 @@
 <span class='line-number'>8</span>
 <span class='line-number'>9</span>
 <span class='line-number'>10</span>
-<span class='line-number'>11</span>
 </pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">streaming-buffer</span> <span class="p">[]</span>
 </span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">step</span><span class="p">]</span>
 </span><span class='line'>    <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">buff</span> <span class="p">(</span><span class="nf">atom</span> <span class="s">&quot;&quot;</span><span class="p">)]</span>
-</span><span class='line'>      <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
-</span><span class='line'>      <span class="p">([</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
-</span><span class='line'>        <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span>
-</span><span class='line'>                             <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span>
-</span><span class='line'>                             <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
-</span><span class='line'>              <span class="nv">to-process</span> <span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)]</span>
-</span><span class='line'>          <span class="p">(</span><span class="nf">reset!</span> <span class="nv">buff</span> <span class="p">(</span><span class="nb">last </span><span class="nv">json-lines</span><span class="p">))</span>
-</span><span class='line'>          <span class="p">(</span><span class="k">if </span><span class="nv">to-process</span> <span class="p">(</span><span class="nb">reduce </span><span class="nv">step</span> <span class="nv">r</span> <span class="nv">to-process</span><span class="p">)</span> <span class="nv">r</span><span class="p">))))))</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">fn</span>
+</span><span class='line'>        <span class="p">([</span><span class="nv">r</span><span class="p">]</span> <span class="p">(</span><span class="nf">step</span> <span class="nv">r</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">([</span><span class="nv">r</span> <span class="nv">x</span><span class="p">]</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">json-lines</span> <span class="p">(</span><span class="nb">-&gt; </span><span class="p">(</span><span class="nb">str </span><span class="o">@</span><span class="nv">buff</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">insert-newline</span><span class="p">)</span> <span class="p">(</span><span class="nf">str/split-lines</span><span class="p">))</span>
+</span><span class='line'>               <span class="nv">to-process</span> <span class="p">(</span><span class="nb">butlast </span><span class="nv">json-lines</span><span class="p">)]</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">reset!</span> <span class="nv">buff</span> <span class="p">(</span><span class="nb">last </span><span class="nv">json-lines</span><span class="p">))</span>
+</span><span class='line'>           <span class="p">(</span><span class="k">if </span><span class="nv">to-process</span> <span class="p">(</span><span class="nb">reduce </span><span class="nv">step</span> <span class="nv">r</span> <span class="nv">to-process</span><span class="p">)</span> <span class="nv">r</span><span class="p">)))))))</span>
 </span></code></pre></td></tr></table></div></figure>
 
 

@@ -94,14 +94,13 @@ Here’s how that looks like in code:
 (defn- streaming-buffer []
   (fn [step]
     (let [buff (atom "")]
-      ([r] (step r))
-      ([r x]
-        (let [json-lines (-> (str @buff x)
-                             (insert-newline)
-                             (str/split-lines))
-              to-process (butlast json-lines)]
-          (reset! buff (last json-lines))
-          (if to-process (reduce step r to-process) r))))))
+      (fn
+        ([r] (step r))
+        ([r x]
+         (let [json-lines (-> (str @buff x) (insert-newline) (str/split-lines))
+               to-process (butlast json-lines)]
+           (reset! buff (last json-lines))
+           (if to-process (reduce step r to-process) r)))))))
 {% endcodeblock %}
 
 Let's go through this line by line. We have a (private) function named **streaming-buffer** that does not take any arguments. It returns a function that accepts the step function. This step function is the function that will be applied to every step from then on. This function then first creates the local state as an atom[^3] which we will use as a buffer to store incomplete tweet fragments. It is worth noting that we don't have to use **atoms** here if we want to squeeze out the last bit of performance, but I find it easier not to introduce yet another concept unless absoletely necessary[^4]. Next, this function returns another function which accepts two parameters, r for result and x for the current data item (in this case the - potentially incomplete - chunk). 
