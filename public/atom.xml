@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-10T11:51:43+02:00</updated>
+  <updated>2014-10-10T11:58:33+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -329,11 +329,10 @@ birdwatch.twitterclient.processing=&gt; (put! c (chunks 4))
 
 <h2>Conclusion</h2>
 
-<p>Okay, this is it for today. We saw how we can process tweets from the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.</p>
+<p>Okay, this is it for today. We saw how we can process tweets from the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application. There is a <strong><a href="http://birdwatch2.matthiasnehlsen.com">live version for you to try out</a></strong> and of course the source code is on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>.</p>
 
-<p>There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I&#8217;d rather refer you to my list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. There, you&#8217;ll find a comprehensive list of all the articles I came across while working on this application.</p>
-
-<p>I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?</p>
+<p>There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I&#8217;d rather refer you to my list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources on GitHub</a></strong>. There, you&#8217;ll find a comprehensive list of all the articles I came across while working on this application.
+I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?</p>
 
 <p>Cheers,
 Matthias</p>

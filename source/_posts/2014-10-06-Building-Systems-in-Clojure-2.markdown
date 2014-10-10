@@ -255,10 +255,9 @@ Now for a simple example in the REPL:
 Excellent, same output. In case you're not familiar with **core.async channels** yet: above we created a channel with the same transducer attached as in the previous example, then we created a **go-loop** to consume the channel and finally, we **put!** the individual chunks on the channel. No worries if this seems a little much right now. Just come back for the next articles where we'll cover this topic in much more detail.
 
 ## Conclusion
-Okay, this is it for today. We saw how we can process tweets from the **[Twitter Streaming API](https://dev.twitter.com/streaming/overview)** in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application.
+Okay, this is it for today. We saw how we can process tweets from the **[Twitter Streaming API](https://dev.twitter.com/streaming/overview)** in a way that is generic and that can be used on different kinds of data structures. Next week, we will use this composed transducer in the context of our application. Then, we will process real data from the Twitter streaming API and feed the processed data into the channels architecture of our application. There is a **[live version for you to try out](http://birdwatch2.matthiasnehlsen.com)** and of course the source code is on **[GitHub](https://github.com/matthiasn/BirdWatch)**.
 
 There is a lot more reading material available on the subjects we covered. Instead of providing all the links now, I'd rather refer you to my list of **[Clojure Resources on GitHub](https://github.com/matthiasn/Clojure-Resources)**. There, you'll find a comprehensive list of all the articles I came across while working on this application.
-
 I hope you found this useful. If you did, why don’t you subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> so I can tell you when the next article is out?
 
 Cheers,
