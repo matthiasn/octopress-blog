@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-10T11:58:33+02:00</updated>
+  <updated>2014-10-15T16:29:05+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,32 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Talk Transcripts: Rich Hickey, David Nolen & more]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/"/>
+    <updated>2014-10-15T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts</id>
+    <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I wanted to study the content of some talks in written form but there were no transcripts available. However, I believe that the valuable and relevant content of these talks should be accessible to everyone, including those for whom &#8216;sit back and listen&#8217; might not be the most viable option. To make that a reality, I had transcripts made. So far, I have compiled five talks by <strong>Rich Hickey</strong>, one talk by <strong>David Nolen</strong> and another talk by <strong>Guy Steele</strong>. The transcripts are <strong><a href="https://github.com/matthiasn/talk-transcripts">available on GitHub</a></strong>.</p>
+
+<h2>Background</h2>
+
+<p>For my <strong><a href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/">previous article</a></strong>, I listened to Rich Hickey&#8217;s <strong><a href="https://www.youtube.com/watch?v=6mTbuzafcII">talk about Transducers</a></strong> a few times and each time I discovered something new, which made me wonder about my perception. After thinking about it for a little while, I noticed a pattern.</p>
+
+<p>My retention rate when reading thoroughly (that is, with a marker and a pen on real paper) is MUCH higher than when listening to a talk. Listening to a talk repeatedly is like skimming a text repeatedly, it just does not yield the same result as reading thoroughly. My theory is that talks are pretty much always too fast or too slow at any given point in time. Something is either all new with background information mentioned that I would want to read about first or I already know what is being talked about. The danger for me lies in the latter. My mind tends to wander off, particularly when watching the recording of a talk, and my thoughts tend to be so engaging that I miss crucial information in the talk.</p>
+
+<p>There&#8217;s really not a lot the presenter can do about that. Listening to a talk is valuable in its own right as it conveys emotion and can be quite entertaining and enlightening. I just feel it is not ideal when a lot of crucial information is only made available through a talk.</p>
+
+<p>But there&#8217;s one thing that would help me immensely: a <strong>transcript</strong> of the talk. With that, I’d watch the talk once and then mark the sections in the transcript I want to read up upon, probably with a good old marker. That way, it should be next to impossible to miss something. In my case at least, my marker hardly ever misses anything, and whenever my thoughts go elsewhere, it is very easy to mark where I stopped in the document and go back there later.</p>
+
+<p>But transcripts of the talks I was interested in just weren&#8217;t available. Which makes me wonder what you do when you&#8217;re a software engineer AND deaf. In the <strong><a href="https://www.youtube.com/watch?v=6mTbuzafcII">Transducers talk</a></strong> in particular, there was plenty of information that I hadn&#8217;t come across anywhere else. I don&#8217;t think we as a community should exclude people just because of their inability to hear. In other words, in think these transcripts should really be available.</p>
+
+<p>Now, I like solutions rather than problems so I hired freelancers to transcribe some talks for me. I then did the proofreading and put the transcripts on <strong><a href="https://github.com/matthiasn/talk-transcripts">GitHub</a></strong>. From a financial standpoint, I thought that I&#8217;d do an experiment: I was prepared to spend up as much for transcripts as I typically spend on a conference. With seven talks already transcribed, I still spent 50% less than I would have been willing to spend. Moreover, because I proofread the transcripts, I have already learned more than what I’d say I learn at the average conference. So for me this is a huge win already, and it would make me happy if the outcome of this project benefitted others too.</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 2 - Transducers]]></title>
@@ -2366,194 +2392,6 @@ Matthias</p>
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[ElasticSearch 1.0.0 - Breaking Changes]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/02/16/elasticsearch-v1/"/>
-    <updated>2014-02-16T18:50:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/02/16/elasticsearch-v1</id>
-    <content type="html"><![CDATA[<p><strong><a href="http://www.elasticsearch.org">ElasticSearch</a></strong> 1.0.0 is out, hooray! Great stuff, congrats to everyone involved. Not that I had any complaints about <strong>v0.9</strong>, but still, this is a great achievement. One of the changes is some <strong><a href="http://www.elasticsearch.org/blog/percolator-redesign-blog-post/">major rework</a></strong> of the <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/master/search-percolate.html">Percolation Query API</a></strong>, making it much more powerful than before. Unfortunately, the update broke the percolation query mechanism in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. But the fix wasn&#8217;t very hard. So in today&#8217;s article, I will revisit the topic of Percolation Queries by explaining what they are, how the new version has become more powerful and what was needed to fix my application. Please refer to this earlier <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article</a></strong> if you want to know more about the overall architecture of the <strong>BirdWatch</strong> application.</p>
-
-<!-- more -->
-
-
-<p>After running <code>brew update</code> and <code>brew upgrade</code> I noticed that live query result updates in my local installation did not work any longer. Pressing <em>F5</em> did show new intermittent Tweets though, so the system did not appear completely broken. A look into the ElasticSearch changelog quickly revealed that there had been some major rework on the Percolation API. Exactly this API is used for matching new Tweets to currently established streaming connections.</p>
-
-<h2>So what is this percolation query thing?</h2>
-
-<p>A percolation query is a query like any other, with one difference: the query is not run against existing data but against future data, item by item as the data is inserted into an index. For that the query itself is stored in ElasticSearch and then each item (Tweet in this case) that is stored is also presented to the percolator mechanism to find the queries that have this item as a result. This resulting query ID is then used to find the streaming connection that is interested in matches to this query and stream the matched Tweet to the connected client immediately. This might sound a little abstract, so let me provide an example:</p>
-
-<p>You are interested in Tweets that have the words <strong>Scala</strong> and <strong>Akka</strong> in them. Your query then looks like this: &#8220;scala AND akka&#8221;. Well, there is a little more to it, like which fields to use as a default, but for this example the simplification should suffice. First the query is run against existing data, for example returning the last 5000 items that match. But you are also interested in live data, not only in the past. So then the query is registered in the percolation query index, using the <strong><a href="http://de.wikipedia.org/wiki/SHA-2">SHA-256</a></strong> hash as the ID. Now when a Tweet comes along that has these words in them, it is presented to the percolator, which returns the ID of the query, potentially among others that match. This query ID is then used to find the streaming connection to your web client so that the Tweet can be streamed to you immediately.</p>
-
-<p>Internally, ElasticSearch stores all the percolation queries in memory. It then creates a temporary index for each document that is to be matched against all the queries and then runs all these queries against that index in order to determine matching queries.</p>
-
-<h2>Changes in ElasticSearch v1.0.0</h2>
-
-<p>In previous versions of Elasticsearch there was a single, specialized index for percolation among cluster of nodes. The problem with that was that it did not scale particularly well. This limitation has been removed in the latest version. Instead the percolation queries can be distributed over any number of shards, all of which will then be asked to percolate a document against the stored queries. With the change, now the percolation query mechanism should scale nicely, whereas before the performance would degrade relatively soon when there was a large number of queries to run against a new document. Every query still has to run over a new document that is tested for a match, but at least that work can now be distributed over many nodes. Also there is nothing special about the percolation index any longer, it is just a regular index.</p>
-
-<p>Let us look at an example using <strong>curl</strong>. We have three persisted queries in our index:</p>
-
-<figure class='code'><figcaption><span>Percolation Queries </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">curl</span> <span class="s1">&#39;localhost:9200/persistent_searches/.percolator/_search?pretty=true&#39;</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="s2">&quot;took&quot;</span> <span class="o">:</span> <span class="mi">1</span><span class="p">,</span>
-</span><span class='line'>  <span class="s2">&quot;timed_out&quot;</span> <span class="o">:</span> <span class="kc">false</span><span class="p">,</span>
-</span><span class='line'>  <span class="s2">&quot;_shards&quot;</span> <span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;successful&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;failed&quot;</span> <span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="s2">&quot;hits&quot;</span> <span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">3</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;max_score&quot;</span> <span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;hits&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="p">{</span>
-</span><span class='line'>      <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;persistent_searches&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_type&quot;</span> <span class="o">:</span> <span class="s2">&quot;.percolator&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;38a0963a6364b09ad867aa9a66c6d009673c21e182015461da236ec361877f77&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_score&quot;</span> <span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;_source&quot;</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;query_string&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;default_field&quot;</span><span class="o">:</span><span class="s2">&quot;text&quot;</span><span class="p">,</span><span class="s2">&quot;default_operator&quot;</span><span class="o">:</span><span class="s2">&quot;AND&quot;</span><span class="p">,</span><span class="s2">&quot;query&quot;</span><span class="o">:</span><span class="s2">&quot;(java) AND lang:en&quot;</span><span class="p">}},</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="s2">&quot;2014-02-19T19:19:32.237Z&quot;</span><span class="p">}</span>
-</span><span class='line'>    <span class="p">},</span> <span class="p">{</span>
-</span><span class='line'>      <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;persistent_searches&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_type&quot;</span> <span class="o">:</span> <span class="s2">&quot;.percolator&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_score&quot;</span> <span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;_source&quot;</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;query_string&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;default_field&quot;</span><span class="o">:</span><span class="s2">&quot;text&quot;</span><span class="p">,</span><span class="s2">&quot;default_operator&quot;</span><span class="o">:</span><span class="s2">&quot;AND&quot;</span><span class="p">,</span><span class="s2">&quot;query&quot;</span><span class="o">:</span><span class="s2">&quot;(*) AND lang:en&quot;</span><span class="p">}},</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="s2">&quot;2014-02-19T19:35:54.332Z&quot;</span><span class="p">}</span>
-</span><span class='line'>    <span class="p">},</span> <span class="p">{</span>
-</span><span class='line'>      <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;persistent_searches&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_type&quot;</span> <span class="o">:</span> <span class="s2">&quot;.percolator&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;49d0feca545a82d29fffbdf6749dcf0086f9c44f6faa9b8e1e2e008b5716e488&quot;</span><span class="p">,</span>
-</span><span class='line'>      <span class="s2">&quot;_score&quot;</span> <span class="o">:</span> <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;_source&quot;</span> <span class="o">:</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;query_string&quot;</span><span class="o">:</span><span class="p">{</span><span class="s2">&quot;default_field&quot;</span><span class="o">:</span><span class="s2">&quot;text&quot;</span><span class="p">,</span><span class="s2">&quot;default_operator&quot;</span><span class="o">:</span><span class="s2">&quot;AND&quot;</span><span class="p">,</span><span class="s2">&quot;query&quot;</span><span class="o">:</span><span class="s2">&quot;(akka scala) AND lang:en&quot;</span><span class="p">}},</span><span class="s2">&quot;timestamp&quot;</span><span class="o">:</span><span class="s2">&quot;2014-02-19T20:00:04.312Z&quot;</span><span class="p">}</span>
-</span><span class='line'>    <span class="p">}</span> <span class="p">]</span>
-</span><span class='line'>  <span class="p">}</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Now if I insert a tweet in English that contains the words <strong>Akka</strong> and <strong>Scala</strong>, two of these queries should match. The second query matches anything that is in English and the third more specifically matches anything with these words. Let&#8217;s see:</p>
-
-<figure class='code'><figcaption><span>Percolation Queries </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">curl</span> <span class="s1">&#39;localhost:9200/persistent_searches/tweets/_percolate?pretty=true&#39;</span> <span class="o">-</span><span class="nx">d</span> <span class="s1">&#39;{</span>
-</span><span class='line'><span class="s1">&gt;     &quot;doc&quot; : {</span>
-</span><span class='line'><span class="s1">&gt;         &quot;text&quot; : &quot;blah, blah, akka blah, scala blah, blah&quot;,</span>
-</span><span class='line'><span class="s1">&gt;         &quot;lang&quot; : &quot;en&quot;</span>
-</span><span class='line'><span class="s1">&gt;     }</span>
-</span><span class='line'><span class="s1">&gt; }&#39;</span>
-</span><span class='line'><span class="p">{</span>
-</span><span class='line'>  <span class="s2">&quot;took&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span class='line'>  <span class="s2">&quot;_shards&quot;</span> <span class="o">:</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;successful&quot;</span> <span class="o">:</span> <span class="mi">5</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;failed&quot;</span> <span class="o">:</span> <span class="mi">0</span>
-</span><span class='line'>  <span class="p">},</span>
-</span><span class='line'>  <span class="s2">&quot;total&quot;</span> <span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
-</span><span class='line'>  <span class="s2">&quot;matches&quot;</span> <span class="o">:</span> <span class="p">[</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;persistent_searches&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;684888c0ebb17f374298b65ee2807526c066094c701bcc7ebbe1c1095f494fc1&quot;</span>
-</span><span class='line'>  <span class="p">},</span> <span class="p">{</span>
-</span><span class='line'>    <span class="s2">&quot;_index&quot;</span> <span class="o">:</span> <span class="s2">&quot;persistent_searches&quot;</span><span class="p">,</span>
-</span><span class='line'>    <span class="s2">&quot;_id&quot;</span> <span class="o">:</span> <span class="s2">&quot;49d0feca545a82d29fffbdf6749dcf0086f9c44f6faa9b8e1e2e008b5716e488&quot;</span>
-</span><span class='line'>  <span class="p">}</span> <span class="p">]</span>
-</span><span class='line'><span class="p">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Changes to the BirdWatch code</h2>
-
-<p>The URL format has changed, I have created the <strong>persistent_searches</strong> index, into which the queries of type <strong>.percolator</strong> are inserted. We have seen these URLs in action above already.</p>
-
-<p>As mentioned above, percolation queries are now stored in a regular index that behaves like any other (because it <strong>is</strong> a standard index). This also means that the index is dynamically created when first addressed, so we no longer need the initialization step for creating the index (using curl on the command line) before successfully running the application for the first time. That&#8217;s great as I&#8217;ve had a few users run into that problem before.</p>
-
-<p>In previous versions of ElasticSearch, there was no result header. Instead there was only a simple array of the matched query IDs. In <strong>v1</strong>, there is now a result header, just like in regular ElasticSearch queries, and the <em>matches</em> array. This array contains one object per resulting percolation query. Each of these match objects not only contains the <em>id</em> of the matching query but also the <em>index</em> where this search was stored. In this application we do not need any of this, so we can parse only the IDs of the matching queries:</p>
-
-<figure class='code'><figcaption><span>Twitter Client</span><a href='https://github.com/matthiasn/BirdWatch/blob/0ce1b15c27eb1ec9cbf29d9e95953cca68404cc0/app/actors/TwitterClient.scala'>TwitterClient.scala </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-</pre></td><td class='code'><pre><code class='scala'><span class='line'><span class="cm">/** Takes JSON and matches it with percolation queries in ElasticSearch</span>
-</span><span class='line'><span class="cm">  * @param json JsValue to match against </span>
-</span><span class='line'><span class="cm">  */</span>
-</span><span class='line'><span class="k">def</span> <span class="n">matchAndPush</span><span class="o">(</span><span class="n">json</span><span class="k">:</span> <span class="kt">JsValue</span><span class="o">)</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span>
-</span><span class='line'>  <span class="nc">WS</span><span class="o">.</span><span class="n">url</span><span class="o">(</span><span class="n">elasticPercolatorURL</span><span class="o">).</span><span class="n">post</span><span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">obj</span><span class="o">(</span><span class="s">&quot;doc&quot;</span> <span class="o">-&gt;</span> <span class="n">json</span><span class="o">)).</span><span class="n">map</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">res</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="nc">Json</span><span class="o">.</span><span class="n">parse</span><span class="o">(</span><span class="n">res</span><span class="o">.</span><span class="n">body</span><span class="o">)</span> <span class="o">\</span> <span class="s">&quot;matches&quot;</span><span class="o">).</span><span class="n">asOpt</span><span class="o">[</span><span class="kt">List</span><span class="o">[</span><span class="kt">JsValue</span><span class="o">]].</span><span class="n">map</span> <span class="o">{</span>
-</span><span class='line'>      <span class="n">matches</span> <span class="k">=&gt;</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">val</span> <span class="n">items</span> <span class="k">=</span> <span class="n">matches</span><span class="o">.</span><span class="n">map</span> <span class="o">{</span> <span class="n">m</span> <span class="k">=&gt;</span> <span class="o">(</span><span class="n">m</span> <span class="o">\</span> <span class="s">&quot;_id&quot;</span><span class="o">).</span><span class="n">as</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">}</span>
-</span><span class='line'>        <span class="n">jsonTweetsChannel</span><span class="o">.</span><span class="n">push</span><span class="o">(</span><span class="nc">Matches</span><span class="o">(</span><span class="n">json</span><span class="o">,</span> <span class="nc">HashSet</span><span class="o">.</span><span class="n">empty</span><span class="o">[</span><span class="kt">String</span><span class="o">]</span> <span class="o">++</span> <span class="n">items</span><span class="o">))</span>
-</span><span class='line'>      <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Above, the tweet is <strong>POSTed</strong> to the <em>elasticPercolatorURL</em> inside the <em>doc</em> property of a <strong>JSON</strong> object. The result <em>res</em> is then parsed for the <em>matches</em> array as a List[Jsvalue], which is then mapped into a List[String] with the matching query IDs. Finally, a HashSet[String] is built from this list and pushed into the <em>jsonTweetsChannel</em> together with the json inside a <strong>Matches</strong> object.</p>
-
-<p>Okay, that&#8217;s all for this article. Initially I wanted it to be about replacing <strong>AngularJS</strong> with <strong>ReactJS</strong>, but then I did not have enough time left before my vacation and after running into this problem. So that article is next, probably some time later this month.</p>
-
-<p>Cheers,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
