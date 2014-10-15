@@ -7,6 +7,8 @@ categories:
 ---
 **TL;DR:** I wanted to study the content of some talks in written form but there were no transcripts available. However, I believe that the valuable and relevant content of these talks should be accessible to everyone, including those for whom 'sit back and listen' might not be the most viable option. To make that a reality, I had transcripts made. So far, I have compiled five talks by **Rich Hickey**, one talk by **David Nolen** and another talk by **Guy Steele**. The transcripts are **[available on GitHub](https://github.com/matthiasn/talk-transcripts)**.
 
+<!-- more -->
+
 ## Background
 
 For my **[previous article](http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/)**, I listened to Rich Hickey's **[talk about Transducers](https://www.youtube.com/watch?v=6mTbuzafcII)** a few times and each time I discovered something new, which made me wonder about my perception. After thinking about it for a little while, I noticed a pattern.
