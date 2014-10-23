@@ -32,7 +32,11 @@ After listening to Guy Steele's talk and proof-reading the **[transcript](https:
 ## Update to OS X Yosemite
 Last weekend I updated my production laptop to Yosemite. Of course, I did a full backup with **[Carbon Copy Cloner](http://bombich.com)** first and I also made sure that my old backup laptop was still working before I embarked on the update adventure, just in case. That turned out to be a good idea.
 
-The system upgrade did not cause any actual trouble, all went smoothly and I also think that the new design looks great. **BUT IT TOOK FOREVER**. The time estimation was so off, it was worse than the worst Windows installation experiences ever. Overall it probably took **six or seven hours**. I have no idea why. Luckily I had read about that in a forum somewhere, so I wasn't too worried and just let the installer do its thing. If you plan on doing the upgrade, I think it will be worth it, but **only** do it when you don't need your machine for a while, like overnight. Also, you can press **CMD-l** to get a console output, which I found much more reassuring than having the installer tell me it'll need another 2 minutes that turn into 2 hours.
+The system upgrade did not cause any actual trouble, all went smoothly and I also think that the new design looks great. **BUT IT TOOK FOREVER**. The time estimation was so off, it was worse than the worst Windows installation experiences ever. Overall it probably took **six or seven hours**. Apparently, this had to do with **[homebrew](http://brew.sh)**, check out **[this article](http://blog.pythonaro.com/2014/10/read-this-before-you-upgrade-to-osx.html)** for more information[^2].
+
+Luckily I had read about the upgrade taking longer in a forum somewhere, so I wasn't too worried and just let the installer do its thing. If you plan on doing the upgrade, I think it will be worth it, but **only** do it when you don't need your machine for a while, like overnight (or you follow the instructions in the article above). All works nicely on my machine now as well, even without doing anything special, just with the consequence of giving me a free afternoon because of not being able to get any work done.
+
+Also, you can press **CMD-l** to get a console output, which I found much more reassuring than having the installer tell me it'll need another 2 minutes that turn into 2 hours.
 
 ## Conclusion
 Okay, that's it for today. There are some additions to the **[Clojure Resources](https://github.com/matthiasn/Clojure-Resources)** project and I have also added links to the talk transcripts in there. Please check out the **[talk-transcripts](https://github.com/matthiasn/talk-transcripts)** if you haven't done so already. I would love to hear from you if any of these transcripts helped you at all and made the content more accessible than it would have been otherwise.
@@ -41,3 +45,4 @@ Until next week,
 Matthias
 
 [^1]: If you've never listened to Rich Hickey's talk about **Hammock-driven development**, you really should. Now there's also a **[transcript for that talk](https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/HammockDrivenDev.md)**. You find the link to the video recording alongside the transcript.
+[^2]: Thanks to **[@RobStuttaford](https://twitter.com/RobStuttaford)** for pointing this out.

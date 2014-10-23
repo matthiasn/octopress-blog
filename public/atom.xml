@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-23T18:04:01+02:00</updated>
+  <updated>2014-10-23T18:18:15+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -47,7 +47,11 @@
 
 <p>Last weekend I updated my production laptop to Yosemite. Of course, I did a full backup with <strong><a href="http://bombich.com">Carbon Copy Cloner</a></strong> first and I also made sure that my old backup laptop was still working before I embarked on the update adventure, just in case. That turned out to be a good idea.</p>
 
-<p>The system upgrade did not cause any actual trouble, all went smoothly and I also think that the new design looks great. <strong>BUT IT TOOK FOREVER</strong>. The time estimation was so off, it was worse than the worst Windows installation experiences ever. Overall it probably took <strong>six or seven hours</strong>. I have no idea why. Luckily I had read about that in a forum somewhere, so I wasn&#8217;t too worried and just let the installer do its thing. If you plan on doing the upgrade, I think it will be worth it, but <strong>only</strong> do it when you don&#8217;t need your machine for a while, like overnight. Also, you can press <strong>CMD-l</strong> to get a console output, which I found much more reassuring than having the installer tell me it&#8217;ll need another 2 minutes that turn into 2 hours.</p>
+<p>The system upgrade did not cause any actual trouble, all went smoothly and I also think that the new design looks great. <strong>BUT IT TOOK FOREVER</strong>. The time estimation was so off, it was worse than the worst Windows installation experiences ever. Overall it probably took <strong>six or seven hours</strong>. Apparently, this had to do with <strong><a href="http://brew.sh">homebrew</a></strong>, check out <strong><a href="http://blog.pythonaro.com/2014/10/read-this-before-you-upgrade-to-osx.html">this article</a></strong> for more information<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>.</p>
+
+<p>Luckily I had read about the upgrade taking longer in a forum somewhere, so I wasn&#8217;t too worried and just let the installer do its thing. If you plan on doing the upgrade, I think it will be worth it, but <strong>only</strong> do it when you don&#8217;t need your machine for a while, like overnight (or you follow the instructions in the article above). All works nicely on my machine now as well, even without doing anything special, just with the consequence of giving me a free afternoon because of not being able to get any work done.</p>
+
+<p>Also, you can press <strong>CMD-l</strong> to get a console output, which I found much more reassuring than having the installer tell me it&#8217;ll need another 2 minutes that turn into 2 hours.</p>
 
 <h2>Conclusion</h2>
 
@@ -60,6 +64,8 @@ Matthias</p>
 <ol>
 <li id="fn:1">
 <p>If you&rsquo;ve never listened to Rich Hickey&rsquo;s talk about <strong>Hammock-driven development</strong>, you really should. Now there&rsquo;s also a <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/HammockDrivenDev.md">transcript for that talk</a></strong>. You find the link to the video recording alongside the transcript.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Thanks to <strong><a href="https://twitter.com/RobStuttaford">@RobStuttaford</a></strong> for pointing this out.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
