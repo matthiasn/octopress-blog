@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-17T14:45:12+02:00</updated>
+  <updated>2014-10-23T16:10:37+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,55 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Weekly Update: Talk Transcripts, Clojure Architecture, OS X Yosemite]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/10/23/weekly-update/"/>
+    <updated>2014-10-23T19:06:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/10/23/weekly-update</id>
+    <content type="html"><![CDATA[<p>As I have no other article to publish this week, I thought a weekly update would be in order. Last week I wrote about <strong><a href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/">making relevant and interesting talks more accessible</a></strong>. In the course of that project, I had <strong>eleven</strong> talks transcribed so far, four more than when I announced the project last week. Not only have I received great feedback about how appreciated this is, I have also learned a lot myself by proofreading the transcripts.</p>
+
+<!-- more -->
+
+
+<p>With all the stuff that I have learned and that I am still learning (with a few more talks in the pipeline), there are a couple of things that I want to rethink in terms of the architecture of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch application</a></strong> before describing the architecture further. Let me do that first before the next article on the application&#8217;s architecture. No worries, I expect to have the next one next week nonetheless, or the week after that the lastest.</p>
+
+<h2>Thoughts from Guy Steele&#8217;s talk on Parallel Programming</h2>
+
+<p>The talk that got me thinking the most about the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch application</a></strong>&#8217;s architecture is Guy Steele&#8217;s talk about <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Steele_Guy/ParallelProg.md">Parallel Programming</a></strong>. Not only does he give a great explanation of the differences between paralellism and concurrency, he also gives great insights on the use of accumulators. So what, according to him, is concurrency? <strong>Concurrency</strong> is when multiple entitites, such as users or processes, compete over scarce resources. In that case, we want efficient ways of utilizing the scarce resources (CPU, memory bandwidth, network, I/O in general) so that more of the entities can be served at the same time on the same box or number of boxes.</p>
+
+<p><strong>Paralellism</strong>, on the other hand, is when there are vast resources and we want want to allocate as many of those as possible to the same number of entities. One example of this could be that we have a CPU-bound operation, a single user and 8, 12 or however many cores. If the operation is single-threaded, we won&#8217;t be able to utilize the resources well at all.</p>
+
+<p>We could, of course, split the computation up so that it runs on all the cores (maybe even on hundreds of boxes and thousands of cores), but that&#8217;s easier said than done. Which brings me to accumulators. The <strong><a href="http://en.wikipedia.org/wiki/Accumulator_(computing)">accumulator</a></strong>, as the name suggests, is where intermediate results are stored while a computation is ongoing. As Guy points out, this has served us extremely well for as long as we didn&#8217;t have to think about parallelism. If the computation happens serially in a single thread, the accumulator is great, but what do we do when we want to spawn 20 threads on a 32-core machine, or 1000 thread on 100 machines? If each of these had to work with the same accumulator, things would become messy and the accumulator would become the source of contention, with all kinds of ugly coordination and locking. That doesn&#8217;t scale at all.</p>
+
+<p>Guy suggests to use <strong>divide-and-conquer</strong> instead so that each process in a parallelized approach only creates a partial result which will be combined with other partial results later. He argues for <strong>MapReduce in the small</strong> in addition to MapReduce in the large. I think this makes a lot of sense. That way, the partial results are created in the map phase on a number of threads (potentially on many machines) and the reduction is where the partial results are combined into a final result.</p>
+
+<p>I had been thinking along these lines for a little while already when considering to move parts of the computation in BirdWatch for previous tweets (wordcount, retweet count, reach,&#8230;) to the server side as the current approach uses way more network bandwidth than strictly necessary. I was mostly thinking about it in terms of <strong>mergability between partial results</strong>, which implies that the merge operation between two partial results is both <strong>associative</strong> and <strong>commutative</strong>. Being associative means that let&#8217;s say we have partial results A, B, C, D and we can merge them in any way we want, for example (A + B) + C + D or A + (B+ (C + D)) or whatever. As another example, let&#8217;s say you have a script with 100 pages in 10 stacks. It doesn&#8217;t matter in which way we build intermediate piles as long as we only merge neighboring piles so that the pile with the higher page counts goes under the one one with the lower page counts. In addition, being commutative means that order also does not matter. For example, these are all the same: 11 + 5 + 16 + 10 or 10 + 16 + 5 + 11 both add up to 42.</p>
+
+<p>I think it should be possible to divide the aggregation tasks in BirdWatch in smaller chunks that can then be combined in an associative and commutative way on the client (in ClojureScript) and I have an idea how to do that. But let me get back into the hammock<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> and ponder that idea some more for now. I&#8217;ll certainly let you know what I come up with.</p>
+
+<h2>Update to OS X Yosemite</h2>
+
+<p>Last weekend, I updated my production laptop to Yosemite. Of course, I did a full backup with <strong><a href="http://bombich.com">Carbon Copy Cloner</a></strong> first and I also made sure that my old backup laptop was still working before I embarked on the update adventure, just in case. That turned out to be a good idea.</p>
+
+<p>The system upgrade did not cause any actual trouble, all went smoothly and I also think that the new design looks great. <strong>BUT IT TOOK FOREVER</strong>. The time estimation was so off, it was worse than the worst Windows installation experiences ever. Overall it probably took <strong>six or seven hours</strong>. I have no idea why. Luckily I had read that in a forum somewhere, so I wasn&#8217;t too worried and just let the installer do its thing. If you plan on doing the upgrade, I think it was worth it, but <strong>only</strong> do it when you won&#8217;t need your machine for a while, like over night. Also, you can press <strong>CMD-l</strong> to get a console output, which I found much more reassuring than having the installer tell me it&#8217;ll need another 2 minutes that turn out to be 2 hours.</p>
+
+<h2>Conclusion</h2>
+
+<p>Okay, that&#8217;s it for today. There are some additions to the <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure Resources</a></strong> project and I have also added links to the talk transcripts in there. Please check out the <strong><a href="https://github.com/matthiasn/talk-transcripts">talk-transcripts</a></strong> if you haven&#8217;t done so already. I would love to hear from you if any of these transcripts helped you at all and made the content more accessible than it would have been otherwise.</p>
+
+<p>Until next week,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>If you&rsquo;ve never listened to Rich Hickey&rsquo;s talk about <strong>Hammock-driven development</strong>, you really should. Now there&rsquo;s also a <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/HammockDrivenDev.md">transcript for that talk</a></strong>. You find the link to the video recording alongside the transcript.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Talk Transcripts: Rich Hickey, David Nolen & more]]></title>
@@ -2032,369 +2081,6 @@ Matthias</p>
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[BirdWatch: AngularJS vs. ReactJS]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/"/>
-    <updated>2014-03-31T22:21:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs</id>
-    <content type="html"><![CDATA[<p><strong>Summary:</strong> In this article I will present a new version of the BirdWatch application that uses <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side instead of <strong><a href="http://angularjs.org">AngularJS</a></strong>. Don&#8217;t worry if you liked the previous AngularJS version - I do not intend to replace it. Rather, I want to create another version of the client side web application in order to get a better feeling for the pros and cons of different frameworks and libraries. So think of it as something like the <strong><a href="http://todomvc.com">TodoMVC</a></strong> of reactive web applications. Well, not quite yet, but feel free to write another client version for comparison. EmberJS anyone?
-For this new version I have also rewritten the barchart as a ReactJS component with integrated trend analysis and no dependency on <strong><a href="http://d3js.org">D3.js</a></strong>. Again, there is nothing wrong with D3; I just like to try different approaches to the same problem.</p>
-
-<!-- more -->
-
-
-<p>In this article I will not go into a lot of detail about the server side of the BirdWatch application as there&#8217;s an <strong><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">article on that</a></strong> already. What you need to know is that there is a server side application using <strong><a href="http://www.playframework.com">Play Framework</a></strong> that connects to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> and that subscribes to a defined set of terms, meaning that it will retrieve all tweets containing at least one of these terms, up to a limit of 1% of all tweets at a given time<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. Then there is a client side JavaScript application that allows users to perform a live search inside a stream of tweets, with realtime updates of the UI when new search matches come in from Twitter. Here&#8217;s how that looks like. Click the image to try out the application:</p>
-
-<p><a href="http://birdwatch.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/bw_reactjs.png" /></a></p>
-
-<p>Here&#8217;s an animated architectural overview, mostly meant as a teaser for the previous article which describes the server side of the application in detail. You can click it to get to that article:</p>
-
-<p><a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/" target="_blank"><img src="http://matthiasnehlsen.com/images/bw_expl_anim.gif" /></a></p>
-
-<p>This has all worked really nicely with AngularJS for a couple of months. Now let&#8217;s see if we can build the same thing with <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> on the client side.</p>
-
-<h2>Why would one choose ReactJS over AngularJS?</h2>
-
-<p>In the current version of BirdWatch, AngularJS decides when to figure out if the data model changes so that it can determine when to re-render the UI. These calls can happen at any time, so they need to be idempotent <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. That requirement has been met, any call to the crossfilter service for data is indeed itempotent, but there&#8217;s a catch: every call to get data is potentially expensive, and I&#8217;d rather avoid unnecessary calls to the <strong><a href="http://square.github.io/crossfilter/">crossfilter</a></strong> service. Instead I want to decide when the client UI is rendered by actively triggering the render process. That way I have full control when and how often the UI renderer is fed with new data.</p>
-
-<p>As discussed in my recently published <strong><a href="http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/">article</a></strong>, ReactJS may also be a better fit when working with immutable data. That is not a concern in the current version of BirdWatch, but it may well be an issue in the future.</p>
-
-<h2>Implementing the existing functionality with ReactJS</h2>
-
-<p>There are four main areas of functionality in the application:</p>
-
-<ul>
-<li><p><strong>Search:</strong> The user can start a search by entering the terms into the search bar, which will refresh the data and establish a <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> connection to the server that will deliver search matches in real time. At the same time previous matches are retrieved and merged with the real time results.</p></li>
-<li><p><strong>Rendering of tweets:</strong> Different sort orders of tweets are displayed in a list of what I call tweet cards. In AngularJS, directives handle the abstraction of one such tweet nicely.</p></li>
-<li><p><strong>Pagination:</strong> The application loads many more tweets than can be displayed on one page (with 5000 tweets being the default). The AngularJS version implements this with a modified subset of the <strong><a href="http://angular-ui.github.io/bootstrap/">AngularUI-Bootstrap project</a></strong>.</p></li>
-<li><p><strong>Charts:</strong> Different visualizations are rendered on the page. At the core, D3 does this for us. In the AngularJS version, relatively thin wrappers make <strong><a href="http://docs.angularjs.org/guide/directive">directives</a></strong> out of these charts that get wired data and that re-render when the data changes.</p></li>
-<li><p><strong>Bookmarkability:</strong> users can bookmark a search and come back to it later, send it to friends, tweet about it or whatever. AngularJS provides the <strong><a href="http://docs.angularjs.org/api/ng/provider/$locationProvider">$locationProvider</a></strong> for this.</p></li>
-</ul>
-
-
-<p>Let&#8217;s go through these areas one by one.</p>
-
-<h2>Search</h2>
-
-<p>In this area, AngularJS and its two-way data-binding shine. The content of the search input element is bound to a property on the <strong>$scope</strong>, just like the button is bound to a function that is also part of the <strong>$scope</strong> and that triggers a new search. ReactJS, on the other hand, does not offer two-way binding out of the box. There are helpers to achieve this, notably <strong><a href="http://facebook.github.io/react/docs/two-way-binding-helpers.html">ReeactLink</a></strong>, but I have not tried it. It also seems that it is generally discouraged. In this case it was fairly trivial to achieve the functionality without ReactJS; instead I am assigning the functionality using onclick for triggering the search function, and jQuery to achieve the same when enter is pressed inside the input field. AngularJS offers more of a full framework solution for such problems, but I am okay with this solution here.</p>
-
-<figure class='code'><figcaption><span>Search Button</span><a href='https://github.com/matthiasn/BirdWatch/blob/603d4dfb85330e346afdf9241e36a62313eaa620/app/views/react_js.scala.html'>react_js.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;button</span> <span class="na">class=</span><span class="s">&quot;btn btn-primary&quot;</span> <span class="na">type=</span><span class="s">&quot;button&quot;</span> <span class="na">onclick=</span><span class="s">&quot;BirdWatch.search()&quot;</span><span class="nt">&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The button is plain HTML with an onclick handler. I have assigned the <em>search</em> function to serve as the handler function, which lives in a property of the global BirdWatch object. In addition to the click handler for the button, I also wanted to be able to trigger a search when pressing ENTER inside the search field. jQuery is perfect for that:</p>
-
-<figure class='code'><figcaption><span>Handling Enter in Search Field</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#searchForm&#39;</span><span class="p">).</span><span class="nx">submit</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>    <span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">search</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">e</span><span class="p">.</span><span class="nx">preventDefault</span><span class="p">();</span>
-</span><span class='line'>    <span class="k">return</span> <span class="kc">false</span><span class="p">;</span>
-</span><span class='line'>  <span class="p">});</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Finally here is the function that triggers the search:</p>
-
-<figure class='code'><figcaption><span>Function for triggering search</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'>  <span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">search</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>    <span class="kd">var</span> <span class="nx">searchField</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#searchField&quot;</span><span class="p">);</span>
-</span><span class='line'>    <span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">wordcount</span><span class="p">.</span><span class="nx">reset</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">activePage</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-</span><span class='line'>    <span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">crossfilter</span><span class="p">.</span><span class="nx">clear</span><span class="p">();</span>
-</span><span class='line'>    <span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">tweets</span><span class="p">.</span><span class="nx">search</span><span class="p">(</span><span class="nx">searchField</span><span class="p">.</span><span class="nx">val</span><span class="p">(),</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#prev-size&quot;</span><span class="p">).</span><span class="nx">val</span><span class="p">());</span>
-</span><span class='line'>    <span class="nx">searchField</span><span class="p">.</span><span class="nx">focus</span><span class="p">();</span>
-</span><span class='line'>  <span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The above is plain old HTML / JavaScript / jQuery. You may think this to be a rather old-fashioned way of doing it. But on the upside, no special framework knowledge is required, and anyone who has done any web development in the last decade can do this without a learning curve. Alternatively, we could make a ReactJS component out of the search bar and pass the the handler function to this component as part of the <strong>props</strong> <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. In this simple case I don&#8217;t believe it is necessary to create a component, but this would be the way to go about it when more complex behavior is desired.</p>
-
-<h2>Rendering of tweets</h2>
-
-<p>This is where it gets much more interesting. AngularJS renders the list of tweets from the data model using <strong>ng-repeat</strong> like this:</p>
-
-<figure class='code'><figcaption><span>ng-repeat in AngularJS version</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/app/views/index.scala.html'>index.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="c">&lt;!-- Tweet Cards inside frame --&gt;</span>
-</span><span class='line'><span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;col-lg-4&quot;</span> <span class="na">id=</span><span class="s">&quot;tweet-frame&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;tweetCard&quot;</span> <span class="na">data-ng-repeat=</span><span class="s">&quot;tweet in cf.tweetPage(currentPage, pageSize, sortModel)&quot;</span>
-</span><span class='line'>        <span class="na">data-tweet=</span><span class="s">&quot;tweet&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span><span class='line'><span class="nt">&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>where <em>cf.tweetPage</em> is a function that delivers the data from the crossfilter object. The application code has little control over when this happens. It will certainly happen when explicitly calling <em>$scope.$apply</em> and also when anything else happens that has any effect on the data model, anywhere. This is what I meant when I said earlier that this may not be the most desirable thing when this function call is potentially expensive.</p>
-
-<p>ReactJS works the other way round. The application instantiates a component for the list of tweets that knows how to render itself, and it will only subsequently do that when the application actively feeds it new data. Let&#8217;s look at that in more detail. In the HTML, there is only a single div without any special notation:</p>
-
-<figure class='code'><figcaption><span>Tweet List Div in ReactJS</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/app/views/react_js.scala.html'>react_js.scala.html </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='html'><span class='line'>    <span class="c">&lt;!-- Tweet Cards inside frame --&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">&quot;col-lg-4&quot;</span> <span class="na">id=</span><span class="s">&quot;tweet-frame&quot;</span><span class="nt">&gt;&lt;/div&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then in the component declaration, it looks as follows:</p>
-
-<figure class='code'><figcaption><span>Tweet List Div in ReactJS</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/jsx/tweetlist.js'>tweetlist.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** Component for conditional rendering of retweet count inside Tweet */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">RetweetCount</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;pull-right timeInterval&quot;</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">numberFormat</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">count</span><span class="p">)}</span> <span class="nx">RT</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>        <span class="p">}</span>
-</span><span class='line'>        <span class="k">else</span> <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** single Tweet component */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Tweet</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">(</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;tweet&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">span</span><span class="o">&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;http://www.twitter.com/&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">screen_name</span><span class="p">}</span> <span class="nx">target</span><span class="o">=</span><span class="s2">&quot;_blank&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>                    <span class="o">&lt;</span><span class="nx">img</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;thumbnail&quot;</span> <span class="nx">src</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">profile_image_url</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="err">/a&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;http://www.twitter.com/&quot;</span> <span class="o">+</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">screen_name</span><span class="p">}</span> <span class="nx">target</span><span class="o">=</span><span class="s2">&quot;_blank&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">span</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="err">/a&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">span</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;username_screen&quot;</span><span class="o">&gt;&amp;</span><span class="nx">nbsp</span><span class="p">;</span><span class="o">&amp;</span><span class="err">#</span><span class="mi">64</span><span class="p">;{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">screen_name</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/span&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;pull-right timeInterval&quot;</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">fromNow</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">created_at</span><span class="p">)}</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;tweettext&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">dangerouslySetInnerHTML</span><span class="o">=</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="o">&gt;&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;pull-left timeInterval&quot;</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">numberFormat</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">user</span><span class="p">.</span><span class="nx">followers_count</span><span class="p">)}</span> <span class="nx">followers</span><span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">RetweetCount</span> <span class="nx">count</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">retweet_count</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>                <span class="o">&lt;</span><span class="nx">FavoriteCount</span> <span class="nx">count</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">t</span><span class="p">.</span><span class="nx">favorite_count</span><span class="p">}</span> <span class="o">/&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/div&gt;</span>
-</span><span class='line'>    <span class="p">);</span> <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** Tweet list component, renders all Tweet items (above) */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">TweetList</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">tweetNodes</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">tweets</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">tweet</span><span class="p">,</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">arr</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="o">&lt;</span><span class="nx">Tweet</span> <span class="nx">t</span><span class="o">=</span><span class="p">{</span><span class="nx">tweet</span><span class="p">}</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">idx</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="s2">&quot;tweet-list&quot;</span><span class="o">&gt;</span><span class="p">{</span><span class="nx">tweetNodes</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/div&gt;;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="cm">/** render BirdWatch components */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">tweetListComp</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">TweetList</span> <span class="nx">tweets</span><span class="o">=</span><span class="p">{[]}</span><span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;tweet-frame&#39;</span><span class="p">));</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">tweetCount</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">TweetCount</span> <span class="nx">count</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">}</span><span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;tweet-count&#39;</span><span class="p">));</span>
-</span><span class='line'>
-</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">setTweetCount</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span> <span class="nx">tweetCount</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span><span class="nx">count</span><span class="o">:</span> <span class="nx">n</span><span class="p">});</span> <span class="p">};</span>
-</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">setTweetList</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">tweetList</span><span class="p">)</span> <span class="p">{</span> <span class="nx">tweetListComp</span><span class="p">.</span><span class="nx">setProps</span><span class="p">({</span><span class="nx">tweets</span><span class="o">:</span> <span class="nx">tweetList</span><span class="p">});</span> <span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Notice the <strong>TweetList</strong> component close to the bottom. This component itself has elements of the <strong>Tweet</strong> component type as child elements which it generates inside its only method <em>render</em> by mapping data in the array to individual elements. <em>Render</em>, by the way, is the only method that a ReactJS component is required to have. In this particular component, the child elements are generated by using the map function on the props.tweet, which accordingly needs to be an array as otherwise the JavaScript map function would not be available. In the mapper function, a <strong>Tweet</strong> component is created for every element of the array, and that element is passed to the Tweet component as <strong>props</strong>.</p>
-
-<p>The Tweet component itself also has a <em>render</em> function in which it creates a <strong>div</strong> holding the representation of a tweet. Dynamic data for this comes from accessing the tweet object that was passed in the TweetList component. Note that the code above is not regular JavaScript but JSX, which allows writing a syntax fairly similar to HTML. This JSX is cross-compiled into JavaScript during the build process. More information on this build process can be found in the paragraph and in the <strong><a href="https://github.com/matthiasn/BirdWatch/tree/master/react-js">README</a></strong>.</p>
-
-<p>The <strong>Tweet</strong> component then includes a <strong>RetweetCount</strong> component, to which it passes the RT count as <strong>props</strong>. This component has conditional logic in which it decides itself if it wants to return an empty <strong>div</strong> or actual content. The same goes for the <strong>FollowersCount</strong> component, which I have omitted here as it follows the same principle.</p>
-
-<h2>Pagination</h2>
-
-<p>Unlike in the AngularJS version, where I relied on additional projects, I have implemented this from scratch with ReactJS. Here&#8217;s the entire component:</p>
-
-<figure class='code'><figcaption><span>Pagination component</span><a href='https://github.com/matthiasn/BirdWatch/blob/b9dc0b4cf19ec47c893aed27a690230dc882d1f8/react-js/jsx/pagination.js'>pagination.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="cm">/** Pagination component, allows selecting the current page in the Tweet list */</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">PaginationItem</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">setActive</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">page</span><span class="p">)},</span>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">active</span> <span class="o">?</span> <span class="s2">&quot;active&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">setActive</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="nx">a</span><span class="o">&gt;</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">page</span><span class="p">}</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">var</span> <span class="nx">Pagination</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">createClass</span><span class="p">({</span>
-</span><span class='line'>    <span class="nx">toggleLive</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">toggleLive</span><span class="p">();</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleFirst</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleLast</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">numPages</span><span class="p">);</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handleNext</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setNext</span><span class="p">();</span> <span class="p">},</span>
-</span><span class='line'>    <span class="nx">handlePrevious</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span> <span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPrev</span><span class="p">();</span> <span class="p">},</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nx">render</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">numPages</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">min</span><span class="p">(</span><span class="o">+</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">numPages</span><span class="p">,</span> <span class="mi">25</span><span class="p">);</span>
-</span><span class='line'>        <span class="kd">var</span> <span class="nx">paginationItems</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">numPages</span><span class="o">+</span><span class="mi">1</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">p</span><span class="p">)</span> <span class="p">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="o">&lt;</span><span class="nx">PaginationItem</span> <span class="nx">page</span><span class="o">=</span><span class="p">{</span><span class="nx">p</span><span class="p">}</span> <span class="nx">active</span><span class="o">=</span><span class="p">{</span><span class="nx">p</span><span class="o">==</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">activePage</span><span class="p">}</span> <span class="nx">setPage</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">setPage</span><span class="p">}</span> <span class="nx">key</span><span class="o">=</span><span class="p">{</span><span class="nx">p</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">;</span>
-</span><span class='line'>        <span class="p">}.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">));</span>
-</span><span class='line'>        <span class="k">return</span> <span class="o">&lt;</span><span class="nx">ul</span> <span class="nx">className</span><span class="o">=</span><span class="s2">&quot;pagination-mini&quot;</span><span class="o">&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span> <span class="nx">className</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">props</span><span class="p">.</span><span class="nx">live</span> <span class="o">?</span> <span class="s2">&quot;active&quot;</span> <span class="o">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">toggleLive</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Live</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleFirst</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">First</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handlePrevious</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Previous</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
-</span><span class='line'>            <span class="p">{</span><span class="nx">paginationItems</span><span class="p">}</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleNext</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Next</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
-</span><span class='line'>            <span class="o">&lt;</span><span class="nx">li</span><span class="o">&gt;&lt;</span><span class="nx">a</span> <span class="nx">onClick</span><span class="o">=</span><span class="p">{</span><span class="k">this</span><span class="p">.</span><span class="nx">handleLast</span><span class="p">}</span><span class="o">&gt;</span><span class="nx">Last</span><span class="o">&lt;</span><span class="err">/a&gt;&lt;/li&gt;</span>
-</span><span class='line'>        <span class="o">&lt;</span><span class="err">/ul&gt;</span>
-</span><span class='line'>    <span class="p">}</span>
-</span><span class='line'><span class="p">});</span>
-</span><span class='line'><span class="kd">var</span> <span class="nx">pagination</span> <span class="o">=</span> <span class="nx">React</span><span class="p">.</span><span class="nx">renderComponent</span><span class="p">(</span><span class="o">&lt;</span><span class="nx">Pagination</span> <span class="nx">numPages</span><span class="o">=</span><span class="p">{</span><span class="mi">1</span><span class="p">}</span> <span class="o">/&gt;</span><span class="p">,</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="s1">&#39;pagination&#39;</span><span class="p">));</span>
-</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">setPagination</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">props</span><span class="p">)</span> <span class="p">{</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">setProps</span><span class="p">(</span><span class="nx">props</span><span class="p">);</span> <span class="p">};</span>
-</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">setPaginationHandlers</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">handlers</span><span class="p">)</span> <span class="p">{</span> <span class="nx">pagination</span><span class="p">.</span><span class="nx">setProps</span><span class="p">(</span><span class="nx">handlers</span><span class="p">);</span> <span class="p">};</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Once again, we have two components, one for each item and one that combines the individual items. In the Pagination component, we first determine the minimum of either the number of pages (passed in as <strong>props</strong>) or 25 in order to render a maximum of 25 pages. Then we do a map on this the resulting range (with the range being created by an <strong><a href="http://underscorejs.org">underscore</a></strong> function), rendering one PaginationItem component for each of these pages. So far this is comparable to the components we have already seen above. What is new here is that the <em>handler functions</em> are also passed as <strong>props</strong> and assigned by the component. The nice thing about this is that this way we can also dynamically assign handler functions. We could just as well call functions on the global application object inside the handlers, but conceptually I find it cleaner to think about the component only ever receiving props, without needing to know anything about the application it is embedded in.</p>
-
-<h2>Bookmarkability</h2>
-
-<p>At first I did not really know how to achieve this feature using ReactJS. I have seen examples using <strong><a href="http://backbonejs.org">Backbone</a></strong> and its <strong><a href="http://backbonetutorials.com/what-is-a-router/">router</a></strong>, which would make sense for more complex applications. One such example is <strong><a href="https://medium.com/react-tutorials/c00be0cf1592">this article</a></strong> and another one is <strong><a href="http://webdesignporto.com/react-js-with-backbone-router-and-local-storage/">this article</a></strong>. For this application, introducing Backbone seemed like overkill though, so I was looking for a simpler approach. Turns out achieving this is super simple using <strong><a href="http://jquery.com">jQuery</a></strong> and the plain old <strong><a href="http://www.w3.org/DOM/">DOM API</a></strong>. For the search function I had already created a jQuery object:</p>
-
-<figure class='code'><figcaption><span>searchField jQuery object</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">searchField</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s2">&quot;#searchField&quot;</span><span class="p">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then inside the search function, I simply set the <strong>window.location.hash</strong> with a <strong><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent">URI encoded</a></strong> version of the search term:</p>
-
-<figure class='code'><figcaption><span>setting location hash when searching</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hash</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="nb">encodeURIComponent</span><span class="p">(</span><span class="nx">searchField</span><span class="p">.</span><span class="nx">val</span><span class="p">());</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then when loading the page, I read the location hash into the search field and call <em>search()</em>, which reads the content of the search field and triggers the search with whatever is in there:</p>
-
-<figure class='code'><figcaption><span>trigger search on page load</span><a href='https://github.com/matthiasn/BirdWatch/blob/ca0ffd54795f26bcbfdcdf5e3e61ea6d0e2d1950/react-js/src/app.js'>app.js </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">searchField</span><span class="p">.</span><span class="nx">val</span><span class="p">(</span><span class="nb">decodeURIComponent</span><span class="p">(</span><span class="nb">window</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">hash</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="mi">2</span><span class="p">)));</span>
-</span><span class='line'><span class="nx">BirdWatch</span><span class="p">.</span><span class="nx">search</span><span class="p">();</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Build system</h2>
-
-<p>To round things off, I have configured a <strong><a href="http://gruntjs.com">grunt-based</a></strong> build system that automatically <strong><a href="http://en.wikipedia.org/wiki/Source-to-source_compiler">transpiles</a></strong> JSX into plain old JavaScript and then concatenates the files into a single JavaScript file. I have also included tasks for <strong><a href="http://www.jshint.com">JsHint</a></strong> and <strong><a href="https://github.com/es-analysis/plato">Plato code analysis</a></strong> to improve code quality. Ideally there should be additional tasks for a CSS preprocessor such as <strong><a href="http://lesscss.org">LESS</a></strong> and minification of HTML, CSS and JavaScript files to achieve the best user experience possible, most notably fast load times. Maybe I&#8217;ll get around to that at some point in time. I should also do the same for the AngularJS version.</p>
-
-<h2>Building an SVG Bar Chart with ReactJS (without D3.js)</h2>
-
-<p><strong><a href="http://d3js.org">D3.js</a></strong> is an amazing technology and really great visualizations have been built with it. However it also has a considerably steep learning curve. I personally find ReactJS easier to reason about because unlike D3.js it does not have the notion of <strong><em>update</em></strong>. Instead, we always pass it the entire data and it will put the changes into effect itself through an intelligent diffing mechanism where it compares current and previous versions of a (fast) virtual DOM and only puts the detected changes into effect in the (slow) actual DOM. Now I thought it would be nice if this concept could aso be applied to <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG (scalable vector graphics)</a></strong> in addition to HTML. Turns out the same principles apply, and accordingly I found it fairly simple to re-build the bar chart and have ReactJS instead of D3 create the SVG inside the <strong><a href="http://en.wikipedia.org/wiki/Document_Object_Model">DOM</a></strong>. The resulting code is much shorter than the previous D3 version despite a lot of added functionality. The previous version was a simplistic bar chart, whereas the new version has a built-in trend analysis using <strong><a href="https://github.com/Tom-Alexander/regression-js">regression-js</a></strong>, a neat little regression analysis library. In this new chart each bar is aware of its history and determines its trends using linear regression. Here&#8217;s how that looks like:</p>
-
-<p><img src="http://matthiasnehlsen.com/images/react-barchart.png" /></p>
-
-<p>Each bar has two associated trend indicators, one to show recent movements in the ranking and the other to show an overall trend of the word occurrence. The trends are determined using a simple linear regression, where the slope of the resulting function directly translates into an upward or downward trend. I don&#8217;t have the time to go into detail about the implementation of this chart today, but this topic should make for an interesting article in the future.</p>
-
-<h1>Conclusion</h1>
-
-<p>ReactJS nicely complements the rendering of the UI of the BirdWatch application. From a bird&#8217;s-eye view, it is really not more than a function that accepts data and that, as a side effect, effects a DOM representation in line with the data provided. It does the rendering in a very efficient way and it is low-maintenance; it does not require any more attention than the call necessary to inform it about data changes. I find its data flow model very easy to reason about, simpler in fact than the multitude of concepts one needs to think about when building an application with AngularJS. So far AngularJS has also worked really well for this application, so I&#8217;d say both are suitable approaches to single page web applications. For now I&#8217;m curious to know your opinion. You can find the source code on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>. A live version is available in two versions: using <strong><a href="http://birdwatch.matthiasnehlsen.com/"> ReactJS </a></strong> and using <strong><a href="http://birdwatch.matthiasnehlsen.com/angular/#/">AngularJS</a></strong>.</p>
-
-<p>Until next time,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>The list of technical terms I use for the live demo under birdwatch.matthiasnehlsen.com easily fits into this cap, in which case the application will receive all these tweets. The term <strong>Obama</strong> also usually fits into this limit. The term <strong>love</strong> on the other hand doesn&rsquo;t. If you were to download BirdWatch from GitHub, create a Twitter API key and replace the list of software terms with only the word <strong>love</strong>, I bet you will reach the 1% limit any second of the day. However not to worry, Twitter will still deliver at the rate limit. When I last tried it, it was about 4 million tweets per day. Sure, you might lose tweets doing this, but there&rsquo;s not need to worry when you are looking for popular tweets as they will appear time and time again as a retweet, making it highly unlikely to miss them over time. Only the current retweet count may lag behind when the last update as a retweet was dropped.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-<li id="fn:2">
-<p><strong>Idempotent</strong>: This basically means that it must be possible to call something multiple times without additional side-effects, if any at all. Idempotency, for example, is also essential in scenarios where some service guarantees an at-least-once delivery. In that case you don&rsquo;t want to run into trouble (like wrongfully incrementing a counter) when that service delivers more than once.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
-<li id="fn:3">
-<p><strong>Props</strong> in ReactJS refers to immutable data dynamically passed to a component. The component will then render itself according to the data it is fed. Functions, being first class in JavaScript, can also be passed as props. JavaScript does not actually know immutable data structures, but conceptionally we should treat any data passed to a component as immutable as it will make our component much easier to reason about. <a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
-
 ]]></content>
   </entry>
   
