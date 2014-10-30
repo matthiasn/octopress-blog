@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Summary: In this article I will present a new version of the BirdWatch application that uses ReactJS on the client side instead of AngularJS. Don&# &hellip;">
+  <meta name="description" content="Next week I will be presenting at Scala Days. In my talk I will discuss how to build reactive applications with two-way (near) real-time &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/06/09/play-sse-ie/">Play Framework, Server Sent Events and Internet Explorer</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-06-09T19:35:00+02:00" pubdate data-updated="true">06/09/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Next week I will be presenting at <strong><a href="http://scaladays.org">Scala Days</a></strong>. In my talk I will discuss how to build reactive applications with two-way (near) real-time communication, using the combination of <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong> to provide clients with updates and <strong><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST calls</a></strong> for the backchannel. You may already be familiar with two examples of this architecture: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> and <strong><a href="https://github.com/matthiasn/sse-chat">sse-chat</a></strong>. I am now thinking about potential questions in the Q&amp;A session after the talk. One potential issue that came to mind almost immediately was the support for <strong><a href="http://en.wikipedia.org/wiki/Internet_Explorer">Internet Explorer</a></strong>. Out of the box, IE does not support <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events</a></strong>. Personally, I do not care very much about IE support. I had not used it in years before I started researching for this article, and only a low single-digit percentage of visitors on my blog use IE. But I understand this can be a showstopper. So if you don&#8217;t care about IE support at all, you really don&#8217;t need to read any further. Otherwise, bear with me.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/06/09/play-sse-ie/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -453,49 +496,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
 
     </article>
   
-  
-    <article>
-      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-07-09T14:14:00+02:00" pubdate data-updated="true">07/09/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implementation of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/07/09/transforming-logs-into-information/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/4/">&larr; Older</a>
@@ -524,6 +524,10 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/10/30/Building-Systems-in-Clojure-3/">Building a System in #Clojure Part 3 - Redesign</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/23/weekly-update/">Weekly Update: Talk Transcripts, Clojure Architecture, OS X Yosemite</a>
       </li>
     
@@ -537,10 +541,6 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     
       <li class="post">
         <a href="/blog/2014/10/04/weekly-update/">Weekly Update: Staging server for this blog</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in #Clojure 1 - Overview</a>
       </li>
     
   </ul>
@@ -582,7 +582,7 @@ On the client side, a <strong><a href="http://en.wikipedia.org/wiki/Single-page_
     <br />
   </div>
 </section>
-<SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/narrow"> </SCRIPT>
+<!--SCRIPT charset="utf-8" type="text/javascript" src="http://r.matthiasnehlsen.com/slideshow1/narrow"> </SCRIPT-->
   
 </aside>
 
