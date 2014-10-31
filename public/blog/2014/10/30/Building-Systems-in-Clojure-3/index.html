@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I did a lot of transcript proofreading of enlightening talk for my new project recently. The most recent one was Design, Composition and Performance &hellip;">
+  <meta name="description" content="I recently did a lot of transcript proofreading concerning enlightening talk for my talk-transcripts project. The most recent one was Design, &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -91,57 +91,65 @@
   </header>
 
 
-<div class="entry-content"><p>I did a lot of transcript proofreading of enlightening talk for my <strong><a href="https://github.com/matthiasn/talk-transcripts">new project</a></strong> recently. The most recent one was Design, Composition and Performance by Rich Hickey. That one in particular got me thinking that there are quite a few ideas I want to adopt in <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>, the application I started writing this series of articles about. That calls for some <strong>redesign</strong>, so it’s probably time to make up my mind what exactly it is that I am trying to solve with this application.</p>
+<div class="entry-content"><p>I recently did a lot of transcript proofreading concerning enlightening talk for my <strong><a href="https://github.com/matthiasn/talk-transcripts">talk-transcripts project</a></strong>. The most recent one was <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/DesignCompositionPerformance.md">Design, Composition and Performance</a></strong>, the tenth transcipt of a talk by <strong><a href="https://twitter.com/richhickey">Rich Hickey</a></strong>. That one in particular got me thinking that there are quite a few ideas I want to adopt in <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>, the application about which I started writing this series of articles. That calls for some <strong>redesign</strong>, so it’s probably time to make up my mind what exactly it is that I am trying to solve with this application.</p>
 
 <!-- more -->
 
 
-<p>So here’s the idea:
-* We have a stream of information, of which we are interested in a subset that we can match on via full-text search and ranges. The searches are really anything that ElasticSearch / Lucene can match on.
-* Further, we are interested in live results plus a certain duration of time into the recent past. For now, we are using tweets from the Twitter Streaming API, but the source could be anything, like other social media data. Sensor data could also be interesting, whatever. Live means matches new matches are added to the displayed results within about a second.
-* The results are supposed to be shown in a browser, including mobile. The number of items reasoned about shall not be limited by the available memory of the browser.
-* My immediately goal is to be able to reason about the last million tweets for a certain topic. Also, it should be possible to serve many concurrent ad-hoc queries, like hundreds of different ones or more.</p>
+<p>So here’s the idea:</p>
 
-<p>I am not sure yet exactly how all these requirements can be brought together, put I am going to find out. I found it to be limiting to only write about stuff after the fact. Instead, I’d enjoy discussing choices as they come up.</p>
+<ul>
+<li>We have a stream of information and we are interested in a subset of that information, which we can match on via <strong>full-text search</strong> and <strong>ranges</strong>. The searches are anything that <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong> / <strong><a href="http://lucene.apache.org">Lucene</a></strong> can match on.</li>
+<li>Furthermore, we are interested in <strong>live results</strong> plus a certain period of time back into the <strong>recent</strong> past. For now, we are using tweets from the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong>, but the source could be anything, such as other social media data. Sensor data could also be really interesting. Live means new matches are added to the displayed results within about a second.</li>
+<li>The results are supposed to be shown in a browser, including on <strong>mobile devices</strong>. The number of items reasoned about should <strong>not be limited by</strong> the available <strong>memory</strong> of the browser<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.</li>
+<li>My immediate goal is to be able to reason about the <strong>last one million tweets</strong> for a certain topic. Also, it should be possible to serve <strong>many concurrent ad-hoc queries</strong>, like hundreds or more different ones.</li>
+</ul>
 
-<p>The immediate thing that comes to my mind when regurgitating the requirements above is Storm and the Lambda Architecture. Please correct me if I’m wrong, but in my understanding it wouldn’t be perfect match though as topologies are fixed once they are running. If that is so, it limits the flexibility to add and tear down additional live searches. I am afraid keeping a few stand-by bolts to assign to queries dynamically would not be flexible enough.</p>
 
-<p>So instead I propose to do the aggregation (the reduce phase) on the browser side in a ClojureScript application. On the server side, partial results are aggregated for shorter time periods. These partial results can be generated in a cluster of nodes while the client is fed with live data immediately. Let&#8217;s have a look at a drawing before I walk you through the individual steps:</p>
+<p>I am not quite sure yet how all these requirements can be brought together, but I am going to find out and I am inviting you to join me and discuss all aspects of the application with me.</p>
+
+<p>What comes to mind immediately when regurgitating the requirements above is <strong><a href="https://storm.apache.org">Storm</a></strong> and the <strong><a href="http://lambda-architecture.net">Lambda Architecture</a></strong>. First I thought, great, such a search could be realized as a <strong>bolt</strong> in Storm. But then I realized, and please correct me if I’m wrong, that topologies are fixed once they are running. This limits the flexibility to add and tear down additional live searches. I am afraid that keeping a few stand-by bolts to assign to queries dynamically would not be flexible enough.</p>
+
+<p>So instead I suggest doing the <strong>final aggregation</strong> (the reduce phase) on the browser side in a <strong>ClojureScript</strong> application. On the server side, partial results are aggregated for shorter time periods. These partial results can be generated in a cluster of nodes whilst the client is fed with live data immediately. Let&#8217;s have a look at a drawing before I walk you through the individual steps:</p>
 
 <p><img class="left" src="/images/redesign.png" title="Redesigned Architecture" alt="Redesigned Architecture"></p>
 
-<p>The redesign also involves breaking the application up into two or three different applications. Let&#8217;s go through the interactions step by step:</p>
+<p>The redesign also involves splitting the application into two or three different applications. Let&#8217;s go through the interactions of the entire system step by step:</p>
 
 <ol>
-<li><p>Tweets are received from the Twitter Streaming API in chunks of (oftentimes incomplete) JSON. A stateful transducer is used for reassembling the JSON and parsing chunks into Clojure maps. This aspect of the application is already described in <strong><a href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/">this recent article</a></strong> and does not need to change a bit for the redesign.</p></li>
-<li><p>Tweets are stored in ElasticSearch in their respective index. If the received tweet contains a retweet, the retweet status is used to update an existing item (e.g. the RT count).</p></li>
-<li><p>The newly received tweet is presented to ElasticSearch&#8217;s percolation index in order to find clients interested in this tweet. It is kind of a reverse matching where the new item is matched against existing queries.</p></li>
-<li><p>The tweet together with information on matched queries are published using <strong><a href="http://redis.io/topics/pubsub">Redis&#8217;s Pub/Sub</a></strong> feature. Potentially, the search ID of the matches could be used to publish to different topics. This constitutes the border of the first Clojure application.</p></li>
-<li><p>The second Clojure application, which serves the client side ClojureScript application as well, receives a new search over the web socket connection.</p></li>
-<li><p>It then registers the query in ElasticSearch&#8217;s percolation index.</p></li>
-<li><p>Next, the socket connection subscribes to the search ID&#8217;s topic in Redis&#8217;s Pub/Sub feature.</p></li>
-<li><p>Matches to the client&#8217;s search are from now on delivered to the client-side ClojureScript application.</p></li>
-<li><p>This next step may or may not live in the same JVM, I haven&#8217;t decided yet. So the idea is to aggregate data on the server side and only deliver the aggregated data structures back to the client side. For example, these could be a few hundred aggregates over increments of five minutes each. These increments can easily be made addressable (and cacheable): let&#8217;s say it is 1:17pm. Then, we have a last and incomplete increment from 1:15pm that will be added upon in the browser whereas all previous once are complete and fixed. By treating the complete ones as immutable, we can cache them and forego unnecessary and expensive request to ElasticSearch. Now since these immutable previous chunks can be individually addressable, so it may make sense to deliver them through REST endpoints instead of via the WebSocket connection (hence the dashed line).</p></li>
-<li><p>We&#8217;ve already established that previous chunks can be cached. Redis seems like a great way to achieve this as it is really simple to having expiring entries in Redis. So Redis would be queried for the chunk address first. If it exists, it is delivered right away. If not, ElasticSearch is queried and the result both delivered and stored in Redis for the next couple of hours or so in order to avoid unnecessary load on Elastic Search.</p></li>
-<li><p>Finally, the aggregate is delivered to the client. This could either be through the WebSockets connection or through <strong><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a></strong> (the dashed line).</p></li>
+<li><p>Tweets are received from the Twitter Streaming API in chunks of (oftentimes incomplete) JSON. A <strong>stateful transducer</strong> is used to reassemble the JSON and parse chunks into Clojure maps. This aspect of the application has already been described in <strong><a href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/">this recent article</a></strong> and will not be affected by the redesign.</p></li>
+<li><p>Tweets are stored in <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong> in their respective index. If the received tweet contains a retweet, the retweet status will be used to update an existing item (e.g. the RT count).</p></li>
+<li><p>The newly received tweet is presented to ElasticSearch&#8217;s <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html">percolation index</a></strong> in order to find clients interested in this tweet. It is kind of a reverse matching where the new item is matched against <strong>existing searches</strong>.</p></li>
+<li><p>Together with information on matched queries the tweet is published using <strong><a href="http://redis.io/topics/pubsub">Redis&#8217;s Pub/Sub</a></strong> feature. Potentially, the search ID of the matches could be used to publish to different topics<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. This constitutes the border of the first Clojure application.</p></li>
+<li><p>The second Clojure application, which serves the client-side ClojureScript application as well, receives a new search via a <strong>WebSocket</strong> connection.</p></li>
+<li><p>It then <strong>registers</strong> the query in ElasticSearch&#8217;s <strong>percolation</strong> index.</p></li>
+<li><p>Next, the socket connection <strong>subscribes</strong> to the search ID&#8217;s topic in Redis&#8217;s <strong>Pub/Sub</strong> feature.</p></li>
+<li><p>From now on matches to the client&#8217;s search will be delivered immediately to the client-side ClojureScript application.</p></li>
+<li><p>This next step may or may not live in the same JVM - I haven&#8217;t decided yet. So the idea is to <strong>aggregate data on the server side</strong> and only deliver the aggregated data structures back to the client side. For example, this could be a few hundred aggregates over increments of five minutes each. These increments can easily be made addressable (and cacheable): let&#8217;s say it is 1:17pm. Then, we have a last and incomplete increment from 1:15pm that will be added upon in the browser whereas all previous ones are complete and fixed. By treating the complete ones as <strong>immutable</strong>, we can cache them and forego unnecessary and expensive requests to ElasticSearch. Since these immutable previous chunks can be addressed individually, it may make sense to deliver them through REST endpoints instead of via the WebSocket connection (the dashed line)<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p></li>
+<li><p>We&#8217;ve already established that previous chunks can be cached. <strong><a href="http://redis.io">Redis</a></strong> seems like a great match utilizing the <strong><a href="http://redis.io/commands/expire">EXPIRE feature</a></strong>. So Redis would be queried for the presence of a certain chunk first. If it exists, it will be delivered right away. If not, ElasticSearch will be queried and the result will be delivered and stored in Redis for the next couple of hours or so in order to avoid unnecessary load on the ElasticSearch cluster.</p></li>
+<li><p>Finally, the aggregate is delivered to the client. This could either be through the WebSocket connection or through <strong><a href="http://en.wikipedia.org/wiki/Representational_state_transfer">REST</a></strong> (the dashed line).</p></li>
 </ol>
 
 
 <h2>Conclusion</h2>
 
-<p>So far, this is just an idea of where the application might go. I am looking forward to implementing it, this should be fun. Completely decoupling the processes between a Twitter client and the clinet-serving part allows both restarting the client-serving part with disconnecting from the Streaming API and also much better allows for scaling. There&#8217;s only one connection to the Streaming API at any one time, but there&#8217;s no reason why not more clients should be served than any one JVM/box could handle.</p>
+<p>So far, this is just an idea of where the application might go. I can&#8217;t wait to get started with implementing the changes; this should be a lot of fun. Completely <strong>decoupling</strong> the processes between a Twitter client and the client-serving part allows restarting the latter <strong>without disconnecting</strong> from the Streaming API. The decoupling also is much better for <strong>scaling</strong>. There&#8217;s only one connection to the Streaming API at any one time, but there&#8217;s no reason why it shouldn&#8217;t be possible to serve more clients than any one JVM/box could handle.</p>
 
-<p>I feel confident that this will work but I&#8217;d also love to hear from you when you think any of this is a bad idea (or any kind of comment you might have). In particular, I&#8217;d also like to hear about ideas how to separate the application. Should this be separate Leiningen projects or separate profiles in one project? Or should this be some kind of a polymorphic monolith which will only know its particular functionality via runtime configuration. I kind of see the polymorphic monolith as an antipattern but I am open to learn better. But probably not.</p>
+<p>I feel confident that this will work, but I&#8217;d also <strong>love to hear from you</strong> if you think any of this is a bad idea (or any kind of comment you may have). In particular, I&#8217;d also like to hear about ideas of how to separate the application. Should this be by way of separate Leiningen projects or separate profiles in one project? Or should this be some kind of a polymorphic monolith that will only know its particular behavior via runtime configuration? I see the polymorphic monolith as an anti-pattern though, so probably not. Right now I favor completely separate projects as that makes it easier to reason about the boundaries of each application.</p>
 
-<p>Cheers,
+<p>If you wonder about the next steps in the design of this application, you can subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or <strong><a href="https://twitter.com/matthiasnehlsen">follow me on Twitter</a></strong> and I will let you know when the next article is out.</p>
+
+<p>Cheers and have a great weekend,<br>
 Matthias</p>
-
-<p><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
 <div class="footnotes">
 <hr/>
 <ol>
 <li id="fn:1">
-<p><a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<p>Right now with all tweets loaded onto the client, the maximum for a desktop browser is somewhere in the range of a <strong>few tens of thousands</strong> of tweets before the application slows down noticably.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>I&rsquo;m undecided about this one. On one hand, it is strikingly simple to have a topic per search ID, which is a hash of the query itself. But on the other hand, this likely involves <strong>book-keeping</strong> of the subscriptions on the consuming side, where the subscription would have to be removed once the client disconnects. Maybe it is simpler to just serialize a set of IDs with the tweet and publish that on a single topic.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>Using REST makes the communication somewhat more complex, but I still think it would make sense to move this aspect of the application into separate JVM. The <strong>GC characteristics</strong> of aggregating large amounts of data in spikes are vastly different from the (near-) realtime aspects of the WebSocket delivery of new tweets. For the aggregation, it would not matter much for the user experience if there was a <strong>stop-the-world</strong> garbage collection pause of even a few seconds, but I don&rsquo;t want that to happen for the streaming data.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
