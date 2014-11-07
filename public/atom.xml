@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-11-07T14:31:05+01:00</updated>
+  <updated>2014-11-07T14:32:43+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -16,7 +16,7 @@
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Inter-process communication with Redis]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4/"/>
-    <updated>2014-11-07T13:06:00+01:00</updated>
+    <updated>2014-11-07T14:32:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4</id>
     <content type="html"><![CDATA[<p><strong><a href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/">Last week</a></strong>, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single client for the connection to the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> and the persistence of the received Tweets in <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong>, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked <strong><a href="http://redis.io/topics/pubsub">Redis Pub/Sub</a></strong> because its model of communication appears to suit the requirements really well. As cute as the drawing may be, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put <strong><a href="http://redis.io">Redis</a></strong> in between for communication. It worked really well and here&#8217;s how.</p>
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Building a System in #Clojure Part 4 - Inter-process communication with Redis"
-date: 2014-11-07 13:06
+date: 2014-11-07 14:32
 comments: true
 categories:
 ---
