@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-10-31T18:30:05+01:00</updated>
+  <updated>2014-11-07T02:49:17+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,183 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Process separation with Redis]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/11/06/Building-Systems-in-Clojure-4/"/>
+    <updated>2014-11-06T19:06:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/11/06/Building-Systems-in-Clojure-4</id>
+    <content type="html"><![CDATA[<p>Last week, I drew a picture about how I wanted to break a monolithic application apart and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single Twitter client for the connection to the streaming API and the persistence of the received Tweets, plus multiple machines for serving WebSocket connections to the client. For the communication between those processes, I picked <strong>Redis Pub/Sub</strong> because its model of communication appears to suit the requirements really well. As cute as the drawing is, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put Redis in between for communication. It worked really well and here&#8217;s how.</p>
+
+<!-- more -->
+
+
+<p>Okay, it wasn&#8217;t a total surprise how well this worked. After all, I started using the <strong><a href="https://github.com/stuartsierra/component">Component library</a></strong> together with <strong><a href="https://github.com/clojure/core.async">core.async</a></strong> for exactly this reason a few weeks ago. I wanted the freedom to only ever put stuff on conveyor belts and not have to think about how a thing got where it needs to go, or even where it needs to go at all.</p>
+
+<h2>Redis Pub/Sub with Carmine</h2>
+
+<p>I chose <strong>Pub/Sub</strong> over a queue because I wanted to <strong><a href="http://en.wikipedia.org/wiki/Fan-out">fan-out</a></strong> messages to multiple clients. Any connected processes are only supposed to be fed with data during their uptime, with no need to store anything for when they aren&#8217;t connected. For interfacing with <strong>Redis</strong> from Clojure, I then chose <strong><a href="https://twitter.com/ptaoussanis">Peter Taoussanis</a></strong>&#8217;s <strong><a href="https://github.com/ptaoussanis/carmine">carmine</a></strong> client and it turned out to be a great choice.</p>
+
+<p>Let&#8217;s look at some code. First of all, I am using a <strong>component</strong> that provides a <strong>send channel</strong> and a <strong>receive channel</strong>. This can be reused on either side of the Pub/Sub connection (or for bidirectional communication, of course):</p>
+
+<figure class='code'><figcaption><span>Interop Channels Component component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defrecord </span><span class="nv">Interop-Channels</span> <span class="p">[]</span>
+</span><span class='line'>  <span class="nv">component/Lifecycle</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">start</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Starting Interop Channels Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:send</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)</span> <span class="ss">:receive</span> <span class="p">(</span><span class="nf">chan</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">stop</span>  <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Stop Interop Channels Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:send</span> <span class="nv">nil</span> <span class="ss">:receive</span> <span class="nv">nil</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This channels component can now be wired into other components. Here&#8217;s the component on the publisher side:</p>
+
+<figure class='code'><figcaption><span>Publishing Interop Component component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defrecord </span><span class="nv">Interop</span> <span class="p">[</span><span class="nv">conf</span> <span class="nv">channels</span><span class="p">]</span>
+</span><span class='line'>  <span class="nv">component/Lifecycle</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">start</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Starting Interop Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">conn</span> <span class="p">{</span><span class="ss">:pool</span> <span class="p">{}</span> <span class="ss">:spec</span> <span class="p">{</span><span class="ss">:host</span> <span class="p">(</span><span class="ss">:redis-host</span> <span class="nv">conf</span><span class="p">)</span> <span class="ss">:port</span> <span class="p">(</span><span class="ss">:redis-port</span> <span class="nv">conf</span><span class="p">)}}]</span>
+</span><span class='line'>           <span class="p">(</span><span class="nf">red/run-send-loop</span> <span class="p">(</span><span class="ss">:send</span> <span class="nv">channels</span><span class="p">)</span> <span class="nv">conn</span> <span class="s">&quot;matches&quot;</span><span class="p">)</span>
+</span><span class='line'>           <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:conn</span> <span class="nv">conn</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">stop</span>  <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Stopping Interop Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:conn</span> <span class="nv">nil</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here, we are creating a configuration map and start a send loop with this configuration for the <strong>&#8220;matches&#8221;</strong> topic. Here&#8217;s that loop:</p>
+
+<figure class='code'><figcaption><span>Send Loop component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">run-send-loop</span>
+</span><span class='line'>  <span class="s">&quot;loop for sending items by publishing them on a Redis pub topic&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">send-chan</span> <span class="nv">conn</span> <span class="nv">topic</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span> <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">msg</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="nv">send-chan</span><span class="p">)]</span>
+</span><span class='line'>                <span class="p">(</span><span class="nf">car/wcar</span> <span class="nv">conn</span> <span class="p">(</span><span class="nf">car/publish</span> <span class="nv">topic</span> <span class="nv">msg</span><span class="p">))</span>
+</span><span class='line'>                <span class="p">(</span><span class="nf">recur</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This <strong>go-loop</strong> consumes all messages that come in on <strong>send-chan</strong> channel and publishes them on <strong>topic</strong> for the specified configuration <strong>conn</strong>.</p>
+
+<p>Here&#8217;s the other side of the communication, the component subscribing to the same topic. The channels component stays the same. The component itself looks a little different:</p>
+
+<figure class='code'><figcaption><span>Subscribing Interop Component component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defrecord </span><span class="nv">Interop</span> <span class="p">[</span><span class="nv">conf</span> <span class="nv">channels</span> <span class="nv">listener</span><span class="p">]</span>
+</span><span class='line'>  <span class="nv">component/Lifecycle</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">start</span> <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Starting Interop Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="k">let </span><span class="p">[</span><span class="nv">conn</span> <span class="p">{</span><span class="ss">:pool</span> <span class="p">{}</span> <span class="ss">:spec</span> <span class="p">{</span><span class="ss">:host</span> <span class="p">(</span><span class="ss">:redis-host</span> <span class="nv">conf</span><span class="p">)</span> <span class="ss">:port</span> <span class="p">(</span><span class="ss">:redis-port</span> <span class="nv">conf</span><span class="p">)}}</span>
+</span><span class='line'>               <span class="nv">listener</span> <span class="p">(</span><span class="nf">red/subscribe-topic</span> <span class="p">(</span><span class="ss">:receive</span> <span class="nv">channels</span><span class="p">)</span> <span class="nv">conn</span> <span class="s">&quot;matches&quot;</span><span class="p">)]</span>
+</span><span class='line'>           <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:conn</span> <span class="nv">conn</span> <span class="ss">:listener</span> <span class="nv">listener</span><span class="p">)))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">stop</span>  <span class="p">[</span><span class="nv">component</span><span class="p">]</span> <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Stopping Interop Component&quot;</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">red/unsubscribe</span> <span class="nv">listener</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">red/close</span> <span class="nv">listener</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nb">assoc </span><span class="nv">component</span> <span class="ss">:conn</span> <span class="nv">nil</span> <span class="ss">:listener</span> <span class="nv">nil</span><span class="p">)))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Just like for the publisher, there#s the configuration map. Next, we subscribe to a topic and hold on to the returned listener so that we can unsubscribe from the topic and shut it down later when the component is shut down<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.</p>
+
+<figure class='code'><figcaption><span>Subscription-related functions component.clj</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn- </span><span class="nv">msg-handler-fn</span>
+</span><span class='line'>  <span class="s">&quot;create handler function for messages from Redis Pub/Sub&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">receive-chan</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">fn </span><span class="p">[[</span><span class="nv">msg-type</span> <span class="nv">topic</span> <span class="nv">payload</span><span class="p">]]</span>
+</span><span class='line'>    <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">= </span><span class="nv">msg-type</span> <span class="s">&quot;message&quot;</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">put!</span> <span class="nv">receive-chan</span> <span class="nv">payload</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">subscribe-topic</span>
+</span><span class='line'>  <span class="s">&quot;subscribe to topic, put items on specified channel&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">receive-chan</span> <span class="nv">conn</span> <span class="nv">topic</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">car/with-new-pubsub-listener</span>
+</span><span class='line'>    <span class="p">(</span><span class="ss">:spec</span> <span class="nv">conn</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span><span class="s">&quot;matches&quot;</span> <span class="p">(</span><span class="nf">msg-handler-fn</span> <span class="nv">receive-chan</span><span class="p">)}</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">car/subscribe</span> <span class="nv">topic</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">unsubscribe</span>
+</span><span class='line'>  <span class="s">&quot;unsubscribe listener from all topics&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">listener</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">car/with-open-listener</span> <span class="nv">listener</span> <span class="p">(</span><span class="nf">car/unsubscribe</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">close</span>
+</span><span class='line'>  <span class="s">&quot;close listener&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">listener</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">car/close-listener</span> <span class="nv">listener</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Performance of Redis</h2>
+
+<p>Redis does an incredibly lot with very little CPU utilization. As an unscientific test, I fired up 50 JVMs (on four machines) subscribing to the topic that the TwitterClient is publishing tweets with matched percolation queries on. Then I changed the tracked term from the Streaming API to <strong>&#8220;love&#8221;</strong>, which reliably maxes out the allowed rate tweets. Typically, with this term I see around 60 to 70 tweets per second. With 50 connected processes, 3000 to 3500 tweets were delivered per second, yet the CPU utilization of Redis idled somewhere between 1.7% and 2.3%.</p>
+
+<h2>Conclusion</h2>
+
+<p>I&#8217;m glad I got around to the process separation last weekend. It was fun to do and gives me confidence to proceed with the design I have in my head. In one of the next articles, I will describe the <strong>Docker</strong> configuration for running a <strong>TwitterClient</strong> container, a couple of containers with the client-serving JVMs connecting over <strong>Redis</strong>, a container with <strong>Redis</strong> itself and another container with <strong>nginx</strong> for load-balancing, plus a few containers for running an <strong>ElasticSearch</strong> cluster. Subscribe to the newsletter if you want to be informed when the next article is out.</p>
+
+<p>Cheers and have a great weekend,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>The beauty of the component library is that during development, we can stop a component and restart it after reloading the code. This takes much less time than completely reloading the application. See Stuart Sierra&rsquo;s talk for more information on the component library.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 3 - Redesign]]></title>
@@ -2060,27 +2237,6 @@ Now, me being me, I would love to have a way to track the current altitude plus 
 <p>But with that being said, I find the idea of having millions of additional - and moving - sensors to measure changes in atmospheric pressure <strong>fascinating</strong>. This real-time data could prove just as useful for refining weather models as it is for improving navigation by getting traffic data from smart phones that move with their owners in their cars (or not in the case of a traffic jam). By the way, does anyone know what data exactly the devices send back for live traffic? Once again, there is a case to be made for an open standard for anonymized sensor data and <strong><a href="http://martinfowler.com/bliki/Datensparsamkeit.html">Datensparsamkeit</a></strong>.</p>
 
 <p>Until next time,
-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Updated Approach]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/07/02/new-approach/"/>
-    <updated>2014-07-02T11:58:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/07/02/new-approach</id>
-    <content type="html"><![CDATA[<p>So, I have recently suffered from writer&#8217;s block. Well no, that&#8217;s not exactly true. The problem was not getting started with a topic, but rather sticking with it and continuing to work on it. But there may be a way to get back into the rhythm: finish a less complex project.</p>
-
-<!-- more -->
-
-
-<p>Looking at my past articles, I seem to have a tendency to go for the long form. While I don’t think there’s anything wrong in that per se, I do want write both long and short articles. Ideally I would have one long article (or three) in the works and at the same time publish short ideas and random ramblings in between. Sometimes with code, sometimes without.</p>
-
-<p><strong>So here&#8217;s to a new approach for this blog.</strong> I will still come up with large and (hopefully) profound articles from time to time, so no changes on that front. But in addition, I will also more frequently post shorter notes. Or at least that&#8217;s the idea. Let&#8217;s see how it works out.</p>
-
-<p>Regarding the existing newsletter, I am not exactly sure how to leverage that. As a subscriber, you have become accustomed to getting an email once or sometimes twice per month. I don&#8217;t want to spam you much more frequently all of a sudden. Maybe I should create another newsletter for the more frequent updates? I&#8217;m curious about your thoughts on this. For now, I will just announce this change once and then keep using the current newsletter only for the more infrequent long articles only.</p>
-
-<p>Cheers,
 Matthias</p>
 ]]></content>
   </entry>

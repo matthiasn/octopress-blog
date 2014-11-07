@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="A couple of weeks back I was trying to wrap my head around Iteratees so I read what I could find on Google. Afterwards, I had a very high level idea &hellip;">
+  <meta name="description" content="Initially I parsed the Tweets in the BirdWatch application into instances of a Tweet case class upon ingestion and then used that case class &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/04/26/data-model-upgrade/">ReactiveMongo 0.9 and Lossless Persistence</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-04-26T13:48:00+02:00" pubdate data-updated="true">04/26/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Initially I parsed the Tweets in the <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application into instances of a Tweet case class upon ingestion and then used that case class representation throughout, including for database persistence. Then I realized that that was actually not a good idea. Using a case class for passing around information in the application is very convenient and useful. But for the persistence, I argue that we cannot afford to be opinionated about what to keep and what to throw away. I fixed this together with the planned migration to <strong><a href="http://reactivemongo.org">ReactiveMongo</a></strong> version 0.9 in the latest commits, storing each  observable fact coming from the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> in its entirety.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/04/26/data-model-upgrade/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -177,6 +220,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/11/06/Building-Systems-in-Clojure-4/">Building a System in #Clojure Part 4 - Process separation with Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/30/Building-Systems-in-Clojure-3/">Building a System in #Clojure Part 3 - Redesign</a>
       </li>
     
@@ -190,10 +237,6 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     
       <li class="post">
         <a href="/blog/2014/10/06/Building-Systems-in-Clojure-2/">Building a System in #Clojure 2 - Transducers</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/10/04/weekly-update/">Weekly Update: Staging server for this blog</a>
       </li>
     
   </ul>

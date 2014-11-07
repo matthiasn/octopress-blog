@@ -178,7 +178,11 @@
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/</loc>
-        <lastmod>2014-10-31T18:29:31+01:00</lastmod>
+        <lastmod>2014-10-31T19:13:41+01:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/blog/2014/11/06/Building-Systems-in-Clojure-4/</loc>
+        <lastmod>2014-11-07T01:00:06+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/about/</loc>
@@ -186,11 +190,11 @@
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
-        <lastmod>2014-10-31T18:29:31+01:00</lastmod>
+        <lastmod>2014-11-07T01:00:06+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
-        <lastmod>2014-10-31T18:29:31+01:00</lastmod>
+        <lastmod>2014-11-07T01:00:06+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reading-lists/</loc>

@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I recently did a lot of transcript proofreading concerning enlightening talk for my talk-transcripts project. The most recent one was Design, &hellip;">
+  <meta name="description" content="Last week, I drew a picture about how I wanted to break a monolithic application apart and instead run different parts of the application in separate &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/11/06/Building-Systems-in-Clojure-4/">Building a System in #Clojure Part 4 - Process separation with Redis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-06T19:06:00+01:00" pubdate data-updated="true">11/06/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week, I drew a picture about how I wanted to break a monolithic application apart and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single Twitter client for the connection to the streaming API and the persistence of the received Tweets, plus multiple machines for serving WebSocket connections to the client. For the communication between those processes, I picked <strong>Redis Pub/Sub</strong> because its model of communication appears to suit the requirements really well. As cute as the drawing is, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put Redis in between for communication. It worked really well and here&#8217;s how.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/11/06/Building-Systems-in-Clojure-4/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -472,49 +515,6 @@
 
     </article>
   
-  
-    <article>
-      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/09/03/weekly-update/">Weekly Update: Pomodoro, all-Clojure BirdWatch, Income</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-09-03T19:06:00+02:00" pubdate data-updated="true">09/03/2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In this weekly update, I will be talking about <strong>why I started this blog</strong> in the first place, <strong>Pomodoro time management</strong>, and the new <strong>Clojure</strong> and <strong>ClojureScript</strong> version of my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application. Again there is a live version, this time subscribing to all tweets containing the term <strong>Ferguson</strong>. Also, the results are out for the first month of <strong>blog monetization</strong> through <strong>affiliate links</strong>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/09/03/weekly-update/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -541,6 +541,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/11/06/Building-Systems-in-Clojure-4/">Building a System in #Clojure Part 4 - Process separation with Redis</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/10/30/Building-Systems-in-Clojure-3/">Building a System in #Clojure Part 3 - Redesign</a>
       </li>
     
@@ -554,10 +558,6 @@
     
       <li class="post">
         <a href="/blog/2014/10/06/Building-Systems-in-Clojure-2/">Building a System in #Clojure 2 - Transducers</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/10/04/weekly-update/">Weekly Update: Staging server for this blog</a>
       </li>
     
   </ul>
