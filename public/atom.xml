@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-11-07T14:44:02+01:00</updated>
+  <updated>2014-11-07T14:48:19+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -172,7 +172,7 @@
 
 <h2>Conclusion</h2>
 
-<p>I&#8217;m glad I got around to the process separation last weekend. It was fun to do and gives me confidence to proceed with the design I have in mind. Very little had to change in order to break the application apart, thanks to <strong>Component</strong> and <strong>core.async</strong>. In one of my next articles, I will describe the <strong>Docker</strong> configuration for running a <strong>TwitterClient</strong> container, a couple of containers with the client-serving JVMs connecting over <strong>Redis</strong>, a container with <strong>Redis</strong> itself and another container with <strong>nginx</strong> for load-balancing, plus a few containers for running an <strong>ElasticSearch</strong> cluster. Subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or <strong><a href="https://twitter.com/matthiasnehlsen">follow me on Twitter</a></strong> if you want to be informed once the next article is out.</p>
+<p>I&#8217;m glad I got around to the process separation last weekend. It was fun to do and gives me confidence to proceed with the design I have in mind. Very little had to change in order to break the application apart, thanks to <strong>Component</strong> and <strong>core.async</strong>. In one of my next articles, I will describe the <strong>Docker</strong> configuration for running a <strong>TwitterClient</strong> container, a couple of containers with the client-serving JVMs connecting over <strong>Redis</strong>, a container with <strong>Redis</strong> itself and another container with <strong>nginx</strong> for load-balancing, plus a few containers for running an <strong>ElasticSearch</strong> cluster. Subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or <strong><a href="https://twitter.com/matthiasnehlsen">follow me on Twitter</a></strong> if you want to be informed once the next article is out. The code of the fully functioning application is on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong>. Let me know if you run into any issues when trying it out.</p>
 
 <p>Cheers and have a great weekend,
 Matthias</p>
