@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-11-07T02:49:17+01:00</updated>
+  <updated>2014-11-07T11:22:22+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Process separation with Redis]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/11/06/Building-Systems-in-Clojure-4/"/>
-    <updated>2014-11-06T19:06:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/11/06/Building-Systems-in-Clojure-4</id>
+    <link href="http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4/"/>
+    <updated>2014-11-07T13:06:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4</id>
     <content type="html"><![CDATA[<p>Last week, I drew a picture about how I wanted to break a monolithic application apart and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single Twitter client for the connection to the streaming API and the persistence of the received Tweets, plus multiple machines for serving WebSocket connections to the client. For the communication between those processes, I picked <strong>Redis Pub/Sub</strong> because its model of communication appears to suit the requirements really well. As cute as the drawing is, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put Redis in between for communication. It worked really well and here&#8217;s how.</p>
 
 <!-- more -->

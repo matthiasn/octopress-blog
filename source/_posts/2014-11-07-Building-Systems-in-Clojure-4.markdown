@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Building a System in #Clojure Part 4 - Process separation with Redis"
-date: 2014-11-06 19:06
+date: 2014-11-07 13:06
 comments: true
 categories:
 ---
