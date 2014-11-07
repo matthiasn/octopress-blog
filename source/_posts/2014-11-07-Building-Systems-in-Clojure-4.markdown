@@ -1,15 +1,17 @@
 ---
 layout: post
-title: "Building a System in #Clojure Part 4 - Interprocess communication with Redis"
+title: "Building a System in #Clojure Part 4 - Inter-process communication with Redis"
 date: 2014-11-07 13:06
 comments: true
 categories:
 ---
-**[Last week](http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/)**, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single Twitter client for the connection to the streaming API and the persistence of the received Tweets, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked **Redis Pub/Sub** because its model of communication appears to suit the requirements really well. As cute as the drawing is, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put Redis in between for communication. It worked really well and here's how.
+**[Last week](http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/)**, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single client for the connection to the **[Twitter Streaming API](https://dev.twitter.com/streaming/overview)** and the persistence of the received Tweets in **[ElasticSearch](http://www.elasticsearch.com)**, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked **[Redis Pub/Sub](http://redis.io/topics/pubsub)** because its model of communication appears to suit the requirements really well. As cute as the drawing may be, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put **[Redis](http://redis.io)** in between for communication. It worked really well and here's how.
 
 <!-- more -->
 
 Okay, it wasn't a total surprise to see how well it worked. After all, I started using the **[Component library](https://github.com/stuartsierra/component)** together with **[core.async](https://github.com/clojure/core.async)** for exactly this reason a few weeks ago. I wanted the freedom to only ever having to put stuff on conveyor belts and not having to think about how a thing got where it needs to go, or even where it needs to go at all.
+
+{% img left /images/redesign2.png 'Redesigned Architecture - InterOp' 'Redesigned Architecture - InterOp'%}
 
 ## Redis Pub/Sub with Carmine
 I chose **Pub/Sub** over a queue because I wanted to **[fan-out](http://en.wikipedia.org/wiki/Fan-out)** messages to multiple clients. Any connected processes are only supposed to be fed with data during their uptime, with no need to store anything for when they aren't connected. For interfacing with **Redis** from Clojure, I then chose **[Peter Taoussanis](https://twitter.com/ptaoussanis)**'s **[carmine](https://github.com/ptaoussanis/carmine)** client and it turned out to be a great choice.
@@ -96,10 +98,10 @@ Just like for the publisher side, there's the configuration map. Next, we subscr
 {% endcodeblock %}
 
 ## Performance of Redis
-Redis does a lot with very little CPU utilization. In a non-scientific test, I fired up 50 JVMs (on four machines) subscribing to the topic on which the TwitterClient publishes tweets with matched percolation queries. Then I changed the tracked term from the **[Twitter Streaming API]()** to **"love"**, which reliably maxes out the rate tweets permitted. Typically, with this term I see around 60 to 70 tweets per second. With 50 connected processes, 3000 to 3500 tweets were delivered per second, yet the CPU utilization of Redis idled somewhere between 1.7% and 2.3%.
+Redis does a lot with very little CPU utilization. In a non-scientific test, I fired up 50 JVMs (on four machines) subscribing to the topic on which the TwitterClient publishes tweets with matched percolation queries. Then I changed the tracked term from the **[Twitter Streaming API](https://dev.twitter.com/streaming/overview)** to **"love"**, which reliably maxes out the rate of tweets permitted. Typically, with this term I see around 60 to 70 tweets per second. With 50 connected processes, 3000 to 3500 tweets were delivered per second overall, yet the CPU utilization of Redis idled somewhere between 1.7% and 2.3%.
 
 ## Conclusion
-I'm glad I got around to the process separation last weekend. It was fun to do and gives me confidence to proceed with the design I have in mind. In one of my next articles, I will describe the **Docker** configuration for running a **TwitterClient** container, a couple of containers with the client-serving JVMs connecting over **Redis**, a container with **Redis** itself and another container with **nginx** for load-balancing, plus a few containers for running an **ElasticSearch** cluster. Subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or **[follow me on Twitter](https://twitter.com/matthiasnehlsen)** if you want to be informed once the next article is out.
+I'm glad I got around to the process separation last weekend. It was fun to do and gives me confidence to proceed with the design I have in mind. Very little had to change in order to break the application apart, thanks to **Component** and **core.async**. In one of my next articles, I will describe the **Docker** configuration for running a **TwitterClient** container, a couple of containers with the client-serving JVMs connecting over **Redis**, a container with **Redis** itself and another container with **nginx** for load-balancing, plus a few containers for running an **ElasticSearch** cluster. Subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or **[follow me on Twitter](https://twitter.com/matthiasnehlsen)** if you want to be informed once the next article is out.
 
 Cheers and have a great weekend,
 Matthias
