@@ -1,0 +1,34 @@
+---
+layout: post
+title: "Inspecting live data"
+date: 2014-11-14 19:06
+comments: true
+categories: 
+---
+<!-- more -->
+
+
+Friday, November 7, 2014
+
+Inspect Library
+
+I had a realization just now. I was thinking about how to approach my next task in the BirdWatch application. There, I want to do aggregations on data from ElasticSearch on the server side and then send the aggregate on the wire to a ClojureScript client. But then I realized that I didn’t like the prospect of continuously pretty printing and then looking up the output on the console.
+
+Instead, I want to see the messages passed around in the system, in a way that’s easy to interact with. Then I thought, hey, I have channels and I already have the infrastructure in place to deliver messages to a ClojureScript / Om client over WebSockets. Why not be able to peek into what’s sent over a channel, from a web client.
+
+I could be a library that makes use of components. This system can then either be fired up independently or embedded as a component. Either way, it would just expose a single channel that receives all different message types from different origins. 
+
+The client can be simple for now, just showing different tabs for different message types. Then in each tab, there is a field for n and a button that will start the delivery of the next n messages of the particular type. Maybe the last ten or whatever, even thousand should be just as long as it isn’t unbounded so the browser doesn’t catch fire for an origin that emits thousands of messages per second. 
+
+Then in the component filtering messages, the default is a no-op, simply ignoring the message unless there’s a client requesting this type, with a decreasing counter of remaining items.
+
+In the default scenario when no client wants messages, the extra burden should be minimal. There shouldn’t even be significant GC pressure as the evaluated immutable data structures exist already and are structurally shared. Nothing I’d be too worried about at this point. The pleasant side effect of this fact is that the inspector could be potentially run all the time, allowing peeking into a production system. The inspector system is even bringing its own HTTP server, listening on a configurable port. Thus, the main application doesn’t even require having anything to do with the web.
+
+
+
+
+
+
+
+
+
