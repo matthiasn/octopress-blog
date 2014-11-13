@@ -1,34 +1,37 @@
 ---
 layout: post
-title: "Inspecting live data"
+title: "Inspect - println no more"
 date: 2014-11-14 19:06
 comments: true
 categories: 
 ---
+
+Last Friday, I was thinking about how to approach my next task in the BirdWatch application. There, I want to do aggregations on data from ElasticSearch on the server side and then send the aggregate on the wire to a ClojureScript client. But then I realized that I didn’t like the prospect of continuously pretty printing and then inspecting the output on the console.
+
 <!-- more -->
 
+Sure, printline statements can be very useful when reasoning about parts of the application. I do not want any kind of a breakpoint in a concurrent system, and it is hardly all that useful anyway. When variables don't change, we don't have to stop the entire application to look at a certain moment in time. 
 
-Friday, November 7, 2014
+But the big problem with logging all kinds of stuff in debug mode is that the particular thing I'm looking for is hard to find among a vast amount of other logged items I'm not interested in at the time, particularly when running the application under real load during development. For example BirdWatch, my current configuration receives around 50 tweets per second. Do I want to log this relatively large data structure every time? Certainly not, it will make everything else difficult to find. Occasionally, though, I want to see one of those. 
 
-Inspect Library
+So what do we do? I constantly find myself commenting and uncommenting log statements and then restarting the application. That's not fun at all.
 
-I had a realization just now. I was thinking about how to approach my next task in the BirdWatch application. There, I want to do aggregations on data from ElasticSearch on the server side and then send the aggregate on the wire to a ClojureScript client. But then I realized that I didn’t like the prospect of continuously pretty printing and then looking up the output on the console.
+Here's my idea for a better way of doing this: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into any existing Clojure application. This subsystem as a default does nothing with the logged data, making it very cheap to even process higher loads. This system then exposes a web interface that allows clients to see the next n of a certain event type (or combinations thereof). Here's how that looks like:
 
-Instead, I want to see the messages passed around in the system, in a way that’s easy to interact with. Then I thought, hey, I have channels and I already have the infrastructure in place to deliver messages to a ClojureScript / Om client over WebSockets. Why not be able to peek into what’s sent over a channel, from a web client.
+IMAGE
 
-I could be a library that makes use of components. This system can then either be fired up independently or embedded as a component. Either way, it would just expose a single channel that receives all different message types from different origins. 
+I wrote this over the weekend, mostly, and it is already fully functional. It makes use of the component library to fire up a subsystem that only exposes three function:
 
-The client can be simple for now, just showing different tabs for different message types. Then in each tab, there is a field for n and a button that will start the delivery of the next n messages of the particular type. Maybe the last ten or whatever, even thousand should be just as long as it isn’t unbounded so the browser doesn’t catch fire for an origin that emits thousands of messages per second. 
+INSPECT
+START
+STOP
+
+The **inspect** function can be used like a log statement, with an additional namespaced keyword to tell the inpect library what kind of a message it receives. Unless **start** is called once (from anywhere), inspect is a no-op so it should be possible to not uncomment the statements even in production. It may even possible to keep the subsystem running in production and keep access to the logging into the web application as matching events with clients does not cause a lot of extra work. In the example application, I am hitting the system with 1,000 messages per second and the extra load to match the messages with connected clients is about 3-5% (out of a total of 800%). But this would have to be verified, of course. Let me know how it goes.
+
+
 
 Then in the component filtering messages, the default is a no-op, simply ignoring the message unless there’s a client requesting this type, with a decreasing counter of remaining items.
 
 In the default scenario when no client wants messages, the extra burden should be minimal. There shouldn’t even be significant GC pressure as the evaluated immutable data structures exist already and are structurally shared. Nothing I’d be too worried about at this point. The pleasant side effect of this fact is that the inspector could be potentially run all the time, allowing peeking into a production system. The inspector system is even bringing its own HTTP server, listening on a configurable port. Thus, the main application doesn’t even require having anything to do with the web.
-
-
-
-
-
-
-
 
 
