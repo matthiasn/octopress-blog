@@ -1,25 +1,25 @@
 ---
 layout: post
 title: "Inspect - println no more"
-date: 2014-11-14 17:06
+date: 2014-11-14 17:30
 comments: true
 categories: 
 ---
-**TL;DR**: I realized how strongly I **disliked** the process of **logging data structures** to the console and then trying to find them and repeatedly commenting out and uncommenting **println** statements. So I decided to **fix that**.
+**TL;DR**: I realized how much I **disliked** the process of **logging data structures** to the console and then trying to find them and repeatedly commenting out and uncommenting **println** statements. So I decided to **fix that**.
 
 <!-- more -->
 
-Last Friday, I was thinking about how to approach the next task in the **[BirdWatch](https://github.com/matthiasn/BirdWatch)** application. There, I want to do **aggregations** on data from ElasticSearch on the server side and then send the aggregate on the wire over **[WebSockets](http://en.wikipedia.org/wiki/WebSocket)** to a **[ClojureScript](https://github.com/clojure/clojurescript)** client. In order to build up the aggregate data structures, I would need to inspect what I'm building during development. But I didn't have a good way to do so.
+Last Friday, I was thinking about how to approach the next task in the **[BirdWatch](https://github.com/matthiasn/BirdWatch)** application. I came up with the idea to do **aggregations** on data from ElasticSearch on the server side and then send the aggregate on the wire over **[WebSockets](http://en.wikipedia.org/wiki/WebSocket)** to a **[ClojureScript](https://github.com/clojure/clojurescript)** client. In order to build up the aggregate data structures, I would need to inspect what I was building during development. But I didn't have a good way to do that.
 
-Sure, **println** statements can be useful when reasoning about parts of an application. Just leaving them in there is **not feasible** though, particularly when running the application under any kind of load. Finding a logged item on the console can easily be like trying to find a needle in a haystack. For example in BirdWatch, my current configuration receives around **50 tweets per second**. I am also using this configuration for the development process. Do I want to log this relatively large tweet data structure every time, 50 times a second? **Certainly not**, that would make everything else difficult to find (an unnecessarily file the file system). Occasionally, though, I want to see one of those, or any other kind of data structure used in the system.
+Sure, **println** statements can be useful when reasoning about parts of an application. Just leaving them in there is **not feasible** though, particularly when running the application under any kind of load. Finding a logged item on the console can easily be like trying to find a needle in a haystack. For example in BirdWatch, my current configuration receives around **50 tweets per second**. I am also using this configuration for the development process. Do I want to log this relatively large tweet data structure every time, 50 times a second? **Certainly not**, as that would make it difficult to find everything else. Occasionally, though, I want to see one of those or any other kind of data structure used in the system.
 
-So what do we usually do? I constantly found myself commenting out and uncommenting log statements and then restarting the application. That's not fun at all and a **huge waste of time**.
+So what do we usually do? I constantly found myself commenting out and uncommenting **println/log** statements and then restarting the application. That's not fun at all and a **huge waste of time**.
 
-Here's my idea for a better way of doing this: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into **any existing Clojure application** and that takes care of the presentation? This subsystem as a **default does nothing** with the logged data, making it very cheap to even process higher loads. This system then exposes a **web application** that allows clients to see the **next n** of a certain event type (or combinations thereof). Here's how that looks like:
+Here's my idea of how to do it **better**: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into **any existing Clojure application** and takes care of the presentation? This subsystem as a **default doesn't do anything** with the logged data, which makes it very cheap to process even higher loads[^1]. The subsystem then exposes a **web application** that allows clients to see the **next n** of a certain event type (or combinations thereof). Here's how that looks like, I have already implemented it:
 
 <a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="/images/inspect1.png" /></a>
 
-When you connect a new client, as a default you currently get the **next 10** of every message type known to the system. On the left, there is a table that shows how many items each are remaining. On the right of the table, there are buttons that toggle if the respective data type is to be shown or not. The **next** button will increment the number for each selected type by whatever is in the field.
+When you connect a new client, as a default you currently get the **next 10** of every message type known to the system. On the left, there is a table that shows how many items per each type are left. On the right of the table, there are buttons that toggle if the respective data type is to be shown or not. The **next** button will increment the number for each selected type by whatever is in the field.
 
 You can click on the image for a live version. In this simple example, there are a couple of message types:
 
@@ -42,13 +42,13 @@ Next, you want to start it once, from anywhere:
 
     (inspect/start)
 
-That's all, now you can use it, for example:
+That's all; you can now use it, for example:
 
     (inspect :interval-put/every-second {:msg "every second"})
 
-There is no need to make the event types know to inspect, other than just passing namespaced keywords. Inspect will then learn the event types itself.
+There is no need to make the event types known to inspect, other than just passing namespaced keywords. Inspect will then learn the event types itself.
 
-Here is the full example application (minus the namespace definition, optional port configuration and REPL reload, click on the link in the upper right of the code block for the entire file):
+Here is the full example application (minus the namespace definition, optional port configuration and REPL reload; click on the link on the upper right of the code block for the entire file):
 
 {% codeblock inspect sample application lang:clojure https://github.com/matthiasn/inspect/blob/65feac4f2bddc9711c7e5798020c3f0b993407a0/example/src/example/core.clj core.clj%}
 (defn interval-put-loop
@@ -69,29 +69,19 @@ Here is the full example application (minus the namespace definition, optional p
   (inspect/start))
 {% endcodeblock %}
 
+## Inspect internals
+The inspect library internally makes use of the **[component library](https://github.com/stuartsierra/component)**, **[Sente](https://github.com/ptaoussanis/sente)** for the WebSockets connection and **[Reagent](https://github.com/reagent-project/reagent)** for building a reactive UI on top of **[ReactJS](http://facebook.github.io/react/)**. I won't go into details today, but I probably will soon.
 
+## Conclusion
+Okay, this is it for today. This project is less than a week old and I am still in the middle of exploring the problem space. In particular, I want to start using it everywhere in my BirdWatch project so that I can get a better idea of how I want to interact with the UI. I think inspect, among other things, makes for a useful **executable documentation** of a system, where you can easily find out how the data in your system looks like. I would have loved to have that in the past when I was new to a project.
 
+Despite this project being so young, there is no reason why you couldn't **try it** already. Maybe you have ideas on what you'd like to see in there. There's a good chance I can implement other good ideas over the upcoming weekend. Either discuss here in the comments or open an issue on **[GitHub](https://github.com/matthiasn/inspect)**.
 
-Okay, this is it for today. This project is less than a week old and I am still in the middle of exploring the problem space. In particular, I want to start using it everywhere in my BirdWatch project so that I can get a better idea of how I want to interact with the UI. I think this makes for a useful executable documentation of your system, where you can easily find out how the data in your system looks like. I would have loved to have that in the past when I was new in a project.
+Over the next weeks, I will show how to use the above inside a real application. Also, I might write an article about how **inspect** works internally. Of course the code is on **[GitHub](https://github.com/matthiasn/inspect)**. It's pretty short; the entire thing including the UI is only around **300 lines** of Clojure and ClojureScript code.
 
-Despite this project being so young, there is no reason why you couldn't try it already. Maybe you have ideas on what you'd like to see in there. I already a few issues on GitHub for potential improvements.
-
-Over the next weeks, I will show how to use this inside a real application. Also, I might write an article how **inspect** works internally. Of course the code is on GitHub. It's pretty short, the entire thing including the UI is only around 300 lines of Clojure ClojureScript.
-
-
-
-The **inspect** function can be used like a log statement, with an additional **namespaced keyword** to tell the inspect library what kind of a message it receives. Unless **start** is called once (from anywhere), inspect is a **no-op** so it should be possible to not uncomment the statements even in production.
-
-It may even possible to keep the inspect subsystem running in production and thus monitoring what is flowing through the system. Matching events with clients does not cause a lot of extra work. In the example application, I am hitting the system with 1,000 messages per second and the extra load to match the messages with connected clients is about 3-5% (out of a total of 800% on my Retina MacBook). But this would have to be verified, of course.
-
-
-If you wonder about the next steps in the design of this application, you can subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or **[follow me on Twitter](https://twitter.com/matthiasnehlsen)** and I will let you know when the next article is out.
+Curious what's next? You can subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or **[follow me on Twitter](https://twitter.com/matthiasnehlsen)** and I will let you know when the next article is out.
 
 Cheers and have a great weekend,<br>
 Matthias
 
-
-Then in the component filtering messages, the default is a no-op, simply ignoring the message unless there’s a client requesting this type, with a decreasing counter of remaining items.
-
-In the default scenario when no client wants messages, the extra burden should be minimal. There shouldn’t even be significant GC pressure as the evaluated immutable data structures exist already and are structurally shared. Nothing I’d be too worried about at this point. The pleasant side effect of this fact is that the inspector could be potentially run all the time, allowing peeking into a production system. The inspector system is even bringing its own HTTP server, listening on a configurable port. Thus, the main application doesn’t even require having anything to do with the web.
-
+[^1]: In the default case when no client wants messages, the extra burden should be minimal. There shouldn’t even be significant GC pressure as the evaluated immutable data structures exist already and are structurally shared. In the example application, I am hitting the system with over 1,000 messages per second and the extra load to match the messages with connected clients is about 3-5% (out of a total of 800% on my Retina MacBook). But this would have to be verified before you use it in production, obviously.
