@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-11-07T14:48:19+01:00</updated>
+  <updated>2014-11-14T15:31:47+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,120 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Inspect - println no more]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/"/>
+    <updated>2014-11-14T17:06:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/11/14/Inspect</id>
+    <content type="html"><![CDATA[<p><strong>TL;DR</strong>: I realized how strongly I <strong>disliked</strong> the process of <strong>logging data structures</strong> to the console and then trying to find them and repeatedly commenting out and uncommenting <strong>println</strong> statements. So I decided to <strong>fix that</strong>.</p>
+
+<!-- more -->
+
+
+<p>Last Friday, I was thinking about how to approach the next task in the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application. There, I want to do <strong>aggregations</strong> on data from ElasticSearch on the server side and then send the aggregate on the wire over <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSockets</a></strong> to a <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> client. In order to build up the aggregate data structures, I would need to inspect what I&#8217;m building during development. But I didn&#8217;t have a good way to do so.</p>
+
+<p>Sure, <strong>println</strong> statements can be useful when reasoning about parts of an application. Just leaving them in there is <strong>not feasible</strong> though, particularly when running the application under any kind of load. Finding a logged item on the console can easily be like trying to find a needle in a haystack. For example in BirdWatch, my current configuration receives around <strong>50 tweets per second</strong>. I am also using this configuration for the development process. Do I want to log this relatively large tweet data structure every time, 50 times a second? <strong>Certainly not</strong>, that would make everything else difficult to find (an unnecessarily file the file system). Occasionally, though, I want to see one of those, or any other kind of data structure used in the system.</p>
+
+<p>So what do we usually do? I constantly found myself commenting out and uncommenting log statements and then restarting the application. That&#8217;s not fun at all and a <strong>huge waste of time</strong>.</p>
+
+<p>Here&#8217;s my idea for a better way of doing this: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into <strong>any existing Clojure application</strong> and that takes care of the presentation? This subsystem as a <strong>default does nothing</strong> with the logged data, making it very cheap to even process higher loads. This system then exposes a <strong>web application</strong> that allows clients to see the <strong>next n</strong> of a certain event type (or combinations thereof). Here&#8217;s how that looks like:</p>
+
+<p><a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect1.png" /></a></p>
+
+<p>When you connect a new client, as a default you currently get the <strong>next 10</strong> of every message type known to the system. On the left, there is a table that shows how many items each are remaining. On the right of the table, there are buttons that toggle if the respective data type is to be shown or not. The <strong>next</strong> button will increment the number for each selected type by whatever is in the field.</p>
+
+<p>You can click on the image for a live version. In this simple example, there are a couple of message types:</p>
+
+<ul>
+<li><strong>:interval-put/every-millisecond</strong> - emitted every millisecond by a go-loop</li>
+<li><strong>:interval-put/every-second</strong> - emitted every second by a go-loop</li>
+<li><strong>:interval-put/every-five-seconds</strong> - emitted every five seconds by a go-loop</li>
+<li><strong>:interval-put/every-ten-seconds</strong> - emitted every ten seconds by a go-loop</li>
+<li><strong>:interval-put/every-minute</strong> - emitted every minute by a go-loop</li>
+<li><strong>:ws/event-in</strong> - emitted when there&#8217;s an incoming message on a WebSocket connection (such as a new connection)</li>
+</ul>
+
+
+<p>Using the <strong>inspect</strong> library is super simple. All you need to do is add <strong>inspect</strong> to the dependencies in your project.clj:</p>
+
+<pre><code>[com.matthiasnehlsen/inspect "0.1.1"]
+</code></pre>
+
+<p>Then, you probably want to import it where you need it:</p>
+
+<pre><code>[com.matthiasnehlsen.inspect :as inspect :refer [inspect]]
+</code></pre>
+
+<p>Next, you want to start it once, from anywhere:</p>
+
+<pre><code>(inspect/start)
+</code></pre>
+
+<p>That&#8217;s all, now you can use it, for example:</p>
+
+<pre><code>(inspect :interval-put/every-second {:msg "every second"})
+</code></pre>
+
+<p>There is no need to make the event types know to inspect, other than just passing namespaced keywords. Inspect will then learn the event types itself.</p>
+
+<p>Here is the full example application (minus the namespace definition, optional port configuration and REPL reload, click on the link in the upper right of the code block for the entire file):</p>
+
+<figure class='code'><figcaption><span>inspect sample application</span><a href='https://github.com/matthiasn/inspect/blob/65feac4f2bddc9711c7e5798020c3f0b993407a0/example/src/example/core.clj'>core.clj</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">interval-put-loop</span>
+</span><span class='line'>  <span class="s">&quot;put msg on chan every interval milliseonds&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">interval</span> <span class="nv">msg-type</span> <span class="nv">msg</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">go-loop</span> <span class="p">[]</span> <span class="p">(</span><span class="nf">&lt;!</span> <span class="p">(</span><span class="nf">timeout</span> <span class="nv">interval</span><span class="p">))</span> <span class="p">(</span><span class="nf">inspect</span> <span class="nv">msg-type</span> <span class="nv">msg</span><span class="p">)</span> <span class="p">(</span><span class="nf">recur</span><span class="p">)))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="nf">interval-put-loop</span>     <span class="mi">1</span> <span class="ss">:interval-put/every-millisecond</span> <span class="p">{</span><span class="ss">:msg</span> <span class="s">&quot;every millisecond&quot;</span><span class="p">})</span>
+</span><span class='line'><span class="p">(</span><span class="nf">interval-put-loop</span>  <span class="mi">1000</span> <span class="ss">:interval-put/every-second</span> <span class="p">{</span><span class="ss">:msg</span> <span class="s">&quot;every second&quot;</span><span class="p">})</span>
+</span><span class='line'><span class="p">(</span><span class="nf">interval-put-loop</span>  <span class="mi">5000</span> <span class="ss">:interval-put/every-five-seconds</span> <span class="p">{</span><span class="ss">:msg</span> <span class="s">&quot;every five seconds&quot;</span><span class="p">})</span>
+</span><span class='line'><span class="p">(</span><span class="nf">interval-put-loop</span> <span class="mi">10000</span> <span class="ss">:interval-put/every-ten-seconds</span> <span class="p">{</span><span class="ss">:msg</span> <span class="s">&quot;every ten seconds&quot;</span><span class="p">})</span>
+</span><span class='line'><span class="p">(</span><span class="nf">interval-put-loop</span> <span class="mi">60000</span> <span class="ss">:interval-put/every-minute</span> <span class="p">{</span><span class="ss">:msg</span> <span class="s">&quot;every minute&quot;</span><span class="p">})</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">-main</span> <span class="p">[</span><span class="o">&amp;</span> <span class="nv">args</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">pid/save</span> <span class="s">&quot;example.pid&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">pid/delete-on-shutdown!</span> <span class="s">&quot;example.pid&quot;</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Application started, PID&quot;</span> <span class="p">(</span><span class="nf">pid/current</span><span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">inspect/start</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Okay, this is it for today. This project is less than a week old and I am still in the middle of exploring the problem space. In particular, I want to start using it everywhere in my BirdWatch project so that I can get a better idea of how I want to interact with the UI. I think this makes for a useful executable documentation of your system, where you can easily find out how the data in your system looks like. I would have loved to have that in the past when I was new in a project.</p>
+
+<p>Despite this project being so young, there is no reason why you couldn&#8217;t try it already. Maybe you have ideas on what you&#8217;d like to see in there. I already a few issues on GitHub for potential improvements.</p>
+
+<p>Over the next weeks, I will show how to use this inside a real application. Also, I might write an article how <strong>inspect</strong> works internally. Of course the code is on GitHub. It&#8217;s pretty short, the entire thing including the UI is only around 300 lines of Clojure ClojureScript.</p>
+
+<p>The <strong>inspect</strong> function can be used like a log statement, with an additional <strong>namespaced keyword</strong> to tell the inspect library what kind of a message it receives. Unless <strong>start</strong> is called once (from anywhere), inspect is a <strong>no-op</strong> so it should be possible to not uncomment the statements even in production.</p>
+
+<p>It may even possible to keep the inspect subsystem running in production and thus monitoring what is flowing through the system. Matching events with clients does not cause a lot of extra work. In the example application, I am hitting the system with 1,000 messages per second and the extra load to match the messages with connected clients is about 3-5% (out of a total of 800% on my Retina MacBook). But this would have to be verified, of course.</p>
+
+<p>If you wonder about the next steps in the design of this application, you can subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> or <strong><a href="https://twitter.com/matthiasnehlsen">follow me on Twitter</a></strong> and I will let you know when the next article is out.</p>
+
+<p>Cheers and have a great weekend,<br>
+Matthias</p>
+
+<p>Then in the component filtering messages, the default is a no-op, simply ignoring the message unless there’s a client requesting this type, with a decreasing counter of remaining items.</p>
+
+<p>In the default scenario when no client wants messages, the extra burden should be minimal. There shouldn’t even be significant GC pressure as the evaluated immutable data structures exist already and are structurally shared. Nothing I’d be too worried about at this point. The pleasant side effect of this fact is that the inspector could be potentially run all the time, allowing peeking into a production system. The inspector system is even bringing its own HTTP server, listening on a configurable port. Thus, the main application doesn’t even require having anything to do with the web.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Inter-process communication with Redis]]></title>
@@ -2202,38 +2316,6 @@ Matthias</p>
 <p>A first Meetup is scheduled for <strong>Thursday, July 24th, 2014 at 7pm</strong>. There is no venue for the event yet, so please let me know if you would like to sponsor the meetup by providing a location or know anyone who can provide the space. There is also no agenda as of yet. Please let me know if you have anything AngularJS-related that you would like to talk about or that you are particularly interested in.</p>
 
 <p>Cheers,
-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Distributed Atmospheric Pressure Measurement]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/07/06/distributed-barometer/"/>
-    <updated>2014-07-06T11:58:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/07/06/distributed-barometer</id>
-    <content type="html"><![CDATA[<p>Later this month, I&#8217;ll be going on a hiking tour in the Alps around the <strong><a href="http://en.wikipedia.org/wiki/Matterhorn">Matterhorn</a></strong>. I do not recall exactly why I said yes to this tour; maybe because I did not know then that during the ten days we&#8217;d climb a combined total of <strong>10,500 meters</strong> (roughly 34,500 feet). But on the other hand, that&#8217;s an interesting challenge for a person with a sedentary job.
-Now, me being me, I would love to have a way to track the current altitude plus the combined ascent. <strong><a href="http://en.wikipedia.org/wiki/Global_Positioning_System">GPS</a></strong> can help here, but the best sensor that&#8217;s up to the task task appears to be a <strong><a href="http://en.wikipedia.org/wiki/Barometer">barometer</a></strong>.</p>
-
-<!-- more -->
-
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/matterhorn.jpg" title="image" alt="images"></p>
-
-<p>GPS sensors only have an accuracy of <strong><a href="http://www.xcmag.com/2011/07/gps-versus-barometric-altitude-the-definitive-answer/">±45m in the vertical axis</a></strong>, which makes them less than ideal for measuring combined ascent unless readings are averaged over longer periods. However, averaging would not only alias the otherwise occurring zigzag lines from the measurement errors, but also the real ups and downs in the terrain that you actually want to measure. Though a barometer can capture these small changes much better, it is prone to a shift over the day as the atmospheric pressure changes with the weather. It appears that the averaged GPS readings, while not all that useful for capturing altitude changes in unknown terrain - could be used to correct the barometric height from time to time. When the barometric height deviates by more than 45m from the averaged GPS altitude, we know that a correction is due.</p>
-
-<p>In addition to providing a higher resolution when continuously measuring altitude changes, a barometric sensor also consumes much less energy than a GPS sensor, which makes this sensor type particularly suitable for continuous monitoring.</p>
-
-<p>Thinking about barometric sensors, I came across two articles (<strong><a href="http://www.forbes.com/sites/gordonkelly/2014/06/19/iphone-6-likely-to-include-barometer-for-super-accurate-local-weather/">Forbes</a></strong>, <strong><a href="http://9to5mac.com/2014/06/18/iphone-6-likely-to-sport-barometer-air-pressure-sensors-to-measure-altitude-weather/">9to5mac</a></strong>) that stated that the upcoming <strong>iPhone 6</strong> will have such a sensor. First of all, <strong>Apple</strong>, that&#8217;s a little late for my tour. Can I get a prototype, please? Anyhow, I find pressure sensors in connected devices really exciting, even if the sensor won&#8217;t be available for the upcoming tour yet.</p>
-
-<p>I am not an expert in <strong><a href="http://en.wikipedia.org/wiki/Meteorology">meteorology</a></strong>, but in my layman&#8217;s understanding of the subject, <strong><a href="http://en.wikipedia.org/wiki/Atmospheric_pressure">atmospheric pressure</a></strong> changes are one of the most essential measurable phenomena that weather forecasts revolve around. This makes total sense when you think about it. Wind brings changes in the weather. Most of the clouds here in <strong><a href="http://en.wikipedia.org/wiki/Hamburg">Hamburg</a></strong> where I live are not formed spontaneously above my apartment building but are blown there by the wind somewhere from the Atlantic Ocean. <strong><a href="http://en.wikipedia.org/wiki/Wind">Wind</a></strong> is a manifestation of atmospheric pressure change. Let&#8217;s assume that at my current location the atmospheric pressure is higher in the west and lower in the east. As air tends to go back to equilibrium, it flows from the high pressure field to the low pressure field, which I then perceive as <strong><a href="http://en.wikipedia.org/wiki/West_wind">west wind</a></strong>.</p>
-
-<p>Have you ever noticed a gust of wind before an adverse weather event like a thunderstorm? Besides being the title of a song on <strong><a href="https://itunes.apple.com/en/album/g-i-r-l/id823593445">Pharell&#8217;s new album</a></strong>, this gust of wind a sudden change in pressure and I am pretty sure that would be measurable by a <strong><a href="http://en.wikipedia.org/wiki/Pressure_sensor">barometric sensor</a></strong> in a mobile device. Now imagine that all smart phones are equipped with such sensors that are constantly sending the current atmospheric pressure together with GPS coordinates. I really wonder what that would mean for the accuracy of <strong><a href="http://en.wikipedia.org/wiki/Weather_forecasting">weather forecasts</a></strong>. I suspect they would become more accurate as they would feed real-time data back into the models, which in turn would adjust predictions. But at the same time, I also wonder how one would process all that extra data, with millions of sensors that move instead of being installed at fixed places. I&#8217;m sure this will not make the predictive models simpler. There are all kinds of interesting questions around this. For example, how do you know if a sensor is on the ground? A sudden change in pressure can also be due to the smart phone holder getting into an elevator, in particular if the elevator is in a high-rise building. Maybe only sensor data from moving targets should be used. How about collecting that data when a turn-by-turn navigation app is used? Then the altitude of the reading is fairly predictable, namely a few feet above the street. And the altitude of that street is typically known and does not change.</p>
-
-<p>I&#8217;m all for using such data when it can keep me from getting wet or otherwise affected by adverse weather conditions. However, I believe there should be open standards on how this data is transmitted. I understand that this data only makes sense with embedded GPS location that ought to be precise to be most valuable. But at the same time <strong>I am not okay with my device constantly leaking my location together with identifiable data</strong>. My device ID or any other information related to me is not necessary for the noble task of making weather forecasts better and as such should not be included. In German we have a word for this: <strong>Datensparsamkeit</strong>. Martin Fowler did a <strong><a href="http://martinfowler.com/bliki/Datensparsamkeit.html">good job translating the concept</a></strong> into English. Just because we can store every piece of information we can get our hands on, it does not mean that that&#8217;s always a great idea.</p>
-
-<p>But with that being said, I find the idea of having millions of additional - and moving - sensors to measure changes in atmospheric pressure <strong>fascinating</strong>. This real-time data could prove just as useful for refining weather models as it is for improving navigation by getting traffic data from smart phones that move with their owners in their cars (or not in the case of a traffic jam). By the way, does anyone know what data exactly the devices send back for live traffic? Once again, there is a case to be made for an open standard for anonymized sensor data and <strong><a href="http://martinfowler.com/bliki/Datensparsamkeit.html">Datensparsamkeit</a></strong>.</p>
-
-<p>Until next time,
 Matthias</p>
 ]]></content>
   </entry>
