@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="TL;DR: I realized how much I disliked the process of logging data structures to the console and then trying to find them and repeatedly commenting &hellip;">
+  <meta name="description" content="Last week I published the first version of inspect, a Clojure library for inpecting messages flowing through your system. One of the questions I had &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,53 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/11/14/Inspect-v0.1.3/">Inspect v0.1.3: 180K msg/s</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-14T17:30:00+01:00" pubdate data-updated="true">11/14/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week I published the first version of <strong><a href="https://github.com/matthiasn/inspect">inspect</a></strong>, a Clojure library for inpecting messages flowing through your system. One of the questions I had raised in the <strong><a href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/">article</a></strong> was how expensive it would be to use this in a live system. In the meantime, I have worked on a new version, <strong>v0.1.3</strong>. Besides some refactoring, this new version now also tracks how many messages of each type it sees per 10 second window. With these changes, I can see that it is very cheap to leave inspect turned on.</p>
+
+<p>For example when generating <strong>22,000</strong> messages per second in the example application, it consumes less than 7% CPU according to VisualVM while doing so. The example application seems to max out at around <strong>180K</strong> messages per second in the current configuration, all while utilizing the CPU a little over <strong>50%</strong> on my 2012 Retina MacBook.</p>
+
+<p>ASK THE JVM FOR THE CPU UTILIZATION; EMIT AS MESSAGE</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/11/14/Inspect-v0.1.3/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -472,49 +519,6 @@
 
     </article>
   
-  
-    <article>
-      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/09/16/weekly-update/">Weekly Update: Clojure, Clojure, Clojure and a nasty cold</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-09-16T19:06:00+02:00" pubdate data-updated="true">09/16/2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/09/16/weekly-update/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -541,6 +545,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/11/14/Inspect-v0.1.3/">Inspect v0.1.3: 180K msg/s</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/11/14/Inspect/">Inspect - println no more</a>
       </li>
     
@@ -554,10 +562,6 @@
     
       <li class="post">
         <a href="/blog/2014/10/23/weekly-update/">Weekly Update: Talk Transcripts, Clojure Architecture, OS X Yosemite</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/10/15/talk-transcripts/">Talk Transcripts: Rich Hickey, David Nolen & more</a>
       </li>
     
   </ul>

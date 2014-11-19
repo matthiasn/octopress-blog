@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-11-16T15:08:07+01:00</updated>
+  <updated>2014-11-19T20:31:40+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,43 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Inspect v0.1.3: 180K msg/s]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect-v0.1.3/"/>
+    <updated>2014-11-14T17:30:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/11/14/Inspect-v0.1.3</id>
+    <content type="html"><![CDATA[<p>Last week I published the first version of <strong><a href="https://github.com/matthiasn/inspect">inspect</a></strong>, a Clojure library for inpecting messages flowing through your system. One of the questions I had raised in the <strong><a href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/">article</a></strong> was how expensive it would be to use this in a live system. In the meantime, I have worked on a new version, <strong>v0.1.3</strong>. Besides some refactoring, this new version now also tracks how many messages of each type it sees per 10 second window. With these changes, I can see that it is very cheap to leave inspect turned on.</p>
+
+<p>For example when generating <strong>22,000</strong> messages per second in the example application, it consumes less than 7% CPU according to VisualVM while doing so. The example application seems to max out at around <strong>180K</strong> messages per second in the current configuration, all while utilizing the CPU a little over <strong>50%</strong> on my 2012 Retina MacBook.</p>
+
+<p>ASK THE JVM FOR THE CPU UTILIZATION; EMIT AS MESSAGE</p>
+
+<!-- more -->
+
+
+<p>Here&#8217;s the new version, once again you can click on it to see it running live:</p>
+
+<p><a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect2.png" /></a></p>
+
+<p>Here&#8217;s a screenshot of VisualVM while running 25 loops for the messages with the 1 millisecond timeouts in parallel:</p>
+
+<p><img src="http://matthiasnehlsen.com/images/inspect-screenhot.png" /></p>
+
+<p>Now these messages are not terribly representative, given their small size, but on the other hand, the size is not really all that much of a problem when the data structures are structurally shared.</p>
+
+<h2>Conclusion</h2>
+
+<p>The actual numbers presented in this article are fairly meaningless, particularly the larger figure. I would hardly ever have half the CPU to spare for occasional debugging in a live system. But then again, I have not worked on a live system so far that had to process 180K msg/s per JVM instance. For the time being, I will just leave <strong>inspect</strong> switched on in production mode in order to always be able to see what&#8217;s going on. I will let you know how that goes.</p>
+
+<p>Most importantly, my tests and the numbers presented here have given me a lot of confidence that <strong>core.async</strong> is an extremely powerful construct. The mentioned example application, with core.async working under the hood in the inspect library, processes the aforementioned 180 thousand messages per second, all while the UI feels completely responsive, without any noticable lag whatsoever.</p>
+
+<p>Okay, this is it for now. I arrived in Washington D.C. yesterday and I&#8217;ll walk over to the <strong><a href="">Conj</a></strong> now. I am super excited, this is my first time at this conference, but I&#8217;ve heard a lot of good things about it in the past. Please say hi when you see me.</p>
+
+<p>Cheers,
+Matthias</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Inspect - println no more]]></title>
@@ -2300,29 +2337,6 @@ Matthias</p>
 Matthias</p>
 
 <p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[New AngularJS Meetup in Hamburg]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/"/>
-    <updated>2014-07-08T09:05:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup</id>
-    <content type="html"><![CDATA[<p>Hamburg is the second largest city in Germany, and as such it really should have an <strong>AngularJS Meetup</strong>. It hasn&#8217;t had one until now, so I founded one.</p>
-
-<!-- more -->
-
-
-<p>I did server side development for the most of the last seven months but I finally had a chance to write an internal web application at work using <strong><a href="https://angularjs.org">AngularJS</a></strong> and I was pleasantly surprised how much I enjoyed the process. AngularJS provides you with quite a useful way of structuring an application with services, controllers, directives, centralized configuration and, most importantly, <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong> for wiring parts of an application together.</p>
-
-<p>While working on the AngularJS application I noticed that I did not really have enough people to talk to when it came to single-page applications and user experience, so I started to look for a nearby <strong><a href="https://angularjs.org">AngularJS</a></strong> meetup.</p>
-
-<p>To my surprise, there was none in Hamburg yet. After all, <strong><a href="http://en.wikipedia.org/wiki/Hamburg">Hamburg</a></strong> is the second largest city in Germany with well over 2 million people if you include the suburbs. I really believe it should have such a meetup so I founded the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/">Hamburg AngularJS Meetup</a></strong>. Please do join if you agree with me that Hamburg still lacks such a Meetup.</p>
-
-<p>A first Meetup is scheduled for <strong>Thursday, July 24th, 2014 at 7pm</strong>. There is no venue for the event yet, so please let me know if you would like to sponsor the meetup by providing a location or know anyone who can provide the space. There is also no agenda as of yet. Please let me know if you have anything AngularJS-related that you would like to talk about or that you are particularly interested in.</p>
-
-<p>Cheers,
-Matthias</p>
 ]]></content>
   </entry>
   
