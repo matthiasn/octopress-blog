@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Last week I published the first version of inspect, a Clojure library for inpecting messages flowing through your system. One of the questions I had &hellip;">
+  <meta name="description" content="Dear Scala, Do you remember how we first met, back in 2012? I thought your functional approach was fresh, and different. For a while I believed we &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -71,7 +71,7 @@
 
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2014/11/14/Inspect-v0.1.3/">Inspect v0.1.3: 180K msg/s</a></h1>
+      <h1 class="entry-title"><a href="/blog/2014/12/04/Farewell-Scala/">A farewell note to a programming language</a></h1>
     
     
       <p class="meta">
@@ -87,24 +87,22 @@
   
 
 
-<time datetime="2014-11-14T17:30:00+01:00" pubdate data-updated="true">11/14/2014</time>
+<time datetime="2014-12-04T14:55:00+00:00" pubdate data-updated="true">12/04/2014</time>
         
       </p>
     
   </header>
 
 
-  <div class="entry-content"><p>Last week I published the first version of <strong><a href="https://github.com/matthiasn/inspect">inspect</a></strong>, a Clojure library for inpecting messages flowing through your system. One of the questions I had raised in the <strong><a href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/">article</a></strong> was how expensive it would be to use this in a live system. In the meantime, I have worked on a new version, <strong>v0.1.3</strong>. Besides some refactoring, this new version now also tracks how many messages of each type it sees per 10 second window. With these changes, I can see that it is very cheap to leave inspect turned on.</p>
+  <div class="entry-content"><p>Dear Scala,</p>
 
-<p>For example when generating <strong>22,000</strong> messages per second in the example application, it consumes less than 7% CPU according to VisualVM while doing so. The example application seems to max out at around <strong>180K</strong> messages per second in the current configuration, all while utilizing the CPU a little over <strong>50%</strong> on my 2012 Retina MacBook.</p>
-
-<p>ASK THE JVM FOR THE CPU UTILIZATION; EMIT AS MESSAGE</p>
+<p>Do you remember how we first met, back in 2012? I thought your functional approach was fresh, and different. For a while I believed we were made for each other. A first project was a success; on my own I was comfortable with the good parts of you. But as soon as I started working in teams writing Scala, your immense syntax started drowning me. At first, I took it as a compliment that you tried to please me by offering me to work the way I liked. But then I noticed that it wasn’t something you did for me in particular. Instead, you try to be everybody’s darling by offering every software development paradigm known to man.</p>
 
 </div>
   
   
     <footer>
-      <a rel="full-article" href="/blog/2014/11/14/Inspect-v0.1.3/">Read on &rarr;</a>
+      <a rel="full-article" href="/blog/2014/12/04/Farewell-Scala/">Read on &rarr;</a>
     </footer>
   
 
@@ -134,7 +132,7 @@
   
 
 
-<time datetime="2014-11-14T17:30:00+01:00" pubdate data-updated="true">11/14/2014</time>
+<time datetime="2014-11-14T17:30:00+00:00" pubdate data-updated="true">11/14/2014</time>
         
       </p>
     
@@ -177,7 +175,7 @@
   
 
 
-<time datetime="2014-11-07T14:32:00+01:00" pubdate data-updated="true">11/07/2014</time>
+<time datetime="2014-11-07T14:32:00+00:00" pubdate data-updated="true">11/07/2014</time>
         
       </p>
     
@@ -220,7 +218,7 @@
   
 
 
-<time datetime="2014-10-30T19:06:00+01:00" pubdate data-updated="true">10/30/2014</time>
+<time datetime="2014-10-30T19:06:00+00:00" pubdate data-updated="true">10/30/2014</time>
         
       </p>
     
@@ -263,7 +261,7 @@
   
 
 
-<time datetime="2014-10-23T19:06:00+02:00" pubdate data-updated="true">10/23/2014</time>
+<time datetime="2014-10-23T19:06:00+01:00" pubdate data-updated="true">10/23/2014</time>
         
       </p>
     
@@ -306,7 +304,7 @@
   
 
 
-<time datetime="2014-10-15T19:06:00+02:00" pubdate data-updated="true">10/15/2014</time>
+<time datetime="2014-10-15T19:06:00+01:00" pubdate data-updated="true">10/15/2014</time>
         
       </p>
     
@@ -349,7 +347,7 @@
   
 
 
-<time datetime="2014-10-06T19:06:00+02:00" pubdate data-updated="true">10/06/2014</time>
+<time datetime="2014-10-06T19:06:00+01:00" pubdate data-updated="true">10/06/2014</time>
         
       </p>
     
@@ -413,7 +411,7 @@
   
 
 
-<time datetime="2014-10-04T19:06:00+02:00" pubdate data-updated="true">10/04/2014</time>
+<time datetime="2014-10-04T19:06:00+01:00" pubdate data-updated="true">10/04/2014</time>
         
       </p>
     
@@ -456,7 +454,7 @@
   
 
 
-<time datetime="2014-09-24T19:06:00+02:00" pubdate data-updated="true">09/24/2014</time>
+<time datetime="2014-09-24T19:06:00+01:00" pubdate data-updated="true">09/24/2014</time>
         
       </p>
     
@@ -499,7 +497,7 @@
   
 
 
-<time datetime="2014-09-23T19:06:00+02:00" pubdate data-updated="true">09/23/2014</time>
+<time datetime="2014-09-23T19:06:00+01:00" pubdate data-updated="true">09/23/2014</time>
         
       </p>
     
@@ -545,7 +543,7 @@
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2014/11/14/Inspect-v0.1.3/">Inspect v0.1.3: 180K msg/s</a>
+        <a href="/blog/2014/12/04/Farewell-Scala/">A farewell note to a programming language</a>
       </li>
     
       <li class="post">

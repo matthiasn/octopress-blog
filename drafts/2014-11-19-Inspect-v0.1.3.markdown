@@ -1,0 +1,36 @@
+---
+layout: post
+title: "Inspect v0.1.3: 180K msg/s"
+date: 2014-11-14 17:30
+comments: true
+categories: 
+---
+Last week I published the first version of **[inspect](https://github.com/matthiasn/inspect)**, a Clojure library for inpecting messages flowing through your system. One of the questions I had raised in the **[article](http://matthiasnehlsen.com/blog/2014/11/14/Inspect/)** was how expensive it would be to use this in a live system. In the meantime, I have worked on a new version, **v0.1.3**. Besides some refactoring, this new version now also tracks how many messages of each type it sees per 10 second window. With these changes, I can see that it is very cheap to leave inspect turned on even when there is a substantial amount of messages flowing through the system.
+
+<!-- more -->
+
+For example when generating **22,000** messages per second in the example application, the entire application (load generation plus processing in inspect) consumes less than 7% CPU according to VisualVM while doing so. The example application seems to max out at around **180K** messages per second in the current configuration, all while utilizing the CPU a little over **50%** on my Retina MacBook.
+
+Now the test messages are not very representative, given their small size, but on the other hand, larger messages aren't all that much of a problem when the data structures are structurally shared.
+
+
+ASK THE JVM FOR THE CPU UTILIZATION; EMIT AS MESSAGE
+
+
+Here's the new version, once again you can click on it to see it running live:
+
+<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="/images/inspect2.png" /></a>
+
+
+
+
+
+## Conclusion
+The actual numbers presented in this article are fairly meaningless, particularly the larger figure. I would hardly ever have half the CPU to spare for occasional debugging in a live system. But then again, I have not worked on a live system so far that had to process 180K msg/s per JVM instance. If your system generates substantially less than those 180,000 events per second and your CPU is not fully utilized yet, you may get away with leaving **inspect** switched on. For the time being, I will do just that and leave **inspect** on in production mode in order to always be able to see what's going on and peek into the live system. Your mileage may vary.
+
+Most importantly, my tests and the numbers presented here have given me a lot of confidence that **core.async** is an extremely powerful construct. The mentioned example application, with core.async working under the hood in the inspect library, processes the aforementioned 180 thousand messages per second, all while the UI feels completely responsive, without any noticable lag whatsoever when compared with a small fraction of the load.
+
+Okay, this is it for now. I arrived in Washington D.C. yesterday and I'll walk over to the **[Conj]()** now. I am super excited, this is my first time at this conference, but I've heard a lot of good things about it in the past. Please say hello when you see me. And please don't hesitate to start a conversation even when you won't make it to the Conj. I like to meet people with similar interests from all over the planet. My email address is on my GitHub profile. 
+
+Cheers,
+Matthias
