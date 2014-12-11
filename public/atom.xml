@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-12-11T17:08:48+01:00</updated>
+  <updated>2014-12-11T17:24:24+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -27,7 +27,7 @@
 
 <p>I do not have major new results to report on the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> front this week, as I was mostly busy with other stuff (such as taxes and actual work). But I did change the design and kicked out <strong><a href="http://getbootstrap.com">Bootstrap</a></strong> in favor of <strong><a href="http://purecss.io">Pure CSS</a></strong>, which not only looks good by default but is also tiny in comparison to Bootstrap. That’s not deployed anywhere just yet except for my development machine, but you can either run it yourself or wait a couple of days until I deploy it together with some of the current work in progress. Here’s a peek of how the new design looks like:</p>
 
-<p><img class="left" src="http://matthiasnehlsen.com/images/birdwatch-pure1.png" title="New Design with Pure CSS" alt="New Design with Pure CSS"></p>
+<p><img class="left" src="http://matthiasnehlsen.com/images/birdwatch-pure.png" title="New Design with Pure CSS" alt="New Design with Pure CSS"></p>
 
 <p>Much better, I find. I had really developed distaste for the old Bootstrap look over the course of the year. Next I want to replace <strong><a href="http://d3js.org/">D3</a></strong>, at least for the bar chart generation. I’d much rather manipulate the <strong><a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></strong> in <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and build the charts myself. Is this going to save me time? Probably not, but this is a toy project, so what does saving time in that context even mean? I am interested in manipulating graphical elements directly from ClojureScript and that’s what matters. I have made good progress so far, but nothing that I’d want to present just yet, maybe next week.</p>
 
@@ -115,7 +115,7 @@ Matthias</p>
 
 <p>Here&#8217;s my idea of how to do it <strong>better</strong>: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into <strong>any existing Clojure application</strong> and takes care of the presentation? This subsystem as a <strong>default doesn&#8217;t do anything</strong> with the logged data, which makes it very cheap to process even higher loads<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. The subsystem then exposes a <strong>web application</strong> that allows clients to see the <strong>next n</strong> of a certain event type (or combinations thereof). Here&#8217;s how that looks like, I have already implemented it:</p>
 
-<p><a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect1.png" /></a></p>
+<p><a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/inspect.png" /></a></p>
 
 <p>When you connect a new client, as a default you currently get the <strong>next 10</strong> of every message type known to the system. On the left, there is a table that shows how many items per each type are left. On the right of the table, there are buttons that toggle if the respective data type is to be shown or not. The <strong>next</strong> button will increment the number for each selected type by whatever is in the field.</p>
 

@@ -104,7 +104,7 @@
 
 <p>Here&#8217;s my idea of how to do it <strong>better</strong>: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into <strong>any existing Clojure application</strong> and takes care of the presentation? This subsystem as a <strong>default doesn&#8217;t do anything</strong> with the logged data, which makes it very cheap to process even higher loads<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. The subsystem then exposes a <strong>web application</strong> that allows clients to see the <strong>next n</strong> of a certain event type (or combinations thereof). Here&#8217;s how that looks like, I have already implemented it:</p>
 
-<p><a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="/images/inspect1.png" /></a></p>
+<p><a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="/images/inspect.png" /></a></p>
 
 <p>When you connect a new client, as a default you currently get the <strong>next 10</strong> of every message type known to the system. On the left, there is a table that shows how many items per each type are left. On the right of the table, there are buttons that toggle if the respective data type is to be shown or not. The <strong>next</strong> button will increment the number for each selected type by whatever is in the field.</p>
 

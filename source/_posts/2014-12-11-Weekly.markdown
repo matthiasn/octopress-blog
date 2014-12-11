@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Weekly Update: Clojure eXchange, next steps in BirdWatch, Clojure and me"
-date: 2014-12-11 16:10
+date: 2014-12-11 16:30
 comments: true
 categories: 
 ---
@@ -13,7 +13,7 @@ I am glad that relationship is over with. Let me just make clear that I don’t 
 
 I do not have major new results to report on the **[BirdWatch](https://github.com/matthiasn/BirdWatch)** front this week, as I was mostly busy with other stuff (such as taxes and actual work). But I did change the design and kicked out **[Bootstrap](http://getbootstrap.com)** in favor of **[Pure CSS](http://purecss.io)**, which not only looks good by default but is also tiny in comparison to Bootstrap. That’s not deployed anywhere just yet except for my development machine, but you can either run it yourself or wait a couple of days until I deploy it together with some of the current work in progress. Here’s a peek of how the new design looks like:
 
-{% img left /images/birdwatch-pure1.png 'New Design with Pure CSS' 'New Design with Pure CSS'%}
+{% img left /images/birdwatch-pure.png 'New Design with Pure CSS' 'New Design with Pure CSS' %}
 
 Much better, I find. I had really developed distaste for the old Bootstrap look over the course of the year. Next I want to replace **[D3](http://d3js.org/)**, at least for the bar chart generation. I’d much rather manipulate the **[SVG](http://en.wikipedia.org/wiki/Scalable_Vector_Graphics)** in **[ClojureScript](https://github.com/clojure/clojurescript)** and build the charts myself. Is this going to save me time? Probably not, but this is a toy project, so what does saving time in that context even mean? I am interested in manipulating graphical elements directly from ClojureScript and that’s what matters. I have made good progress so far, but nothing that I’d want to present just yet, maybe next week.
 
