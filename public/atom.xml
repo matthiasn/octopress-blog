@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-12-04T14:55:11+00:00</updated>
+  <updated>2014-12-11T16:47:46+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,9 +14,46 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Weekly Update: Clojure eXchange, next steps in BirdWatch, Clojure and me]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/12/11/Weekly/"/>
+    <updated>2014-12-11T16:00:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/12/11/Weekly</id>
+    <content type="html"><![CDATA[<p>Last week was great. I had just come back from my trip to the United States the week before, where I attended the <strong><a href="http://clojure-conj.org">Conj</a></strong> and got to hang out with dear friends in both Washington DC and New York City. I used to live in DC in 2009 and 2010, and it was really good to be back. Last Friday, I had a talk about my BirdWatch application and my journey to Clojure at <strong><a href="https://skillsmatter.com/conferences/1956-clojure-exchange-2014">Clojure eXchange</a></strong> in London. I think there should be a recording somewhere, but I haven’t checked it out just yet. The day before that, I had parted from <strong><a href="http://www.scala-lang.org">Scala</a></strong> with a <strong><a href="http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/">farewell letter</a></strong> here on this blog. It took me by surprise how much attention this little letter received <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, considering that it was really only between Scala and me.</p>
+
+<!-- more -->
+
+
+<p>I am glad that relationship is over with. Let me just make clear that I don’t hate Scala. I built some interesting stuff with it in the past. But it is just not as much fun as <strong><a href="http://clojure.org">Clojure</a></strong> is and that’s extremely important for me. I came to be a programmer after 10 years of project and operations management in healthcare IT <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>, all while running my own company and managing employees. I did that until it was no challenge any longer. Then I thought, hey, building software myself should be plenty of fun and shouldn’t be all that difficult if done right. But none of the technologies I worked with so far (C#, Java, JavaScript, Scala) had sparked the excitement that I was looking for. Well, that has definitely changed with Clojure.</p>
+
+<p>I do not have major new results to report on the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> front this week, as I was mostly busy with other stuff (such as taxes and actual work). But I did change the design and kicked out <strong><a href="http://getbootstrap.com">Bootstrap</a></strong> in favor of <strong><a href="http://purecss.io">Pure CSS</a></strong>, which not only looks good by default but is also tiny in comparison to Bootstrap. That’s not deployed anywhere just yet except for my development machine, but you can either run it yourself or wait a couple of days until I deploy it together with some of the current work in progress. Here’s a peek of how the new design looks like:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/birdwatch-pure1.png" title="New Design with Pure CSS" alt="New Design with Pure CSS"></p>
+
+<p>Much better, I find. I had really developed distaste for the old Bootstrap look over the course of the year. Next I want to replace D3, at least for the bar chart generation. I’d much rather manipulate the SVG in ClojureScript and build the charts myself. Is this going to save me time? Probably not, but this is a toy project so what does saving time in that context even mean? I am interested in manipulating graphical elements directly from ClojureScript and that’s what matters. I have made good progress so far, but nothing that I’d want to present just yet, maybe next week.</p>
+
+<p>Also I was able to put some more thought into server-side aggregation. But again, nothing for this week, please check back soon.</p>
+
+<p>Oh, before I forget, I will present at the <strong><a href="http://www.meetup.com/ClojureUserGroupHH/events/218689956/">Clojure Meetup in Hamburg</a></strong> next week on Thursday. Please come out and say hi if you&#8217;re anywhere near.</p>
+
+<p>Cheers,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Thanks to Hacker News, there were like an extra <strong>30K</strong> pageviews on my blog during the first 36 hours after publishing the farewell note. I should publicly part more often, I guess.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Okay, I did write some software myself at that time, but my involvement with software development was was mostly overseeing development done by others.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[A farewell note to a programming language]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/"/>
-    <updated>2014-12-04T14:55:00+00:00</updated>
+    <updated>2014-12-04T14:55:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala</id>
     <content type="html"><![CDATA[<p>Dear Scala,</p>
 
@@ -63,7 +100,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Inspect - println no more]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/"/>
-    <updated>2014-11-14T17:30:00+00:00</updated>
+    <updated>2014-11-14T17:30:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/14/Inspect</id>
     <content type="html"><![CDATA[<p><strong>TL;DR</strong>: I realized how much I <strong>disliked</strong> the process of <strong>logging data structures</strong> to the console and then trying to find them and repeatedly commenting out and uncommenting <strong>println</strong> statements. So I decided to <strong>fix that</strong>.</p>
 
@@ -183,7 +220,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Inter-process communication with Redis]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4/"/>
-    <updated>2014-11-07T14:32:00+00:00</updated>
+    <updated>2014-11-07T14:32:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4</id>
     <content type="html"><![CDATA[<p><strong><a href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/">Last week</a></strong>, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single client for the connection to the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> and the persistence of the received Tweets in <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong>, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked <strong><a href="http://redis.io/topics/pubsub">Redis Pub/Sub</a></strong> because its model of communication appears to suit the requirements really well. As cute as the drawing may be, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put <strong><a href="http://redis.io">Redis</a></strong> in between for communication. It worked really well and here&#8217;s how.</p>
 
@@ -357,7 +394,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 3 - Redesign]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/"/>
-    <updated>2014-10-30T19:06:00+00:00</updated>
+    <updated>2014-10-30T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3</id>
     <content type="html"><![CDATA[<p>I recently did a lot of transcript proofreading concerning enlightening talk for my <strong><a href="https://github.com/matthiasn/talk-transcripts">talk-transcripts project</a></strong>. The most recent one was <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/DesignCompositionPerformance.md">Design, Composition and Performance</a></strong>, the tenth transcript of a talk by <strong><a href="https://twitter.com/richhickey">Rich Hickey</a></strong>. That one in particular got me thinking that there are quite a few ideas I want to adopt in <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>, the application about which I started writing this series of articles. That calls for some <strong>redesign</strong>, so it’s probably time to make up my mind what exactly it is that I am trying to solve with this application.</p>
 
@@ -427,7 +464,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Talk Transcripts, Clojure Architecture, OS X Yosemite]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/23/weekly-update/"/>
-    <updated>2014-10-23T19:06:00+01:00</updated>
+    <updated>2014-10-23T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/23/weekly-update</id>
     <content type="html"><![CDATA[<p>As I have no other article to publish this week, I thought a weekly update would be in order. Last week I wrote about <strong><a href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/">making relevant and interesting talks more accessible</a></strong>. In the course of that project, I had <strong>eleven</strong> talks transcribed so far, four more than when I announced the project last week. Not only have I received great feedback about how appreciated this is, I have also learned a lot myself while proofreading the transcripts.</p>
 
@@ -486,7 +523,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Talk Transcripts: Rich Hickey, David Nolen & more]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/"/>
-    <updated>2014-10-15T19:06:00+01:00</updated>
+    <updated>2014-10-15T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I wanted to study the content of some talks in written form but there were no transcripts available. However, I believe that the valuable and relevant content of these talks should be accessible to everyone, including those for whom &#8216;sit back and listen&#8217; might not be the most viable option. To make that a reality, I had transcripts made. So far, I have compiled five talks by <strong>Rich Hickey</strong>, one talk by <strong>David Nolen</strong> and another talk by <strong>Guy Steele</strong>. The transcripts are <strong><a href="https://github.com/matthiasn/talk-transcripts">available on GitHub</a></strong>.</p>
 
@@ -515,7 +552,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 2 - Transducers]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/"/>
-    <updated>2014-10-06T19:06:00+01:00</updated>
+    <updated>2014-10-06T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> This article covers the usage of <strong>Transducers</strong> in Clojure, spiced up with some <strong>core.async</strong>. Here&#8217;s an animation that shows the information flow of the <strong>composed transducer</strong> that we are going to build in this article:</p>
 
@@ -893,7 +930,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Staging server for this blog]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/"/>
-    <updated>2014-10-04T19:06:00+01:00</updated>
+    <updated>2014-10-04T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update</id>
     <content type="html"><![CDATA[<p>This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles.</p>
 
@@ -924,7 +961,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 1 - Overview]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
-    <updated>2014-09-24T19:06:00+01:00</updated>
+    <updated>2014-09-24T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
     <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is <strong>easy to understand and maintain</strong>. Here is what I found.</p>
 
@@ -1097,7 +1134,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/"/>
-    <updated>2014-09-23T19:06:00+01:00</updated>
+    <updated>2014-09-23T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/23/weekly-update</id>
     <content type="html"><![CDATA[<p>This weekly update is mostly about my new article series, about using animations to explain complex topics and about how I just extended the useful lifespan of my <strong>2012 Retina MacBook</strong>.</p>
 
@@ -1161,7 +1198,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure, Clojure, Clojure and a nasty cold]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/16/weekly-update/"/>
-    <updated>2014-09-16T19:06:00+01:00</updated>
+    <updated>2014-09-16T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/16/weekly-update</id>
     <content type="html"><![CDATA[<p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
 
@@ -1205,7 +1242,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: PageSpeed Insights, optimizing Octopress & more Clojure]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/08/weekly-update/"/>
-    <updated>2014-09-08T19:06:00+01:00</updated>
+    <updated>2014-09-08T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/08/weekly-update</id>
     <content type="html"><![CDATA[<p>In this weekly update, I will discuss how I turned the load times for this <strong><a href="http://octopress.org/">Octopress</a></strong>-powered blog <strong>from terrible to pretty decent</strong>. In <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> numbers: before the optimization <strong style="color:#DD0000;">58/100</strong> for mobile and <strong style="color:#EE8800;">77/100</strong> for desktop; after the optimization <strong style="color:#00AA66;">94/100</strong> for mobile and <strong style="color:#00AA66;">96/100</strong> for desktop. More concretely: on a lousy mobile connection, the load time improved from <strong>32 seconds</strong> to a mere <strong>5 seconds</strong>. Now we&#8217;re talking. You would presumably <strong>not have waited</strong> for 32 seconds, and neither would I. Also, I have a status update on the <strong><a href="http://clojure.org/">Clojure</a></strong> version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong>.</p>
 
@@ -1403,7 +1440,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Pomodoro, all-Clojure BirdWatch, Income]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/"/>
-    <updated>2014-09-03T19:06:00+01:00</updated>
+    <updated>2014-09-03T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/03/weekly-update</id>
     <content type="html"><![CDATA[<p>In this weekly update, I will be talking about <strong>why I started this blog</strong> in the first place, <strong>Pomodoro time management</strong>, and the new <strong>Clojure</strong> and <strong>ClojureScript</strong> version of my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application. Again there is a live version, this time subscribing to all tweets containing the term <strong>Ferguson</strong>. Also, the results are out for the first month of <strong>blog monetization</strong> through <strong>affiliate links</strong>.</p>
 
@@ -1462,7 +1499,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/"/>
-    <updated>2014-08-25T19:06:00+01:00</updated>
+    <updated>2014-08-25T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/25/weekly-update</id>
     <content type="html"><![CDATA[<p>In this weekly update, I will be talking about <strong>Clojure and ClojureScript</strong>, an upcoming article on <strong>AngularJS, Grunt, Karma and Protractor</strong> and how I use <strong>Upstart</strong> to run my <strong>Play</strong> applications as services on <strong>Ubuntu</strong>.</p>
 
@@ -1564,7 +1601,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/"/>
-    <updated>2014-08-17T22:06:00+01:00</updated>
+    <updated>2014-08-17T22:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/17/weekly-update</id>
     <content type="html"><![CDATA[<p>In this weekly update, I will show you how <strong>git</strong> helped me alleviate the disastrous consequences of a <strong>brain fart</strong>. I will also share my experiences with <strong>Octopress</strong>. You will learn what helps me <strong>feel better</strong>, day in and day out. Then, I&#8217;ll talk about some changes regarding the <strong>mailing list</strong> for this blog. And last, there&#8217;ll be <strong>reviews</strong> on my <strong>audio setup</strong> for a combined work / chill area and on the <strong>Sony A7</strong> full frame camera.</p>
 
@@ -1637,7 +1674,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: AngularJS book, Geo-Lookup, Reading]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/"/>
-    <updated>2014-08-10T22:06:00+01:00</updated>
+    <updated>2014-08-10T22:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update</id>
     <content type="html"><![CDATA[<p>I have mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated its first contribution to running this blog. I have also read some more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
 
@@ -1660,7 +1697,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a geo-aware link shortener with Play Framework]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/"/>
-    <updated>2014-08-04T15:16:00+01:00</updated>
+    <updated>2014-08-04T15:16:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework</id>
     <content type="html"><![CDATA[<p><strong><a href="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/">Last week</a></strong> I wrote about blog monetization through the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>. I needed a way to serve country-specific URLs depending on the location of the page visitor, so I wrote a geo-aware link shortener using <strong><a href="http://www.playframework.com">Play Framework</a></strong>. This week I would like to introduce that application. The source code is available on <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">GitHub</a></strong>. You may find that tool useful for your own purposes, or you may just want to read this as a tutorial on how to call backend services with Play Framework and the asynchronous <strong><a href="http://www.playframework.com/documentation/2.3.2/ScalaWS">WS client</a></strong>.</p>
 
@@ -1879,7 +1916,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Buying time, AngularJS Meetup, Mountains]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/"/>
-    <updated>2014-08-01T15:51:00+01:00</updated>
+    <updated>2014-08-01T15:51:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/08/01/weekly-update</id>
     <content type="html"><![CDATA[<p>Here&#8217;s something new to try: a weekly update, covering pretty much of what I keep myself busy with. That may be about what I am reading, learning or currently working on, mostly software-related. In this installment I will discuss monetization, the Hamburg AngularJS meetup and photographing in the mountains while hiking.</p>
 
@@ -1952,7 +1989,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[BirdWatch with ClojureScript and Om explained]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/"/>
-    <updated>2014-07-24T08:30:00+01:00</updated>
+    <updated>2014-07-24T08:30:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om</id>
     <content type="html"><![CDATA[<p><strong>ABANDONED</strong> because of writing an all-Clojure version instead, not just ClojureScript on the client side. Last update on August 18th, 2014. There is a <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">new series of articles</a></strong> about the all-Clojure version starting in 09/2014. You might still find useful information in this article though.</p>
 
@@ -2299,54 +2336,6 @@ Matthias</p>
 </ol>
 </div>
 
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[BirdWatch client using ClojureScript and Om]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/"/>
-    <updated>2014-07-17T08:30:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript</id>
-    <content type="html"><![CDATA[<p>Back in January I wanted to try out <strong><a href="https://github.com/swannodette/om">Om</a></strong>. Now, I finally got around to doing so.</p>
-
-<!-- more -->
-
-
-
-
-<blockquote class="twitter-tweet" lang="en"><p><a href="https://twitter.com/swannodette">@swannodette</a> Om looks really powerful, I think I&#39;m going to give it a try in one of the next articles.</p>&mdash; Matthias Nehlsen (@matthiasnehlsen) <a href="https://twitter.com/matthiasnehlsen/statuses/427945296971042816">January 27, 2014</a></blockquote>
-
-
-<script async src="http://matthiasnehlsen.com//platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-
-<p>For those of you who do not know, <strong><a href="https://github.com/swannodette/om">Om</a></strong> is a <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> wrapper around Facebook&#8217;s <strong><a href="http://facebook.github.io/react/">ReactJS</a></strong> library. I have covered <strong>ReactJS</strong> on this blog a few times, for example in the post mentioned in the twitter conversation above. <strong>ClojureScript</strong> is very similar to <strong><a href="http://clojure.org">Clojure</a></strong>, except that it targets the browser and not the <strong><a href="http://en.wikipedia.org/wiki/Java_virtual_machine">JVM</a></strong>. Like <strong><a href="http://www.scala-js.org">Scala.js</a></strong>, ClojureScript is compiled into <strong>JavaScript</strong>.</p>
-
-<p>Finally I got around to giving <strong>Om</strong> a spin and wrote my first application in <strong>ClojureScript</strong>. You can try it out <a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><strong>here</strong></a>. Before, I had only read a little bit about Clojure and ClojureScript and I had also gone through <strong><a href="http://clojurekoans.com">clojurekoans</a></strong>. Then, just for the fun of it (and to see for myself if I could make it work), I wanted to write a new client for my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application, this time in ClojureScript. BirdWatch is kind of a live search engine to search for tweets in an area of interest, with a <strong><a href="http://en.wikipedia.org/wiki/Single-page_application">Single Page Application</a></strong> retrieving search results from a server component, including updates to that search over a streaming connection using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong>. In the browser, some basic stats are shown about specific tweets (like recent RTs) and the usage of words (wordcloud and trending barchart) plus a time series chart displaying the time distribution of recent tweets matching a query. The server side is written in <strong><a href="http://www.scala-lang.org">Scala</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong>, however that does not need to concern us for this article as the wire format is plain <strong><a href="http://tools.ietf.org/html/rfc4627">JSON</a></strong>.</p>
-
-<p>The UI of the new client is done in <strong><a href="https://github.com/swannodette/om">Om</a></strong> and the internal communication between application parts is realized with <strong><a href="https://github.com/clojure/core.async">Core.async</a></strong>. All the data mangling is done in ClojureScript instead of using <strong><a href="http://square.github.io/crossfilter/">crossfilter.js</a></strong> as was the case with the ReactJS and the AngularJS versions. For more information about the server side and a JavaScript version of the client side application, I recommend <a href="http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/">this article</a>. The description of the server side is still accurate; nothing changed while I was writing this ClojureScript version. On the client side there are version available using AngularJS, ReactJS and now ClojureScript and Om.</p>
-
-<p>This is how the UI of the application looks like now. I have also improved the application while writing this recent addition by</p>
-
-<ul>
-<li>offering additional sort orders (by favorite and by retweet within analyzed tweets)</li>
-<li>enabling retweets, replies and favorites directly from within the application using web intents</li>
-<li>showing photos embedded in tweets</li>
-</ul>
-
-
-<p>So far, some of these changes have made it back into the ReactJS version, with the AngularJS version planned to follow.</p>
-
-<p><a href="http://birdwatch.matthiasnehlsen.com/cljs/#" target="_blank"><img src="http://matthiasnehlsen.com/images/cljs-screenshot.png" /></a></p>
-
-<p>Click the image above to give this new client, which was written in <strong>ClojureScript</strong> a try. Writing it worked surprisingly well and I have learned a lot in the process.</p>
-
-<p>EDIT July 24th, 2014: The <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">next article</a></strong> outlines in detail how this application is implemented.</p>
-
-<p>Cheers,
-Matthias</p>
-
-<p>Check out my <strong><a href="http://matthiasnehlsen.com/reviews">reviews page</a></strong> where I share my thoughts on books and gadgets.</p>
 ]]></content>
   </entry>
   
