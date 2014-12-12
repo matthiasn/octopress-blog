@@ -17,7 +17,7 @@ So what do we usually do? I constantly found myself commenting out and uncomment
 
 Here's my idea of how to do it **better**: what if we can leave all those log statements in there and send them to a subsystem that can easily be integrated into **any existing Clojure application** and takes care of the presentation? This subsystem as a **default doesn't do anything** with the logged data, which makes it very cheap to process even higher loads[^1]. The subsystem then exposes a **web application** that allows clients to see the **next n** of a certain event type (or combinations thereof). Here's how that looks like, I have already implemented it:
 
-<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="/images/inspect.png" /></a>
+<a href="http://inspect.matthiasnehlsen.com" target="_blank"><img src="/images/inspect.jpg" /></a>
 
 When you connect a new client, as a default you currently get the **next 10** of every message type known to the system. On the left, there is a table that shows how many items per each type are left. On the right of the table, there are buttons that toggle if the respective data type is to be shown or not. The **next** button will increment the number for each selected type by whatever is in the field.
 
