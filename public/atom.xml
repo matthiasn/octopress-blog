@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-12-19T16:19:00+01:00</updated>
+  <updated>2014-12-19T21:21:13+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -23,7 +23,7 @@
 <!-- more -->
 
 
-<p>The book format will me allow to write a consistent narrative around the flow of data through a system, where we will follow the journey of data from a streaming source to a user interface that updates changes according to new data from the streaming source immediately, or rather within a few hundred microseconds.</p>
+<p>The book format will allow me to write a consistent narrative around the flow of data through a system, where we will follow the journey of data from a streaming source to a user interface that updates changes according to new data from the streaming source immediately, or rather within a few hundred microseconds.</p>
 
 <p>As a sample application, we will use tweets streaming live from the Twitter Streaming API. In case you haven&#8217;t seen it yet, this is how the application looks like:</p>
 

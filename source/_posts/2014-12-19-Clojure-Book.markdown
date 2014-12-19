@@ -9,7 +9,7 @@ I thought about where to take my series about **[Building a System in Clojure](h
 
 <!-- more -->
 
-The book format will me allow to write a consistent narrative around the flow of data through a system, where we will follow the journey of data from a streaming source to a user interface that updates changes according to new data from the streaming source immediately, or rather within a few hundred microseconds.
+The book format will allow me to write a consistent narrative around the flow of data through a system, where we will follow the journey of data from a streaming source to a user interface that updates changes according to new data from the streaming source immediately, or rather within a few hundred microseconds.
 
 As a sample application, we will use tweets streaming live from the Twitter Streaming API. In case you haven't seen it yet, this is how the application looks like:
 
