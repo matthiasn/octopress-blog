@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-12-19T21:21:13+01:00</updated>
+  <updated>2014-12-23T16:16:44+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,40 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Happy Holidays and Thanks for Reading]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays/"/>
+    <updated>2014-12-23T15:15:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays</id>
+    <content type="html"><![CDATA[<p>Last week, I published the very first version of my <strong><a href="https://leanpub.com/building-a-system-in-clojure">&#8220;Building a System in Clojure&#8221;</a></strong> book. I’m thrilled by the amount of interest it has already generated and I’ll do my best to live up to your expectations.</p>
+
+<!-- more -->
+
+
+<p>Today, after a few hundred readers signed up for free, I have removed the free option. There are more than enough readers now to give valuable feedback on the early versions of the book.
+Yesterday and today I have published new versions, with the latest one being roughly 25 pages longer than the initial version. The content is growing fast and a good part of the reason why is that I <strong>really like the authoring process</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.</p>
+
+<p>I will publish another version <strong>tomorrow</strong> that aims at covering the entire server-side code in writing and will probably also contain some additional drawings to make things clearer.</p>
+
+<p>So, you will have something to read over the holidays<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. Please let me know if any passage needs clarification.</p>
+
+<p><strong>Thank you</strong> for reading this blog and a <strong>special</strong> thank you if you read my book. I had a plenty of fun this year and I learned a lot. I will take the next week off, so I’ll see you back here in 2015.</p>
+
+<p>Happy Holidays,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I am using <strong><a href="https://leanpub.com">leanpub.com</a></strong> to publish the book and I love the authoring workflow, it has been nothing but pleasure so far. Writing in Markdown is so much better than constantly having to wrangle with Word files. I will probably write more about that later, but already a <strong>big shout-out to guys at Leanpub</strong> for offering a great service.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>But only after you spend enough time with your loved ones.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[I'm writing a book about Building a System in Clojure]]></title>
@@ -1946,79 +1980,6 @@ Of course, it is not ideal to store the links in code. Instead, that data should
 <p>Please let me know your thoughts on the above. I will be happy to clarify anything that is difficult to grasp right away. And please let me know if you encounter problems making any of this work for yourself.</p>
 
 <p>That&#8217;s it for today - hope to see you back soon. And now that you have made it this far in the article, why don&#8217;t you follow me on Twitter <strong><a href="https://twitter.com/matthiasnehlsen">@matthiasnehlsen</a></strong> so you&#8217;ll know when the next article is out.</p>
-
-<p>Cheers,
-Matthias</p>
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: Buying time, AngularJS Meetup, Mountains]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/"/>
-    <updated>2014-08-01T15:51:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/08/01/weekly-update</id>
-    <content type="html"><![CDATA[<p>Here&#8217;s something new to try: a weekly update, covering pretty much of what I keep myself busy with. That may be about what I am reading, learning or currently working on, mostly software-related. In this installment I will discuss monetization, the Hamburg AngularJS meetup and photographing in the mountains while hiking.</p>
-
-<!-- more -->
-
-
-<h1>Buying time for more blogging</h1>
-
-<p>There&#8217;s been one thought that keeps coming back. I really like writing this blog, but the problem is that I never seem to have enough time to really focus on it. Now I could try to make more time for it in my free time, but obviously that would be at the expense of my remaining private life. Or I could shift the blogging effort into my working life and get paid to do so. That&#8217;s quite an attractive thought. How could one go about it? I buy a lot at <a target="_blank" href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a><img src="http://r.matthiasnehlsen.com/amazon-landing/img" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" /> because I find it really convenient to have my orders delivered the next day and because I have not once had problems sending stuff back that I did not like. Now I usually have an opinion on the stuff I buy, so why not share my thoughts on that? Using the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>, I can link to the product pages and whenever someone clicks on those links and then buys something within the next 24 hours, a small percentage of the price paid goes to me, the affiliate partner. The same goes for banner ads and such. Sounds like a decent way for the blog to start paying for itself, right?</p>
-
-<p>But not so fast. There is one issue with the approach as outlined above. The Amazon Affiliate Program is on a per country basis. When I simply link to the U.S. store and you are in the United Kingdom and get redirected there, I won&#8217;t get a commission, even if I have signed up for the program in the UK. Instead, I would have to send you to the UK store in the first place. But how can I do that? How do I detect which country you come from and send you to the appropriate store, should there be one in your country? I would need to do a very fast GeoIP lookup to determine where your IP address is located and then redirect you to your country store. So I <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">wrote an application</a></strong> using <strong><a href="http://www.playframework.com">Play Framework</a></strong> and a local installation of <strong><a href="http://freegeoip.net">freegeoip</a></strong> which looks up the IP address in a few milliseconds and then redirects to the appropriate store. A detailed, tutorial-style article on that application will follow soon. Maybe others will find this useful as well.</p>
-
-<h1>The first Hamburg AngularJS meetup</h1>
-
-<p>Okay, this was technically last week, but there was no weekly review in place back then. So the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/193495902/">first session of the Hamburg AngularJS meetup</a></strong> that I founded recently (see <strong><a href="http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/">this article</a></strong>) went great, it was fun to meet and solve a problem together. I had found a sponsor for the meetup, <strong><a href="https://www.packtpub.com">Packt Publisher</a></strong>, and they were kind enough to provide some free ebooks that could be given away during the meetup. So I thought, why not do a raffle so that everyone gets a fair chance? Then I thought, why not build an <strong><a href="http://angularjs.org">AngularJS</a></strong> application together and use it to draw the winning tickets in the raffle.</p>
-
-<p>We had a total of four ebooks to give away, two each of these:</p>
-
-<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/mastering-angular/iframe">
-</iframe>
-
-
-
-
-<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/angular-directives/iframe">
-</iframe>
-
-
-<p>I reserved one for the volunteer who was willing to do the coding on the big screen so there were three more to draw with the application we were about to build. Then as a group we discussed the options of how to go about this and that worked really well. We wrote a web application for drawing the three winners and we even wrote tests for the application.</p>
-
-<p>I am looking forward to the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/196972082/">next session on August 21st</a></strong>, which is already fully booked. On that note, last time all 20 spots were snapped up and there was a waiting list with an additional 10 members. But we were &#8220;only&#8221; 13 who actually showed up. I wonder how best to deal with that. It&#8217;s not a problem if people don&#8217;t come, but they could at least change the RSVP as soon as possible. On the other hand, I have to admit that I have done the same in the past - sign up for something free and then neither show up nor change the RSVP. Maybe the best way would be to simply increase the number of spots and plan for a percentage of <strong><a href="http://www.merriam-webster.com/dictionary/no-show">no-shows</a></strong>? That&#8217;s working for airlines, why should it not work here? Maybe, to be on the safe side, I should plan for 25% no-shows and then just increase the number of spots accordingly?</p>
-
-<h1>The mountains / photography</h1>
-
-<p>I am back already. The weather turned quite bad and I wasn&#8217;t in the mood to get struck by lightning while on top of a mountain. Still, it was great and I am looking forward to the next time. I had my camera with me - a <strong>Sony A7</strong> full frame that by itself is a surprisingly compact camera. As a lens, I had the <strong>Zeiss 24-70 OSS 4.0</strong> lens - which I hoped would be a good combination for travel photography. Here are some examples:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/photography/DSC02249-1200x800.jpg" title="'snow'" ></p>
-
-<p>If you&#8217;re interested, here is the image in the <strong><a href="http://matthiasnehlsen.com/images/photography/DSC02249-full.jpg">original resolution</a></strong>. It is not the original image, but rather the processed version I used when I ordered a larger-format print. If anyone is interested in the post processing in Photoshop, let me know. The same goes for the next image, with the original resolution <strong><a href="http://matthiasnehlsen.com/images/photography/DSC02231-full.jpg">here</a></strong>.</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/photography/DSC02231-1200x800.jpg" title="'valley'" ></p>
-
-<p>Overall, I am happy with the image quality, but it is below the quality of images taken with fixed focal length lenses. Usually I don&#8217;t use zoom lenses at all, so I would mostly use this lens when traveling. But is it really a good travel lens? No, I don&#8217;t think so. It is way too bulky:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/sony-a7-24-70.jpg" title="'a7 with 24-70mm'" ></p>
-
-<p>I only got to use it ever so often as it had to go into the backpack because of its large size. That&#8217;s kinda pointless when you are hiking with other people. Once you find your pace, you don&#8217;t like to stop for that guy with the bulky camera, so you don&#8217;t. Meaning, I fell behind and ended up taking way more photos with my smart phone because that was always handy. Couldn&#8217;t I simply have taken these particular photos with the smart phone? Not a chance - besides the better image quality, the Zeiss lens also has a much more wide angle than the one in the smart phone.</p>
-
-<p>So the Zeiss lens goes back to Amazon tomorrow for a refund. I don’t think the lens is bad actually. I just don’t use zoom lenses that often; if possible, I prefer fixed focal length lenses. If you like to use a zoom lens, this one might serve you well. It is by all means better than the plastic kit lens. That one&#8217;s just plain awful. While traveling, though, this lens proved to be too bulky for my taste.</p>
-
-<p>I think I have an idea for a better travel lens, but more on that another time. For those interested in the equipment mentioned above, here are the links:</p>
-
-<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/sony-a7/iframe">
-</iframe>
-
-
-
-
-<iframe style="width:120px;height:240px;" marginwidth="0" marginheight="0" scrolling="no" frameborder="0" src="http://r.matthiasnehlsen.com/zeiss-24-70/iframe">
-</iframe>
-
-
-<p>The camera is really great, by the way, I do not regret that purchase at all. The menu might not be the greatest, but for this form factor the image quality is unbeatable, unless you use the more expensive <strong><a href="http://r.matthiasnehlsen.com/sony-a7r/link">A7R</a></strong>. But I do not usually need <strong>36MP</strong>.</p>
 
 <p>Cheers,
 Matthias</p>

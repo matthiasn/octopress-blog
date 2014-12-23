@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="Some weeks ago when I started working on the BirdWatch project, I basically wanted to play around with Iteratees and stream information to the &hellip;">
+  <meta name="description" content="Let us assume for a second that the BirdWatch application needed to handle more load than a single server could handle. The current version could not &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Scaling Play applications with ZeroMQ</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-02T07:48:00+02:00" pubdate data-updated="true">06/02/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Let us assume for a second that the <strong><a href="http://bit.ly/BirdWatch">BirdWatch</a></strong> application needed to handle more load than a single server could handle. The current version could not just be run as multiple instances because then each one would establish a connection to Twitter, of which there is supposed to be only one per application. It would work to split the application into a TwitterClient part and a user-facing controller part, of which multiple instances could run as needed. How do we connect these separate parts of the application though?</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/06/02/scaling-play-applications-with-zeromq/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -392,6 +435,10 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/12/23/Happy-Holidays/">Happy Holidays and Thanks for Reading</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/12/19/Clojure-Book/">I&#8217;m writing a book about Building a System in Clojure</a>
       </li>
     
@@ -405,10 +452,6 @@ My name is Matthias and I had my first computer before I had my first bike. I&#8
     
       <li class="post">
         <a href="/blog/2014/11/14/Inspect/">Inspect - println no more</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/11/07/Building-Systems-in-Clojure-4/">Building a System in #Clojure Part 4 - Inter-process communication with Redis</a>
       </li>
     
   </ul>
