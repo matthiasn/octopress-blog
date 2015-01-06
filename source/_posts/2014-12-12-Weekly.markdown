@@ -24,6 +24,8 @@ Oh, before I forget, I will present at the **[Clojure Meetup in Hamburg](http://
 Cheers,
 Matthias
 
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: Thanks to Hacker News, there were like an extra **30K** pageviews on my blog during the first 36 hours after publishing the farewell note. I should publicly part more often, I guess.
 
 [^2]: Okay, I did write some software myself at that time, but my involvement with software development was was mostly overseeing development done by others.

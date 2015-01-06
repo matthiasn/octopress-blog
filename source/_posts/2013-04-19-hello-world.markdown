@@ -35,4 +35,7 @@ Most importantly, ask if there is anything that you find difficult to understand
 
 You can also follow me on Twitter **[@matthiasnehlsen](https://twitter.com/matthiasnehlsen)**. I just launched my feed, so you'll get to be among the first to follow me, and it will make keeping track of when I published a new post much easier for you, as well as other things I find interesting in general.
 
--Matthias
+Cheers,
+Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

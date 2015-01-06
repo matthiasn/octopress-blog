@@ -49,3 +49,5 @@ Last week’s cliffhanger was a section on speed improvements on this blog. Sorr
 
 Have a great remaining week,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

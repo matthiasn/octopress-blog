@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2014-12-23T16:16:44+01:00</updated>
+  <updated>2015-01-06T23:29:24+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -34,6 +34,11 @@ Yesterday and today I have published new versions, with the latest one being rou
 
 <p>Happy Holidays,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -75,6 +80,11 @@ Matthias</p>
 
 <p>Cheers and Happy Holidays,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -110,6 +120,11 @@ Matthias</p>
 
 <p>Cheers,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -157,6 +172,11 @@ Matthias</p>
 
 <p>Cheers,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -279,6 +299,11 @@ Matthias</p>
 
 <p>Cheers and have a great weekend,<br>
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -453,6 +478,13 @@ Matthias</p>
 
 <p>Cheers and have a great weekend,
 Matthias</p>
+
+<p><strong>P.S.</strong> This series of articles is now continued in this book:</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -519,6 +551,13 @@ Matthias</p>
 
 <p>Cheers and have a great weekend,<br>
 Matthias</p>
+
+<p><strong>P.S.</strong> This series of articles is now continued in this book:</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -580,6 +619,11 @@ Matthias</p>
 
 <p>Until next week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -619,6 +663,9 @@ Matthias</p>
 
 <p>Cheers,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -946,6 +993,13 @@ I hope you found this useful. If you did, why don’t you subscribe to the <a hr
 <p>Cheers,
 Matthias</p>
 
+<p><strong>P.S.</strong> This series of articles is now continued in this book:</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
+
 <div class="sharing">
   <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="http://platform.twitter.com/widgets/tweet_button.2df3b13213b70e6d91180bf64c17db20.en.html#_=1412769297267&amp;count=horizontal&amp;counturl=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;size=m&amp;text=Building%20a%20System%20in%20%23Clojure%202%20-%20Transducers%20-%20Matthias%20Nehlsen&amp;url=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;via=matthiasnehlsen" class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-horizontal" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 107px; height: 20px;"></iframe>
 
@@ -1028,6 +1082,9 @@ Matthias</p>
 
 <p>That&#8217;s all for now. Have a great week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1193,6 +1250,13 @@ Matthias</p>
 
 <p>Cheers,
 Matthias</p>
+
+<p><strong>P.S.</strong> This series of articles is now continued in this book:</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
 <div class="footnotes">
 <hr/>
 <ol>
@@ -1265,6 +1329,9 @@ Matthias</p>
 
 <p>Until next week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1309,6 +1376,9 @@ Matthias</p>
 
 <p>Have a great remaining week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1507,6 +1577,9 @@ links to this list of <strong><a href="https://github.com/matthiasn/Clojure-Reso
 
 <p>Thanks and until next week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1566,6 +1639,9 @@ Matthias</p>
 
 <p>Have a great remaining week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1668,6 +1744,9 @@ exec start-stop-daemon --pidfile ${APP_HOME}/RUNNING_PID --chdir ${APP_HOME} --c
 
 <p>Have a great week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1741,6 +1820,9 @@ find . -print | xargs grep someUniqueTextHere
 
 <p>Have a great week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1764,6 +1846,9 @@ Matthias</p>
 
 <p>Have a great week,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   
@@ -1983,6 +2068,9 @@ Of course, it is not ideal to store the links in code. Instead, that data should
 
 <p>Cheers,
 Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 ]]></content>
   </entry>
   

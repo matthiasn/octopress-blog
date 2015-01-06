@@ -192,3 +192,5 @@ This allows us to do something upon return of the collection size in a non-block
 Great stuff, I really like **[ReactiveMongo](http://reactivemongo.org)**. The documentation has also gotten a lot better in 0.9, compared to previous versions. Nonetheless it takes some source code reading to find some of the good stuff. I'd be more than to happy help out here and contribute to the project documentation.
 
 -Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

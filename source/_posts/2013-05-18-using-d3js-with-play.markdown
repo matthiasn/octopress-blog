@@ -81,3 +81,5 @@ The stream I use as a trigger has data every 3 seconds. I found that it looks **
 This is it for today, check back for more elaborate examples in the future. If you haven't already, how about you **[subscribe to the mailing list](http://matthiasnehlsen.us7.list-manage1.com/subscribe/post?u=798fd7b50a1d9cc58be41c2af&id=eb7a7193c5)** so you won't miss anything?
 
 -Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

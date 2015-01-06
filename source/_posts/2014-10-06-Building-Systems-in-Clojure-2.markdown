@@ -263,6 +263,9 @@ I hope you found this useful. If you did, why don’t you subscribe to the <a hr
 Cheers,
 Matthias
 
+**P.S.** This series of articles is now continued in this book:
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 <div class="sharing">
   <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="http://platform.twitter.com/widgets/tweet_button.2df3b13213b70e6d91180bf64c17db20.en.html#_=1412769297267&amp;count=horizontal&amp;counturl=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;id=twitter-widget-0&amp;lang=en&amp;original_referer=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;size=m&amp;text=Building%20a%20System%20in%20%23Clojure%202%20-%20Transducers%20-%20Matthias%20Nehlsen&amp;url=http%3A%2F%2Fmatthiasnehlsen.com%2Fblog%2F2014%2F10%2F06%2FBuilding-Systems-in-Clojure-2%2F&amp;via=matthiasnehlsen" class="twitter-share-button twitter-tweet-button twitter-share-button twitter-count-horizontal" title="Twitter Tweet Button" data-twttr-rendered="true" style="width: 107px; height: 20px;"></iframe>
 

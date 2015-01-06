@@ -34,6 +34,8 @@ To sum up things, dear Scala, it is definitely over between the two of us. I don
 Cheers,
 Matthias
 
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: The whole LISP / S-expression / homoiconicity thing seems very compatible with the operating system of my brain, and I also feel that constraint is bliss. There aren’t nearly as many ways to write idiomatic Clojure as there are ways to write a Scala program.
 
 [^2]: It must be possible to start a lucrative business around software written in Clojure, in particular when I consider how much more productive I personally am when I write Clojure compared to Scala. If you know of any opportunities where my skillset could be an asset, please let me know. Ideally, I’d favor multiple short-term projects over one long project. These short projects could start with an analysis of a problem or an existing system, a prototype for something new and then checking back on it from time to time. If that sounds like something you may need, please contact me offline. My email is on my GitHub repo.

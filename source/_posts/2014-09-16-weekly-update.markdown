@@ -35,3 +35,5 @@ Okay, back to bed - I need to get rid of this nasty cold ASAP. I have stuff to d
 
 Have a great remaining week,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

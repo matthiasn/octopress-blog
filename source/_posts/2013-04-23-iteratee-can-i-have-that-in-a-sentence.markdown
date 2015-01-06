@@ -247,4 +247,7 @@ One comment regarding possible Iteratee states: An Iteratee can  be in one of th
 
 Okay, this has been a lot. But I promised to share what I learned about Iteratees with this project so far. Let me know if this helped you in your understanding as well.
 
--Matthias
+Cheers,
+Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

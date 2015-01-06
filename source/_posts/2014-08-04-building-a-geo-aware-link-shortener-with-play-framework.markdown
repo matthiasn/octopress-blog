@@ -140,3 +140,5 @@ That's it for today - hope to see you back soon. And now that you have made it t
 
 Cheers,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

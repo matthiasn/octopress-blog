@@ -106,4 +106,7 @@ I'm glad I got around to the process separation last weekend. It was fun to do a
 Cheers and have a great weekend,
 Matthias
 
+**P.S.** This series of articles is now continued in this book:
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: The beauty of the component library is that during development, we can stop a component and restart it after reloading the code. This takes much less time than completely reloading the application. Watch **[Stuart Sierra's talk](https://www.youtube.com/watch?v=13cmHf_kt-Q)** for more information on the component library. I also created a **[transcript of this talk](https://github.com/matthiasn/talk-transcripts/blob/master/Sierra_Stuart/Components.md)** if you prefer reading.

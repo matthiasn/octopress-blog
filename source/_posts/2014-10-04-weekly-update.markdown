@@ -26,3 +26,5 @@ While this little modification is probably not terribly useful for you, I believ
 
 That's all for now. Have a great week,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

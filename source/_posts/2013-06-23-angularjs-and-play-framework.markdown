@@ -143,4 +143,4 @@ There is a **[follow-up article](http://matthiasnehlsen.com/blog/2013/07/03/angu
 
 Cheers, Matthias
 
-Check out my **[reviews page](/reviews)** where I share my thoughts on books and gadgets.
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

@@ -90,3 +90,5 @@ It also feels like the pages are loading a lot faster. **Next week** I'll let yo
 
 Have a great week,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

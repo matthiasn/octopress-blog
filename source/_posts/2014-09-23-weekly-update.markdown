@@ -49,3 +49,5 @@ Most importantly, check out the new **[article series](/blog/2014/09/24/Building
 
 Until next week,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

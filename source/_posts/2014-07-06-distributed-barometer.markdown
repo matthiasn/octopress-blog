@@ -28,3 +28,5 @@ But with that being said, I find the idea of having millions of additional - and
 
 Until next time,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

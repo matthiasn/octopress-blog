@@ -19,3 +19,5 @@ A first Meetup is scheduled for **Thursday, July 24th, 2014 at 7pm**. There is n
 
 Cheers,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

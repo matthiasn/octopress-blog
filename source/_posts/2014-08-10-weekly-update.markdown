@@ -19,3 +19,5 @@ Okay, that's it for today. Next week I'll be busy with the book chapters, but I 
 
 Have a great week,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

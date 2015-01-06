@@ -21,6 +21,8 @@ So, you will have something to read over the holidays[^2]. Please let me know if
 Happy Holidays,
 Matthias
 
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: I am using **[leanpub.com](https://leanpub.com)** to publish the book and I love the authoring workflow, it has been nothing but pleasure so far. Writing in Markdown is so much better than constantly having to wrangle with Word files. I will probably write more about that later, but already a **big shout-out to guys at Leanpub** for offering a great service.
 
 [^2]: But only after you spend enough time with your loved ones.

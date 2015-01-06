@@ -44,5 +44,7 @@ Okay, that's it for today. There are some additions to the **[Clojure Resources]
 Until next week,
 Matthias
 
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: If you've never listened to Rich Hickey's talk about **Hammock-driven development**, you really should. Now there's also a **[transcript for that talk](https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/HammockDrivenDev.md)**. You find the link to the video recording alongside the transcript.
 [^2]: Thanks to **[@RobStuttaford](https://twitter.com/RobStuttaford)** for pointing this out.

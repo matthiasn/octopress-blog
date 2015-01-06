@@ -28,4 +28,6 @@ Would you do me a favor? [^1] Please sign up as a reader (for free and with no c
 Cheers and Happy Holidays,
 Matthias
 
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: As a little christmas present, if you will.

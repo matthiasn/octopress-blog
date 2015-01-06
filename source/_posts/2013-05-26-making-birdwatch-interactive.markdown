@@ -89,3 +89,5 @@ Right before the Champions League final, I measured the performance for the sear
 Not too bad, I'm very glad the **[Play Framework](http://www.playframework.com)** does not spawn a thread for every single one of those connections. I have not filtered those Tweets but instead delivered all Tweets to all clients. It remains to be seen how much of a performance hit the matching algorithm will incur.
 
 -Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

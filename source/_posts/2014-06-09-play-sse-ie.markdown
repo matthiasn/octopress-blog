@@ -59,4 +59,4 @@ The **[Rickshaw](http://code.shutterstock.com/rickshaw/)** time series chart on 
 Okay, until next time, I hope to see you at Scala Days. Say hi when you see me, please.
 Matthias
 
-Check out my **[reviews page](/reviews)** where I share my thoughts on books and gadgets.
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

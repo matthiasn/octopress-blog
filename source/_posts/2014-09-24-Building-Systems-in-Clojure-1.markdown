@@ -109,4 +109,7 @@ That's it for now. Would you like to be informed when the next article is out? J
 Cheers,
 Matthias
 
+**P.S.** This series of articles is now continued in this book:
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: In case you are interested in the animation as such, you can check out the current **[weekly review](/blog/2014/09/23/weekly-update/)** in which I provide some background information.

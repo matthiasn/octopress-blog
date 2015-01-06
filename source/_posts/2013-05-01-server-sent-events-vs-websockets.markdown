@@ -115,3 +115,5 @@ http {
 **EDIT 07/03/2013:** I am exploring the combination of Server Sent Events plus REST (for client to server communication) in **[this article](http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/)**.
 
 -Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

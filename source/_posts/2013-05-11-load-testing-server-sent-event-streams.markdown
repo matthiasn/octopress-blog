@@ -28,3 +28,5 @@ I have put the code on **[GitHub](https://github.com/matthiasn/sse-perf)** and I
 In the next posts I will introduce animating live streaming data on the client and also share what I have learned when establishing thousands of connections at the same time, using **[WS](http://www.playframework.com/documentation/api/2.1.1/scala/index.html#play.api.libs.ws.WS$)** from the **[Play Framework](http://www.playframework.com)**. Let me know which one you would like to read first.
 
 -Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

@@ -254,7 +254,7 @@ Please comment and suggest any improvement you can think of, including typos and
 Cheers,
 Matthias
 
-Check out my **[reviews page](/reviews)** where I share my thoughts on books and gadgets.
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
 
 [^1]: Actually I should mention **[Lo-Dash](http://lodash.com)** instead of **underscore**. I use it as a drop-in replacement for underscore for one reason in particular: **[_.cloneDeep](http://lodash.com/docs#cloneDeep)**. The ability to deep clone a data structure makes developing an undo functionality much, much, much easier. Not as trivial as with **[ClojureScript](http://swannodette.github.io/2013/12/31/time-travel/)** or with **[Scala.js](http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/)**, but not difficult either.
 

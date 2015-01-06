@@ -84,4 +84,6 @@ Curious what's next? You can subscribe to the <a href="http://eepurl.com/y0HWv" 
 Cheers and have a great weekend,<br>
 Matthias
 
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: In the default case when no client wants messages, the extra burden should be minimal. There shouldn’t even be significant GC pressure as the evaluated immutable data structures exist already and are structurally shared. In the example application, I am hitting the system with over 1,000 messages per second and the extra load to match the messages with connected clients is about 3-5% (out of a total of 800% on my Retina MacBook). But this would have to be verified before you use it in production, obviously.

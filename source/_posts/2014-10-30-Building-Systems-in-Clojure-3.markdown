@@ -58,6 +58,9 @@ If you wonder about the next steps in the design of this application, you can su
 Cheers and have a great weekend,<br>
 Matthias
 
+**P.S.** This series of articles is now continued in this book:
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
 [^1]: Right now with all tweets loaded onto the client, the maximum for a desktop browser is somewhere in the range of a **few tens of thousands** of tweets before the application slows down noticably.
 [^2]: I'm undecided about this one. On one hand, it is strikingly simple to have a topic per search ID, which is a hash of the query itself. But on the other hand, this likely involves **book-keeping** of the subscriptions on the consuming side, where the subscription would have to be removed once the client disconnects. Maybe it is simpler to just serialize a set of IDs with the tweet and publish that on a single topic.
 [^3]: Using REST makes the communication somewhat more complex, but I still think it would make sense to move this aspect of the application into separate JVM. The **GC characteristics** of aggregating large amounts of data in spikes are vastly different from the (near-) realtime aspects of the WebSocket delivery of new tweets. For the aggregation, it would not matter much for the user experience if there was a **stop-the-world** garbage collection pause of even a few seconds, but I don't want that to happen for the streaming data.
