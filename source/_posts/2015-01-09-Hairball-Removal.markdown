@@ -20,6 +20,8 @@ That’s it; I’m back to a fun coding session. Thanks for reading.
 Happy 2015, 
 Matthias
 
+**PS** - you can start reading the book **right away**:
+
 <iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
 
 [^1]: I had some fun animating fireworks by manipulating SVG in ClojureScript instead. Maybe I’ll make an article out of that one day.
