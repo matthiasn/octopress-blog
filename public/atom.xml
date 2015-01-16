@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-01-16T02:55:10+01:00</updated>
+  <updated>2015-01-16T20:03:39+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,29 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: new Feature]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features/"/>
+    <updated>2015-01-16T19:35:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features</id>
+    <content type="html"><![CDATA[<p>Most of this week, I was working on the client-side codebase of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application in order to remove the hairball in its architecture that I mentioned last week. That&#8217;s been going really well. But how do I make the readers aware of what I am working on right now? Your time is precious, so you may only want to read the stuff that I feel good about already, unless you have the time to dive deeper and compare the good, the bad and the ugly. That&#8217;s fine, too, but it&#8217;s just going to involve more effort on your part.</p>
+
+<!-- more -->
+
+
+<p>So what to do? From now on I will keep a journal in the beginning of the book to keep track of what I&#8217;m working on at any moment and also the status of each chapter. Then, since that&#8217;s going to be in the free preview of the book as well, even if you haven&#8217;t purchased it or didn&#8217;t take advantage of the initial availability for free, you can follow along, see where it&#8217;s going and then purchase the book iff it has gotten to the point where you&#8217;d want to read it cover to cover.</p>
+
+<p>I started a brief version of what I described above and will keep that updated frequently. Seems like a good way to communicate the process.</p>
+
+<p>Okay, that&#8217;s all for today. Keep on coding!</p>
+
+<p>Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: Hairball Removal]]></title>
@@ -1857,32 +1880,6 @@ find . -print | xargs grep someUniqueTextHere
 <h3>My camera, Sony A7</h3>
 
 <p>I can finally use my classic Zeiss and Leica prime lenses again thanks to this camera. Overall I am quite happy with it. This review is a work in progress, but you can already read some of it <strong><a href="http://matthiasnehlsen.com/reviews/sony-a7">here</a></strong>.</p>
-
-<p>Have a great week,
-Matthias</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: AngularJS book, Geo-Lookup, Reading]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/"/>
-    <updated>2014-08-10T22:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update</id>
-    <content type="html"><![CDATA[<p>I have mostly kept myself busy with <strong><a href="http://angularjs.org">AngularJS</a></strong> this week. Then, my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> generated its first contribution to running this blog. I have also read some more this week: <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers</a></strong> by Robert C. Martin (Uncle Bob).</p>
-
-<!-- more -->
-
-
-<p>I have been doing a lot of <strong><a href="http://angularjs.org">AngularJS</a></strong> work. I haven&#8217;t really talked about it yet, but last year I started co-authoring a book about <strong><a href="https://www.packtpub.com/web-development/angularjs-ui-development">AngularUI Development</a></strong>. The book is scheduled to be out in November this year. Right now, I am putting the finishing touches on the chapters that I wrote. I added quite a few pages to the first chapter about bootstrapping an <strong><a href="http://angularjs.org">AngularJS</a></strong> environment, in particular about AngularJS integration tests using <strong><a href="https://github.com/angular/protractor">Protractor</a></strong>. I am quite happy with the testability of AngularJS application is progressing. Protractor is really powerful and I am looking forward to implementing a comprehensive testing strategy for my current work project. Protractor looks like it will be up to the job. It will be interesting to integrate this into the overall <strong><a href="http://www.scala-lang.org">Scala</a></strong> / <strong><a href="http://www.playframework.com">Play Framework</a></strong> / <strong><a href="http://www.scala-sbt.org">SBT</a></strong> build chain, though. Maybe that&#8217;ll be an article for another day.</p>
-
-<p>Then, earlier this week, I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote about building</a></strong> an application for country-specific embedding of links for the <strong><a href="https://affiliate-program.amazon.com">Amazon Affiliate Program</a></strong>, with the idea of having purchases on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon</a></strong> contribute to the running costs of this blog. Besides the time that I invest, I also rent a server for serving my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch application</a></strong> at <strong><a href="http://www.hetzner.de">Hetzner Online AG</a></strong>, that costs <strong>€81</strong> per month. Today I am happy to report that in the first week, clicks on <strong><a href="http://r.matthiasnehlsen.com/amazon-landing/link">Amazon links</a></strong> have generated roughly <strong>$37</strong> in advertising fees aka revenue through orders in the <strong><a href="http://www.amazon.com/?_encoding=UTF8&amp;camp=1789&amp;creative=390957&amp;linkCode=ur2&amp;tag=matthiasnehls-20&amp;linkId=2JYSWJ7Q5CJ7F7QW">U.S. store</a></strong>. Sweet - thanks a lot to the purchasers, much appreciated! If that became the weekly average, the running costs for my server would be covered. Feels great that my baby, the blog, may be well on the way to paying its own rent. I will have to make my <strong><a href="https://github.com/matthiasn/amzn-geo-lookup">geo-specific link shortener</a></strong> application more user-friendly though; it is already annoying me a lot to store created links in code. But that&#8217;s on my list anyway; for this week the idea was to create a proof-of-concept and for that, storing the links in code was okay.</p>
-
-<p>I was also able to read a little more in <strong><a href="https://twitter.com/unclebobmartin">Uncle Bob</a></strong>&#8217;s book, <strong><a href="http://r.matthiasnehlsen.com/unclebob-cleancoder/link">The Clean Coder: A Code of Conduct for Professional Programmers (Robert C. Martin Series)</a></strong>. I enjoy this book a lot and I will make sure to share some thoughts on it soon. The main idea about sharing thoughts on what I read is that though I read a lot, I also forget too much too fast. I have been meaning to take notes by chapter for a while now, but I have never really got around to doing it. If I publish my notes, I will be able to force myself to actually take notes. First of all, I want to keep them for my future reference so that I can more easily recap what I learned. If anyone else finds my notes useful, so much the better. More on that soon.</p>
-
-<p>Okay, that&#8217;s it for today. Next week I&#8217;ll be busy with the book chapters, but I also want to try to get back to my work-in-progress <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">article about writing the BirdWatch client in ClojureScript</a></strong>.</p>
 
 <p>Have a great week,
 Matthias</p>
