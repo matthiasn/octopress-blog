@@ -24,7 +24,7 @@ So I went to a local partner. Surely enough, by the time I got there, I didn't g
 
 I was determined to bring the laptop in for an extended check, but oddly enough it then worked for a little bit. It didn't take long, though, and the annoying behavior was back. Either the logged-in user was randomly logged out in the middle of something, which is greatly annoying when you have to restart everything after logging on again, or the laptop would hibernate all of a sudden at charges around 30%.
 
-Then, in the last couple of weeks, the right hinge became loose. Another annoyance, really, when I'm on the couch with the laptop on my lap, coding or working on my **"Building a System in Clojure"** book while watching TV series [^1] and that hinge makes sounds at the slightest movement of anything.
+Then, in the last couple of weeks, the right hinge became loose. Another annoyance, really, when I'm on the couch with the laptop on my lap, coding or working on my **["Building a System in Clojure"](https://leanpub.com/building-a-system-in-clojure)** book while watching TV series [^1] and that hinge makes sounds at the slightest movement of anything.
 
 Then I went to the other **Apple Store** in Hamburg last week; they had an appointment available one week later. The lady scheduling my appointment asked me why I had come in instead of just scheduling online. I told her that that had not been possible for weeks, for both stores in Hamburg. After mocking me about probably not having visited the correct website, I challenged her to go online and try it herself. Indeed, she got the same message for both stores that no appointments were available at either store at the moment. 
 
@@ -60,6 +60,8 @@ That's all for today [^3].
 
 Cheers,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
 
 [^1]: Right now, I am mostly watching either **Suits** or **American Horror Story**. I found the latter to be very addictive, particularly from the second season on. If I were you and you haven't watched any of that yet and are curious about it, I suggest you start with **Season 2**. You wouldn't miss anything as the plots are not connected between **Season 1** and **Season 2**. You'd only recognize a couple of familiar faces from the previous season.
 
