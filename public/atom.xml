@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-01-16T20:03:39+01:00</updated>
+  <updated>2015-01-21T16:30:06+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,85 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Dear Apple, Get Your Act Together]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/"/>
+    <updated>2015-01-21T15:30:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together</id>
+    <content type="html"><![CDATA[<p>This is a rant.</p>
+
+<!-- more -->
+
+
+<p>I&#8217;ve been having issues with my Retina MacBook lately, to the point where I am craving a Linux-based laptop. But there are two programs that keep me on the Mac at the moment:</p>
+
+<ul>
+<li>Photoshop</li>
+<li>Omnigraffle</li>
+</ul>
+
+
+<p>Everything else I think I can live with on Linux. But I might still buy one of these cute 2015 Dell XPS 13 with Ubuntu once they come out. I like the form factor a lot actually. Anyhow.</p>
+
+<p>So my 2012 Retina MacBook showed a few signs of aging. Sometimes, but not all the time, the battery would show <strong>&#8220;Service Battery&#8221;</strong>. According to some website I found but forgot, that is supposed to be something that&#8217;s covered under the 3 year extended warranty because the battery is aging badly, not as supposed to.</p>
+
+<p>So I tried to get that fixed at the local Apple store. But they didn&#8217;t have any appointments for <strong>two and a half weeks</strong>. Really, that&#8217;s considered good service for professionally used equipment, with the so-called care protection plan purchased in addition to the hardware? <strong>You can&#8217;t be serious!</strong></p>
+
+<p>So I went to a local partner. Surely enough, by the time I got there, I didn&#8217;t get the warning any longer. So they wanted to keep my laptop for a night or two. That&#8217;s not really something I can easily do, though. There&#8217;s data on my laptop that&#8217;s under one confidentiality agreement or another. That&#8217;s why I encrypt both the internal SSD and all backup disks. I can, of course, prepare the hardware for that, by removing the user account, but I can&#8217;t just give the laptop away as it is. Also, the partner told me that it was extremely unlikely that they could replace the battery under warranty, even if it behaved erroneously.</p>
+
+<p>I was determined to bring the laptop in for an extended check, but oddly enough it then worked for a little bit. It didn&#8217;t take long, though, and the annoying behavior was back. Either the logged-in user was randomly logged out in the middle of something, which is greatly annoying when you have to restart everything after logging on again, or the laptop would hibernate all of a sudden at charges around 30%.</p>
+
+<p>Then, in the last couple of weeks, the right hinge became loose. Another annoyance, really, when I&#8217;m on the couch with the laptop on my lap, coding or working on my <strong>&#8220;Building a System in Clojure&#8221;</strong> book while watching TV series <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> and that hinge makes sounds at the slightest movement of anything.</p>
+
+<p>Then I went to the other <strong>Apple Store</strong> in Hamburg last week; they had an appointment available one week later. The lady scheduling my appointment asked me why I had come in instead of just scheduling online. I told her that that had not been possible for weeks, for both stores in Hamburg. After mocking me about probably not having visited the correct website, I challenged her to go online and try it herself. Indeed, she got the same message for both stores that no appointments were available at either store at the moment.</p>
+
+<p>A gem of an idiotic policy then came out of her mouth after realizing the non-availability of an appointment: so they, on a daily basis, only report back free appointments for one week in advance. So I asked, &#8220;Okay, sometime tonight, you&#8217;ll report back the availability of appointments until one week from toda?&#8221; She confirmed, so I asked back if she realized that she had just given me the second to last appointment available that day one week later, with a couple more hours to go that day so that likely there&#8217;d be no openings to report later on. Right.</p>
+
+<p>But probably even worse, they also prepared me that I&#8217;d have to leave the laptop in for service for <strong>five to seven working days</strong> after bringing it in. Guys, that&#8217;s up to almost a week and a half at worst. Seriously? I get it that you stock spare parts on a just-in-time basis. But then again, <strong>I don&#8217;t even get that</strong>. Apple has so few product lines that it seems reasonable to me as a layman to keep at least the most popular spare parts for all product lines stocked at all times. Surely, the top case of the Retina MacBook that comes with the batteries, the keyboard and the trackpad all in one unit is something you&#8217;d replace frequently.</p>
+
+<p>How many individually replaceable spare parts are there even for a Retina MacBook? Top case, screen, logic board with attached RAM, SSD, bottom cover. Did I miss anything? Sure, the logic board comes in a couple of different varieties, but I don&#8217;t think any customer would be upset if you only stocked the best one for each generation. That&#8217;s a conversation I wouldn&#8217;t mind having when my laptop is being serviced. &#8220;We&#8217;re terribly sorry, we didn&#8217;t have your logic board but we had a more powerful one, or one with more memory, or both. So we replaced yours with that one.&#8221; Customer would all of a sudden have more than they paid for initially, but hey, they&#8217;re also going through the trouble of having to bring in their work machine in the first place. Can&#8217;t imagine anyone being upset about that. All this is just to say that I believe stocking spare parts would be viable. Also, the most expensive CPU at the time of the initial purchase is probably kind of midrange now.</p>
+
+<p>Instead, you guys want to order the spare part somewhere. Okay, fine. You may be able to deliver a new machine to me in 24 hours when I order online but you cannot have my spare part here within 24 hours and then have it worked into my machine in 36 hours and have me back at work?</p>
+
+<p>Which brings me back to the Dell laptop. My experience with their customer service is from a few years back, roughly from 2004 to 2008, when I was doing IT support in a large, 1500-bed hospital. So I cannot say how it is nowadays. But back then, when one of their Latitude laptops, 30 or 40 of which I was responsible, had any issue, you&#8217;d call the hotline, describe the issue and have a service technician at your desk within 24 hours, oftentimes sooner, AND equipped with all spare parts that machine might need. That guy would then repair your machine on the spot and if that wasn&#8217;t possible, he&#8217;d either give you a replacement machine right away or order one with <strong>Morning Express</strong>. So at best, you called in at 4 or 5pm and had your machine up and running by 9am the next morning, already repaired. Or, at worst, you&#8217;d have the replacement by 8am the morning after.</p>
+
+<p>I don&#8217;t remember any service failures right now. Maybe there was a time when there was plenty of ice on the street so some delivery got delayed, but that&#8217;s about it. That&#8217;s what I call an appropriate service for a laptop in the price range of the Retina MacBook &#8220;Pro&#8221;. Only that the Latitudes where cheaper, probably in the range of <strong>€800 to €1800</strong> depending on CPU, RAM and what not. Oh, and the service was not only on the premises of the hospital, it was worldwide, and we used that on rare occasions when one of the physicians was at a conference somewhere in the world and the machine had a major issue.</p>
+
+<p>So really, Apple, get your act together and offer me the service that I expect for a professionally priced and used machine. Otherwise, I may really find a replacement for OmniGraffle and Photoshop and switch to a Linux machine instead.</p>
+
+<p>That new Dell is sexy, by the way. I wish the 15 inch was as cute, with the same, almost non-existent frame around the display. Then, I&#8217;d make the switch work right away. I very much like the idea of running Docker natively on a Linux machine instead of running a virtual box with that <strong><a href="http://boot2docker.io">boot2docker</a></strong> thing. It works, but I don&#8217;t want the overhead. It makes the machine sluggish and warm.</p>
+
+<p>This half-baked availability of Docker on OS X has become so much of an issue for me that at the moment, I&#8217;d definitely not go for an Apple desktop but buy a powerful Linux machine instead. You also get so much more bang for your buck, all while working daily on the platform that you&#8217;re likely going to deploy on anyway. More familiarity with the platform your software will be running on in production surely never hurt anyone.</p>
+
+<p>The thing is, dear Apple, that I really want to like you more. In terms of industrial design or whatever, I&#8217;d choose the Retina MacBook any day of the year<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup>. But my emotional attachment to good industrial design doesn&#8217;t help me earn a living, really. For that, I need a customer service of which I can tell my friends, &#8220;You know, I had a problem with the machine I spent pretty much all of my working hours with, and the manufacturer of that machine went to great lengths to make sure that issue disrupted my life and schedule as little as humanly possible!&#8221;. Yes, I wish I could say that.</p>
+
+<p>Then, to add insult to injury, I had an appointment for a session with a <strong>&#8220;Genius&#8221;</strong> yesterday. Now I find that an insult to the word <strong>genius</strong>. But also, why don&#8217;t you send a reminder of the appointment, with a button to click that says something like &#8220;I am sorry, but I would like to reschedule my audience with a genius because I had the audacity to not know my schedule with paying customers one week in advance of the precious audience&#8221;. Something like that. Yes, you did send an email when the appointment was made, but the reschedule button in that email yielded nothing more than telling me I have no appointments, neither past nor future. Quite helpful.</p>
+
+<p>Now with that being said, I am doing a clean install of OS X. I kind of wish that wasn&#8217;t something you had to do in situations like mine, where the system just randomly logs itself out. Mind you, it&#8217;s not a restart because of a power issue connected to the battery. I think this is separate. Back in the days when I was responsible for those Windows laptops, the one recipe that worked more often than not was a re-install of Windows first and see if that fixed the issue. When the physicians asked me why the re-install was necessary - as that was not immediately obvious to them - I usually told them something along the lines of, &#8220;Well, I believe Windows kind of rots from the inside over time, and starting afresh without the accumulated mess is oftentimes all that&#8217;s needed.&#8221; That they did understand.</p>
+
+<p>Is the same true for you, dear OS X? Are you rotting from the inside so all that&#8217;s necessary is to replace you with a fresher instance of yourself? I hope so. The battery I can live with for a little while, but logging me out is really annoying. I&#8217;d rather have that fix itself than having to go to the temple to consult a genius.</p>
+
+<p>Will I be using Apple three years from now? Time will tell, but probably not. If there&#8217;s going to be a 15-inch, four-point-something pounds laptop with nearly the same dedication to hardware design and the same specs or better but running Linux, the availability of Docker will be the one feature that&#8217;ll tip over my decision.</p>
+
+<p>That&#8217;s all for today <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>.</p>
+
+<p>Cheers,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Right now, I am mostly watching either <strong>Suits</strong> or <strong>American Horror Story</strong>. I found the latter to be very addictive, particularly from the second season on. If I were you and you haven&rsquo;t watched any of that yet and are curious about it, I suggest you start with <strong>Season 2</strong>. You wouldn&rsquo;t miss anything as the plots are not connected between <strong>Season 1</strong> and <strong>Season 2</strong>. You&rsquo;d only recognize a couple of familiar faces from the previous season.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>This is despite laptop having so few USB ports. Really, two more, one on each side, to make the machine actually practical would not have been possible?<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>By the way, why does Colin Firth look so botox&#8217;ed? He&rsquo;s 54, are a few wrinkles on your forehead something to be shamed of at his age? I don&rsquo;t think so. Just a random thought from watching the Golden Globes while typing this.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: new Feature]]></title>
@@ -1804,82 +1883,6 @@ exec start-stop-daemon --pidfile ${APP_HOME}/RUNNING_PID --chdir ${APP_HOME} --c
 <p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed.png" title="'pagespeed results'" ></p>
 
 <p>It also feels like the pages are loading a lot faster. <strong>Next week</strong> I&#8217;ll let you know what I did. Would you like to get notified when the next article is out? Just <strong>sign up</strong> for the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>mailing list</strong></a>.</p>
-
-<p>Have a great week,
-Matthias</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: git vs brain fart, Octopress, Sony A7, my audio setup]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/"/>
-    <updated>2014-08-17T22:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/08/17/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will show you how <strong>git</strong> helped me alleviate the disastrous consequences of a <strong>brain fart</strong>. I will also share my experiences with <strong>Octopress</strong>. You will learn what helps me <strong>feel better</strong>, day in and day out. Then, I&#8217;ll talk about some changes regarding the <strong>mailing list</strong> for this blog. And last, there&#8217;ll be <strong>reviews</strong> on my <strong>audio setup</strong> for a combined work / chill area and on the <strong>Sony A7</strong> full frame camera.</p>
-
-<!-- more -->
-
-
-<h2>git vs brain fart</h2>
-
-<p>The other day I experienced a curious malfunction of my brain. I had some uncommitted changes in a repository. Many hours of work in fact, way more than I normally would leave uncommitted anywhere. So to alleviate this grievance, I typed <code>git add .</code> on the command line.</p>
-
-<p>So far so good. But then I got distracted by a rather annoying phone call. During that call, something happened that I can best describe as a <strong><a href="http://en.wikipedia.org/wiki/Brain_fart">brain fart</a></strong>. I typed <code>git reset --hard HEAD</code> and pressed ENTER. Now you will probably ask why anyone would want to do that, particularly before actually committing the changes. To be honest, I am clueless. Maybe it was the geek&#8217;s version of a <strong><a href="http://en.wikipedia.org/wiki/Freudian_slip">Freudian slip</a></strong>? Something in my brain probably wanted to reset itself to the happier pre-call state, but somehow that idea landed on the command line instead?</p>
-
-<p>In case you don&#8217;t know this (destructive) <strong><a href="http://git-scm.com/">git</a></strong> command, this is what it does:</p>
-
-<blockquote><p>&#8211;hard<br/>Resets the index and working tree. Any changes to tracked files in the working tree made since <commit> will be discarded.</p><footer><strong>git-reset documentation</strong> <cite><a href='http://git-scm.com/docs/git-reset'>git-scm.com/docs/git-reset/&hellip;</a></cite></footer></blockquote>
-
-
-<p>Okay, think about that for a second. The documentation says it loud and clear. Changes to tracked files since <strong>HEAD</strong>, which is the current commit to which I have added above but not committed, are <strong>discarded</strong>. Oops.</p>
-
-<p>I have no idea what I was thinking. My changes appeared to be lost forever. Not a surprise really when you think about the description above. But for me in that second it was like getting hit by a truck that came out of nowhere.</p>
-
-<p>So I really wanted the fruits of my previous and tedious labor back.</p>
-
-<p>I tried <code>git reflog</code> according to <strong><a href="http://stackoverflow.com/questions/5788037/recover-from-git-reset-hard">these instructions</a></strong>, but that did not help; I did not find anything useful in the output. Luckily though, <strong><a href="http://git-scm.com/docs/git-fsck">fsck</a></strong> helped:</p>
-
-<pre><code>git fsck --lost-found --verbose
-cd .git/lost-found/other/
-find . -print | xargs grep someUniqueTextHere
-</code></pre>
-
-<p>So basically, git only runs a <strong><a href="http://de.wikipedia.org/wiki/Garbage_Collection">garbage collection</a></strong> every once in a while. I found this <strong><a href="http://gitready.com/advanced/2009/01/17/restoring-lost-commits.html">here</a></strong>. Using the commands above, I tell git to run a <strong>fschk</strong> and write out the <strong>lost and found</strong> items. Then I can find the one I was looking for by piping the result of <strong><a href="http://en.wikipedia.org/wiki/Find">find</a></strong> in that directory to <strong><a href="http://en.wikipedia.org/wiki/Grep">grep</a></strong>, looking for some specific text I remembered from the work I had lost.</p>
-
-<p>Then from the files I found, I was easily able to reconstruct the work that previously appeared lost. That really <strong>saved my day</strong>.</p>
-
-<h2>ClojureScript article</h2>
-
-<p>I found some time to put additional work into the article in which I describe the recently added <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">ClojureScript client</a></strong> of my <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong> application. Initially I wanted to do more work on the application itself and specifically use <strong><a href="https://github.com/cognitect/transit-format">Transit</a></strong> instead of JSON parsing. But this application is fairly dependent on <strong>keywordized keys</strong> inside the representation of the tweets, and Transit as of now does not have a built-in way to keywordize the JSON property names so that would have been a bit of work. Totally doable and the only thing that keeps me from actually doing it is that I want to do some major redesign of the application. Then, that effort would likely be wasted. More on that soon.</p>
-
-<h2>Octopress, one year later</h2>
-
-<p>I am using Octopress to generate my blog. It has served me alright, but I don&#8217;t really like it a lot and probably wouldn&#8217;t use it again.  I am just not enough of a Ruby guy to tinker around with it. I cannot even fix issues when I try to update it. The other night I wasted two precious hours trying to get my installation current so that I would benefit from newer features. I didn&#8217;t succeed. Quite frankly, I have no intentions of becoming a Ruby expert any time soon or ever.</p>
-
-<p>Along those lines, I was thinking about rolling my own blogging engine. Yeah I know what you&#8217;re thinking. At some point every (technical) blogger will reach that stage where you want to create your own blogging engine. But hear me out, this one might be a little different. I am thinking about making use of <strong><a href="http://www.polymer-project.org">Polymer</a></strong> and <strong><a href="http://webcomponents.org">Web Components</a></strong>. Now that the Google robots run JavaScript, the blog would get indexed just fine, without pre-rendering for search engine visibility. Why not load the markdown directly from a web component handling the current post and then let that render itself? Polymer handles browser compatibility, but I do not care much about IE6 users and the like anyway. At the same time that would give me a chance to delve deeper into web components. The idea of a shadow DOM is just brilliant, and I hope web components will have the success they deserve. Finally a vendor-agnotic way of building web applications.</p>
-
-<h2>Feeling good</h2>
-
-<p>I have a lot of fun writing stuff at the moment. I also write for myself. The first 25-30 minutes in the morning belong to me and me alone. Before reading any email, I focus on everything that comes to mind and write it down. It&#8217;s a great way to gain some clarity on what I want to do and where I want to go. The only thing that&#8217;s missing in the process is a decent and searchable way to organize the notes. That part needs work. But nonetheless, I am a happier person when I do this regularly. Highly recommended.</p>
-
-<h2>Mailing list: one and only one</h2>
-
-<p>At first I thought about creating a separate mailing list because I didn&#8217;t want to spam anyone who subscribed for infrequent tutorials with weekly updates like this one. But that&#8217;s too much work on my end. So instead I will unify the mailing lists. If the updates are too frequent for any of the existing subscribers, there are two options: <strong>a)</strong> let me know or <strong>b)</strong> unsubscribe. But why don&#8217;t you give it a try? My intention is to make the weekly update an entertaining read.</p>
-
-<h2>Book and gadget reviews</h2>
-
-<p>Last week I mentioned that I wanted an outlet for my opinions on books and gadgets. So I created a <strong><a href="http://matthiasnehlsen.com/reviews">page for reviews</a></strong>. I also started writing about some electronic stuff that I own.</p>
-
-<h3>My audio setup</h3>
-
-<p>I recently kicked out a high-end surround sound system in favor of a mixer, two active speakers and a pair of headphones. <strong><a href="http://matthiasnehlsen.com/reviews/audio-setup">Find out why</a></strong>.</p>
-
-<h3>My camera, Sony A7</h3>
-
-<p>I can finally use my classic Zeiss and Leica prime lenses again thanks to this camera. Overall I am quite happy with it. This review is a work in progress, but you can already read some of it <strong><a href="http://matthiasnehlsen.com/reviews/sony-a7">here</a></strong>.</p>
 
 <p>Have a great week,
 Matthias</p>
