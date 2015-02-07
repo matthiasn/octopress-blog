@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-01-21T16:54:26+01:00</updated>
+  <updated>2015-02-07T17:48:11+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,86 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Optimizing my Workspace]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2015/02/06/weekly-update/"/>
+    <updated>2015-02-06T20:56:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/02/06/weekly-update</id>
+    <content type="html"><![CDATA[<p>So within the last week or two, I spent a fair amount of time with something that seems fairly obvious to me as some who uses computers a lot, yet that had gotten far too little attention in the last couple of years. Now you may wonder what I&#8217;m getting at, but I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Probably most of your waking hours if you read this. But is your workplace ideal? Ideal in what way, I hear you ask. Ideal (or close) in <strong>every way</strong> you can imagine.</p>
+
+<!-- more -->
+
+
+<p>Your friends probably think that you as a software engineer work on the fastest hardware available. But do you, really? Let me tell you, a Retina MacBook is not the fastest computer out there. So when you freshly compile something, is waiting for 45 seconds okay or would you rather wait less than 20 seconds? I definetely fall in the latter camp.</p>
+
+<p>Also, is your posture okay when you sit in front of a laptop? Mine hardly is. When I was 25, that didn&#8217;t matter all that much. But I&#8217;m not 25. So I had a conversation with my orthopedic recently. I was initially there because I apparently hurt myself when doing sprints on the stairs in an old tunnel that goes under the river Elbe, which hosts the second biggest port in Europe right where the tunnel allows you to cross over. Here&#8217;s an old picture<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> of the building where you enter the tunnel, with an embedded illustration of where the tunnel and the stairs are located:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/elbtunnel.jpg" title="'Alter Elbtunnel'" ></p>
+
+<p>Anyway, I still believe that sprinting up those stairs is an excellent exercise for your legs as part of a longer run, but my right knee begs to differ.</p>
+
+<p>Whatever. Once the knee issue was discussed, he asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn&#8217;t really using the option of standing instead of sitting all that much. This is the desk:<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/imove-c-b-02.jpg" title="'Leuwico iMOVE-C'" ></p>
+
+<p>He smirked and said, &#8216;Oh that&#8217;s excellent that you have the right equipment already. You know, you should <strong>be standing about 70 percent</strong> of the day. That appears to be the <strong>most healthy thing to do</strong> for your back and all.&#8217;.</p>
+
+<p>Hmm. 70 percent of the time. That doesn&#8217;t really work with a laptop in front of me atop the desk in standing position. My neck just wouldn&#8217;t have it. Then I thought that I wanted to make my Retina MacBook redundant anyway, so why not replace it with a fine Linux workstation. The thing is, I can only bring the laptop in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it&#8217;s repaired, it will go on eBay. Bye Apple.</p>
+
+<p>For a moment I thought about reviving an older workstation of mine, which was pretty decent like four years back. While it was still equally performant as the 2012 Retina MacBook and partially better, with 24GB of RAM and a brand-new and fast SSD, it wasn&#8217;t the best I could get at the beginning of 2015.</p>
+
+<p>So what would I need to buy when I wanted the best option available, for decent but not crazy budget?</p>
+
+<p><strong>Intel Core i7 4790K</strong>. That part&#8217;s for sure. For the stuff I do on a development machine, the per-core performance is MUCH more important that the number of cores. Whatever I do, there will ALWAYS be parts of anything involved that don&#8217;t evenly scale to more cores. Adding any more cores than you find on the 4790K comes with a substantial penalty in GHz so it&#8217;s not only not worth it but more than likely makes your compiler slower than with less kernels a but higher clock rate.</p>
+
+<p>So that part was settled. Next, I needed a mainboard. A gaming board seems like the way to go. There, you want your computer at the highest clockrate possible, even when only occasionally. I actually want the same when running <code>lein cljsbuild once</code>. I don&#8217;t want the CPU to adapt to that after there&#8217;s demand for more CPU resources. No, I want the CPU to be at full blast by the time the task begins, and I wouldn&#8217;t mind pressing an actual button for that. That&#8217;s like playing an instrument.</p>
+
+<p>So I bought an ASUS Maximus VII Hero for my 4790K. Good choice, I&#8217;m happy with it. Next, there was the RAM. I still had 24 GB in my older workstation, of pretty good quality. But only 16 GB would fit into this new workstation. Why would I want to limit myself to that? I want to run quite a few docker containers simultaneously on that machine, all of which shall not starve on memory. So I needed 32 GB, the maximum amount the board could fit. The fastest available appeared to be the 2400 GHz Kingston memory. So I got that.</p>
+
+<p>Next, there was the SSD. I have good experiences with &#8230;, so I got a 250 GB one from them, for starters. More later, but 250 GB seems to hit a sweet spot when you want to run multiple SSDs on different SATA channels in order to get more OPs per second than if you were running a single and larger SSD.</p>
+
+<p>Then, there was the monitor. At first, I got the LG curved 34&#8221; display, but quite frankly, as awesome as the experience is for watching movies or gaming, it sucks for development. That&#8217;s simply because I&#8217;ve gotten so used to the Retina display on my MacBook that I&#8217;m not going back to a substantially lower ppi of the display. Not an option. Also, you definetely want a height-adjustable screen when building an ergonomic, hybrid standing/sitting workspace. So I sent the screen back to Amazon for refund. Instead, I now got a DELL 27&#8221; 4K screen for only like €600 which is like half of the LG I just returned. It works nicely, but of course we need a GPU to drive 8 million pixels. Even if the mainboard had a DisplayPort out, I wouldn&#8217;t want to use it. I also wanted the whole workstation to be extremely silent when not under load, so the ASUS GTX970 Strix was a good option. 4 GB of VRAM should be plenty to drive one or two 4K displays.</p>
+
+<p>All this combined with the installation of Linux Mint 17.1 and the proprietary nvidia driver and I have a very powerful workstation on which I can run my development environment really fast and also simulate a fairly complex environment with <strong>nginx</strong>, <strong>redis</strong>, multiple and clustered instance of <strong>ElasticSearch</strong>, plus multiple instances of the application I want to load-test, such as for example my <strong>BirdWatch</strong> application.</p>
+
+<p>Oh, did I mention that the machine is also COMPLETELY inaudible when not under sustantial load but still BLAZINGLY fast compared to the Retina MacBook?</p>
+
+<p>Compiling ClojureScript code on that machine is literally more than <strong>twice</strong> as fast compared to the my Retina MacBook, all while staying completely quiet. What took 42 seconds before (fresh compile of BirdWatch ClojureScript) application takes a little under 19 seconds on the Linux machine. Much more fun. Everything feels a lot snappier, the IntelliJ, for example. Plus I get to work with Docker natively. And while I mentioned last time that I would really miss Photoshop and OmniGraffle on a Linux machine, I can report that Photoshop runs perfectly well inside a virtual box running Windows 7 64 bit, with 4 GB of RAM and 4 CPUs assigned. It&#8217;s not that I&#8217;m lacking memory on this machine. I could even double that or more if I ever feel like it.</p>
+
+<p>Here&#8217;s how my new workplace looks like:</p>
+
+<p>By the way, the second screen is a workaround until I can replace it by another 4K screen. Unfortunately, the GTX 970 only has a single DisplayPort out, and while it&#8217;s HDMI port supports version 2.0 and a refresh rate of 60 Hz, the DELL doesn&#8217;t support this latest HDMI standard. 30 Hz is simply not an option. I should have bought the GTX 980 right away, it has three DisplayPort plugs, turning this into a non-issue. I should talk to the vendor about swapping the cards, maybe they can do something, considering that the one I want to trade the GTX 970 in for is way more expensive with over €500. Otherwise, I will need to buy another screen from a different vendor that supports 60 Hz.</p>
+
+<p>If you feel any kind of envy, you should probably talk to your boss about an upgrade, maybe while adjusting your next bonus. You&#8217;re likely in this profession for a long time. Staying healthy is just as important as knowing the latest (fad) framework.</p>
+
+<p>Assembling this machine has also been fun. It gives me more appreciation of all the achievements involved on the hardware side of computer science and electrical engineering that I had to familiarize myself what makes a component of the system more desirable than another one.</p>
+
+<p>If anyone&#8217;s interested, I can also write a step-by-step guide on how to set up this machine. I&#8217;m writing scripts for setting the machine up freshly at any moment in time, on another SSD. I might as well share those scripts. I&#8217;ll let you know about my further experiences with my new machine and my workspace.</p>
+
+<p>On this new machine, I have started setting up Docker containers for running load test and conceptually thinking about how to load test different aspects of the system I&#8217;m working on for my work-in-progress <strong>Building a System in ClojureScript</strong>. I will be working on that chapter next. In conjunction with the older workstation, I should have a decent environment for observing what kind of load can be handled per machine.</p>
+
+<p>The description of the status quo of the <strong>BirdWatch</strong> application is pretty much done, expcept for cleaning up the namespace that takes care of ingesting tweets and properly describing it. That will come in the next couple of days.</p>
+
+<p>Happy coding,
+Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>Postcard from the collection of Björn Larsson, please visit the  <strong><a href="maritime%20timetable%20images%20website">http://www.timetableimages.com/maritime/images/ha.htm</a></strong> for context and more historic images like this one.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>Leuwico iMOVE-C, more info on the <strong><a href="http://www.leuwico.com/office_furniture/products/office_furniture/imove/imove-c.html?goto=02">company website</a></strong><a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Dear Apple, Get Your Act Together]]></title>
@@ -1785,111 +1865,6 @@ Matthias</p>
 <p>Last week’s cliffhanger was a section on speed improvements on this blog. Sorry, but you will have to wait a little longer for that story. I was so busy writing Clojure that I didn’t find the time to write it down. But no worries, the speed improvements will be covered soon.</p>
 
 <p>Have a great remaining week,
-Matthias</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: AngularJS book, BirdWatch and Clojure, Web Components, Upstart and Play]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/"/>
-    <updated>2014-08-25T19:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/08/25/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will be talking about <strong>Clojure and ClojureScript</strong>, an upcoming article on <strong>AngularJS, Grunt, Karma and Protractor</strong> and how I use <strong>Upstart</strong> to run my <strong>Play</strong> applications as services on <strong>Ubuntu</strong>.</p>
-
-<!-- more -->
-
-
-<h2>AngularJS book available for pre-order on Amazon, Meetup</h2>
-
-<p>I am very excited that the book that <strong><a href="http://amitgharat.wordpress.com">Amit Gharat</a></strong> and I wrote about <strong><a href="http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1783288477&amp;linkCode=as2&amp;tag=matthiasnehls-20&amp;linkId=7WKFJKNQICCUSFES">AngularJS UI Development</a></strong> is now available for <strong><a href="http://www.amazon.com/gp/product/1783288477/ref=as_li_tl?ie=UTF8&amp;camp=1789&amp;creative=390957&amp;creativeASIN=1783288477&amp;linkCode=as2&amp;tag=matthiasnehls-20&amp;linkId=7WKFJKNQICCUSFES">pre-order on Amazon</a></strong>. Interesting experience to see it being listed already while still working on the final stages.</p>
-
-<p>We will have <strong>content</strong> available for <strong>preview</strong> soon. On my end, I will <strong>publish</strong> an article about <strong>setting up the environment for AngularJS</strong> with a <strong>build system consisting of Grunt, Bower, Karma and Protractor</strong>. Last week I also gave a talk on the subject at the <strong><a href="http://www.meetup.com/Hamburg-AngularJS-Meetup/events/196972082/">Hamburg AngularJS meetup</a></strong>. Or rather a live coding session in which we coded up an application that is being <strong>tested in Chrome, Firefox, PhantomJS and also in Mobile Safari</strong>. <strong>Android</strong> is still <strong>missing</strong> due to some difficulties but should be added soon. Two interesting questions came up during the meetup: <strong>a)</strong> How do you test swipe gestures? <strong>b)</strong> When selecting elements to click by <strong>id</strong>, will <strong><a href="https://github.com/angular/protractor">Protractor</a></strong> catch errors if an element, though visible, is covered by another element and thus cannot be clicked? Tests should also be added for cases such as these. The project the article will be based upon is already available on <strong><a href="https://github.com/matthiasn/angular-grunt-protractor-starter">GitHub</a></strong>. You may find it to be a good starting point for an <strong>AngularJS</strong> application that includes a <strong>test</strong> and <strong>build</strong> system. Besides the planned article I also want to do a <strong>screencast</strong> on the subject. Stay tuned. By the way, <strong>you</strong> could help with testing the application on Android or adding the additional test cases.</p>
-
-<h2>Tweet stream analysis with Clojure and ClojureScript/Om</h2>
-
-<p>I recently <strong><a href="http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/">rewrote</a></strong> the client side of my <strong><a href="https://github.com/matthiasn/birdwatch">BirdWatch</a></strong> application using <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> and <strong><a href="https://github.com/swannodette/om">Om</a></strong>. While I enjoyed the process, I also noticed some performance issues when I tried to keep the application responsive while <strong>ingesting and transforming</strong> thousands of previous tweets as quickly as possible. While optimizations certainly could have been done on the client side alone, this was a good reminder that the information flow architecture was <strong>far from ideal</strong>. The previous version was also a bit of a <strong>Frankenstein&#8217;s patchwork</strong> of programming languages. I acknowledge that it may be a little bit of a <strong>tough sell</strong> to have to understand both <strong><a href="http://www.scala-lang.org">Scala</a></strong> and <strong><a href="http://clojure.org">Clojure</a></strong> in order to wrap your head around a single application. Totally unnecessary, too.</p>
-
-<p>So I rewrote the server side using <strong>Clojure</strong>. That already works nicely, this time making use of <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSockets</a></strong> instead of <strong><a href="http://en.wikipedia.org/wiki/Server-sent_events">Server-Sent Events</a></strong>. Turns out <strong>WebSockets</strong> are a nice fit conceptually for <strong><a href="http://en.wikipedia.org/wiki/Communicating_sequential_processes">CSP-style channels</a></strong>.</p>
-
-<p>A couple of things still need to be resolved. In order to fully achieve the previous functionality, there needs to be an <strong>auto-reconnect</strong> if the connection to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> is lost. That should be really simple, given what is there already. Also, <strong>matching</strong> new tweets with the clients&#8217; queries using <strong>ElasticSearch</strong>&#8217;s <strong><a href="http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-percolate.html">Percolator</a></strong> and only delivering a <strong>filtered stream</strong> needs to be implemented. This is slightly more involved, but also seems totally doable.</p>
-
-<p>Above and beyond, it seems useful to <strong>partially perform</strong> the computation (ranking by retweets, word counts) <strong>on the server</strong> in order to <strong>reduce the load</strong> on the client. With <strong>Clojure</strong> and <strong>ClojureScript</strong> being so similar, my idea is to use a part of the code base on both sides and split the computation. Then, the amount of data having to traverse the potentially slow network connection would be reduced drastically, leading to faster loading and a more <strong>mobile-friendly</strong> memory footprint of the client.</p>
-
-<p>A new article on this application rewrite will follow soon. The work in progress code is on <strong><a href="https://github.com/matthiasn/BirdWatch/tree/2014-08-25-Clojure-Server">Github</a></strong> already, currently in a separate branch.</p>
-
-<h2>Web Components / Polymer / X-Tag resources</h2>
-
-<p>As already mentioned last week, I find some of the ideas behind <strong><a href="http://webcomponents.org">Web Components</a></strong> <strong>brilliant</strong>, in particular <strong>Shadow DOM</strong> and <strong>Custom Elements</strong>. Now that I am learning these concepts anyway, I thought I might as well <strong>share useful resources</strong> I come across, so I have created a <strong><a href="https://github.com/matthiasn/WebComponents-Polymer-Resources">list over on GitHub</a></strong>. Check it out and <strong>please add your links</strong> too. I expect this list to grow substantially in the next couple of weeks.</p>
-
-<h2>Upstart scripts for Play</h2>
-
-<p>I am running <strong>live instances</strong> of my <strong><a href="http://playframework">Play</a></strong> applications (BirdWatch, sse-chat, amzn-geo-lookup) on an <strong><a href="http://www.ubuntu.com">Ubuntu</a></strong> server. There are <strong>hardly any disruptions</strong>, something like once every few months. But whenever they occurred, I had to restart the applications <strong>manually</strong>. Not terrible when all is running smoothly, but not great either. So how could that be done better? <strong><a href="http://upstart.ubuntu.com">Upstart</a></strong> provides the answer. After some googling I found <strong><a href="http://www.agileand.me/blog/posts/play-2-2-x-upstart-init-script">this blog post</a></strong> by <strong><a href="https://twitter.com/ajevans85">Adam Evans</a></strong>. I have only slightly modified it and now, I have all of my applications running as services that I can <strong>start</strong> and <strong>stop</strong> the way one would expect, e.g.:</p>
-
-<pre><code># status birdwatch
-birdwatch start/running, process 947
-# stop birdwatch
-birdwatch stop/waiting
-# start birdwatch
-birdwatch start/running, process 30453
-</code></pre>
-
-<p>Also, the services <strong>start automatically</strong> after a system reboot.</p>
-
-<p>So what needs to be done? First of all, we need a standalone instance of the applications using the <strong><a href="https://www.playframework.com/documentation/2.2.x/ProductionDist">dist</a></strong> command, e.g.;</p>
-
-<pre><code># play dist
-[info] Loading project definition from /home/bw/BirdWatch/project
-[info] Set current project to BirdWatch (in build file:/home/bw/BirdWatch/)
-[info] Wrote /home/bw/BirdWatch/target/scala-2.10/birdwatch_2.10-0.3.0.pom
-[info] 
-[info] Your package is ready in /home/bw/BirdWatch/target/universal/birdwatch-0.3.0.zip
-</code></pre>
-
-<p>We can unpack the zip file where we choose and then simply adapt the script from the blog post mentioned above, in this case:</p>
-
-<pre><code>description "Upstart script for https://github.com/matthiasn/Birdwatch, modified from http://www.agileand.me/blog/posts/play-2-2-x-upstart-init-script"
-
-env USER=bw
-env GROUP=www
-env APP_HOME=/home/bw/apps/birdwatch-0.3.0
-env APP_NAME=birdwatch
-env PORT=9000
-env BIND_ADDRESS=0.0.0.0
-env EXTRA=""
-
-start on (filesystem and net-device-up IFACE=lo)
-stop on runlevel [!2345]
-
-respawn
-respawn limit 30 10
-umask 022
-expect daemon
-
-pre-start script
-    #If improper shutdown and the PID file is left on disk delete it so we can start again
-
-    if [ -f $APP_HOME/RUNNING_PID ] &amp;&amp; ! ps -p `cat $APP_HOME/RUNNING_PID` &gt; /dev/null ; then
-        rm $HOME/RUNNING_PID ;
-    fi
-end script
-
-exec start-stop-daemon --pidfile ${APP_HOME}/RUNNING_PID --chdir ${APP_HOME} --chuid $USER:$GROUP --exec ${APP_HOME}/bin/$APP_NAME --background --start -- -Dhttp.port=$PORT -Dhttp.address=$BIND_ADDRESS $EXTRA
-</code></pre>
-
-<p>Et voilà - after a restart of the server, all services come up as expected. Much nicer. The script is also on <strong><a href="https://github.com/matthiasn/BirdWatch/blob/797c9b27eeb018138e90f95ad3df8774b4fbd6e5/conf/upstart/birdwatch.conf">GitHub</a></strong>. For more information, check out the <strong><a href="http://upstart.ubuntu.com/cookbook/">upstart cookbok</a></strong> and the <strong><a href="http://upstart.ubuntu.com/getting-started.html">getting started guide</a></strong>.</p>
-
-<h2>Conclusion</h2>
-
-<p>Last week was fairly <strong>productive</strong>, I got some really cool stuff done that had been on my mind for a while. I hope to continue this flow in the week that has just started. I&#8217;ll let you know next week. <strong><a href="http://en.wikipedia.org/wiki/Cliffhanger">Cliffhanger</a></strong>: I recently increased the <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=http%3A%2F%2Fmatthiasnehlsen.com&amp;tab=desktop">Google PageSpeed Insights</a></strong> score of this blog by a lot, from <strong>58/100 to 83/100 for mobile</strong> and from <strong>77/100 to 90/100 for desktop</strong>.</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed.png" title="'pagespeed results'" ></p>
-
-<p>It also feels like the pages are loading a lot faster. <strong>Next week</strong> I&#8217;ll let you know what I did. Would you like to get notified when the next article is out? Just <strong>sign up</strong> for the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>mailing list</strong></a>.</p>
-
-<p>Have a great week,
 Matthias</p>
 
 <iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

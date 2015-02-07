@@ -1,27 +1,31 @@
 ---
 layout: post
-title: "Weekly Update: Linux, Clojure Book, Docker"
+title: "Optimizing my Workspace"
 date: 2015-02-06 20:56
 comments: true
 categories: 
 ---
-I haven't done a weekly update in a while and I kind of miss the habit of doing so. So here we go. In my last article, I mentioned how unsatisfied I was with Apple's customer service. But I'm actually beginning to be thankful for their sucky customer service as that means I will finally be able to withdraw from their overpriced products.
+So within the last week or two, I spent a fair amount of time with something that seems fairly obvious to me as some who uses computers a lot, yet that had gotten far too little attention in the last couple of years. Now you may wonder what I'm getting at, but I'll get there. Let me ask you something first. **How many hours per week do you spend in front of your computer?** Probably most of your waking hours if you read this. But is your workplace ideal? Ideal in what way, I hear you ask. Ideal (or close) in **every way** you can imagine.
 
-The thing is, I can only bring my 2012 Retina MacBook in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it's repaired, it will go on eBay. Bye Apple.
+<!-- more -->
 
-Most of my free time this week went into building a development workstation running Linux Mint 17.1. That's been fun for the most part, except for installing the NVIDIA drivers. Ah well. I'll probably make another article about building the system soon. Suffice to say that I'm really happy with how powerful the system is. Compiling ClojureScript on that machine is literally more than **twice** as fast compared to the my Retina MacBook. What took 42 seconds before (fresh compile of BirdWatch ClojureScript) application takes a little under 19 seconds on the Linux machine. Much more fun. Everything feels a lot snappier. Plus I get to work with Docker natively.
+Your friends probably think that you as a software engineer work on the fastest hardware available. But do you, really? Let me tell you, a Retina MacBook is not the fastest computer out there. So when you freshly compile something, is waiting for 45 seconds okay or would you rather wait less than 20 seconds? I definetely fall in the latter camp.
 
+Also, is your posture okay when you sit in front of a laptop? Mine hardly is. When I was 25, that didn't matter all that much. But I'm not 25. So I had a conversation with my orthopedic recently. I was initially there because I apparently hurt myself when doing sprints on the stairs in an old tunnel that goes under the river Elbe, which hosts the second biggest port in Europe right where the tunnel allows you to cross over. Here's an old picture[^1] of the building where you enter the tunnel, with an embedded illustration of where the tunnel and the stairs are located:
 
+{% img left /images/elbtunnel.jpg 'Alter Elbtunnel' %}
 
-So the last week or two, I spent a fair amount of time with with something that seems fairly obvious to me as a developer, yet that had gotten far too little attention in the last couple of years. Now you may wonder what I'm getting at, but I'll get there. Let me ask you something. How many hours per week do you spend in front of your computer? Probably most of your waking hours if you read this. But is your workplace ideal? Ideal in what way, I hear you ask. Ideal in every way you can imagine.
+Anyway, I still believe that sprinting up those stairs is an excellent exercise for your legs as part of a longer run, but my right knee begs to differ.
 
-Your friends probably think that you work on the fastest hardware available. But do you, really? Let me tell you, a Retina MacBook is not the fastest computer out there. So when you freshly compile something, is waiting for 45 seconds okay or would you rather wait less than 20 seconds? I definetely fall in the latter camp.
+Whatever. Once the knee issue was discussed, he asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn't really using the option of standing instead of sitting all that much. This is the desk:[^2]
 
-Also, is your pasture okay when you sit in front of a laptop? Mine isn't. When I was 25, that didn't matter all that much. But I'm not 25. So I had a conversation with my orthopedic recently. I was initially there because I apparently hurt myself when doing sprints on the stairs in an old tunnel that goes under the river Elbe, which hosts the second biggest port in Europe right where the tunnel allows you to cross over. Anyway, I still believe that sprinting up those stairs is an excellent exercise for your legs as part of a longer run, but my right knee begs to differ.
+{% img left /images/imove-c-b-02.jpg 'Leuwico iMOVE-C' %}
 
-Whatever. Once that issue was discussed, he asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn't really using the option of standing instead of sitting all that much. He smirked and said, 'Oh that's excellent that you have the right equipment already. You know, you should be standing about 70 percent of the time. That appears to be the most healthy thing to do for your back and all.'.
+He smirked and said, 'Oh that's excellent that you have the right equipment already. You know, you should **be standing about 70 percent** of the day. That appears to be the **most healthy thing to do** for your back and all.'.
 
-Hmm. 70 percent of the time. That doesn't really work with a laptop in front of me atop the desk in standing position. My neck just wouldn't have it. Then I thought that I wanted to make my Retina MacBook redundant anyway, so why not replace it with a fine Linux workstation. For a moment I thought about reviving an older workstation of mine, which was pretty decent like four years back. While it was still equally performant as the 2012 Retina MacBook and partially better, with 24GB of RAM and a brand-new and fast SSD, it wasn't the best I could get at the beginning of 2015.
+Hmm. 70 percent of the time. That doesn't really work with a laptop in front of me atop the desk in standing position. My neck just wouldn't have it. Then I thought that I wanted to make my Retina MacBook redundant anyway, so why not replace it with a fine Linux workstation. The thing is, I can only bring the laptop in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it's repaired, it will go on eBay. Bye Apple.
+
+For a moment I thought about reviving an older workstation of mine, which was pretty decent like four years back. While it was still equally performant as the 2012 Retina MacBook and partially better, with 24GB of RAM and a brand-new and fast SSD, it wasn't anywhere near the best I could get at the beginning of 2015.
 
 So what would I need to buy when I wanted the best option available, for decent but not crazy budget?
 
@@ -57,3 +61,9 @@ The description of the status quo of the **BirdWatch** application is pretty muc
 
 Happy coding,
 Matthias
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+[^1]: Postcard from the collection of Björn Larsson, please visit the  **[http://www.timetableimages.com/maritime/images/ha.htm](maritime timetable images website)** for context and more historic images like this one.
+
+[^2]: Leuwico iMOVE-C, more info on the **[company website](http://www.leuwico.com/office_furniture/products/office_furniture/imove/imove-c.html?goto=02)**

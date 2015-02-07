@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="This is the follow-up on last week&#8217;s article about AngularJS and Play Framework. I want to share with you the problems that I encountered on &hellip;">
+  <meta name="description" content="Last week I was dealing with an odd behavior of the chat application demo I was running for this article. The issue was timing-related and there were &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/07/09/transforming-logs-into-information/">Transforming Log Events into Information</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-07-09T14:14:00+02:00" pubdate data-updated="true">07/09/2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last week I was dealing with an odd behavior of the chat application demo I was running for <strong><a href="http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/">this article</a></strong>. The issue was timing-related and there were no actual exceptions that would have helped in identifying the problem. How are you going to even notice spikes and pauses in potentially thousands of lines in a logfile? I was upset, mostly with myself for not finding the issue earlier, and I promised myself to find a better tool. I needed a way to transform the raw logging data into useful information so I could first understand and then tackle the problem. In this article I will show what I have put together over the weekend. <strong>Part I</strong> describes the general approach and applies to any application out there, no matter what language or framework you are using. <strong>Part II</strong> describes one possible implementation of this approach using <strong><a href="http://www.playframework.com">Play Framework</a></strong>.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2013/07/09/transforming-logs-into-information/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -451,49 +494,6 @@
 
     </article>
   
-  
-    <article>
-      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Iteratee: can I have that in a sentence?</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2013-04-23T22:08:00+02:00" pubdate data-updated="true">04/23/2013</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>A couple of weeks back I was trying to wrap my head around <strong><a href="http://www.playframework.com/documentation/2.0.4/Iteratees">Iteratees</a></strong> so I read what I could find on Google. Afterwards, I had a very high level idea about Enumerators producing or emitting a stream of information and Iteratees consuming that information, potentially with aggregate state. At the same time, the Iteratee was supposed to be immutable. Okay, so I have this immutable thing aggregating state over time. That did not seem right.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/6/">&larr; Older</a>
@@ -522,6 +522,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/02/06/weekly-update/">Optimizing my Workspace</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/01/21/apple-get-your-act-together/">Dear Apple, Get Your Act Together</a>
       </li>
     
@@ -535,10 +539,6 @@
     
       <li class="post">
         <a href="/blog/2014/12/23/Happy-Holidays/">Happy Holidays and Thanks for Reading</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2014/12/19/Clojure-Book/">I&#8217;m writing a book about Building a System in Clojure</a>
       </li>
     
   </ul>
