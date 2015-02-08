@@ -17,15 +17,15 @@ Also, is your posture okay when you sit in front of a laptop? Mine hardly is. Wh
 
 Anyway, I still believe that sprinting up those stairs is an excellent exercise for your legs as part of a longer run, but my right knee begs to differ.
 
-Whatever. Once the knee issue was discussed, he asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn't really using the option of standing instead of sitting all that much. This is the desk:[^2]
+Whatever. Once the knee issue was discussed, the orthopedic asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn't really using the option of standing instead of sitting all that much. This is the desk:[^2]
 
 {% img left /images/imove-c-b-02.jpg 'Leuwico iMOVE-C' %}
 
-He smirked and said, 'Oh that's excellent that you have the right equipment already. You know, you should **be standing about 70 percent** of the day. That appears to be the **most healthy thing to do** for your back and all.'.
+He smirked, ignored what I mentioned about not using the desk as intended, and said, 'Oh that's excellent that you have the right equipment already. You know, you should **be standing about 70 percent** of the day. That appears to be the **most healthy thing to do** for your back and all.'.
 
-Hmm. 70 percent of the time. That doesn't really work with a laptop in front of me atop the desk in standing position. My neck just wouldn't have it. Then I thought that I wanted to make my Retina MacBook redundant anyway, so why not replace it with a fine Linux workstation. The thing is, I can only bring the laptop in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it's repaired, it will go on eBay. Bye Apple.
+Hmm. 70 percent of the time. That doesn't really work with a laptop in front of me atop the desk in standing position. My neck just wouldn't have it. Then I thought that I wanted to **[throw my Retina MacBook out](http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/)** anyway, so why not replace it with a _fine_ Linux workstation plus a lightweight laptop running Linux as well. The thing is, I can only bring the MacBook in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it's repaired, it will go on eBay. Bye Apple.
 
-For a moment I thought about reviving an older workstation of mine, which was pretty decent like four years back. While it was still equally performant as the 2012 Retina MacBook and partially better, with 24GB of RAM and a brand-new and fast SSD, it wasn't anywhere near the best I could get at the beginning of 2015.
+For a moment I thought about reviving an older workstation of mine, which was pretty decent like four years back. While it was still equally performant as the 2012 Retina MacBook and partially better, with recently upgraded 24GB of RAM and a brand-new and fast SSD, it wasn't anywhere near the best I could get at the beginning of 2015.
 
 So what would I need to buy when I wanted the best option available, for decent but not crazy budget?
 
