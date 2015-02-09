@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-02-09T02:13:56+01:00</updated>
+  <updated>2015-02-09T13:12:28+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -18,32 +18,30 @@
     <link href="http://matthiasnehlsen.com/blog/2015/02/06/optimizing-my-workspace/"/>
     <updated>2015-02-06T20:56:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/02/06/optimizing-my-workspace</id>
-    <content type="html"><![CDATA[<p>So within the last week or two, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that had gotten far too little attention in the last couple of years. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal? Ideal in what way, I hear you ask. Ideal (or close) in <strong>every way</strong> you can imagine.</p>
+    <content type="html"><![CDATA[<p>So within the last week or two, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that had gotten far too little attention in the last couple of years of my life. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close?</p>
 
 <!-- more -->
 
 
 <p>Your friends probably think that you as a software engineer always work on the fastest hardware available. But do you, really? Let me tell you a secret, a Retina MacBook is not the fastest computer out there. So when you freshly compile something, is waiting for 45 seconds okay or would you rather wait less than 20 seconds? I definetely fall in the latter camp.</p>
 
-<p>Also, is your posture okay when you sit in front of a laptop? Mine hardly is. When I was 25, that didn&#8217;t matter all that much. But I&#8217;m not 25. So I had a conversation with my orthopedic recently. I was initially there because I apparently hurt myself when doing sprints on the stairs in an old tunnel that goes under the river Elbe, which hosts the second biggest port in Europe right where the tunnel allows you to cross over (or should I say under?). Here&#8217;s an old picture<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> of the building where you enter the tunnel, with an embedded illustration of where the tunnel and the stairs are located:</p>
+<p>Also, is your posture okay when you sit in front of a laptop? Mine hardly is. When I was 25, that didn&#8217;t matter all that much. But I&#8217;m not 25. I had a conversation with my orthopedic recently. I was initially there because I apparently hurt myself when doing sprints on the stairs in an old tunnel that goes under the river Elbe, which hosts the second biggest port in Europe right where the tunnel allows you to cross over (or should I say under?). Here&#8217;s an old picture<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> of the building where you enter the tunnel, with an embedded illustration of where the tunnel and the stairs are located:</p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/elbtunnel.jpg" title="'Alter Elbtunnel'" ></p>
 
-<p>Anyway, I still believe that sprinting up those stairs is an excellent exercise for your legs as part of a longer run, but my right knee begs to differ.</p>
-
-<p>Whatever. Once the knee issue was discussed, the orthopedic asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn&#8217;t really using the option of standing instead of sitting all that much. This is the desk:<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+<p>Anyway, I still believe that sprinting up those stairs is an excellent exercise for your legs as part of a longer run, but my right knee begs to differ. Whatever. Once the knee issue was discussed, the orthopedic asked me about my workspace, upon which I responded that I had purchased a standing desk about a year back but that I wasn&#8217;t really using the option of standing instead of sitting all that much. This is the desk:<sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
 
 <p><img class="left" src="http://matthiasnehlsen.com/images/imove-c-b-02.jpg" title="'Leuwico iMOVE-C'" ></p>
 
 <p>He smirked, ignored what I mentioned about not using the desk as intended, and said, &#8216;Oh that&#8217;s excellent that you have the right equipment already. You know, you should <strong>be standing about 70 percent</strong> of your waking hours. That appears to be the <strong>most healthy thing to do</strong> for your back and all.&#8217;.</p>
 
-<p>Hmm. 70 percent of the time. The thing is that working with a laptop in front of me atop the desk in standing position isn&#8217;t really feasible for long. My neck just wouldn&#8217;t have it. Then I thought that I wanted to <strong><a href="http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/">throw my Retina MacBook out</a></strong> anyway, so why not replace it with a <em>fine</em> Linux workstation plus a lightweight laptop running Linux as well. The thing is, I can only bring the MacBook in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it&#8217;s repaired, it will go on eBay. Bye Apple.</p>
+<p>Hmm. <strong>70 percent of the time.</strong> The thing is that working with a laptop in front of me atop the desk in standing position isn&#8217;t really feasible for extended periods of time. My neck just wouldn&#8217;t have it. Then I thought that I wanted to <strong><a href="http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/">throw my Retina MacBook out</a></strong> anyway and I also wasn&#8217;t kidding, so why not replace it with a <em>fine</em> Linux workstation plus a lightweight laptop running Linux as well<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. The thing is, I can only bring the MacBook in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it&#8217;s repaired, it will go on eBay. Bye Apple.</p>
 
-<p>For a moment I thought about reviving an older workstation of mine, which was pretty decent like four and a half years back. While it was still equally performant as the 2012 Retina MacBook and partially better, with recently upgraded 24GB of fast RAM and a brand-new and fast SSD, it wasn&#8217;t anywhere near the best I could get in early 2015.</p>
+<p>For a moment I thought about using an older workstation of mine, which was pretty decent like four and a half years back and that hadn&#8217;t seen so much usage recently. While it was still equally performant as the 2012 Retina MacBook and partially better, with recently upgraded 24GB of fast RAM and a brand-new and fast SSD, it wasn&#8217;t anywhere near the best I could get in early 2015.</p>
 
 <p>So I thought I&#8217;d rather keep that workstation in use for running load tests against a new machine. But what would I need to buy when I wanted the best option available, for a decent but not crazy budget?</p>
 
-<p><strong>Intel Core i7 4790K</strong>. That part&#8217;s for sure. It seems to me that for the stuff I typically do on a development machine, the per-core performance is MUCH more important than the number of cores. Whatever I do, there will ALWAYS be parts of anything involved that don&#8217;t evenly scale to more cores. Adding any more cores than you find on the 4790K comes with a substantial penalty in GHz though so it&#8217;s not only not worth it but more than likely makes some compilers slower than with less kernels a but higher clock rate.</p>
+<p><strong>Intel Core i7 4790K</strong>. That part&#8217;s for sure. It seems to me that for the stuff I typically do on a development machine, the per-core performance is MUCH more important than the number of cores. Whatever I do, there will ALWAYS be parts of anything involved that don&#8217;t evenly scale to more cores. Adding any more cores than the four (plus Hyperthreading) you find on the 4790K comes with a substantial penalty in GHz though so it&#8217;s not only not worth it but more than likely makes some compilers slower than with less kernels a but higher clock rate. <sup id="fnref:4"><a href="#fn:4" rel="footnote">4</a></sup></p>
 
 <p>The CPU part was settled. Next, I needed a mainboard. A gaming board seems like the way to go. There, you want your computer at the highest clockrate possible, even when only occasionally. I actually want the same when running <code>lein cljsbuild once</code>. I don&#8217;t want the CPU to adapt to that after there&#8217;s demand for more CPU resources. No, I want the CPU to be at full blast by the time the task begins, and I wouldn&#8217;t mind pressing an actual button for that. That&#8217;s like playing an instrument.</p>
 
@@ -63,17 +61,23 @@
 
 <p>Here&#8217;s how my new workplace looks like:</p>
 
-<p>By the way, the second screen is a workaround until I can replace it by another 4K screen. Unfortunately, the GTX 970 only has a single DisplayPort out, and while it&#8217;s HDMI port supports version <strong>2.0</strong> and a refresh rate of <strong>60 Hz</strong>, the DELL doesn&#8217;t support this latest HDMI standard. Hardly any screens do at the moment, but 30 Hz is simply not an option. I should have bought the <strong>GTX 980</strong> right away, it has three DisplayPort plugs, turning this into a non-issue. I should talk to the vendor about swapping the cards, maybe they can do something, considering that the one I want to trade the GTX 970 in for is way more expensive with over €500. Otherwise, I will need to buy another screen from a different vendor that supports 60 Hz over HDMI.<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup></p>
+<p>By the way, the second screen is a workaround until I can replace it by another 4K screen. Unfortunately, the GTX 970 only has a single DisplayPort out, and while it&#8217;s HDMI port supports version <strong>2.0</strong> and a refresh rate of <strong>60 Hz</strong>, the DELL doesn&#8217;t support this latest HDMI standard. Hardly any screens do at the moment, but 30 Hz is simply not an option. I should have bought the <strong>GTX 980</strong> right away, it has three DisplayPort plugs, turning this into a non-issue. I should talk to the vendor about swapping the cards, maybe they can do something, considering that the one I want to trade the GTX 970 in for is way more expensive with over €500. Otherwise, I will need to buy another screen from a different vendor that supports 60 Hz over HDMI.<sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup></p>
 
 <p>If you feel any kind of envy now, you should probably talk to your boss about an upgrade. You&#8217;re likely in this profession for a long time. Staying healthy is just as important as knowing the latest (probably fad) framework, if not more so.</p>
 
-<p>By the way, if I were you, I&#8217;d start with the ergomics of a standing desk. Most reasonable employers tend to understand that the price for a decent desk is negligible in comparison to the costs in lost productivity and sick days caused by back pain. Back pain sucks, and it&#8217;s almost as bad hearing others whine about it than experiencing it yourself. Then, when there&#8217;s a standing desk in front of you, you are obviously going to need a height-adjustable screen.</p>
+<p>By the way, if I were you, I&#8217;d start with the ergomics of a standing desk. Most reasonable employers tend to understand that the price for a decent desk is negligible in comparison to the costs in lost productivity and sick days caused by back pain. Back pain sucks, and it&#8217;s almost as bad hearing others whine about it than experiencing it yourself. Then, when there&#8217;s a standing desk in front of you, you are obviously going to need a height-adjustable screen. Do yourself a favor and get a high-res screen if you&#8217;re used to high pixel density on your laptop screen.</p>
+
+<p>Okay, that&#8217;s it for my workspace for today. Good luck with improving your work environment as well. Now for some other stuff that I&#8217;ve been up to.</p>
 
 <h1>Progress with &#8216;Building a System in Clojure&#8217;</h1>
 
-<p>On this new machine, I have started setting up <strong>Docker</strong> containers for running load test and conceptually thinking about how to load test different aspects of the system I&#8217;m working on for my work-in-progress <strong>Building a System in ClojureScript</strong>. I will be working on that chapter next. In conjunction with the older workstation, I should have a decent environment for observing what kind of load can be handled per machine.</p>
+<p>On this new machine I described above, I have started setting up <strong>Docker</strong> containers for running load test and conceptually thinking about how to load test different aspects of the system I&#8217;m working on for my work-in-progress <strong>Building a System in ClojureScript</strong>. I will be working on that chapter next. In conjunction with the older workstation, I should have a decent environment for observing what kind of load can be handled per machine.</p>
 
 <p>The description of the status quo of the <strong>BirdWatch</strong> application is pretty much done, except for cleaning up the namespace that takes care of ingesting tweets and properly describing it. That will come in the next couple of days.</p>
+
+<h1>Inspect</h1>
+
+<p>I fixed an issue with the <strong>inspect</strong> library where you would get some cryptic NullPointerException when pulling version <strong>0.1.4</strong> in from <strong>Clojars</strong> that did not occur when publishing locally. Not sure exactly what I did wrong when publishing it, but I created version <strong>0.1.5</strong> now with a newer version of ClojureScript and this one appears to be working as advertised when pulled in from Clojars.</p>
 
 <p>Happy coding,
 Matthias</p>
@@ -90,7 +94,11 @@ Matthias</p>
 <li id="fn:2">
 <p>Leuwico iMOVE-C, more info on the <strong><a href="http://www.leuwico.com/office_furniture/products/office_furniture/imove/imove-c.html?goto=02">company website</a></strong><a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
 <li id="fn:3">
-<p>Funny enough, I just read that NVIDIA is somewhat in trouble about falsely advertising the specs of the GTX 970, making it look closer to the GTX 980 than it actually is. Maybe that&rsquo;s how I can swap the card. I should have bought it on Amazon, then I could just send it back instead of negotiating with the local vendor where I bought.<a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<p>I still need to buy said Linux laptop. Let&rsquo;s see how the 2015 Dell XPS 15 will look like. Or should I get the 13 inch version? It&rsquo;s delightfully lightweight, and considering that it will not be my primary workhorse, it is probably going to be enough. Whenever I get a decent Internet connection, I can just dial into my new workstation and tap into it&rsquo;s sheer power. <a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+<li id="fn:4">
+<p>This seems particularly true for anything compilation-related. For running more Docker containers simultaneously, more 6 or 8 or even more cores would certainly help. Also, the new Socket 2011-3 CPUs have more PCI Express lanes, which comes in handy when driving SSDs over PCI-E instead of the now-way-too-slow SATA or connecting to a 10GB network. I&rsquo;m already in the mood for building such a machine myself, but I&rsquo;ll try to wait until the next generation of CPUs comes out in the second half of 2015.<a href="#fnref:4" rev="footnote">&#8617;</a></p></li>
+<li id="fn:5">
+<p>Funny enough, I just read that NVIDIA is somewhat in trouble about falsely advertising the specs of the GTX 970, making it look closer to the GTX 980 than it actually is. Maybe that&rsquo;s how I can swap the card. I should have bought it on Amazon, then I could just send it back instead of negotiating with the local vendor where I bought.<a href="#fnref:5" rev="footnote">&#8617;</a></p></li>
 </ol>
 </div>
 
