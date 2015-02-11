@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-02-10T17:18:57+01:00</updated>
+  <updated>2015-02-11T19:49:52+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Optimizing my Workspace - Hardware, Software, Ergonomics]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2015/02/06/optimizing-my-workspace/"/>
-    <updated>2015-02-06T20:56:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2015/02/06/optimizing-my-workspace</id>
+    <link href="http://matthiasnehlsen.com/blog/2015/02/11/optimizing-my-workspace/"/>
+    <updated>2015-02-11T20:56:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/02/11/optimizing-my-workspace</id>
     <content type="html"><![CDATA[<p>So within the last week or two, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?</p>
 
 <!-- more -->
@@ -37,6 +37,8 @@
 
 <p>Hmm. <strong>70 percent of the time.</strong> The thing is that working with a laptop in front of me atop the desk in standing position isn&#8217;t really feasible for extended periods of time. My neck just won&#8217;t have it. Then I thought that I wanted to <strong><a href="http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/">throw my Retina MacBook out</a></strong> anyway and I also wasn&#8217;t kidding, so why not replace it with a <em>fine</em> Linux workstation plus a lightweight laptop running Linux as well<sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>. The thing is, I can only bring the MacBook in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it&#8217;s repaired, it will go on eBay. Bye Apple.</p>
 
+<p>I&#8217;m still in the process of assembling and configuring my new workstation and also of moving my furniture around until I finally settle for the setup I want to start a project with fairly soon. I will keep you posted on how the final setup will look like. For now only this much: I&#8217;m very happy with all aspects of my new work space.</p>
+
 <p>For a moment I thought about using an older workstation of mine, which was pretty decent like four and a half years back and that I haven&#8217;t used much recently. While it was still equally performant as the 2012 Retina MacBook and partially better, with recently upgraded 24GB of fast RAM and a brand-new and fast SSD, it wasn&#8217;t anywhere near the best I could get in early 2015.</p>
 
 <p>So I thought I&#8217;d rather keep that workstation in use for running load tests against a new machine. But what should I buy to get the best option available, for a decent but not crazy budget?</p>
@@ -45,7 +47,7 @@
 
 <p>The CPU part was settled. Next, I needed a mainboard. A gaming board seemed like the way to go. When gaming, you want your computer at the highest clockrate possible even if only occasionally. I actually want the same when running <code>lein cljsbuild once</code>. I don&#8217;t want the CPU to adapt to that after there&#8217;s demand for more CPU resources. No, I want the CPU to be at full blast by the time the task begins, and I wouldn&#8217;t mind pressing an actual button for that. That&#8217;s like playing an instrument. <sup id="fnref:5"><a href="#fn:5" rel="footnote">5</a></sup></p>
 
-<p>So I bought an <strong>ASUS Maximus VII Hero</strong> for my 4790K. Good choice, I&#8217;m happy with it. It even allows you to press a button to go into turbo mode on a specialized panel, but I&#8217;m still waiting for the delivery of that one. Next, there was the RAM. I still had 24 GB in my older workstation, of pretty good quality. But only 16 GB would fit into this new workstation as there were only 4 slots. Why would I want to limit myself to that? I want to run quite a few docker containers simultaneously on that machine, all of which should not starve on memory. So I needed 32 GB, the maximum amount the board could fit. The fastest available memory appeared to be the 2400 GHz Kingston. So I got 32 GB of that.</p>
+<p>So I bought an <strong>ASUS Maximus VII Hero</strong> for my 4790K. Good choice, I&#8217;m happy with it. Supposedly, besides overclocking, this board even allows you to press a button to go into turbo mode on a specialized panel, but I haven&#8217;t gotten that to work just yet. Next, there was the RAM. I still had 24 GB in my older workstation, of pretty good quality. But only 16 GB would fit into this new workstation as there were only 4 slots. Why would I want to limit myself to that? I want to run quite a few docker containers simultaneously on that machine, all of which should not starve on memory. So I needed 32 GB, the maximum amount the board could fit. The fastest available memory appeared to be the 2400 GHz Kingston. So I got 32 GB of that.</p>
 
 <p>Next, there was the SSD. So far, my experiences with Samsung have been good, so I got a <strong>250 GB 850 EVO</strong> from them for starters. I&#8217;ll probably get more of those drives later. 250 GB seems to hit a sweet spot when you want to run multiple SSDs on different SATA channels in order to get more OPs per second than if you were running a single and larger SSD.</p>
 

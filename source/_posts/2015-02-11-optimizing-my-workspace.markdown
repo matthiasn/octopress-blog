@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Optimizing my Workspace - Hardware, Software, Ergonomics"
-date: 2015-02-06 20:56
+date: 2015-02-11 20:56
 comments: true
 categories: 
 ---
@@ -23,6 +23,12 @@ He smirked, ignored what I mentioned about not using the desk as intended, and s
 
 Hmm. **70 percent of the time.** The thing is that working with a laptop in front of me atop the desk in standing position isn't really feasible for extended periods of time. My neck just won't have it. Then I thought that I wanted to **[throw my Retina MacBook out](http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/)** anyway and I also wasn't kidding, so why not replace it with a _fine_ Linux workstation plus a lightweight laptop running Linux as well[^3]. The thing is, I can only bring the MacBook in for service after making it redundant for a week or a week and a half. But once it is redundant for so long, it will remain redundant. So once it's repaired, it will go on eBay. Bye Apple.
 
+I'm still in the process of assembling and configuring my new workstation and also of moving my furniture around until I finally settle for the setup I want to start a project with fairly soon. I will keep you posted on how the final setup will look like. For now only this much: I'm very happy with all aspects of my new work space.
+
+
+
+
+
 For a moment I thought about using an older workstation of mine, which was pretty decent like four and a half years back and that I haven't used much recently. While it was still equally performant as the 2012 Retina MacBook and partially better, with recently upgraded 24GB of fast RAM and a brand-new and fast SSD, it wasn't anywhere near the best I could get in early 2015. 
 
 So I thought I'd rather keep that workstation in use for running load tests against a new machine. But what should I buy to get the best option available, for a decent but not crazy budget?
@@ -31,7 +37,7 @@ So I thought I'd rather keep that workstation in use for running load tests agai
 
 The CPU part was settled. Next, I needed a mainboard. A gaming board seemed like the way to go. When gaming, you want your computer at the highest clockrate possible even if only occasionally. I actually want the same when running ````lein cljsbuild once````. I don't want the CPU to adapt to that after there's demand for more CPU resources. No, I want the CPU to be at full blast by the time the task begins, and I wouldn't mind pressing an actual button for that. That's like playing an instrument. [^5]
 
-So I bought an **ASUS Maximus VII Hero** for my 4790K. Good choice, I'm happy with it. It even allows you to press a button to go into turbo mode on a specialized panel, but I'm still waiting for the delivery of that one. Next, there was the RAM. I still had 24 GB in my older workstation, of pretty good quality. But only 16 GB would fit into this new workstation as there were only 4 slots. Why would I want to limit myself to that? I want to run quite a few docker containers simultaneously on that machine, all of which should not starve on memory. So I needed 32 GB, the maximum amount the board could fit. The fastest available memory appeared to be the 2400 GHz Kingston. So I got 32 GB of that. 
+So I bought an **ASUS Maximus VII Hero** for my 4790K. Good choice, I'm happy with it. Supposedly, besides overclocking, this board even allows you to press a button to go into turbo mode on a specialized panel, but I haven't gotten that to work just yet. Next, there was the RAM. I still had 24 GB in my older workstation, of pretty good quality. But only 16 GB would fit into this new workstation as there were only 4 slots. Why would I want to limit myself to that? I want to run quite a few docker containers simultaneously on that machine, all of which should not starve on memory. So I needed 32 GB, the maximum amount the board could fit. The fastest available memory appeared to be the 2400 GHz Kingston. So I got 32 GB of that. 
 
 Next, there was the SSD. So far, my experiences with Samsung have been good, so I got a **250 GB 850 EVO** from them for starters. I'll probably get more of those drives later. 250 GB seems to hit a sweet spot when you want to run multiple SSDs on different SATA channels in order to get more OPs per second than if you were running a single and larger SSD.
 
