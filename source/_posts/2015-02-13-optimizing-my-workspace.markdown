@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Optimizing my Workspace - Hardware, Software, Ergonomics"
-date: 2015-02-11 20:56
+date: 2015-02-13 22:56
 comments: true
 categories: 
 ---
