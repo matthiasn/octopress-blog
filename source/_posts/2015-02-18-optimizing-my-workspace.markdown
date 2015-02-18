@@ -1,11 +1,11 @@
 ---
 layout: post
 title: "Optimizing my Workspace - Hardware, Software, Ergonomics"
-date: 2015-02-13 22:56
+date: 2015-02-18 21:56
 comments: true
 categories: 
 ---
-So within the last week or two, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I'm getting at, but no worries, I'll get there. Let me ask you something first. **How many hours per week do you spend in front of your computer?** Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?
+So within the two weeks, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I'm getting at, but no worries, I'll get there. Let me ask you something first. **How many hours per week do you spend in front of your computer?** Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?
 
 <!-- more -->
 
@@ -25,15 +25,20 @@ Hmm. **70 percent of the time.** The thing is that working with a laptop in fron
 
 I'm still in the process of assembling and configuring my new workstation and also of moving my furniture around until I finally settle for the setup I want to start a project with fairly soon. I will keep you posted on how the final setup will look like. 
 
-Okay, that's it for my new workspace for today. For now only this much: I'm very happy with all aspects of my new workspace. Now on to some other stuff that I've been up to.
+Okay, that's it for my new workspace for today. For now only this much: I'm very happy with all aspects of my new workspace. Only the energy consumption is higher than what I would find acceptable. However, a solution is already in the works: renewable energy, with solar panels and some substantial batteries. More about that another time.
+
+Now on to some other stuff that I've been up to.
 
 # Progress with 'Building a System in Clojure'
 On the new machine I described above, I started setting up **Docker** containers for running load tests. I also started thinking conceptually about how to load-test different aspects of the system I'm working on for my work-in-progress **Building a System in ClojureScript**. I will be working on that chapter next. Together with the older workstation, I should have a decent environment for observing what kind of load can be handled per machine.
 
-The description of the status quo of the **BirdWatch** application is pretty much done, except for cleaning up the namespace that takes care of ingesting tweets and properly describing it. That will come in the next couple of days.
+
+Also, I've been re-reading a book about **Systems Thinking** and I find that the approach applies to software artifacts as well. Another topic I will cover in much more detail later on.
 
 # Inspect
 I fixed an issue with the **inspect** library where you would get some cryptic NullPointerException when pulling version **0.1.4** in from **Clojars** that did not occur when publishing locally. Not sure exactly what I did wrong when publishing it, but I have now created version **0.1.5** with a newer version of ClojureScript and this one appears to be working as advertised when pulled in from Clojars.
+
+That's it for today. 
 
 Happy coding,
 Matthias

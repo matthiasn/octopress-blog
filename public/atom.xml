@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-02-13T23:01:09+01:00</updated>
+  <updated>2015-02-18T20:25:52+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -15,10 +15,10 @@
   
   <entry>
     <title type="html"><![CDATA[Optimizing my Workspace - Hardware, Software, Ergonomics]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2015/02/13/optimizing-my-workspace/"/>
-    <updated>2015-02-13T22:56:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2015/02/13/optimizing-my-workspace</id>
-    <content type="html"><![CDATA[<p>So within the last week or two, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?</p>
+    <link href="http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace/"/>
+    <updated>2015-02-18T21:56:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace</id>
+    <content type="html"><![CDATA[<p>So within the two weeks, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?</p>
 
 <!-- more -->
 
@@ -39,17 +39,21 @@
 
 <p>I&#8217;m still in the process of assembling and configuring my new workstation and also of moving my furniture around until I finally settle for the setup I want to start a project with fairly soon. I will keep you posted on how the final setup will look like.</p>
 
-<p>Okay, that&#8217;s it for my new workspace for today. For now only this much: I&#8217;m very happy with all aspects of my new workspace. Now on to some other stuff that I&#8217;ve been up to.</p>
+<p>Okay, that&#8217;s it for my new workspace for today. For now only this much: I&#8217;m very happy with all aspects of my new workspace. Only the energy consumption is higher than what I would find acceptable. However, a solution is already in the works: renewable energy, with solar panels and some substantial batteries. More about that another time.</p>
+
+<p>Now on to some other stuff that I&#8217;ve been up to.</p>
 
 <h1>Progress with &#8216;Building a System in Clojure&#8217;</h1>
 
 <p>On the new machine I described above, I started setting up <strong>Docker</strong> containers for running load tests. I also started thinking conceptually about how to load-test different aspects of the system I&#8217;m working on for my work-in-progress <strong>Building a System in ClojureScript</strong>. I will be working on that chapter next. Together with the older workstation, I should have a decent environment for observing what kind of load can be handled per machine.</p>
 
-<p>The description of the status quo of the <strong>BirdWatch</strong> application is pretty much done, except for cleaning up the namespace that takes care of ingesting tweets and properly describing it. That will come in the next couple of days.</p>
+<p>Also, I&#8217;ve been re-reading a book about <strong>Systems Thinking</strong> and I find that the approach applies to software artifacts as well. Another topic I will cover in much more detail later on.</p>
 
 <h1>Inspect</h1>
 
 <p>I fixed an issue with the <strong>inspect</strong> library where you would get some cryptic NullPointerException when pulling version <strong>0.1.4</strong> in from <strong>Clojars</strong> that did not occur when publishing locally. Not sure exactly what I did wrong when publishing it, but I have now created version <strong>0.1.5</strong> with a newer version of ClojureScript and this one appears to be working as advertised when pulled in from Clojars.</p>
+
+<p>That&#8217;s it for today.</p>
 
 <p>Happy coding,
 Matthias</p>
