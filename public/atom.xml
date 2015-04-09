@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-02-18T20:25:52+01:00</updated>
+  <updated>2015-04-09T18:35:50+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,66 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Building a System in #Clojure - Where are the Updates???]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates/"/>
+    <updated>2015-04-09T17:30:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates</id>
+    <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I&#8217;ve been developing a library for building systems, and it has already made the codebase of the BirdWatch application much simpler. I&#8217;ll be back to updating the book using the new code and concepts soon. Thanks for buying the book!</p>
+
+<!-- more -->
+
+
+<hr />
+
+<br>
+
+
+<p>Hi there, and thank you for becoming a reader of <strong><a href="https://leanpub.com/building-a-system-in-clojure">Building a System in Clojure (and ClojureScript)</a></strong> early on<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. You will probably have wondered by now when I was planning to release new content. That&#8217;s a valid question &#8211; and you deserve to know.</p>
+
+<p>Writing a book while people are reading it is an interesting endeavor as that substantially raises the hurdle for changing something. I never thought about that before, yet it is very real. Without readers, you can just shuffle stuff around, throw away or completely rewrite parts without having to answer to anyone. With readers, the author should at least have a good reason to make radical changes. I&#8217;m not saying that&#8217;s a bad thing, it&#8217;s just different.</p>
+
+<p>Anyhow, I believe I have good reasons to make substantial changes to what exists already. In the chapters you have probably read so far, I describe building a system, both on client and server, for consuming and processing some real-time information source. This source happens to be one of the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming APIs</a></strong>. Personally, I don&#8217;t think it&#8217;s the most interesting data source of such kind out there, but it happens to be interesting enough while also being easily accessible &#8211; and constantly running.</p>
+
+<p>While editing the existing content of the <strong><a href="https://leanpub.com/building-a-system-in-clojure">book</a></strong>, I increasingly noticed that I was portraying building a house on a fairly low level of abstraction. It was like I&#8217;m describing the plumbing in a house by providing a detailed account of every body movement performed by the plumber. If I were the recipient of such account, on the second or third time of explaining how to hold the pressing tool in order to connect two copper pipes with a valve in between, I&#8217;d probably yawn. And mention that I understood the process the first time &#8211; please just continue with locations and purposes of the valves as I have no problem imagining how the valves got there in the first place.</p>
+
+<p>The code inside the BirdWatch application felt the same way. Where I only wanted to focus on what makes individual components different, I was forced to write even the stuff that&#8217;s the same over and again. That&#8217;s boilerplate.</p>
+
+<p>So instead, I wanted to pull common functionality out into a separate library. Then, a new consulting gig came along with <strong><a href="http://www.aviso.io">Aviso</a></strong> thanks to the recommendation of <strong><a href="http://homegrown.io">Ryan Neufeld</a></strong>. That could have been a problem in terms of finding the time for working on the library. But luckily, the opposite was true. The library could well be helpful in the project I&#8217;m working on, so they generously let me explore the problem and write the library.</p>
+
+<p>I call this library <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong>. If you happen to follow me on GitHub, you may have seen the <strong><a href="https://github.com/matthiasn/systems-toolbox/commits/master">90 commits</a></strong> or so I pushed there over the last five weeks, and now I can say that it is shaping up nicely. The documentation is not up to speed yet, but the codebase of <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> provides a good point of reference. I&#8217;ve already fully migrated BirdWatch to use the new approach, both on the client- and the server-side, and it&#8217;s working well. There&#8217;s also an interesting example application in the library project itself, but I&#8217;ll discuss that in the next couple of days on here.</p>
+
+<p>I&#8217;ve been very interested in <strong>Systems Thinking</strong> lately. If you&#8217;re not familiar with this kind of thinking, it is based on approaching and understanding the world by determining observable systems.</p>
+
+<p>One such system is your house and how it&#8217;s dealing with changing weather conditions outside the thermal envelope. The system is trying to stabilize the inside conditions like temperature and humidity all while either energy flows into the building on a hot summer day or out on a freezing winter night. Through observing the system, we can start interacting with it through thermostat settings or, in modern times, through some smart home control center.</p>
+
+<p>Now my realization was that <strong>a piece of software is not all that different</strong>. We have some input, such as user requests, a desired output, and a set of constraints. Now by observing the system, we can start utilizing resources better and get closer to the desired behavior. So far, so old. But what if the observability was built right into the system, instead of being tugged on with some monitoring tool? When I have components emit some logging information, and I do roughly the same in every component, then that&#8217;s boilerplate, too. Instead, the library should provide the same kind of logging for every component, such as the input and output messages, processing times, wait times, plus whatever we might want to log about a particular component&#8217;s behavior.</p>
+
+<p>In the library I mentioned I above, so far I have mostly focused on the mechanics of the plumbing between components and how to embed functionality into these components, and that part is working well. In the <strong>BirdWatch</strong> application, I have thrown out the <strong><a href="https://github.com/stuartsierra/component">Component library</a></strong> in <strong><a href="https://github.com/matthiasn/BirdWatch">master on GitHub</a></strong>, and I find using the <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong> much more straight-forward.</p>
+
+<p>But please don&#8217;t take my word for it and have a look for yourself. The best place to start is the <strong>BirdWatch</strong> code, specifically in these namespaces:</p>
+
+<p><strong><a href="https://github.com/matthiasn/BirdWatch/blob/master/Clojure-Websockets/MainApp/src/clj/birdwatch/main.clj">Server-side SwitchBoard in Clojure </a></strong></p>
+
+<p><strong><a href="https://github.com/matthiasn/BirdWatch/blob/master/Clojure-Websockets/MainApp/src/cljs/birdwatch/core.cljs">Client-side SwitchBoard in ClojureScript </a></strong></p>
+
+<p>The new library is used throughout, both on the server and on the <strong><a href="https://github.com/clojure/clojurescript">ClojureScript</a></strong> client. Observability and metrics are not as developed as I want them to be, but that&#8217;s an area of focus now and will be addressed soon.</p>
+
+<p>Okay, this is all for today. The <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong> library is stabilizing, and I will soon get around to writing about it in the book. For now, your best bet is to explore the code mentioned above. I&#8217;ve tried to make message flow as obvious as possible there. Please don&#8217;t forget to let me know what you think. <em>Right now</em> is probably the best time for feedback.</p>
+
+<p>Cheers,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>If you are not a reader of the book yet, no worries, you can get the book while supply lasts on <strong><a href="https://leanpub.com/building-a-system-in-clojure">Leanpub</a></strong>.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Optimizing my Workspace - Hardware, Software, Ergonomics]]></title>
@@ -1787,68 +1847,6 @@ links to this list of <strong><a href="https://github.com/matthiasn/Clojure-Reso
 <p>Then, coding in <strong>Clojure</strong> was once again exciting and productive last week, with like <strong>35 commits</strong> so far this month. Things are finally settling down, which means that I will soon be able to start a series of articles about this application. In that regard, please let me know if <strong>you have any ideas</strong> for features that would make the application more <strong>useful</strong> for you. It is already great that this little toy application of mine has received so much love (if love can be counted in GitHub stars) and I appreciate that a lot, but it would be even more awesome if the application solved an actual problem. I would <strong>love to start a conversation</strong> (or two or three) here.</p>
 
 <p>Thanks and until next week,
-Matthias</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: Pomodoro, all-Clojure BirdWatch, Income]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/"/>
-    <updated>2014-09-03T19:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/09/03/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will be talking about <strong>why I started this blog</strong> in the first place, <strong>Pomodoro time management</strong>, and the new <strong>Clojure</strong> and <strong>ClojureScript</strong> version of my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application. Again there is a live version, this time subscribing to all tweets containing the term <strong>Ferguson</strong>. Also, the results are out for the first month of <strong>blog monetization</strong> through <strong>affiliate links</strong>.</p>
-
-<!-- more -->
-
-
-<h2>Why I started this blog in the first place</h2>
-
-<p>Initially, when I started this blog, I wanted to explore real-time information processing. My initial project was the <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application which has evolved quite a bit since the first version came out. But then, for a while, I focused more on frameworks and libraries than on the underlying architectural principles. That was probably also due to the fact that I was not convinced I really had the right tools in my toolbox. Well, that has changed. It is a luxury to use (roughly) the same language on both the server and the client, in particular if as a single developer you want to quickly explore an idea end-to-end.</p>
-
-<h2>Pomodoro time management</h2>
-
-<p>For a while now I have been using the <strong><a href="http://pomodorotechnique.com">Pomodoro</a></strong> time management technique and it has served me <strong>extremely well</strong>. The main idea is to set a timer (such as the tomato-shaped kitchen timers) to a predefined time interval and then fully focus on a single task with no distractions allowed whatsoever. The default time interval is <strong>25 minutes</strong> and while it is possible to adapt this to suit your needs, I have found the 25 minutes to be perfect for mine. Then you take a 5-minute break after every interval or a 15-minute break after the successful completion of four of these Pomodoro intervals. I find that I am much <strong>more productive</strong> when I use this technique.</p>
-
-<p>It is also a great help if you tend to <strong>procrastinate</strong>. It is usually a good idea to start with just one of these 25-minute intervals per day for so-and-so many days. The reason why I mention it is that in the next section, I will talk about an experiment I made to find out if it was possible to implement an entire real-time feature (both on the client and the server side) of the BirdWatch application within one of these 25-minute intervals and the answer is yes. I finished 76 seconds earlier than the allotted time.</p>
-
-<h2>BirdWatch in Clojure and ClojureScript, #Ferguson</h2>
-
-<p>In the last two weeks, I finally got around to rewriting the <strong><a href="https://github.com/matthiasn/Birdwatch/tree/master/Clojure-Websockets">BirdWatch</a></strong> application so that it now uses <strong>Clojure</strong> on the server side and <strong>ClojureScript</strong> on the client side. During that process, I also changed the implementation of the bi-directional communication from using <strong><a href="http://dev.w3.org/html5/eventsource/">Server Sent Events (SSE)</a></strong> + <strong>REST API calls</strong> to using <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSockets</a></strong>. Since <strong><a href="http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/">last week&#8217;s update</a></strong> I have been able to tackle the remaining issues and today I proudly present the fully functional <strong><a href="https://github.com/matthiasn/Birdwatch/tree/master/Clojure-Websockets">all-Clojure version</a></strong>.</p>
-
-<p>Of course, there is also a live version running on my server. This time I did not use the selection of software related terms that I used previously, but instead let my application subscribe to the term <strong>Ferguson</strong>. This is because I was particularly interested in how the situation in <strong><a href="http://en.wikipedia.org/wiki/Ferguson,_Missouri">Ferguson, Missouri</a></strong> was (and is) developing. So what you see when you click the image below is an application that retrieves all tweets mentioning the term. This has been a highly educational topic to follow during the process of writing this new version of the application. I am <strong>deeply disturbed</strong> by how much of a difference the color of your skin seems to make when it comes to how government authorities deal with you as a human being. More broadly, I am also very concerned about <strong>militarization</strong> of police forces in the USA and elsewhere in the world.</p>
-
-<p>Click the image or alternatively <strong><a href="http://birdwatch2.matthiasnehlsen.com/">click here</a></strong> to open a live version of this application.</p>
-
-<p><a href="http://birdwatch2.matthiasnehlsen.com/" target="blank"><img class="left" src="http://matthiasnehlsen.com/images/bw-ferguson.png" title="BirdWatch Screenshot for term Ferguson" alt="BirdWatch Screenshot for term Ferguson"></a></p>
-
-<p>In the Pomodoro time management section above, I mentioned a little experiment I carried out to determine how much I would be able to achieve in a single 25-minute Pomodoro time interval. Yesterday I had the idea that I wanted to know how many clients were connected to the live version of this application at any given time. Right after I had the idea, I asked myself if this was doable in a single Pomodoro interval. So I set the timer and started right away. All of my thoughts concerning this feature, the implementation on both client and server, the testing (on Chrome, Firefox, Safari, and Opera), and the code documentation and prettification were done and there were still 76 seconds left before my digital kitchen timer started ringing. Almost time to take a little nap. Here&#8217;s how that looks like, see the upper right corner:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/bw-ferguson2.png" title="Connection count feature" alt="Connection count feature"></p>
-
-<p>Every other second, all clients are notified about the number of current number of simultaneous connections. It is really useful to have a message bus for different message types between client and server. More on that in a future article.</p>
-
-<p>Considering that I have just started out with Clojure and that this is my first real application written in it, I have a hunch that I may have found the tools that I have been looking for all the while. Sure, this was not a very large feature, but the fact alone that it was possible to implement it in such a short time on both server and client without significant context switches in the brain bodes well for productivity.</p>
-
-<p><strong>What&#8217;s next?</strong> I will work on a series of articles describing the application architecture in detail. Also, I will put much more focus on a mobile version of the application. Currently, it does not work well on mobile devices. In order to alleviate performance issues, I will move a good part of the computation for previous tweets to the server side. The layout needs some major rework for mobile as well. I&#8217;ll keep you posted.</p>
-
-<h2>Affiliate links results for the first month</h2>
-
-<p>A couple of weeks ago I <strong><a href="http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/">wrote</a></strong> about a tool for country-specific deliveries of Amazon affiliate links. The results for the first month are out now. I made a whopping <strong>$44.37</strong>. Hmm, I will try not to spend it all at once, I promise. But to be honest, I don&#8217;t think the result is all that bad. Particularly if you consider that I have not written many reviews just yet. Eventually, it should be possible for the blog to finance itself, maybe even retroactively. I will try to write more quality reviews in the weeks to come. Then, by the time Santa climbs down the chimneys, there will hopefully be more clicks on those links and better conversion rates. What I have read about affiliate marketing is that people who do it successfully talk about how much of a difference the holiday season makes. We&#8217;ll see.</p>
-
-<h2>Gadget reviews</h2>
-
-<p>I still have not found the perfect travel lens for my <strong><a href="http://matthiasnehlsen.com/reviews/sony-a7/">Sony A7</a></strong> camera. One contender was the <strong>Zeiss Vario-Tessar T* FE 24-70mm f/4 ZA OSS</strong>, but in the end I decided to send it back for a refund. <strong><a href="http://matthiasnehlsen.com/reviews/zeiss-24-70">Read all about it here</a></strong>.</p>
-
-<h2>Conclusion</h2>
-
-<p>The last week was a lot of fun. I mostly focused on the <strong>Clojure</strong> and found that be be very rewarding. There is plenty of stuff I still want to do with this application and I am really looking forward to getting around to those features.</p>
-
-<p>Last week’s cliffhanger was a section on speed improvements on this blog. Sorry, but you will have to wait a little longer for that story. I was so busy writing Clojure that I didn’t find the time to write it down. But no worries, the speed improvements will be covered soon.</p>
-
-<p>Have a great remaining week,
 Matthias</p>
 
 <iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

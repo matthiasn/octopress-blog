@@ -9,7 +9,7 @@
   <meta name="author" content="Matthias Nehlsen">
 
   
-  <meta name="description" content="I recently did a lot of transcript proofreading concerning enlightening talk for my talk-transcripts project. The most recent one was Design, &hellip;">
+  <meta name="description" content="Last week, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -63,6 +63,49 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
+
+
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/11/07/Building-Systems-in-Clojure-4/">Building a System in #Clojure Part 4 - Inter-process communication with Redis</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-11-07T14:32:00+01:00" pubdate data-updated="true">11/07/2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong><a href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/">Last week</a></strong>, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single client for the connection to the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> and the persistence of the received Tweets in <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong>, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked <strong><a href="http://redis.io/topics/pubsub">Redis Pub/Sub</a></strong> because its model of communication appears to suit the requirements really well. As cute as the drawing may be, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put <strong><a href="http://redis.io">Redis</a></strong> in between for communication. It worked really well and here&#8217;s how.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/11/07/Building-Systems-in-Clojure-4/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -472,49 +515,6 @@
 
     </article>
   
-  
-    <article>
-      <a href="https://plus.google.com/100986586701798521209" rel="publisher"></a>
-
-
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2014/09/03/weekly-update/">Weekly Update: Pomodoro, all-Clojure BirdWatch, Income</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2014-09-03T19:06:00+02:00" pubdate data-updated="true">09/03/2014</time>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In this weekly update, I will be talking about <strong>why I started this blog</strong> in the first place, <strong>Pomodoro time management</strong>, and the new <strong>Clojure</strong> and <strong>ClojureScript</strong> version of my <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> application. Again there is a live version, this time subscribing to all tweets containing the term <strong>Ferguson</strong>. Also, the results are out for the first month of <strong>blog monetization</strong> through <strong>affiliate links</strong>.</p>
-
-</div>
-  
-  
-    <footer>
-      <a rel="full-article" href="/blog/2014/09/03/weekly-update/">Read on &rarr;</a>
-    </footer>
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/3/">&larr; Older</a>
@@ -543,6 +543,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2015/04/09/Where-Are-The-Updates/">Building a System in #Clojure - Where are the Updates???</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2015/02/18/optimizing-my-workspace/">Optimizing my Workspace - Hardware, Software, Ergonomics</a>
       </li>
     
@@ -558,10 +562,6 @@
         <a href="/blog/2015/01/09/Hairball-Removal/">Progress with “Building a System in #Clojure”: Hairball Removal</a>
       </li>
     
-      <li class="post">
-        <a href="/blog/2014/12/23/Happy-Holidays/">Happy Holidays and Thanks for Reading</a>
-      </li>
-    
   </ul>
 </section>
 <section>
@@ -570,14 +570,17 @@
     <li><a href="https://github.com/matthiasn/birdwatch/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/birdwatch#stargazers_count">BirdWatch</a>
       <p>Reactive web application using Play Framework 2.2 for consuming and visualizing live Tweets from the Twitter Streaming API.</p>
     </li>
-    <li><a href="https://github.com/matthiasn/sse-chat/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/sse-chat#stargazers_count">sse-chat</a>
-      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
-    </li>
     <li><a href="https://github.com/matthiasn/talk-transcripts/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/talk-transcripts#stargazers_count">talk-transcripts</a>
         <p>Transcripts of talks I find interesting and that have influenced me: Rich Hickey, David Nolen and Guy Steele.</p>
     </li>
+    <li><a href="https://github.com/matthiasn/sse-chat/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/sse-chat#stargazers_count">sse-chat</a>
+      <p>Chat example app using Server Sent Events plus REST calls. Client side implementations both in AngularJS and in React.</p>
+    </li>
     <li><a href="https://github.com/matthiasn/Clojure-Resources/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/Clojure-Resources#stargazers_count">Clojure-Resources</a>
         <p>Compilation of useful links and resources for learning Clojure and ClojureScript.</p>
+    </li>
+    <li><a href="https://github.com/matthiasn/systems-toolbox/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/systems-toolbox#stargazers_count">systems-toolbox</a>
+        <p>Toolbox for building observable systems.</p>
     </li>
     <li><a href="https://github.com/matthiasn/inspect/" class="github-button" data-count-href="/ntkme/github-buttons/stargazers" data-style="mega" data-count-api="/repos/matthiasn/inspect#stargazers_count">inspect</a>
         <p>Inspect data structures flowing through your application, from a web client.</p>
