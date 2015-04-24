@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-04-09T18:35:50+02:00</updated>
+  <updated>2015-04-24T22:51:16+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,9 +14,103 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Systems Toolbox Example]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2015/04/24/systems-toolbox-example/"/>
+    <updated>2015-04-24T16:05:00+01:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2015/04/24/systems-toolbox-example</id>
+    <content type="html"><![CDATA[<p>Today, I have another sample application for the <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong> library for you. This application measures roundtrip times of a WebSockets connection. Before I delve into the reasoning behind this library, here&#8217;s a little teaser of how that&#8217;ll look like:</p>
+
+<p><a href="http://systems-toolbox.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/sys-tb-tmp_local.gif" /></a></p>
+
+<p>I wrote all of this from scratch in Clojure and ClojureScript, including the histogram - no charting libraries required. There&#8217;s a live version, try it out by clicking on the animated GIF.</p>
+
+<!-- more -->
+
+
+<h2>Systems Toolbox - Rationale</h2>
+
+<p>I started writing this library for two equally important reasons. First, I was beyond tired of writing boilerplate for every system I was building, so I wanted a simpler way of composing systems with as little coupling as possible (including UI). Second of all, I want and need better ways of <strong>observing systems</strong>.</p>
+
+<p>Have you ever been in the situation where you came into a new team, asked what the system does and got the response that <strong>it&#8217;s all in the code</strong>? I call <strong><a href="http://www.urbandictionary.com/define.php?term=bullpucky">bullpucky</a></strong>. The behavior of a system lies in the running system, and I can ONLY figure it out by observing this very system in the wild. Everything else is speculation.</p>
+
+<p>Imagine a somewhat similar situation. Let&#8217;s say you&#8217;re interested in a <strong><a href="http://en.wikipedia.org/wiki/Porsche_911">Porsche 911</a></strong>. You are particularly curious how that thing behaves at high speed on the Autobahn. Also, you want to know what the rear of the car does when you push the gas pedal while coming out of a tight curve. So you go to the nearest Porsche dealership and ask the sales representative. And then that guy responds, &#8220;here are the blueprints from the engineering department, it&#8217;s all in there&#8221;. Good sales pitch? Not so much. But worse, it would not even remotely answer your questions.</p>
+
+<p>I&#8217;d much rather have the sales representative say, &#8220;Here are the keys, why don&#8217;t you find out?&#8221;. Taking that vehicle for a spin is observing a beautifully crafted system instead of studying a boring blueprint. Let&#8217;s not <strong>mistake the map for the territory</strong><sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>.</p>
+
+<p>I found that all the systems I had been working on previously lacked in this department. Observability was usually an ugly afterthought; something tugged on, and that often even had to be removed eventually. Think about all these log statements that are removed from the code later on. If there ever was value in observing data flowing through the system in a particular line of code, there will potentially be value in doing so again later on, in a system running in production.</p>
+
+<p>My initial approach was observing data structures as they flow through a system, for which I built the <strong><a href="https://github.com/matthiasn/inspect">inspect</a></strong> library. But that didn&#8217;t go far enough as it still required log-like statements. Why would I need those?</p>
+
+<p>Let&#8217;s say a system consisted of subsystems that communicate with each other in defined ways. Then, a library for composing message flows could intercept each of those messages as desired without any additional line of code required. Also, timing of everything going on in the system could and should be a first-class citizen, without having to add some annoying log statements (and then remove those later on).</p>
+
+<p>The question for me here was if it is possible to come up with a model for subsystems of an application that together form a larger system, which communicate with each other, and which are fully observable.</p>
+
+<p>Here&#8217;s a drawing of what I have in mind:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/system.png" title="'Subsystem'" ></p>
+
+<p>There are two inputs and two outputs to each such subsystem. These are <strong><a href="https://github.com/clojure/core.async">core.async channels</a></strong>. One input and one output work as expected whereas the other is for publishing snapshots of the state of the subsystem. This channel uses a sliding buffer, so only the latest version of the snapshot is ever kept for further processing, should the system still be busy with processing a previous version of such snapshot. Then there&#8217;s another input for processing such state snapshots, e.g. when another component renders such state snapshot into a user interface.</p>
+
+<p>These subsystems can then be composed into larger systems, as we shall see below. There&#8217;s also more to be written about this library soon, but for now let&#8217;s go back to the sample application.</p>
+
+<h2>Back to the Example Application</h2>
+
+<p>The first application I completely rewrote so that it&#8217;s using the systems-toolbox library both on client and server (in Clojure and ClojureScript) is my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>  application. However, that one is slightly more complex than what I would want to handle inside a blog post. <sup id="fnref:2"><a href="#fn:2" rel="footnote">2</a></sup></p>
+
+<p>So what does this new and simple sample do? I wanted to know how fast a WebSockets connection is. How long does it take to send a very short message to a server and return the message right away while only adding a key and not doing complicated processing? Sort of like a ping, only with a graphical representation. Then I thought, why not use two circles for that, where one is drawn immediately in the UI from local mouse move events and the other one from the returned message. The longer it takes to send a message to the server and back, the further the second circle will trail behind in the UI. An <strong>animated GIF</strong> shows this better than words:</p>
+
+<p><a href="http://systems-toolbox.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/sys-tb-tmp_local_half.gif" /></a></p>
+
+<p>Above, we have a fast (local) connection where the majority of the network roundtrips take less than 40ms. Now, usually, I have difficulties imagining what 40ms mean in practice, but I think the two circles demonstrate that the second circle hardly trails behind at all. However, there is likely still room for improvement, considering that the fastest roundtrip in the sample of 455 roundtrips only took 3ms.</p>
+
+<p>Now how can we make the data more useful for finding where the holdups happen? In this sample, we have <strong>26ms mean</strong>, <strong>89ms maximum</strong> and <strong>3ms minimum</strong>. What shall we compute next? Maybe a standard deviation? Think again. The standard deviation only makes sense when we have a Gaussian, bell-shaped normal distribution, and we don&#8217;t know that from the sample, do we?</p>
+
+<p>Let&#8217;s have a look at the distribution of the sample. A <strong><a href="http://en.wikipedia.org/wiki/Histogram">histogram</a></strong> seems like an appropriate visual representation of the distribution of values, so let&#8217;s draw one <sup id="fnref:3"><a href="#fn:3" rel="footnote">3</a></sup>:</p>
+
+<p><a href="http://systems-toolbox.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/sys-tb-tmp_local.gif" /></a></p>
+
+<p>Today, I won&#8217;t discuss how I built the histogram, other than it&#8217;s an embedded SVG drawn from the current data, all written in ClojureScript. The animation of the chart is an emergent property, it results the underlying sample including additonal measurements. The number of bins in this histogram is determined by applying the <strong><a href="http://en.wikipedia.org/wiki/Freedman%E2%80%93Diaconis_rule">Freedman–Diaconis rule</a></strong>:</p>
+
+<p>Bin size = 2 IQR(x) n^-1/3 where IQR(x) is the interquartile range of the data, and n is the number of observations in the sample x. This calculation is easy to do in Clojure.</p>
+
+<p>I&#8217;ll probably write another article on the implementation of this application soon. For today, I&#8217;m more interested in the actual behavior that we can observe using the histogram. In the screen capture above, I was connecting locally. Now that&#8217;s an idealized condition that&#8217;s hardly relevant for actual visitors, so I did the same with a connection to my server in southern Germany from Lisbon, where I am right now:</p>
+
+<p><a href="http://systems-toolbox.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/sys-tb-tmp_lisbon.gif" /></a></p>
+
+<p>Still pretty good. Here&#8217;s another attempt from Funchal, Madeira (island somewhere in the Atlantic) earlier today. To create adverse conditions, I used my mobile phone as a hotspot and then used a VPN to Amsterdam to connect to the same server in Germany:</p>
+
+<p><a href="http://systems-toolbox.matthiasnehlsen.com" target="_blank"><img src="http://matthiasnehlsen.com/images/sys-tb-tmp_vpn.gif" /></a></p>
+
+<p>Okay, admittedly, this is substantially slower than the previous connections, but I&#8217;d say that&#8217;s still good enough for most applications. It&#8217;s not that other ways of communicating with the server would be faster here.</p>
+
+<p>In the next article, I will explain the code behind this sample application and also try to make more sense of the data we saw in the histograms. Apparently, our samples don&#8217;t follow a normal distribution but are rather bimodal or double-peaked. I want to explore further why that is the case. If there are two peaks that are roughly 20ms apart, then it seems like there&#8217;s something taking an extra 20ms in some of the roundtrips and not in others. If you have any ideas what that could be, please let me know.</p>
+
+<p>Also, I&#8217;d like to see additional data from other places in the world. Can you do me a favor? Please take a screenshot after generating at least 500 or better over a thousand roundtrips and email it to me, together with your location and your name on twitter if you&#8217;d like to be mentioned by name. The first ten will get the <strong><a href="https://leanpub.com/building-a-system-in-clojure/">book I&#8217;m working on</a></strong> for free.</p>
+
+<p>Cheers,
+Matthias</p>
+
+<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
+
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>I have heard this multiple times over the years, and I have no idea where it originates. <a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+<li id="fn:2">
+<p>If you&rsquo;re interested in this real-time application for tweet stream analysis with multiple server-side processes and a ClojureScript frontend, you can either read the source code or buy my book about it. Beware that there&rsquo;s no substantial write-up about the library yet as the library is still changing quite a bit. But there will be soon.<a href="#fnref:2" rev="footnote">&#8617;</a></p></li>
+<li id="fn:3">
+<p>The histogram is written entirely in ClojureScript and only making use of the systems-toolbox library and <strong><a href="http://reagent-project.github.io">Reagent</a></strong>. So far, it is only part of the example application, but I&rsquo;m planning on making a library component out of this chart and a few others. There certainly are a couple of ways that visual representations of system behavior can help in understanding systems.  <a href="#fnref:3" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Building a System in #Clojure - Where are the Updates???]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates/"/>
-    <updated>2015-04-09T17:30:00+02:00</updated>
+    <updated>2015-04-09T17:30:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I&#8217;ve been developing a library for building systems, and it has already made the codebase of the BirdWatch application much simpler. I&#8217;ll be back to updating the book using the new code and concepts soon. Thanks for buying the book!</p>
 
@@ -76,7 +170,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Optimizing my Workspace - Hardware, Software, Ergonomics]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace/"/>
-    <updated>2015-02-18T21:56:00+01:00</updated>
+    <updated>2015-02-18T21:56:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace</id>
     <content type="html"><![CDATA[<p>So within the two weeks, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?</p>
 
@@ -140,7 +234,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Dear Apple, Get Your Act Together]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/"/>
-    <updated>2015-01-21T15:30:00+01:00</updated>
+    <updated>2015-01-21T15:30:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together</id>
     <content type="html"><![CDATA[<p>This is a rant.</p>
 
@@ -224,7 +318,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: new Feature]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features/"/>
-    <updated>2015-01-16T19:35:00+01:00</updated>
+    <updated>2015-01-16T19:35:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features</id>
     <content type="html"><![CDATA[<p>Most of this week, I was working on the client-side codebase of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application in order to remove the hairball in its architecture that I mentioned last week. That&#8217;s been going really well. But how do I make the readers aware of what I am working on right now? Your time is precious, so you may only want to read the stuff that I feel good about already, unless you have the time to dive deeper and compare the good, the bad and the ugly. That&#8217;s fine, too, but it&#8217;s just going to involve more effort on your part.</p>
 
@@ -247,7 +341,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: Hairball Removal]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/01/09/Hairball-Removal/"/>
-    <updated>2015-01-09T12:05:00+01:00</updated>
+    <updated>2015-01-09T12:05:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/01/09/Hairball-Removal</id>
     <content type="html"><![CDATA[<p>I’ve been struggling with finishing the next chapter of my <strong><a href="https://leanpub.com/building-a-system-in-clojure">&#8220;Building a System in Clojure&#8221;</a></strong> book. I tried to explain and draw the client-side architecture, but instead I’ve been procrastinating <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> around the conceptual drawings for days and now I realize why. The current architecture of the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> web client just plain <strong>sucks</strong>.</p>
 
@@ -287,7 +381,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Happy Holidays and Thanks for Reading]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays/"/>
-    <updated>2014-12-23T15:15:00+01:00</updated>
+    <updated>2014-12-23T15:15:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays</id>
     <content type="html"><![CDATA[<p>Last week, I published the very first version of my <strong><a href="https://leanpub.com/building-a-system-in-clojure">&#8220;Building a System in Clojure&#8221;</a></strong> book. I’m thrilled by the amount of interest it has already generated and I’ll do my best to live up to your expectations.</p>
 
@@ -326,7 +420,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[I'm writing a book about Building a System in Clojure]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/19/Clojure-Book/"/>
-    <updated>2014-12-19T16:15:00+01:00</updated>
+    <updated>2014-12-19T16:15:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/19/Clojure-Book</id>
     <content type="html"><![CDATA[<p>I thought about where to take my series about <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure</a></strong> next and realized that I don&#8217;t like the format of a <strong>blog series</strong> all that much. Instead, the format of a <strong>book</strong> seems like a better choice; one where you, the potential reader, are invited to provide feedback from the very first moment of the writing process. I have already started that process and for now I have transferred the existing articles from the series into the book without much further editing. Over the next couple of weeks, I will be working on making the content more consistent with the book format. The book is available for free on <strong><a href="https://leanpub.com/building-a-system-in-clojure">leanpub.com</a></strong>. Iff (if and only if) you find the content to be of value, you can pay a suggested price, but that&#8217;s entirely up to you and something you can decide on later.</p>
 
@@ -370,7 +464,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure eXchange, next steps in BirdWatch, Clojure and me]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/12/Weekly/"/>
-    <updated>2014-12-12T14:20:00+01:00</updated>
+    <updated>2014-12-12T14:20:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/12/Weekly</id>
     <content type="html"><![CDATA[<p>Last week was great. I had just come back from my trip to the United States the week before, where I attended the <strong><a href="http://clojure-conj.org">Conj</a></strong> and got to hang out with dear friends in both Washington DC and New York City. I used to live in DC in 2009 and 2010, and it was really good to be back. Last Friday, I had a talk at <strong><a href="https://skillsmatter.com/conferences/1956-clojure-exchange-2014">Clojure eXchange</a></strong> in London about my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application and my journey to Clojure. I think there should be a recording somewhere, but I haven’t checked it out just yet. The day before that, I had parted from <strong><a href="http://www.scala-lang.org">Scala</a></strong> with a <strong><a href="http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/">farewell letter</a></strong> here on this blog. It took me by surprise how much attention this little letter received <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, considering that it was really only between Scala and me.</p>
 
@@ -412,7 +506,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[A farewell note to a programming language]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/"/>
-    <updated>2014-12-04T14:55:00+01:00</updated>
+    <updated>2014-12-04T14:55:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala</id>
     <content type="html"><![CDATA[<p>Dear Scala,</p>
 
@@ -464,7 +558,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Inspect - println no more]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/"/>
-    <updated>2014-11-14T17:30:00+01:00</updated>
+    <updated>2014-11-14T17:30:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/14/Inspect</id>
     <content type="html"><![CDATA[<p><strong>TL;DR</strong>: I realized how much I <strong>disliked</strong> the process of <strong>logging data structures</strong> to the console and then trying to find them and repeatedly commenting out and uncommenting <strong>println</strong> statements. So I decided to <strong>fix that</strong>.</p>
 
@@ -589,7 +683,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Inter-process communication with Redis]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4/"/>
-    <updated>2014-11-07T14:32:00+01:00</updated>
+    <updated>2014-11-07T14:32:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4</id>
     <content type="html"><![CDATA[<p><strong><a href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/">Last week</a></strong>, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single client for the connection to the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> and the persistence of the received Tweets in <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong>, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked <strong><a href="http://redis.io/topics/pubsub">Redis Pub/Sub</a></strong> because its model of communication appears to suit the requirements really well. As cute as the drawing may be, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put <strong><a href="http://redis.io">Redis</a></strong> in between for communication. It worked really well and here&#8217;s how.</p>
 
@@ -770,7 +864,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 3 - Redesign]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/"/>
-    <updated>2014-10-30T19:06:00+01:00</updated>
+    <updated>2014-10-30T19:06:00+00:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3</id>
     <content type="html"><![CDATA[<p>I recently did a lot of transcript proofreading concerning enlightening talk for my <strong><a href="https://github.com/matthiasn/talk-transcripts">talk-transcripts project</a></strong>. The most recent one was <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/DesignCompositionPerformance.md">Design, Composition and Performance</a></strong>, the tenth transcript of a talk by <strong><a href="https://twitter.com/richhickey">Rich Hickey</a></strong>. That one in particular got me thinking that there are quite a few ideas I want to adopt in <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>, the application about which I started writing this series of articles. That calls for some <strong>redesign</strong>, so it’s probably time to make up my mind what exactly it is that I am trying to solve with this application.</p>
 
@@ -847,7 +941,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Talk Transcripts, Clojure Architecture, OS X Yosemite]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/23/weekly-update/"/>
-    <updated>2014-10-23T19:06:00+02:00</updated>
+    <updated>2014-10-23T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/23/weekly-update</id>
     <content type="html"><![CDATA[<p>As I have no other article to publish this week, I thought a weekly update would be in order. Last week I wrote about <strong><a href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/">making relevant and interesting talks more accessible</a></strong>. In the course of that project, I had <strong>eleven</strong> talks transcribed so far, four more than when I announced the project last week. Not only have I received great feedback about how appreciated this is, I have also learned a lot myself while proofreading the transcripts.</p>
 
@@ -911,7 +1005,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Talk Transcripts: Rich Hickey, David Nolen & more]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/"/>
-    <updated>2014-10-15T19:06:00+02:00</updated>
+    <updated>2014-10-15T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I wanted to study the content of some talks in written form but there were no transcripts available. However, I believe that the valuable and relevant content of these talks should be accessible to everyone, including those for whom &#8216;sit back and listen&#8217; might not be the most viable option. To make that a reality, I had transcripts made. So far, I have compiled five talks by <strong>Rich Hickey</strong>, one talk by <strong>David Nolen</strong> and another talk by <strong>Guy Steele</strong>. The transcripts are <strong><a href="https://github.com/matthiasn/talk-transcripts">available on GitHub</a></strong>.</p>
 
@@ -943,7 +1037,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 2 - Transducers]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/"/>
-    <updated>2014-10-06T19:06:00+02:00</updated>
+    <updated>2014-10-06T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> This article covers the usage of <strong>Transducers</strong> in Clojure, spiced up with some <strong>core.async</strong>. Here&#8217;s an animation that shows the information flow of the <strong>composed transducer</strong> that we are going to build in this article:</p>
 
@@ -1328,7 +1422,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Staging server for this blog]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/"/>
-    <updated>2014-10-04T19:06:00+02:00</updated>
+    <updated>2014-10-04T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update</id>
     <content type="html"><![CDATA[<p>This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles.</p>
 
@@ -1362,7 +1456,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 1 - Overview]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
-    <updated>2014-09-24T19:06:00+02:00</updated>
+    <updated>2014-09-24T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
     <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is <strong>easy to understand and maintain</strong>. Here is what I found.</p>
 
@@ -1542,7 +1636,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/"/>
-    <updated>2014-09-23T19:06:00+02:00</updated>
+    <updated>2014-09-23T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/23/weekly-update</id>
     <content type="html"><![CDATA[<p>This weekly update is mostly about my new article series, about using animations to explain complex topics and about how I just extended the useful lifespan of my <strong>2012 Retina MacBook</strong>.</p>
 
@@ -1609,7 +1703,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure, Clojure, Clojure and a nasty cold]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/16/weekly-update/"/>
-    <updated>2014-09-16T19:06:00+02:00</updated>
+    <updated>2014-09-16T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/16/weekly-update</id>
     <content type="html"><![CDATA[<p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
 
@@ -1646,207 +1740,6 @@ Matthias</p>
 <p>Okay, back to bed - I need to get rid of this nasty cold ASAP. I have stuff to do; stuff other than coughing. The bugs came without invitation last week and now they don&#8217;t seem inclined to leave. But on the upside, I went to the doctor today and he gave me a prescription for three different medications and assured me that I&#8217;d survive.</p>
 
 <p>Have a great remaining week,
-Matthias</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: PageSpeed Insights, optimizing Octopress & more Clojure]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/09/08/weekly-update/"/>
-    <updated>2014-09-08T19:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/09/08/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will discuss how I turned the load times for this <strong><a href="http://octopress.org/">Octopress</a></strong>-powered blog <strong>from terrible to pretty decent</strong>. In <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> numbers: before the optimization <strong style="color:#DD0000;">58/100</strong> for mobile and <strong style="color:#EE8800;">77/100</strong> for desktop; after the optimization <strong style="color:#00AA66;">94/100</strong> for mobile and <strong style="color:#00AA66;">96/100</strong> for desktop. More concretely: on a lousy mobile connection, the load time improved from <strong>32 seconds</strong> to a mere <strong>5 seconds</strong>. Now we&#8217;re talking. You would presumably <strong>not have waited</strong> for 32 seconds, and neither would I. Also, I have a status update on the <strong><a href="http://clojure.org/">Clojure</a></strong> version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong>.</p>
-
-<!-- more -->
-
-
-<h2>Making this page load fast, even on a pre-3G mobile connection</h2>
-
-<p>Some time ago I attempted to open my blog on my smart phone and, to my dismay, it took like forever to load. I noticed that I did not have a <strong><a href="http://en.wikipedia.org/wiki/3G">3G</a></strong> connection at the time but come on, you should be able to open the page even if you only have an <strong><a href="http://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution">Edge</a></strong> connection with decent signal strength at your disposal. I was <strong>sad</strong>. Then I ran Google&#8217;s <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> and that tool confirmed that things weren&#8217;t rosy:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed_before.png" title="PageSpeed results before optimization" alt="PageSpeed results before optimization"></p>
-
-<p><strong style="color:#DD0000;">Red</strong> for mobile. That&#8217;s exactly how I would describe my previous experience. Now, after a couple of simple changes, here is how things look <strong>now</strong>:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed_after.png" title="PageSpeed results after optimization" alt="PageSpeed results after optimization"></p>
-
-<p>Not only does that look substantially better, it also makes <strong style="color:#00AA66;">all the difference</strong> in terms of user experience. I subjected a friend of mine to a tiny experiment involving his smart phone. The blog had never been loaded on it before, so certainly nothing was cached. We switched off the Wifi connection and <strong>disabled 3G</strong> so all that remained was four bars of an <strong><a href="http://en.wikipedia.org/wiki/Enhanced_Data_Rates_for_GSM_Evolution">Edge</a></strong> connection. Initially, we loaded the new and optimized version, and it took a mere <strong>5 seconds</strong> until the page was visible and properly styled, except for the right web font. His reaction was <strong>&#8220;wow, that was fast&#8221;</strong> considering that we were on a really sluggish network connection. Next, we opened the old version with none of the optimizations, and that took a prohibitive <strong>32 seconds</strong>. From half a minute to 5 seconds, that is a hugely desirable improvement. Let&#8217;s now have a look at what was necessary for this <strong style="color:#00AA66;">triumph</strong> over the intricacies and pitfalls of speedy web page delivery.</p>
-
-<h3>Inlining the CSS / above-the-fold content</h3>
-
-<p>One of the complaints that <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com">PageSpeed Insights</a></strong> uttered was that the <strong>above-the-fold CSS</strong> was in a separate file. <strong>Above-the-fold</strong> is the portion of the page that needs to be fully loaded before <strong>any</strong> rendering whatsoever can happen. You want this above-the-fold portion to load as swiftly as possible because any delay here will keep the browser from rendering the page altogether, which of course means that most people are <strong>leaving</strong> rather than staring at a blank page for ten seconds or longer.</p>
-
-<p>Funny enough, I think I read somewhere that people tend to be even more impatient on mobile devices, despite the slower network connection to begin with. And that makes sense. On desktop, I typically have twenty or more tabs open anyway. If something doesn&#8217;t load immediately, my attention will either move to another application like mail or to another tab. Good for a page if I divert my attention to checking email; then, at least, I will see the page once I come back to the browser. Another tab is worse as I probably won&#8217;t come back in a timely manner or ever. But at least, there&#8217;s a chance. On mobile, though, once I&#8217;m gone, I&#8217;m typically <strong>gone for good</strong>.</p>
-
-<p>In order to not hold up page loading by fetching the <code>screen.css</code> and being penalized with an additional <strong><a href="http://en.wikipedia.org/wiki/Round-trip_delay_time">round trip</a></strong>, I embedded the entire CSS in the header of each HTML file. While that incurred an extra <strong>39KB</strong>, in the compressed files the difference was a mere <strong>7KB</strong>. This extra amount of data certainly loads faster than the extra round trip would take. This is particularly true for <strong>pre-LTE</strong> mobile which is notorious for long <strong><a href="http://en.wikipedia.org/wiki/Round-trip_delay_time">ping times</a></strong>. However, embedding all the CSS only works up to a certain size. While I don&#8217;t know the threshold, there comes a certain size where PageSpeed Insights starts complaining. But I suppose I can consider myself lucky that the resulting file size fell within the range that is deemed acceptable. Otherwise, one would have to figure out which parts of the CSS are essential to the initial rendering and then only embed that, with the rest loaded at the bottom of the HTML body.</p>
-
-<h3>Nginx instead of hosted page</h3>
-
-<p>Before, I was using a hosted web page where I had no real influence over how the files were served. Specifically, I had no control over <strong><a href="http://en.wikipedia.org/wiki/HTTP_compression">HTTP compression</a></strong> settings, <strong><a href="http://en.wikipedia.org/wiki/HTTP_ETag">ETags</a></strong> or <strong><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching">HTTP caching</a></strong>. In addition, it was also increasingly annoying to update the content because the only available method was <strong><a href="http://en.wikipedia.org/wiki/File_Transfer_Protocol">FTP</a></strong>. When I got started with the blog, that was bearable, but with an increasing number of files, specifically images, it started to take a few minutes. What I really wanted instead was to use either <strong><a href="http://en.wikipedia.org/wiki/Rsync">rsync</a></strong> or <strong><a href="http://git-scm.com/">git</a></strong>. I had a server already (the one used, for example, for serving <strong>BirdWatch</strong>) with <strong><a href="http://nginx.org">nginx</a></strong> running, so the first thing I did was move my blog over there and reconfigure the domain&#8217;s <strong><a href="http://en.wikipedia.org/wiki/Domain_Name_System">DNS</a></strong> settings. Here is the section of the <strong>nginx.conf</strong> that is now responsible for serving the blog:</p>
-
-<figure class='code'><figcaption><span>nginx config nginx.conf </span></figcaption>
- <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-<span class='line-number'>41</span>
-<span class='line-number'>42</span>
-<span class='line-number'>43</span>
-<span class='line-number'>44</span>
-<span class='line-number'>45</span>
-<span class='line-number'>46</span>
-<span class='line-number'>47</span>
-<span class='line-number'>48</span>
-<span class='line-number'>49</span>
-<span class='line-number'>50</span>
-<span class='line-number'>51</span>
-</pre></td><td class='code'><pre><code class='text'><span class='line'>user www-data;
-</span><span class='line'>worker_processes 4;
-</span><span class='line'>pid /var/run/nginx.pid;
-</span><span class='line'>
-</span><span class='line'>events {
-</span><span class='line'>  worker_connections 15000;
-</span><span class='line'>}
-</span><span class='line'>
-</span><span class='line'>http {
-</span><span class='line'>  include       mime.types;
-</span><span class='line'>  default_type  application/octet-stream;
-</span><span class='line'>  charset UTF-8;
-</span><span class='line'>
-</span><span class='line'>  gzip_static on;
-</span><span class='line'>  gzip on;
-</span><span class='line'>  gzip_proxied any;
-</span><span class='line'>  gzip_types text/plain text/html text/css application/json application/javascri
-</span><span class='line'>pt application/xml application/xml+rss text/javascript;
-</span><span class='line'>  gzip_vary on;
-</span><span class='line'>
-</span><span class='line'>  server {
-</span><span class='line'>    listen       80;
-</span><span class='line'>    server_name  www.matthiasnehlsen.com;
-</span><span class='line'>    return       301 http://matthiasnehlsen.com$request_uri;
-</span><span class='line'>  }
-</span><span class='line'>
-</span><span class='line'>  server {
-</span><span class='line'>    listen       80;
-</span><span class='line'>    server_name  matthiasnehlsen.com;
-</span><span class='line'>    root /home/bw/octopress-blog/public;
-</span><span class='line'>
-</span><span class='line'>    location / {
-</span><span class='line'>      autoindex on;
-</span><span class='line'>    }
-</span><span class='line'>
-</span><span class='line'>    # Media: images, icons, video, audio, HTC
-</span><span class='line'>    location ~* \.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc)$
-</span><span class='line'> {
-</span><span class='line'>      expires 1M;
-</span><span class='line'>      access_log off;
-</span><span class='line'>      add_header Cache-Control &quot;public&quot;;
-</span><span class='line'>    }
-</span><span class='line'>
-</span><span class='line'>    # CSS and Javascript
-</span><span class='line'>    location ~* \.(?:css|js)$ {
-</span><span class='line'>      expires 1y;
-</span><span class='line'>      access_log off;
-</span><span class='line'>      add_header Cache-Control &quot;public&quot;;
-</span><span class='line'>    }
-</span><span class='line'>  }
-</span><span class='line'>}
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I&#8217;m no expert in the subject of <strong>nginx configuration</strong>, but the above seems to be working well for what I am trying to do. If you are more knowledgeable and spot any nonsense in there, please let me know. Note that <code>www.matthiasnehlsen.com</code> is forwarded to the same host but without <code>www.</code> in front of all URLs. This is to make Google happy as it would otherwise <strong>index both versions as separate entities</strong> and thus potentially <strong>dilute the rank</strong> at which the page appears in search results.</p>
-
-<h4>Expiration settings</h4>
-
-<p>For the configuration of <strong>nginx</strong>&#8217;s expiration settings, I used <strong><a href="https://github.com/h5bp/html5-boilerplate">html5-boilerplate</a></strong>&#8217;s <strong><a href="https://github.com/h5bp/server-configs-nginx/blob/master/h5bp/location/expires.conf">server-configs-nginx</a></strong> project as a template. The suggested settings in there worked well and I got no further complaints from <strong>PageSpeed Insights</strong> about caching of any resources that are under control of my <strong>nginx</strong> server. Obviously, there is little I can do about resources served from elsewhere.</p>
-
-<h4>Gzipping the content</h4>
-
-<p>The configuration above enables both static content compression and on-the-fly compression. Under heavy load, static compression is preferable where nginx serves the gzip version of a file, should it exist with the same name but with an appended <code>.gz</code>. If this file is not available, nginx instead compresses the content on-the-fly, obviously resulting in a somewhat higher CPU utilization as that work will need to be performed time and again. I have only gzipped some resources while others are compressed on-the-fly. I have never really seen high CPU utilization from nginx on my server, therefore for me at this point, high nginx load due to compression is a luxury problem for which I would probably need to increase the number of visitors by an order of magnitude or two. But when that happens, I may look once more into pre-compression of more of the files. Part of the reason I don&#8217;t run into issues here is probably because the server is bare metal and has a powerful Xeon CPU. If this was a virtual machine sharing the CPU with other guest VMs, the effect would probably be measurable already, despite the modest number of concurrent users that the server is handling at the moment.</p>
-
-<h3>Move webfonts out of above-the-fold content</h3>
-
-<p>For the blog, I am using a non-standard <strong><a href="http://en.wikipedia.org/wiki/Web_typography">web font</a></strong> named <strong><a href="http://www.type-together.com/Tablet%20Gothic">Tablet Gothic</a></strong> from an independent type foundry named <strong><a href="http://www.type-together.com/info">TypeTogether</a></strong>. I like this font family a lot for many reasons, not least because there is a vast range of styles available (84 altogether). The narrow versions for headlines work really well with the body text. I also think that this font family is really pretty. I don&#8217;t have to pay extra for the font as it is included in the <strong><a href="https://typekit.com">TypeKit</a></strong> service of my <strong><a href="https://www.adobe.com">Creative Cloud</a></strong> subscription. However, there is a downside to web fonts when it comes to page render times. At least if you load the font above-the-fold, which I previously did. That will hold up the page rendering until both the TypeKit script and the actual files are loaded. But after thinking about it, I decided that showing the page in <em>Helvetica Neue / SansSerif</em> first is better than not rendering anything at all for a long time. If your connection is fast, you&#8217;ll hardly notice and if it is not, you will probably still not leave in disgust just because you were subjected to another perfectly fine font for a few seconds. Your mileage may vary, of course, but personally, I don&#8217;t think I&#8217;d use web fonts - unless showing a built-in font first would be okay - because loading the files related to the web fonts alone can take over ten seconds on a slow connection.</p>
-
-<h3>What else could be done?</h3>
-
-<p>Short answer in my case: <strong>nothing really</strong>. With these changes in place, <strong><a href="https://developers.google.com/speed/pagespeed/insights/?url=matthiasnehlsen.com&amp;tab=mobile">PageSpeed Insights</a></strong> now only complains about items that are outside of my sphere of influence:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/pagespeed_after2.png" title="pagespeed results after optimization" alt="pagespeed results after optimization"></p>
-
-<p>I could remove the <strong><a href="https://github.com/mdo/github-buttons">GitHub buttons</a></strong>, the <strong><a href="http://www.google.com/analytics/">analytics script</a></strong> and the <strong>web font</strong> altogether just to get an even higher score, but I won&#8217;t. I am happy with the results and I am not willing to forego any of them. I also find it somewhat odd that one Google tool (PageSpeed Insights) complains about the script of another Google tool (Google Analytics) - as if I could do anything about that! In addition, I think that the complaint about leveraging longer cache times for the GitHub API calls is <strong>plain wrong</strong>. Those are <strong><a href="http://en.wikipedia.org/wiki/JSONP">JSONP</a></strong> calls rather than static content. Arguably, the resource need not be cached at all if we want the result to be accurate.</p>
-
-<p>I also ran <strong><a href="https://developer.yahoo.com/yslow/">YSlow</a></strong>, which seemed pretty happy with the optimizations as well:</p>
-
-<p><img class="left" src="http://matthiasnehlsen.com/images/yslow.png" title="YSlow results after optimization" alt="YSlow results after optimization"></p>
-
-<p><strong style="color:#00AA66;">Grade A (94/100)</strong> sounds much better than the <strong style="color:#EE8800;">Grade C (78/100)</strong> that YSlow previously gave this blog.</p>
-
-<h3>Useful links</h3>
-
-<p>Here are a handful of articles that I found useful while squeezing the last bit of performance out of this blog. Google has a few great resources available, for example on <strong><a href="https://developers.google.com/speed/docs/insights/OptimizeCSSDelivery">Optimizing CSS Delivery</a></strong>, <strong><a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#invalidating-and-updating-cached-responses">HTTP Caching</a></strong> and <strong><a href="https://developers.google.com/web/fundamentals/performance/">Optimizing Performance</a></strong> in general. I consider them a <strong>must-read</strong> if you are serious about delivering a speedy user experience. Also really helpful: the <strong>YouTube channels</strong> of <strong><a href="https://www.youtube.com/user/igrigorik">Ilya Grigorik</a></strong> and <strong><a href="https://www.youtube.com/user/addyosmani">Addy Osmani</a></strong>.</p>
-
-<h2>BirdWatch in Clojure, ClojureScript and Om</h2>
-
-<p>I did a lot of refactoring of the new version of <strong><a href="https://github.com/matthiasn/Birdwatch">BirdWatch</a></strong> this past week. The application architecture still feels like clay in my hands, but the sculpture is getting into a decent shape. I made the interesting discovery that there really <strong>weren&#8217;t any performance issues</strong> introduced by the <strong>Clojure</strong> rewrite. Rather, the problem was sitting in front of the screen. My initial version triggered a re-render of the word cloud <strong>a few orders of magnitude more often</strong> than what a reasonable and sane person would have done.</p>
-
-<p>Considering that the word cloud layout is probably the most expensive operation in the entire client-side application, it is no wonder that the application did not respond in the way I would have hoped. It is kind of <strong>spectacular that it worked at all</strong>&#8230;</p>
-
-<p>I also did some preparations for moving the aggregation of previous tweets to the server. More precisely, the client side can now request missing tweets via <strong><a href="http://en.wikipedia.org/wiki/WebSocket">WebSocket</a></strong> command messages and subsequently render the full tweet once it is back from the server. This isn&#8217;t terribly useful yet, but it will be at a later stage. Once <strong>server-side aggregation</strong> is in place, it will no longer be necessary to transmit all thousands of the analyzed tweets to the client. This should either reduce the memory fingerprint by a lot when analyzing the same number of tweets or enable a <strong>much</strong> higher number of tweets for the same memory utilization. It should also reduce page load times, potentially by a lot.</p>
-
-<p>Here&#8217;s the current version as a <strong><a href="http://birdwatch2.matthiasnehlsen.com">live demo</a></strong>.</p>
-
-<h2>My Clojure Resources List</h2>
-
-<p>While working on the <strong>Clojure</strong> application described above, I constantly added fresh
-links to this list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure resources on GitHub</a></strong>. This week, I added several articles I discovered and found useful and or sometimes outright entertaining. Maybe you&#8217;ll find enlightening stuff in there as well. Or you may have a link that you believe belongs in there, too. Just let me know or, better yet, submit a <strong>pull request</strong> with the link and a short comment.</p>
-
-<h2>Conclusion</h2>
-
-<p>I still want to redesign the blog. But at least the load times have improved tremendously so redesigning it isn&#8217;t that urgent. Unlike before, the load times even on mobile are such that visitors should only leave because the content of this blog is irrelevant to them, not because the page doesn&#8217;t load. By the way, back in <strong>December 2013</strong> I put a little work into a fast <strong>AngularJS</strong>-based <strong>blog engine</strong>. I have not worked on it since, but I thought at least I could open source it. There is no good reason for it to sit in a private repository, after all. I am now curious about some feedback. The cool feature include client-side rendering from markdown, configurable and animated code blocks (see at the bottom of the live demo) and a live preview while authoring. Here&#8217;s the <strong><a href="https://github.com/matthiasn/ng-blog">ng-blog repository on GitHub</a></strong> and here&#8217;s a <strong><a href="http://ng-blog.org/blog">live demo</a></strong>. I am just putting this out there to see if anyone is interested. If so, I would probably put more work into it.</p>
-
-<p>Then, coding in <strong>Clojure</strong> was once again exciting and productive last week, with like <strong>35 commits</strong> so far this month. Things are finally settling down, which means that I will soon be able to start a series of articles about this application. In that regard, please let me know if <strong>you have any ideas</strong> for features that would make the application more <strong>useful</strong> for you. It is already great that this little toy application of mine has received so much love (if love can be counted in GitHub stars) and I appreciate that a lot, but it would be even more awesome if the application solved an actual problem. I would <strong>love to start a conversation</strong> (or two or three) here.</p>
-
-<p>Thanks and until next week,
 Matthias</p>
 
 <iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
