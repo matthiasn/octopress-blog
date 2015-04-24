@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-04-24T22:51:16+01:00</updated>
+  <updated>2015-04-25T00:24:31+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -85,7 +85,7 @@
 
 <p>In the next article, I will explain the code behind this sample application and also try to make more sense of the data we saw in the histograms. Apparently, our samples don&#8217;t follow a normal distribution but are rather bimodal or double-peaked. I want to explore further why that is the case. If there are two peaks that are roughly 20ms apart, then it seems like there&#8217;s something taking an extra 20ms in some of the roundtrips and not in others. If you have any ideas what that could be, please let me know.</p>
 
-<p>Also, I&#8217;d like to see additional data from other places in the world. Can you do me a favor? Please take a screenshot after generating at least 500 or better over a thousand roundtrips and email it to me, together with your location and your name on twitter if you&#8217;d like to be mentioned by name. The first ten will get the <strong><a href="https://leanpub.com/building-a-system-in-clojure/">book I&#8217;m working on</a></strong> for free.</p>
+<p>Also, I&#8217;d like to see additional data from other places in the world. Can you do me a favor? Please take a screenshot once you&#8217;ve generated at least 500 or better over a thousand round trips and <strong><a href="mailto:matthias.nehlsen@gmail.com">email it to me</a></strong>. Make sure to add your location and optionally your name on twitter if you&#8217;d like to be mentioned by name. The first ten will get the <strong><a href="https://leanpub.com/building-a-system-in-clojure/">book I&#8217;m working on</a></strong> for free.</p>
 
 <p>Cheers,
 Matthias</p>

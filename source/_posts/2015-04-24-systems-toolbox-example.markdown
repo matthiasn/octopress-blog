@@ -71,7 +71,7 @@ Okay, admittedly, this is substantially slower than the previous connections, bu
 
 In the next article, I will explain the code behind this sample application and also try to make more sense of the data we saw in the histograms. Apparently, our samples don't follow a normal distribution but are rather bimodal or double-peaked. I want to explore further why that is the case. If there are two peaks that are roughly 20ms apart, then it seems like there's something taking an extra 20ms in some of the roundtrips and not in others. If you have any ideas what that could be, please let me know.
 
-Also, I'd like to see additional data from other places in the world. Can you do me a favor? Please take a screenshot once you've generated at least 500 or better over a thousand round trips and email it to me. Make sure to add your location and optionally your name on twitter if you'd like to be mentioned by name. The first ten will get the **[book I'm working on](https://leanpub.com/building-a-system-in-clojure/)** for free.
+Also, I'd like to see additional data from other places in the world. Can you do me a favor? Please take a screenshot once you've generated at least 500 or better over a thousand round trips and **[email it to me](mailto:matthias.nehlsen@gmail.com)**. Make sure to add your location and optionally your name on twitter if you'd like to be mentioned by name. The first ten will get the **[book I'm working on](https://leanpub.com/building-a-system-in-clojure/)** for free.
 
 Cheers,
 Matthias
