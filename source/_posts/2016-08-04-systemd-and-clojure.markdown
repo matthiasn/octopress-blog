@@ -13,6 +13,8 @@ Oh hey, I'm back. Been a while. Today, I want to share with you how I'm using **
 * **[trailing mouse pointer example](http://systems-toolbox.matthiasnehlsen.com/)**, another sample application for the book
 * **[inspect](http://inspect.matthiasnehlsen.com/)**, a demo for my **[inspect library](https://github.com/matthiasn/inspect)**. This is will soon be replaced by a new version making sense of messages passed around in **[systems-toolbox](https://github.com/matthiasn/systems-toolbox)** applications.
 
+<!-- more -->
+
 Also, I'm using systemd to start up **[sse-chat](http://sse-chat.matthiasnehlsen.com/)**, a **[Scala]()** demo application which you can also find on **[GitHub](https://github.com/matthiasn/sse-chat)**. However, this application is only started by systemd, but not restarted when anything goes wrong.
 
 The background for this post is that I recently ordered a new **[Skylake Intel® Xeon® E3-1275 v5](http://ark.intel.com/products/codename/37572/Skylake#@All)** based server at **[Hetzner](https://www.hetzner.de/en/)**, and I felt it was finally time to retire the manual process startup approach I had used before. Servers should be updated as often as possible, but who does that often enough when it takes 10-15 minutes to wait for a reboot and then manually restart the processes? Certainly not me. So instead, all process startup should be automatic. Initially, I considered using **[Docker](https://www.docker.com/)**, but regarding monitoring that the application is alive, and restarting it if not, systemd has the better story to offer. Also, I wasted way too much time on a Docker environment in my last client project, so I'm a little cured of the snake oil.[^1] 
@@ -25,7 +27,7 @@ This library also happens to be a sweet opportunity to write a minimal **[system
 
 This is the entire library:
 
-~~~
+{% codeblock lang:clojure %}
 (ns matthiasn.systemd-watchdog.core
   (:require [matthiasn.systems-toolbox.switchboard :as sb]
             [matthiasn.systems-toolbox.scheduler :as sched])
@@ -53,21 +55,21 @@ This is the entire library:
                          {:timeout timeout
                           :message [:wd/send]
                           :repeat  true}]}]
-~~~
+{% endcodeblock %}
 
 It fires up a **switchboard**, which manages and wires systems, the `:wd/notify-cmp`, which calls `(SDNotify/sendWatchdog)` from the **[SDNotify library](https://github.com/faljse/SDNotify)**, and a scheduler component, which emits `:wd/send` messages every `timeout` milliseconds. You can build much more complex applications with the **systems-toolbox**, e.g. **[BirdWatch](http://birdwatch.matthiasnehlsen.com)**. The 14 lines above (plus comments and imports) however are about the minimum case when some scheduling is desired.
 
 You can have a look at the mentioned examples if you're interested in building systems with the systems-toolbox. In subsequent articles, I will introduce them in detail. For now, you can just use the library in your projects if you want to have your application monitored by systemd. It's just a one-liner, as you can see for example in the **[trailing mouse pointer example](https://github.com/matthiasn/systems-toolbox/blob/master/examples/trailing-mouse-pointer/src/clj/example/core.clj#L41)**: 
 
-~~~
+{% codeblock lang:clojure %}
   (wd/start-watchdog! 5000)
-~~~
+{% endcodeblock %}
 
 This simple command calls systemd every 5 seconds, but only if the `NOTIFY_SOCKET` environment variable is set, which would only be the case if systemd had started the application.
 
 Here's the service configuration:
 
-~~~
+{% codeblock lang:text %}
 [Unit]
 Description=systems-toolbox websocket latency visualization example
 
@@ -87,7 +89,7 @@ TimeoutSec=300
 
 [Install]
 WantedBy=multi-user.target
-~~~
+{% endcodeblock %}
 
 You can find all the service configurations for my server in my **[conf](https://github.com/matthiasn/conf) project, together with some install scripts which allow me to set up a new server with little effort. I hope this helps you in your deployments. It certainly helps me with mine.
 

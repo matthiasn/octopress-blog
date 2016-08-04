@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2015-04-25T00:24:31+01:00</updated>
+  <updated>2016-08-04T18:23:58+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -14,9 +14,167 @@
 
   
   <entry>
+    <title type="html"><![CDATA[SystemD and Clojure]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2016/08/04/systemd-and-clojure/"/>
+    <updated>2016-08-04T19:11:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2016/08/04/systemd-and-clojure</id>
+    <content type="html"><![CDATA[<p>Oh hey, I&#8217;m back. Been a while. Today, I want to share with you how I&#8217;m using <strong><a href="https://en.wikipedia.org/wiki/Systemd">systemd</a></strong> to start my Clojure applications on <strong><a href="http://matthiasnehlsen.com">matthiasnehlsen.com</a></strong>, and keep them alive, in case anything should go wrong. These are the applications managed this way:</p>
+
+<ul>
+<li><strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong>, an application for tweet stream analysis, see on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong></li>
+<li><strong><a href="http://redux-style.matthiasnehlsen.com/">redux-counter example</a></strong>, a sample application for my Clojure <strong><a href="https://leanpub.com/building-a-system-in-clojure">book</a></strong></li>
+<li><strong><a href="http://systems-toolbox.matthiasnehlsen.com/">trailing mouse pointer example</a></strong>, another sample application for the book</li>
+<li><strong><a href="http://inspect.matthiasnehlsen.com/">inspect</a></strong>, a demo for my <strong><a href="https://github.com/matthiasn/inspect">inspect library</a></strong>. This is will soon be replaced by a new version making sense of messages passed around in <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong> applications.</li>
+</ul>
+
+
+<!-- more -->
+
+
+<p>Also, I&#8217;m using systemd to start up <strong><a href="http://sse-chat.matthiasnehlsen.com/">sse-chat</a></strong>, a <strong><a href="">Scala</a></strong> demo application which you can also find on <strong><a href="https://github.com/matthiasn/sse-chat">GitHub</a></strong>. However, this application is only started by systemd, but not restarted when anything goes wrong.</p>
+
+<p>The background for this post is that I recently ordered a new <strong><a href="http://ark.intel.com/products/codename/37572/Skylake#@All">Skylake Intel® Xeon® E3-1275 v5</a></strong> based server at <strong><a href="https://www.hetzner.de/en/">Hetzner</a></strong>, and I felt it was finally time to retire the manual process startup approach I had used before. Servers should be updated as often as possible, but who does that often enough when it takes 10-15 minutes to wait for a reboot and then manually restart the processes? Certainly not me. So instead, all process startup should be automatic. Initially, I considered using <strong><a href="https://www.docker.com/">Docker</a></strong>, but regarding monitoring that the application is alive, and restarting it if not, systemd has the better story to offer. Also, I wasted way too much time on a Docker environment in my last client project, so I&#8217;m a little cured of the snake oil.<sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup></p>
+
+<p>So what I wanted was restarting the machine and have all services come up automatically. Also, I wanted to use the <strong>watchdog</strong> functionality, which expects the monitored applications to call systemd with a <strong>heartbeat</strong> message and restarts the application if that heartbeat wasn&#8217;t encountered for say 20 seconds or whatever else you define there. You can read all about this mechanism in this <strong><a href="http://0pointer.de/blog/projects/watchdog.html">blog post</a></strong> by one of the original authors of systemd.</p>
+
+<p>While my applications were running rock solid for months in a row until I finally managed to update the server and restart it, it is certainly appealing from an operations perspective to have a mechanism in place that listens for a heartbeat and restarts a process when the heartbeat does not come as expected. So I thought this might be a good opportunity to write a small library that takes care of emitting said heartbeat when an application is monitored by systemd. You can find this library on GitHub <strong><a href="https://github.com/matthiasn/systemd-watchdog">here</a></strong>.</p>
+
+<p>This library also happens to be a sweet opportunity to write a minimal <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong> system, with a scheduler component that emits messages every so often, and then calls systemd via <strong><a href="https://github.com/java-native-access/jna">JNA</a></strong>.</p>
+
+<p>This is the entire library:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">ns </span><span class="nv">matthiasn.systemd-watchdog.core</span>
+</span><span class='line'>  <span class="p">(</span><span class="ss">:require</span> <span class="p">[</span><span class="nv">matthiasn.systems-toolbox.switchboard</span> <span class="ss">:as</span> <span class="nv">sb</span><span class="p">]</span>
+</span><span class='line'>            <span class="p">[</span><span class="nv">matthiasn.systems-toolbox.scheduler</span> <span class="ss">:as</span> <span class="nv">sched</span><span class="p">])</span>
+</span><span class='line'>  <span class="p">(</span><span class="ss">:import</span> <span class="p">[</span><span class="nv">info.faljse.SDNotify</span> <span class="nv">SDNotify</span><span class="p">]))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">start-watchdog!</span>
+</span><span class='line'>  <span class="s">&quot;Call systemd&#39;s watchdog every so many milliseconds.</span>
+</span><span class='line'><span class="s">   Requires the NOTIFY_SOCKET environment variable to be set, otherwise does</span>
+</span><span class='line'><span class="s">   nothing. Fires up a minimal systems-toolbox system with two components:</span>
+</span><span class='line'><span class="s">    * a scheduler component</span>
+</span><span class='line'><span class="s">    * a component notifying systemd.</span>
+</span><span class='line'><span class="s">   Then, the scheduler will emit messages every so often, and upon receiving,</span>
+</span><span class='line'><span class="s">   the notifying component will call the sendWatchdog function.</span>
+</span><span class='line'><span class="s">   Takes the timeout in milliseconds.&quot;</span>
+</span><span class='line'>  <span class="p">[</span><span class="nv">timeout</span><span class="p">]</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">when </span><span class="p">(</span><span class="nb">get </span><span class="p">(</span><span class="nf">System/getenv</span><span class="p">)</span> <span class="s">&quot;NOTIFY_SOCKET&quot;</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">sb/send-mult-cmd</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">sb/component</span> <span class="ss">:wd/switchboard</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">[[</span><span class="ss">:cmd/init-comp</span> <span class="p">(</span><span class="nf">sched/cmp-map</span> <span class="ss">:wd/scheduler-cmp</span><span class="p">)]</span>
+</span><span class='line'>       <span class="p">[</span><span class="ss">:cmd/init-comp</span>
+</span><span class='line'>        <span class="p">{</span><span class="ss">:cmp-id</span>      <span class="ss">:wd/notify-cmp</span>
+</span><span class='line'>         <span class="ss">:handler-map</span> <span class="p">{</span><span class="ss">:wd/send</span> <span class="p">(</span><span class="k">fn </span><span class="p">[</span><span class="nv">_</span><span class="p">]</span> <span class="p">(</span><span class="nf">SDNotify/sendWatchdog</span><span class="p">))}}]</span>
+</span><span class='line'>       <span class="p">[</span><span class="ss">:cmd/send</span> <span class="p">{</span><span class="ss">:to</span>  <span class="ss">:wd/scheduler-cmp</span>
+</span><span class='line'>                   <span class="ss">:msg</span> <span class="p">[</span><span class="ss">:cmd/schedule-new</span>
+</span><span class='line'>                         <span class="p">{</span><span class="ss">:timeout</span> <span class="nv">timeout</span>
+</span><span class='line'>                          <span class="ss">:message</span> <span class="p">[</span><span class="ss">:wd/send</span><span class="p">]</span>
+</span><span class='line'>                          <span class="ss">:repeat</span>  <span class="nv">true</span><span class="p">}]}]</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It fires up a <strong>switchboard</strong>, which manages and wires systems, the <code>:wd/notify-cmp</code>, which calls <code>(SDNotify/sendWatchdog)</code> from the <strong><a href="https://github.com/faljse/SDNotify">SDNotify library</a></strong>, and a scheduler component, which emits <code>:wd/send</code> messages every <code>timeout</code> milliseconds. You can build much more complex applications with the <strong>systems-toolbox</strong>, e.g. <strong><a href="http://birdwatch.matthiasnehlsen.com">BirdWatch</a></strong>. The 14 lines above (plus comments and imports) however are about the minimum case when some scheduling is desired.</p>
+
+<p>You can have a look at the mentioned examples if you&#8217;re interested in building systems with the systems-toolbox. In subsequent articles, I will introduce them in detail. For now, you can just use the library in your projects if you want to have your application monitored by systemd. It&#8217;s just a one-liner, as you can see for example in the <strong><a href="https://github.com/matthiasn/systems-toolbox/blob/master/examples/trailing-mouse-pointer/src/clj/example/core.clj#L41">trailing mouse pointer example</a></strong>:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='clojure'><span class='line'>  <span class="p">(</span><span class="nf">wd/start-watchdog!</span> <span class="mi">5000</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This simple command calls systemd every 5 seconds, but only if the <code>NOTIFY_SOCKET</code> environment variable is set, which would only be the case if systemd had started the application.</p>
+
+<p>Here&#8217;s the service configuration:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+</pre></td><td class='code'><pre><code class='text'><span class='line'>[Unit]
+</span><span class='line'>Description=systems-toolbox websocket latency visualization example
+</span><span class='line'>
+</span><span class='line'>[Service]
+</span><span class='line'>Type=simple
+</span><span class='line'>User=bw
+</span><span class='line'>Group=bw
+</span><span class='line'>Environment=PORT=8010
+</span><span class='line'>Environment=HOST=0.0.0.0
+</span><span class='line'>WorkingDirectory=/home/bw/run
+</span><span class='line'>ExecStart=/usr/bin/java -jar /home/bw/bin/trailing-mouse-pointer.jar
+</span><span class='line'>WatchdogSec=20s
+</span><span class='line'>Restart=on-failure
+</span><span class='line'>
+</span><span class='line'># Give a reasonable amount of time for the server to start up/shut down
+</span><span class='line'>TimeoutSec=300
+</span><span class='line'>
+</span><span class='line'>[Install]
+</span><span class='line'>WantedBy=multi-user.target
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can find all the service configurations for my server in my **<a href="https://github.com/matthiasn/conf">conf</a> project, together with some install scripts which allow me to set up a new server with little effort. I hope this helps you in your deployments. It certainly helps me with mine.</p>
+
+<p>Would you like to know when there&#8217;s a new article? Subscribe to the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>newsletter</strong></a> and I&#8217;ll let you know.</p>
+
+<p>Cheers,
+Matthias</p>
+<div class="footnotes">
+<hr/>
+<ol>
+<li id="fn:1">
+<p>There, the problem was that silly Docker service that frequently hung, which, for whatever reason, required a <strong>REBOOT</strong> of the whole machine. As you can imagine, this was very annoying, as that, of course, meant ALL services would become unavailable until the machine was back up.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
+</ol>
+</div>
+
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Systems Toolbox Example]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/04/24/systems-toolbox-example/"/>
-    <updated>2015-04-24T16:05:00+01:00</updated>
+    <updated>2015-04-24T16:05:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/04/24/systems-toolbox-example</id>
     <content type="html"><![CDATA[<p>Today, I have another sample application for the <strong><a href="https://github.com/matthiasn/systems-toolbox">systems-toolbox</a></strong> library for you. This application measures roundtrip times of a WebSockets connection. Before I delve into the reasoning behind this library, here&#8217;s a little teaser of how that&#8217;ll look like:</p>
 
@@ -110,7 +268,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure - Where are the Updates???]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates/"/>
-    <updated>2015-04-09T17:30:00+01:00</updated>
+    <updated>2015-04-09T17:30:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I&#8217;ve been developing a library for building systems, and it has already made the codebase of the BirdWatch application much simpler. I&#8217;ll be back to updating the book using the new code and concepts soon. Thanks for buying the book!</p>
 
@@ -170,7 +328,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Optimizing my Workspace - Hardware, Software, Ergonomics]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace/"/>
-    <updated>2015-02-18T21:56:00+00:00</updated>
+    <updated>2015-02-18T21:56:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace</id>
     <content type="html"><![CDATA[<p>So within the two weeks, I spent a fair amount of time with something that should seem fairly obvious to someone who uses computers a lot, yet that I paid far too little attention in the last couple of years of my life. Now you may wonder what I&#8217;m getting at, but no worries, I&#8217;ll get there. Let me ask you something first. <strong>How many hours per week do you spend in front of your computer?</strong> Let me guess, probably most of your waking hours, considering that you read a software-related blog. But is your workplace ideal or even anywhere close to it?</p>
 
@@ -234,7 +392,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Dear Apple, Get Your Act Together]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/"/>
-    <updated>2015-01-21T15:30:00+00:00</updated>
+    <updated>2015-01-21T15:30:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together</id>
     <content type="html"><![CDATA[<p>This is a rant.</p>
 
@@ -318,7 +476,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: new Feature]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features/"/>
-    <updated>2015-01-16T19:35:00+00:00</updated>
+    <updated>2015-01-16T19:35:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features</id>
     <content type="html"><![CDATA[<p>Most of this week, I was working on the client-side codebase of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application in order to remove the hairball in its architecture that I mentioned last week. That&#8217;s been going really well. But how do I make the readers aware of what I am working on right now? Your time is precious, so you may only want to read the stuff that I feel good about already, unless you have the time to dive deeper and compare the good, the bad and the ugly. That&#8217;s fine, too, but it&#8217;s just going to involve more effort on your part.</p>
 
@@ -341,7 +499,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Progress with “Building a System in #Clojure”: Hairball Removal]]></title>
     <link href="http://matthiasnehlsen.com/blog/2015/01/09/Hairball-Removal/"/>
-    <updated>2015-01-09T12:05:00+00:00</updated>
+    <updated>2015-01-09T12:05:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2015/01/09/Hairball-Removal</id>
     <content type="html"><![CDATA[<p>I’ve been struggling with finishing the next chapter of my <strong><a href="https://leanpub.com/building-a-system-in-clojure">&#8220;Building a System in Clojure&#8221;</a></strong> book. I tried to explain and draw the client-side architecture, but instead I’ve been procrastinating <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> around the conceptual drawings for days and now I realize why. The current architecture of the <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> web client just plain <strong>sucks</strong>.</p>
 
@@ -381,7 +539,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Happy Holidays and Thanks for Reading]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays/"/>
-    <updated>2014-12-23T15:15:00+00:00</updated>
+    <updated>2014-12-23T15:15:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays</id>
     <content type="html"><![CDATA[<p>Last week, I published the very first version of my <strong><a href="https://leanpub.com/building-a-system-in-clojure">&#8220;Building a System in Clojure&#8221;</a></strong> book. I’m thrilled by the amount of interest it has already generated and I’ll do my best to live up to your expectations.</p>
 
@@ -420,7 +578,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[I'm writing a book about Building a System in Clojure]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/19/Clojure-Book/"/>
-    <updated>2014-12-19T16:15:00+00:00</updated>
+    <updated>2014-12-19T16:15:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/19/Clojure-Book</id>
     <content type="html"><![CDATA[<p>I thought about where to take my series about <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">Building a System in Clojure</a></strong> next and realized that I don&#8217;t like the format of a <strong>blog series</strong> all that much. Instead, the format of a <strong>book</strong> seems like a better choice; one where you, the potential reader, are invited to provide feedback from the very first moment of the writing process. I have already started that process and for now I have transferred the existing articles from the series into the book without much further editing. Over the next couple of weeks, I will be working on making the content more consistent with the book format. The book is available for free on <strong><a href="https://leanpub.com/building-a-system-in-clojure">leanpub.com</a></strong>. Iff (if and only if) you find the content to be of value, you can pay a suggested price, but that&#8217;s entirely up to you and something you can decide on later.</p>
 
@@ -464,7 +622,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure eXchange, next steps in BirdWatch, Clojure and me]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/12/Weekly/"/>
-    <updated>2014-12-12T14:20:00+00:00</updated>
+    <updated>2014-12-12T14:20:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/12/Weekly</id>
     <content type="html"><![CDATA[<p>Last week was great. I had just come back from my trip to the United States the week before, where I attended the <strong><a href="http://clojure-conj.org">Conj</a></strong> and got to hang out with dear friends in both Washington DC and New York City. I used to live in DC in 2009 and 2010, and it was really good to be back. Last Friday, I had a talk at <strong><a href="https://skillsmatter.com/conferences/1956-clojure-exchange-2014">Clojure eXchange</a></strong> in London about my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application and my journey to Clojure. I think there should be a recording somewhere, but I haven’t checked it out just yet. The day before that, I had parted from <strong><a href="http://www.scala-lang.org">Scala</a></strong> with a <strong><a href="http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/">farewell letter</a></strong> here on this blog. It took me by surprise how much attention this little letter received <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>, considering that it was really only between Scala and me.</p>
 
@@ -506,7 +664,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[A farewell note to a programming language]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/"/>
-    <updated>2014-12-04T14:55:00+00:00</updated>
+    <updated>2014-12-04T14:55:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala</id>
     <content type="html"><![CDATA[<p>Dear Scala,</p>
 
@@ -558,7 +716,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Inspect - println no more]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/14/Inspect/"/>
-    <updated>2014-11-14T17:30:00+00:00</updated>
+    <updated>2014-11-14T17:30:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/14/Inspect</id>
     <content type="html"><![CDATA[<p><strong>TL;DR</strong>: I realized how much I <strong>disliked</strong> the process of <strong>logging data structures</strong> to the console and then trying to find them and repeatedly commenting out and uncommenting <strong>println</strong> statements. So I decided to <strong>fix that</strong>.</p>
 
@@ -683,7 +841,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 4 - Inter-process communication with Redis]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4/"/>
-    <updated>2014-11-07T14:32:00+00:00</updated>
+    <updated>2014-11-07T14:32:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4</id>
     <content type="html"><![CDATA[<p><strong><a href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/">Last week</a></strong>, I drew a picture of how I wanted to break apart a monolithic application and instead run different parts of the application in separate processes / separate JVMs. The idea was to have a single client for the connection to the <strong><a href="https://dev.twitter.com/streaming/overview">Twitter Streaming API</a></strong> and the persistence of the received Tweets in <strong><a href="http://www.elasticsearch.com">ElasticSearch</a></strong>, plus multiple machines to serve WebSocket connections to the client. For the communication between the processes, I picked <strong><a href="http://redis.io/topics/pubsub">Redis Pub/Sub</a></strong> because its model of communication appears to suit the requirements really well. As cute as the drawing may be, I prefer code (plus drawing), so I took the previous monolith apart over the weekend and put <strong><a href="http://redis.io">Redis</a></strong> in between for communication. It worked really well and here&#8217;s how.</p>
 
@@ -864,7 +1022,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure Part 3 - Redesign]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/"/>
-    <updated>2014-10-30T19:06:00+00:00</updated>
+    <updated>2014-10-30T19:06:00+01:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3</id>
     <content type="html"><![CDATA[<p>I recently did a lot of transcript proofreading concerning enlightening talk for my <strong><a href="https://github.com/matthiasn/talk-transcripts">talk-transcripts project</a></strong>. The most recent one was <strong><a href="https://github.com/matthiasn/talk-transcripts/blob/master/Hickey_Rich/DesignCompositionPerformance.md">Design, Composition and Performance</a></strong>, the tenth transcript of a talk by <strong><a href="https://twitter.com/richhickey">Rich Hickey</a></strong>. That one in particular got me thinking that there are quite a few ideas I want to adopt in <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>, the application about which I started writing this series of articles. That calls for some <strong>redesign</strong>, so it’s probably time to make up my mind what exactly it is that I am trying to solve with this application.</p>
 
@@ -941,7 +1099,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Talk Transcripts, Clojure Architecture, OS X Yosemite]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/23/weekly-update/"/>
-    <updated>2014-10-23T19:06:00+01:00</updated>
+    <updated>2014-10-23T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/23/weekly-update</id>
     <content type="html"><![CDATA[<p>As I have no other article to publish this week, I thought a weekly update would be in order. Last week I wrote about <strong><a href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/">making relevant and interesting talks more accessible</a></strong>. In the course of that project, I had <strong>eleven</strong> talks transcribed so far, four more than when I announced the project last week. Not only have I received great feedback about how appreciated this is, I have also learned a lot myself while proofreading the transcripts.</p>
 
@@ -1005,7 +1163,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Talk Transcripts: Rich Hickey, David Nolen & more]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/"/>
-    <updated>2014-10-15T19:06:00+01:00</updated>
+    <updated>2014-10-15T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> I wanted to study the content of some talks in written form but there were no transcripts available. However, I believe that the valuable and relevant content of these talks should be accessible to everyone, including those for whom &#8216;sit back and listen&#8217; might not be the most viable option. To make that a reality, I had transcripts made. So far, I have compiled five talks by <strong>Rich Hickey</strong>, one talk by <strong>David Nolen</strong> and another talk by <strong>Guy Steele</strong>. The transcripts are <strong><a href="https://github.com/matthiasn/talk-transcripts">available on GitHub</a></strong>.</p>
 
@@ -1037,7 +1195,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 2 - Transducers]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/"/>
-    <updated>2014-10-06T19:06:00+01:00</updated>
+    <updated>2014-10-06T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2</id>
     <content type="html"><![CDATA[<p><strong>TL;DR:</strong> This article covers the usage of <strong>Transducers</strong> in Clojure, spiced up with some <strong>core.async</strong>. Here&#8217;s an animation that shows the information flow of the <strong>composed transducer</strong> that we are going to build in this article:</p>
 
@@ -1422,7 +1580,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Staging server for this blog]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/"/>
-    <updated>2014-10-04T19:06:00+01:00</updated>
+    <updated>2014-10-04T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update</id>
     <content type="html"><![CDATA[<p>This weekly update is mostly about organizational issues with regard to publishing articles and getting feedback for unfinished articles.</p>
 
@@ -1456,7 +1614,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Building a System in #Clojure 1 - Overview]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
-    <updated>2014-09-24T19:06:00+01:00</updated>
+    <updated>2014-09-24T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
     <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is <strong>easy to understand and maintain</strong>. Here is what I found.</p>
 
@@ -1636,7 +1794,7 @@ Matthias</p>
   <entry>
     <title type="html"><![CDATA[Weekly Update: Clojure and Dependency Injection, Animations reloaded & freeing my SSD]]></title>
     <link href="http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/"/>
-    <updated>2014-09-23T19:06:00+01:00</updated>
+    <updated>2014-09-23T19:06:00+02:00</updated>
     <id>http://matthiasnehlsen.com/blog/2014/09/23/weekly-update</id>
     <content type="html"><![CDATA[<p>This weekly update is mostly about my new article series, about using animations to explain complex topics and about how I just extended the useful lifespan of my <strong>2012 Retina MacBook</strong>.</p>
 
@@ -1693,53 +1851,6 @@ Matthias</p>
 <p>Most importantly, check out the new <strong><a href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/">article series</a></strong> that I just started. I hope you will find it useful and I am looking forward to your feedback. In addition, there have been plenty of new entries to my <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources</a></strong> repository on GitHub. You may want to check that out if you&#8217;re interested in Clojure at all. Finally, I bought a useful gadget that makes my digital life a little better.</p>
 
 <p>Until next week,
-Matthias</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Weekly Update: Clojure, Clojure, Clojure and a nasty cold]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/09/16/weekly-update/"/>
-    <updated>2014-09-16T19:06:00+01:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/09/16/weekly-update</id>
-    <content type="html"><![CDATA[<p>In this weekly update, I will just give you a very brief update on what I&#8217;ve been doing. Most notably, I have refactored the <strong><a href="http://clojure.org">Clojure</a></strong> version of my <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong> application to use Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. Other than that, I am calling in sick for the week.</p>
-
-<!-- more -->
-
-
-<p><a href="http://birdwatch2.matthiasnehlsen.com" target="_blank"><img class="left" src="http://matthiasnehlsen.com/images/bw-clj.gif" title="BirdWatch in action" alt="BirdWatch in action"></a></p>
-
-<br />
-
-
-<p>Above you can see what the latest <strong>all-Clojure</strong> version looks like. I have added two features: <em>a)</em> aggregation and sorting by <strong>reach</strong> and <em>b)</em> a counter for the total number of tweets indexed, which is updated every ten seconds. You can see a live version by clicking on the animated GIF.</p>
-
-<h2>Componentizing BirdWatch</h2>
-
-<p>Over the weekend, I have componentized the server side of <strong><a href="https://github.com/matthiasn/birdwatch/">BirdWatch</a></strong>. In terms of functionality I had been content with the earlier version, but in terms of the structure, I started to recognize something that I have <strong>learned to dread</strong>: an application where everything depends on everything. Okay, in this case at least there, were no circular dependencies (any more), but there were still way too many dependencies between namespaces, in a way that I had seen way too often in past projects to lull myself into being satisfied. I don&#8217;t even like real <strong><a href="http://en.wikipedia.org/wiki/Spaghetti">spaghetti</a></strong> all that much.</p>
-
-<p>The <strong><a href="https://github.com/stuartsierra/component">component library</a></strong> offers help by allowing us to structure an application into components (and boundaries between them) and then wire them together by means of <strong><a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injection</a></strong>. It took a moment or two to wrap my head around it, but once I had, I was convinced that I wanted to reap the benefits of <strong>DI</strong> and rewrite my application. The library&#8217;s description contains a fair warning that it is somewhat difficult to refactor an existing application to use it throughout, but I can now say for sure that it can be done and that it&#8217;s worth it.</p>
-
-<p>As a result I have an application where ONLY the main namespace depends on the different components it wires together via dependency injection. Other than that, the different namespaces know nothing about each other. Communication between the different components takes places via <strong><a href="https://github.com/clojure/core.async">core.async channels</a></strong>, which all live in a single component. The component holding the channels is then injected into the other components as a dependency.</p>
-
-<p>I find this new architecture beautiful and I will surely write more about it soon. Until then, I could use <strong>your help</strong>. I am really just getting started with Clojure, and this is my first real application written in it. I would love to have more knowledgeable Clojurians review the code and point out to me possible improvements. Right now, I would especially appreciate your feedback regarding the <strong><a href="https://github.com/matthiasn/BirdWatch/tree/master/Clojure-Websockets/src/clj/birdwatch">server-side code</a></strong>.</p>
-
-<h2>Are Clojure developers happier?</h2>
-
-<p>I recently read an article that <strong><a href="http://www.itworld.com/big-data/433057/clojure-developers-are-happiest-developers">Clojure developers are the happiest</a></strong> developers. While I cannot honestly say that the article provides hard evidence, I can say for sure that I, for one, enjoy programming in <strong><a href="http://clojure.org">Clojure</a></strong> more than I enjoyed programming in other languages in a while. I have also found the community rto be eally helpful. Yesterday, I had a problem I couldn&#8217;t figure out myself. After scratching my head for way too long, it only took a few minutes after joining the <strong><a href="http://clojure-log.n01se.net/date/2014-09-16.html">Clojure room</a></strong> on <strong>IRC</strong> for me to be happily coding again.</p>
-
-<h2>Clojure Resources</h2>
-
-<p>I recently liberated my accumulated list of bookmarks on Clojure-related stuff and have since added every new link and useful link I came across. I am now working on making it a habit of writing a sentence or two about all the new resources I discover. In the past couple of days, I was really happy to see that people seem to find this compilation useful. Please go check it out if you haven&#8217;t already: <strong><a href="https://github.com/matthiasn/Clojure-Resources">Clojure-Resources on GitHub</a></strong>.</p>
-
-<h2>Closing remarks</h2>
-
-<p>Okay, back to bed - I need to get rid of this nasty cold ASAP. I have stuff to do; stuff other than coughing. The bugs came without invitation last week and now they don&#8217;t seem inclined to leave. But on the upside, I went to the doctor today and he gave me a prescription for three different medications and assured me that I&#8217;d survive.</p>
-
-<p>Have a great remaining week,
 Matthias</p>
 
 <iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>

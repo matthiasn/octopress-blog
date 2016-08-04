@@ -2,274 +2,278 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/19/hello-world/</loc>
-        <lastmod>2015-01-06T22:17:28+00:00</lastmod>
+        <lastmod>2015-01-06T23:17:28+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/04/23/iteratee-can-i-have-that-in-a-sentence/
         </loc>
-        <lastmod>2015-01-06T22:17:53+00:00</lastmod>
+        <lastmod>2015-01-06T23:17:53+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/04/26/data-model-upgrade/</loc>
-        <lastmod>2015-01-06T22:18:03+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:03+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/01/server-sent-events-vs-websockets/</loc>
-        <lastmod>2015-01-06T22:18:10+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:10+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/05/11/load-testing-server-sent-event-streams/
         </loc>
-        <lastmod>2015-01-06T22:18:16+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:16+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/18/using-d3js-with-play/</loc>
-        <lastmod>2015-01-06T22:18:27+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:27+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/05/26/making-birdwatch-interactive/</loc>
-        <lastmod>2015-01-06T22:18:36+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:36+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/06/02/scaling-play-applications-with-zeromq/
         </loc>
-        <lastmod>2015-01-06T22:18:48+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:48+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/06/10/scala-days-2013/</loc>
-        <lastmod>2015-01-06T22:18:58+00:00</lastmod>
+        <lastmod>2015-01-06T23:18:58+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/06/23/angularjs-and-play-framework/</loc>
-        <lastmod>2015-01-06T22:19:09+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:09+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/07/03/angularjs-and-play-maintenance/</loc>
-        <lastmod>2015-01-06T22:19:18+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:18+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/07/09/transforming-logs-into-information/</loc>
-        <lastmod>2015-01-06T22:19:24+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:24+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2013/08/13/birdwatch-angularjs-elasticsearch-play/
         </loc>
-        <lastmod>2015-01-06T22:19:31+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:31+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/09/10/birdwatch-explained/</loc>
-        <lastmod>2015-01-06T22:19:42+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:42+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/09/15/using-crossfilter-with-angularjs/</loc>
-        <lastmod>2015-01-06T22:19:50+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:50+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/11/23/live-page-reload-on-any-device/</loc>
-        <lastmod>2015-01-06T22:19:57+00:00</lastmod>
+        <lastmod>2015-01-06T23:19:57+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2013/12/31/new-years-resolution/</loc>
-        <lastmod>2015-01-06T22:20:04+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:04+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2014/01/05/play-framework-and-facebooks-react-library/
         </loc>
-        <lastmod>2015-01-06T22:20:10+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:10+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/01/24/scala-dot-js-and-reactjs/</loc>
-        <lastmod>2015-01-06T22:20:20+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:20+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/02/16/elasticsearch-v1/</loc>
-        <lastmod>2015-01-06T22:20:28+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:28+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/03/31/birdwatch-with-reactjs/</loc>
-        <lastmod>2015-01-06T22:20:38+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:38+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/06/09/play-sse-ie/</loc>
-        <lastmod>2015-01-06T22:20:48+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:48+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/02/new-approach/</loc>
-        <lastmod>2015-01-06T22:20:55+00:00</lastmod>
+        <lastmod>2015-01-06T23:20:55+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/06/distributed-barometer/</loc>
-        <lastmod>2015-01-06T22:21:02+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:02+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/08/hamburg-angularjs-meetup/</loc>
-        <lastmod>2015-01-06T22:21:07+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:07+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/17/BirdWatch-in-ClojureScript/</loc>
-        <lastmod>2015-01-06T22:21:13+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:13+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/07/24/birdwatch-cljs-om/</loc>
-        <lastmod>2015-01-06T22:21:25+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:25+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/01/weekly-update/</loc>
-        <lastmod>2015-01-06T22:21:36+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:36+01:00</lastmod>
     </url>
     <url>
         <loc>
             http://matthiasnehlsen.com/blog/2014/08/04/building-a-geo-aware-link-shortener-with-play-framework/
         </loc>
-        <lastmod>2015-01-06T22:21:47+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:47+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/10/weekly-update/</loc>
-        <lastmod>2015-01-06T22:21:53+00:00</lastmod>
+        <lastmod>2015-01-06T23:21:53+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/17/weekly-update/</loc>
-        <lastmod>2015-01-06T22:22:00+00:00</lastmod>
+        <lastmod>2015-01-06T23:22:00+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/08/25/weekly-update/</loc>
-        <lastmod>2015-01-06T22:22:08+00:00</lastmod>
+        <lastmod>2015-01-06T23:22:08+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/09/03/weekly-update/</loc>
-        <lastmod>2015-01-06T22:22:16+00:00</lastmod>
+        <lastmod>2015-01-06T23:22:16+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/09/08/weekly-update/</loc>
-        <lastmod>2015-01-06T22:22:27+00:00</lastmod>
+        <lastmod>2015-01-06T23:22:27+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/09/16/weekly-update/</loc>
-        <lastmod>2015-01-06T22:17:12+00:00</lastmod>
+        <lastmod>2015-01-06T23:17:12+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/</loc>
-        <lastmod>2015-01-06T22:17:04+00:00</lastmod>
+        <lastmod>2015-01-06T23:17:04+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/</loc>
-        <lastmod>2015-01-06T22:28:08+00:00</lastmod>
+        <lastmod>2015-01-06T23:28:08+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/10/04/weekly-update/</loc>
-        <lastmod>2015-01-06T22:16:49+00:00</lastmod>
+        <lastmod>2015-01-06T23:16:49+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/10/06/Building-Systems-in-Clojure-2/</loc>
-        <lastmod>2015-01-06T22:28:03+00:00</lastmod>
+        <lastmod>2015-01-06T23:28:03+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/10/15/talk-transcripts/</loc>
-        <lastmod>2015-01-06T22:16:19+00:00</lastmod>
+        <lastmod>2015-01-06T23:16:19+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/10/23/weekly-update/</loc>
-        <lastmod>2015-01-06T22:16:11+00:00</lastmod>
+        <lastmod>2015-01-06T23:16:11+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/10/30/Building-Systems-in-Clojure-3/</loc>
-        <lastmod>2015-01-06T22:27:35+00:00</lastmod>
+        <lastmod>2015-01-06T23:27:35+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/11/07/Building-Systems-in-Clojure-4/</loc>
-        <lastmod>2015-01-06T22:27:43+00:00</lastmod>
+        <lastmod>2015-01-06T23:27:43+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/11/14/Inspect/</loc>
-        <lastmod>2015-01-06T22:15:51+00:00</lastmod>
+        <lastmod>2015-01-06T23:15:51+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/12/04/Farewell-Scala/</loc>
-        <lastmod>2015-01-06T22:15:41+00:00</lastmod>
+        <lastmod>2015-01-06T23:15:41+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/12/12/Weekly/</loc>
-        <lastmod>2015-01-06T22:15:35+00:00</lastmod>
+        <lastmod>2015-01-06T23:15:35+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/12/19/Clojure-Book/</loc>
-        <lastmod>2015-01-06T22:15:28+00:00</lastmod>
+        <lastmod>2015-01-06T23:15:28+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2014/12/23/Happy-Holidays/</loc>
-        <lastmod>2015-01-06T22:14:45+00:00</lastmod>
+        <lastmod>2015-01-06T23:14:45+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2015/01/09/Hairball-Removal/</loc>
-        <lastmod>2015-01-09T13:09:19+00:00</lastmod>
+        <lastmod>2015-01-09T14:09:19+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2015/01/16/Book-New-Features/</loc>
-        <lastmod>2015-01-16T19:03:29+00:00</lastmod>
+        <lastmod>2015-01-16T20:03:29+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2015/01/21/apple-get-your-act-together/</loc>
-        <lastmod>2015-01-21T15:54:08+00:00</lastmod>
+        <lastmod>2015-01-21T16:54:08+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2015/02/18/optimizing-my-workspace/</loc>
-        <lastmod>2015-02-18T19:25:28+00:00</lastmod>
+        <lastmod>2015-02-18T20:25:28+01:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2015/04/09/Where-Are-The-Updates/</loc>
-        <lastmod>2015-04-09T17:35:33+01:00</lastmod>
+        <lastmod>2015-04-09T18:35:33+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/2015/04/24/systems-toolbox-example/</loc>
-        <lastmod>2015-04-25T00:23:05+01:00</lastmod>
+        <lastmod>2015-04-27T00:38:17+02:00</lastmod>
+    </url>
+    <url>
+        <loc>http://matthiasnehlsen.com/blog/2016/08/04/systemd-and-clojure/</loc>
+        <lastmod>2016-08-04T18:23:49+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/about/</loc>
-        <lastmod>2014-09-15T15:10:56+01:00</lastmod>
+        <lastmod>2014-09-15T16:10:56+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/blog/archives/</loc>
-        <lastmod>2015-04-25T00:23:05+01:00</lastmod>
+        <lastmod>2016-08-04T18:23:49+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/</loc>
-        <lastmod>2015-04-25T00:23:05+01:00</lastmod>
+        <lastmod>2016-08-04T18:23:49+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reading-lists/</loc>
-        <lastmod>2014-08-26T16:48:21+01:00</lastmod>
+        <lastmod>2014-08-26T17:48:21+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reviews/audio-setup/</loc>
-        <lastmod>2014-09-06T23:29:27+01:00</lastmod>
+        <lastmod>2014-09-07T00:29:27+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reviews/cleancoder/</loc>
-        <lastmod>2014-08-18T10:10:31+01:00</lastmod>
+        <lastmod>2014-08-18T11:10:31+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reviews/</loc>
-        <lastmod>2014-09-23T20:09:34+01:00</lastmod>
+        <lastmod>2014-09-23T21:09:34+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reviews/sony-a7/</loc>
-        <lastmod>2014-09-08T14:09:42+01:00</lastmod>
+        <lastmod>2014-09-08T15:09:42+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reviews/transcend-jetdrive-lite-350/</loc>
-        <lastmod>2014-09-24T16:33:24+01:00</lastmod>
+        <lastmod>2014-09-24T17:33:24+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/reviews/zeiss-24-70/</loc>
-        <lastmod>2014-09-23T20:09:34+01:00</lastmod>
+        <lastmod>2014-09-23T21:09:34+02:00</lastmod>
     </url>
     <url>
         <loc>http://matthiasnehlsen.com/robots.txt</loc>
-        <lastmod>2014-03-30T20:31:04+01:00</lastmod>
+        <lastmod>2014-03-30T21:31:04+02:00</lastmod>
     </url>
 </urlset>
