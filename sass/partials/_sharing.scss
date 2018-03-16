@@ -1,4 +1,7 @@
 .sharing {
+  display: flex;
+
+  background-color: red;
   p.meta + & {
     padding: { top: 1em; left: 0; }
     background: $img-border top left repeat-x;

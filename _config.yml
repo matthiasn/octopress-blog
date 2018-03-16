@@ -74,7 +74,7 @@ twitter_user: matthiasnehlsen
 twitter_tweet_button: true
 
 # Google +1
-google_plus_one: true
+google_plus_one: false
 google_plus_one_size: medium
 
 # DZone
@@ -86,7 +86,7 @@ reddit_button: false
 # Google Plus Profile
 # Hidden: No visible button, just add author information to search results
 googleplus_user: 100986586701798521209
-googleplus_hidden: false
+googleplus_hidden: true
 
 # Pinboard
 pinboard_user:

@@ -37,7 +37,7 @@ Here's how that looks like, with the labels omitted again, because hey, most of 
 
 In other contexts, companies pay money for banner ads, so I assume they are proven to work. Only that here, the banner ad, being about myself, is far more relevant to my life than any commercial advertisement could ever be. I want to spend more time in the future on relevant calls to action in both those banner ads on the desktop and notifications on mobile. It already helps me to see that I have multiple days in a row where I have walked over 10K steps, and that then motivates me to keep going, but there is a lot more potential. For example, the application could tell me to go for a walk after the completion of a task when I'm nowhere near being on track for meeting my daily goal.
 
-A part of my motivation for writing **[meo](https://github.com/matthiasn/meo)** was that it could be an example application for a book I started a few years back about building systems in Clojure. But I soon realized that I could not write a book that is authoritative about any of this. I was learning so much new stuff all the time. And then it never felt like a good time to take a snapshot and write about it, knowing that it would likely change. And then that was not the only thing I felt bad about, so I thought why not also track my mood, as it seemed to me that something was not going well there.
+A part of my motivation for writing **[meo](https://github.com/matthiasn/meo)** was that it could be an example application for a book I started a few years back about building systems in Clojure [^5]. But I soon realized that I could not write a book that is authoritative about any of this. I was learning so much new stuff all the time. And then it never felt like a good time to take a snapshot and write about it, knowing that it would likely change. And then that was not the only thing I felt bad about, so I thought why not also track my mood, as it seemed to me that something was not going well there.
 
 I researched a few psychological instruments for assessing current mood. I'm by no means an expert on any of that, but what seemed to make sense to me is the [PANAS](https://en.wikipedia.org/wiki/Positive_and_Negative_Affect_Schedule), an instrument for assessing the momentary affective situation. There are 20 terms, for each of which the subject selects a value on a 5-item Likert scale. In the end, it gives you a positive and a negative score. The score probably also means something in comparison to the general population, but for me, it was most interesting to observe changes over time, and I found some patterns in my recorded data that make me unusually well-informed when talking to mental health professionals, including friends in that field.
 
@@ -82,7 +82,7 @@ It looks convoluted because it is, and I have not had the time to simplify it ye
 
 I'm happy and grateful that my grandma is still around to see this article about what she inspired. Her birthday helped me coming to terms with the idea of talking about this project. It's probably true what Reid Hoffmann said, 'If you are not embarrassed by the first version of your product, you've launched too late.' And I'm still fairly embarrassed, and without grandma's birthday, I probably would have tried to keep polishing stuff until the end of time, so thanks for that, too, dear grandma.
 
-Thanks for reading. Let me know if you have any questions [^5] or comments. You can subscribe below if you want to hear about progress. Please share this post if you want to help me find great collaborators. With help, **meo** can be launched much sooner - plus I'm tired of working on this project all by myself.
+Thanks for reading. Let me know if you have any questions [^6] or comments. You can subscribe below if you want to hear about progress. Please share this post if you want to help me find great collaborators. With help, **meo** can be launched much sooner - plus I'm tired of working on this project all by myself.
 
 Until next time,
 Matthias
@@ -115,4 +115,6 @@ Matthias
 
 [^4]: Currently, everything from Apple Health is imported automatically - anyone out there who want's to help make this available on Android?
 
-[^5]: My email address is on my [GitHub](https://github.com/matthiasn) profile.
+[^5]: You can find the book [here](https://leanpub.com/building-a-system-in-clojure). Don't buy it yet, unless you want to use your purchase as a way to buy me time to continue working on it (and meo). Or buy it but don't spend too much time on reading it yet, as most of it will have to be rewritten anyway.
+
+[^6]: My email address is on my [GitHub](https://github.com/matthiasn) profile.
