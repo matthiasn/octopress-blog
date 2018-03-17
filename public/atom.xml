@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2018-03-16T12:25:10+01:00</updated>
+  <updated>2018-03-17T11:35:52+01:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -27,7 +27,7 @@
 <!-- more -->
 
 
-<p>That made a think hard about the problem of getting older and forgetting more and more. I had always wanted a journal, but using paper wasn&#8217;t an option. I cannot even read my own handwriting, or at least find it very unpleasant. Also, paper-based notes have physical weight, plus indexing them sucks. I wanted a digital journal instead, one that runs on both desktop and mobile, and that does not require me to hand my recordings over to interested third parties.</p>
+<p>That made me think hard about the problem of getting older and forgetting more and more. I had always wanted a journal, but using paper wasn&#8217;t an option. I cannot even read my own handwriting, or at least find it very unpleasant. Also, paper-based notes have physical weight, plus indexing them sucks. I wanted a digital journal instead, one that runs on both desktop and mobile, and that does not require me to hand my recordings over to interested third parties.</p>
 
 <p>Nope, journals must be (and stay) private. Also, it would have to be an open-source tool so that anyone can check what it does with your data. I have zero reason to take anyone by their word on how they will respect my privacy. Maybe they mean it as of today, but through either neglect or change of mind, they will probably still sell or lose my data at some point, especially if it&#8217;s a free service that struggles to find a business model while dealing with increasing infrastructure costs. What if there was an application that does not share your information with anyone? <strong><a href="https://github.com/matthiasn/meo">meo</a></strong> wants to be this project, but first, I would like people smarter than me to review it, and point out where it can be improved and made more secure before making it generally available as a packaged thing <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup>. You can use it now if you don&#8217;t mind building it yourself, though. Here&#8217;s how the desktop application currently looks like:</p>
 
