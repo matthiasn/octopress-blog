@@ -4,7 +4,7 @@
   <title><![CDATA[Matthias Nehlsen]]></title>
   <link href="http://matthiasnehlsen.com/atom.xml" rel="self"/>
   <link href="http://matthiasnehlsen.com/"/>
-  <updated>2018-03-17T11:35:52+01:00</updated>
+  <updated>2018-06-15T04:18:18+02:00</updated>
   <id>http://matthiasnehlsen.com/</id>
   <author>
     <name><![CDATA[Matthias Nehlsen]]></name>
@@ -12,6 +12,57 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[RIP grandma; meo progress & beta version]]></title>
+    <link href="http://matthiasnehlsen.com/blog/2018/06/15/meo-beta/"/>
+    <updated>2018-06-15T01:00:00+02:00</updated>
+    <id>http://matthiasnehlsen.com/blog/2018/06/15/meo-beta</id>
+    <content type="html"><![CDATA[<p>A couple of weeks ago I introduced <a href="https://github.com/matthiasn/meo">meo</a>, the intelligent journal that my beloved grandma inspired around two years ago. Since that blog post, she passed away, following a stroke and subsequent coma. Those weeks have been tough, and I miss my grandma a lot. It helped me quite a bit though to be working on meo, something that she inspired and that will be part of her legacy. There were multiple occasions recently when I might have given up working on meo otherwise, throw in the towel, and look for another hobby. Yes, I still like <a href="https://clojure.org/">Clojure</a>, but this code base that I created has made me feel like an idiot way too often recently.</p>
+
+<!-- more -->
+
+
+<p>But instead of complaining, let me just give you an update on where I made progress, and what I was struggling with. While grandma was still in the hospital, I played around with the <a href="https://www.mapbox.com/api-documentation/">Mapbox API</a> and a map view that allows zooming into areas with recorded photos, and then see which photos were taken there. This is how that looks like, for the photos I took at <strong>EuroClojure 2016</strong>, and their respective whereabouts:</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/2018-06-15-heatmap.gif"></p>
+
+<p>That&#8217;s working pretty well, but I can&#8217;t include that in a free version of meo as then I would be paying for your usage of the mapbox API, and I will not do that. Not sure yet what to do with this feature. Maybe something similar can be created with <a href="https://www.openstreetmap.org/">OpenStreetMap</a> or Google maps? Or you can create your own Mapbox token. I&#8217;m open for ideas, and pull requests are welcome.</p>
+
+<p>Then I took issue with me calling meo an <strong>intelligent journal</strong> and realizing that it&#8217;s not particularly intelligent thus far, so it clearly needed the integration of a <strong>neural network</strong>, right? So I learned some <strong><a href="https://www.tensorflow.org/">Tensorflow</a></strong> and created a simple feedforward network for predicting which story an entry might belong to. I wanted to power the story select field by a top ten of the results from asking the network for a prediction. That works well enough, with an accuracy of over <strong>90%</strong> for the matching story being in the top ten predicted stories. That task was fun, but at the same time, it was <strong>bullshit</strong> at this point. Rather, it was that kind of a shiny object that an intelligent journal should really protect me from pursuing by making me stick to my plans - and hold myself responsible for the things I have actually committed to. I&#8217;ll get back to neural networks within meo at some point, but I&#8217;m also hoping to find collaborators who are interested in some machine learning inside a data-driven journal and want to help make this useful.</p>
+
+<p>Then I had a really annoying issue with the ClojureScript client inside then Electron renderer process somehow disconnecting from the Clojure backend, or rather all processing getting stuck, and it would only work again after completely closing the electron application, and reopening it, as a simple refresh in the developer tools in Electron would not help. I think I eventually found the problem by using the <a href="https://www.yourkit.com/">YourKit</a> profiler, which showed me a deadlock related to logging.</p>
+
+<p><img class="left" src="http://matthiasnehlsen.com/images/1527025951656.png"></p>
+
+<p>I am not entirely sure what happens, but I know that when I use <strong><a href="https://github.com/ptaoussanis/timbre">timbre</a></strong> with the default configuration merged with mine, and then when multiple threads tried to log at the same time, they seem to compete over stdout, blocking the entire application. Not sure if that is to blame on timbre, or because of log4j also being in there from other libs, but for me, it was definitely a big <strong>WTF</strong> moment, and now everything is working again, but without logging to the terminal, which is weird. Please let me know if this sounds at all familiar to you, and what you did about it. I created an <strong><a href="https://github.com/matthiasn/meo/issues/13">issue</a></strong> for it.</p>
+
+<p>Then I was trying some simple refactoring and noticed that it had become very unwieldy to work with the project, as persistence &amp; retrieval related code was sprinkled all over the codebase - and totally ad-hoc. I had wanted something like <strong><a href="https://graphql.org">GraphQL</a></strong> in mind for a long time, but when I looked at Clojure implementations early last year, I found <strong><a href="https://github.com/walmartlabs/lacinia">Lacinia</a></strong> and did not understand how to use it. Now I looked at it again earlier this month and decided to finally make the switch. Overall it&#8217;s really nice to have a language for describing how returned data looks like, and then fetch exactly what you need - no more and no less. Before it was really tripping me up what to fetch when, and then mostly underfetching a little, and sometimes overfetching so much that it would slow down the entire application.</p>
+
+<p>So I refactored the code base to use <strong><a href="https://github.com/walmartlabs/lacinia">Lacinia</a></strong> for all data retrieval in meo. Mutations may come later at some point, or maybe not. Using Lacinia started very smoothly as long as I was interacting with my development instance. But then with my actual dataset of <strong>91K</strong> entries and <strong>820K</strong> words, it started getting pretty slow, and I initially found it difficult to figure out why.</p>
+
+<p>One of the unexpected things was that keys have to be in snake case. So I did a <code>transform-keys</code> from the <strong><a href="https://github.com/qerub/camel-snake-kebab">camel-snake-kebab</a></strong> library, and that turned out to be a pretty dumb idea, as for some cases it took over 600ms to transform the initial data structure to give it to Lacinia as required. But there was no other way, except for migrating my entire append log (roughly <strong>170K</strong> lines, where each line is a new version of an entry). That&#8217;s what I ended up doing since it&#8217;s way better to do this once as opposed to on every request. The migration worked fine, but it&#8217;s also weird to not have the same case everywhere. So if you wonder why data is using snake case, it&#8217;s because the <strong><a href="http://facebook.github.io/graphql/June2018/">GraphQL spec</a></strong> requires it, and by proxy Lacinia as well.</p>
+
+<p>Then, I wanted GraphQL queries to execute in parallel and did not understand how to do that for a surprisingly long time until I finally figured out a way that works. I initially thought I could call <em>execute</em> with a few queries in parallel, say inside say a few futures, and then have those run independently. Unexpectedly, though, they did not run independently, but rather sequentially - which I found odd, because what does that thing actually synchronize on at all? I learned that I need to implement async resolvers, plus assign a thread pool. But now that is figured out, it&#8217;s running smoothly. I just feel like the code around data retrieval is still way too complicated, and I&#8217;m looking for collaborators who want to help me clean it up.</p>
+
+<p>Oh and then I tried reviving the packaging for Windows 10. If you suspect a rant now, you&#8217;re wrong, to my own surprise. After installing <strong><a href="https://www.cygwin.com/">cygwin</a></strong>, it has been running very smoothly, and I have published tens of versions of meo into an S3 bucket without a glitch. On Linux, however, setting up a virtual machine for publishing AppImage files was way more of a nightmare, with Electron relying on global libraries, and new versions of it that weren&#8217;t available in Ubuntu, and so on. Eventually, it all worked out though, and here are the installers:</p>
+
+<ul>
+<li><strong><a href="https://s3.eu-central-1.amazonaws.com/matthiasn-meo/meo-0.5.150.dmg">Mac</a></strong></li>
+<li><strong><a href="https://s3.eu-central-1.amazonaws.com/matthiasn-meo/meo-0.5.150-x86_64.AppImage">Linux</a></strong></li>
+<li><strong><a href="https://s3.eu-central-1.amazonaws.com/matthiasn-meo/meo+Setup+0.5.150.exe">Windows</a></strong></li>
+</ul>
+
+
+<p>All of these provide auto-update functionality, which can be accessed through &#8220;Check for Updates&#8221; in the application menu. In addition, checks for a newer version run once every 24 hours.</p>
+
+<p>About using <strong><a href="https://github.com/matthiasn/meo">meo</a></strong> to document the process: it&#8217;s quite charming to have contemporary witness reports for all those things that were bugging me. That&#8217;s because I document the entire process of whatever I am working on, including screenshots. That makes it super nice to look up all this stuff, rather than having to rely on memory. And then, yeah, keep me accountable. The stuff that I am working on is my life, for the number of hours that I spend, plus polluting other areas of my life when I cannot leave grief where it belongs. Doing a brain dump into a journal entry isn&#8217;t so bad for that, and then telling yourself that you can stop worrying stuff, as all can be picked from writing next time.</p>
+
+<p>But even better have a process in place to look at the amount of frustration in your life, try everything you can for actively changing the situation from the inside. And if that does not work, know when to quit. I have had that way too many times in my life that a fucked up situation had just normalized, and become my reality, instead of the necessary change. An intelligent journal should really help and support you in a situation like that. Meo isn&#8217;t doing that yet, at least not to the extend that it could, but that is where I want to go with it.</p>
+
+<p>Please try out the appropriate links if you like, and let me know what you think. The entirety of the functionality will certainly not be obvious, and I haven&#8217;t gotten around to writing a manual yet. But let me know where questions arise, and ideally create issues on GitHub for those. I will try to answer everything that comes up. Thanks &amp; until next time.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Introducing meo - Thanks, Grandma!]]></title>
@@ -1737,186 +1788,6 @@ Matthias</p>
 Matthias</p>
 
 <iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-]]></content>
-  </entry>
-  
-  <entry>
-    <title type="html"><![CDATA[Building a System in #Clojure 1 - Overview]]></title>
-    <link href="http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1/"/>
-    <updated>2014-09-24T19:06:00+02:00</updated>
-    <id>http://matthiasnehlsen.com/blog/2014/09/24/Building-Systems-in-Clojure-1</id>
-    <content type="html"><![CDATA[<p>This is the first of <strong>n</strong> articles about building <strong>systems</strong> in <strong><a href="http://clojure.org/">Clojure</a></strong>. Clojure is a beautiful language and I have been fascinated from the first moment I laid eyes on it last summer. However, what remained a mystery to me for most of the time was how to build more complex systems. I started researching the options that would allow me to structure an arbitrarily complex application in a way that is <strong>easy to understand and maintain</strong>. Here is what I found.</p>
-
-<!-- more -->
-
-
-<p>As an example for such a system, we will be looking at the Clojure rewrite of an application I wrote last year: <strong><a href="https://github.com/matthiasn/BirdWatch">BirdWatch</a></strong>. This application subscribes to the <strong><a href="https://dev.twitter.com/docs/streaming-apis">Twitter Streaming API</a></strong> for all tweets that contain one or more terms out of a set of terms and makes the tweets searchable through storing them in ElasticSearch. A live version of the Clojure version of this application is available here: <strong><a href="http://birdwatch2.matthiasnehlsen.com/#*">http://birdwatch2.matthiasnehlsen.com</a></strong>.</p>
-
-<p>In this first installment we will be looking at the basic architecture of the server side. Let&#8217;s start with an animation <sup id="fnref:1"><a href="#fn:1" rel="footnote">1</a></sup> to demonstrate how components in the system get wired up when the application initializes before we go into details.</p>
-
-<br/>
-
-
-
-
-<script language="javascript" type="text/javascript">
-  function resizeIframe(obj) {
-    obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
-    obj.style.width = obj.contentWindow.document.body.scrollWidth + 'px';
-  }
-</script>
-
-
-
-
-<iframe width="100%;" src="http://matthiasnehlsen.com/iframes/bw-anim/index.html" scrolling="no" onload="javascript:resizeIframe(this);" ></iframe>
-
-
-
-
-<br/>
-
-
-<br/>
-
-
-<p>The architecture above is a huge improvement over the first version and was only possible thanks to Stuart Sierra&#8217;s <strong><a href="https://github.com/stuartsierra/component">component library</a></strong>. This new version has cleanly separated components with no dependencies between namespace at all (except, of course, in the main namespace that wires everything together). But the individual components don&#8217;t know anything about each other except for where the components in the animation touch each other. And even there, it is mostly just plain <strong><a href="https://github.com/clojure/core.async">core.async</a></strong> channels.</p>
-
-<p>In the initial version that I wrote, where everything depended on everything, things were very different. Some people would call that &#8220;spaghetti code&#8221;, but I think that is not doing justice to spaghetti. Unlike bad code, I don&#8217;t mind touching spaghetti. I would rather liken bad code to hairballs, of the worst kind that is. Have you ever experienced the following: you are standing in the shower and the water doesn&#8217;t drain. You notice something in the sink, so you squat down to pull it out only to start screaming, &#8220;Oh my god, it&#8217;s a dead rat&#8221; a second later. I am referring to that kind of entangled hairball mess, nothing less. On top, you may even hit your head when you jump up in disgust.</p>
-
-<p>This is where dependency injection comes in. Can we agree that we don&#8217;t like hairballs? Good. Usually, what we are trying to achieve is a so-called inversion of control, in which a component of the application knows that it will be injected something which implements a known interface at runtime. Then, no matter what the actual implementation is, it knows what methods it can call on that something because of the implemented interface.</p>
-
-<p>Here, unlike in object-oriented dependency injection, things are a little different because we don&#8217;t really have objects. The components play the role of objects, but as a further way of decoupling, I wanted them to only communicate via <strong>core.async</strong> channels. Channels are a great abstraction. Rich Hickey likens them to conveyor belts onto which you put something without having to know at all what happens on the other side. We will have a more detailed look at the channels in the next article. For now, as an abstraction, we can think about the channel components (the flat ones connecting the components with the switchboard) as <strong>wiring harnesses</strong>, like the one that connects the electronics of your car to your engine. The only way to interface with a modern engine (that doesn&#8217;t have separate mechanical controls) is by connecting to this wiring harness and either send or receive information, depending on the channel / cable that you interface with.</p>
-
-<p>Let&#8217;s have a look at how the initialization of the application we have already seen in the animation looks in code:</p>
-
-<figure class='code'><figcaption><span>Main namespace</span><a href='https://github.com/matthiasn/BirdWatch/blob/a26c201d2cc2c89f4b3d2ecb8e6adb403e6f89c7/Clojure-Websockets/src/clj/birdwatch/main.clj'>main.clj</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-<span class='line-number'>31</span>
-<span class='line-number'>32</span>
-<span class='line-number'>33</span>
-<span class='line-number'>34</span>
-<span class='line-number'>35</span>
-<span class='line-number'>36</span>
-<span class='line-number'>37</span>
-<span class='line-number'>38</span>
-<span class='line-number'>39</span>
-<span class='line-number'>40</span>
-</pre></td><td class='code'><pre><code class='clojure'><span class='line'><span class="p">(</span><span class="kd">ns </span><span class="nv">birdwatch.main</span>
-</span><span class='line'>  <span class="p">(</span><span class="ss">:gen-class</span><span class="p">)</span>
-</span><span class='line'>  <span class="p">(</span><span class="ss">:require</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">birdwatch.twitter-client</span> <span class="ss">:as</span> <span class="nv">tc</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">birdwatch.communicator</span> <span class="ss">:as</span> <span class="nv">comm</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">birdwatch.persistence</span> <span class="ss">:as</span> <span class="nv">p</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">birdwatch.percolator</span> <span class="ss">:as</span> <span class="nv">perc</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">birdwatch.http</span> <span class="ss">:as</span> <span class="nv">http</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">birdwatch.switchboard</span> <span class="ss">:as</span> <span class="nv">sw</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">clojure.edn</span> <span class="ss">:as</span> <span class="nv">edn</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">clojure.tools.logging</span> <span class="ss">:as</span> <span class="nv">log</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">clj-pid.core</span> <span class="ss">:as</span> <span class="nv">pid</span><span class="p">]</span>
-</span><span class='line'>   <span class="p">[</span><span class="nv">com.stuartsierra.component</span> <span class="ss">:as</span> <span class="nv">component</span><span class="p">]))</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">conf</span> <span class="p">(</span><span class="nf">edn/read-string</span> <span class="p">(</span><span class="nb">slurp </span><span class="s">&quot;twitterconf.edn&quot;</span><span class="p">)))</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">get-system</span> <span class="p">[</span><span class="nv">conf</span><span class="p">]</span>
-</span><span class='line'>  <span class="s">&quot;Create system by wiring individual components so that component/start</span>
-</span><span class='line'><span class="s">  will bring up the individual components in the correct order.&quot;</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">component/system-map</span>
-</span><span class='line'>   <span class="ss">:communicator-channels</span> <span class="p">(</span><span class="nf">comm/new-communicator-channels</span><span class="p">)</span>
-</span><span class='line'>   <span class="ss">:communicator</span>  <span class="p">(</span><span class="nf">component/using</span> <span class="p">(</span><span class="nf">comm/new-communicator</span><span class="p">)</span> <span class="p">{</span><span class="ss">:channels</span> <span class="ss">:communicator-channels</span><span class="p">})</span>
-</span><span class='line'>   <span class="ss">:twitterclient-channels</span> <span class="p">(</span><span class="nf">tc/new-twitterclient-channels</span><span class="p">)</span>
-</span><span class='line'>   <span class="ss">:twitterclient</span> <span class="p">(</span><span class="nf">component/using</span> <span class="p">(</span><span class="nf">tc/new-twitterclient</span> <span class="nv">conf</span><span class="p">)</span> <span class="p">{</span><span class="ss">:channels</span> <span class="ss">:twitterclient-channels</span><span class="p">})</span>
-</span><span class='line'>   <span class="ss">:persistence-channels</span> <span class="p">(</span><span class="nf">p/new-persistence-channels</span><span class="p">)</span>
-</span><span class='line'>   <span class="ss">:persistence</span>   <span class="p">(</span><span class="nf">component/using</span> <span class="p">(</span><span class="nf">p/new-persistence</span> <span class="nv">conf</span><span class="p">)</span> <span class="p">{</span><span class="ss">:channels</span> <span class="ss">:persistence-channels</span><span class="p">})</span>
-</span><span class='line'>   <span class="ss">:percolation-channels</span> <span class="p">(</span><span class="nf">perc/new-percolation-channels</span><span class="p">)</span>
-</span><span class='line'>   <span class="ss">:percolator</span>    <span class="p">(</span><span class="nf">component/using</span> <span class="p">(</span><span class="nf">perc/new-percolator</span> <span class="nv">conf</span><span class="p">)</span> <span class="p">{</span><span class="ss">:channels</span> <span class="ss">:percolation-channels</span><span class="p">})</span>
-</span><span class='line'>   <span class="ss">:http</span>          <span class="p">(</span><span class="nf">component/using</span> <span class="p">(</span><span class="nf">http/new-http-server</span> <span class="nv">conf</span><span class="p">)</span> <span class="p">{</span><span class="ss">:communicator</span> <span class="ss">:communicator</span><span class="p">})</span>
-</span><span class='line'>   <span class="ss">:switchboard</span>   <span class="p">(</span><span class="nf">component/using</span> <span class="p">(</span><span class="nf">sw/new-switchboard</span><span class="p">)</span> <span class="p">{</span><span class="ss">:comm-chans</span> <span class="ss">:communicator-channels</span>
-</span><span class='line'>                                                         <span class="ss">:tc-chans</span> <span class="ss">:twitterclient-channels</span>
-</span><span class='line'>                                                         <span class="ss">:pers-chans</span> <span class="ss">:persistence-channels</span>
-</span><span class='line'>                                                         <span class="ss">:perc-chans</span> <span class="ss">:percolation-channels</span><span class="p">})))</span>
-</span><span class='line'><span class="p">(</span><span class="k">def </span><span class="nv">system</span> <span class="p">(</span><span class="nf">get-system</span> <span class="nv">conf</span><span class="p">))</span>
-</span><span class='line'>
-</span><span class='line'><span class="p">(</span><span class="kd">defn </span><span class="nv">-main</span> <span class="p">[</span><span class="o">&amp;</span> <span class="nv">args</span><span class="p">]</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">pid/save</span> <span class="p">(</span><span class="ss">:pidfile-name</span> <span class="nv">conf</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">pid/delete-on-shutdown!</span> <span class="p">(</span><span class="ss">:pidfile-name</span> <span class="nv">conf</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">log/info</span> <span class="s">&quot;Application started, PID&quot;</span> <span class="p">(</span><span class="nf">pid/current</span><span class="p">))</span>
-</span><span class='line'>  <span class="p">(</span><span class="nf">alter-var-root</span> <span class="o">#</span><span class="ss">&#39;system</span> <span class="nv">component/start</span><span class="p">))</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>I personally think this <strong>reads really well</strong>, even if you have never seen Clojure before in your life. Roughly the first half is concerned with imports and reading the configuration file. Next, we have the <code>get-system</code> function which declares, what components depend on what other components. The system is finally started in the <code>-main</code> function (plus the process ID logged and saved to a file). This is all there is to know about the application entry point.</p>
-
-<p>Now, when we start the application, all the dependencies will be started in an order that the component library determines so that all dependencies are met. Here&#8217;s the output of that startup process:</p>
-
-<pre><code>mn:Clojure-Websockets mn$ lein run
-16:46:30.925 [main] INFO  birdwatch.main - Application started, PID 6682
-16:46:30.937 [main] INFO  birdwatch.twitter-client - Starting Twitterclient Channels Component
-16:46:30.939 [main] INFO  birdwatch.twitter-client - Starting Twitterclient Component
-16:46:30.940 [main] INFO  birdwatch.twitter-client - Starting Twitter client.
-16:46:31.323 [main] INFO  birdwatch.persistence - Starting Persistence Channels Component
-16:46:31.324 [main] INFO  birdwatch.persistence - Starting Persistence Component
-16:46:31.415 [main] INFO  org.elasticsearch.plugins - [Chameleon] loaded [], sites []
-16:46:32.339 [main] INFO  birdwatch.communicator - Starting Communicator Channels Component
-16:46:32.340 [main] INFO  birdwatch.communicator - Starting Communicator Component
-16:46:32.355 [main] INFO  birdwatch.http - Starting HTTP Component
-16:46:32.375 [main] INFO  birdwatch.http - Http-kit server is running at http://localhost:8888/
-16:46:32.376 [main] INFO  birdwatch.percolator - Starting Percolation Channels Component
-16:46:32.377 [main] INFO  birdwatch.percolator - Starting Percolator Component
-16:46:32.380 [main] INFO  birdwatch.switchboard - Starting Switchboard Component
-</code></pre>
-
-<p>Next week, we will look at how these components wire a channel grid and how information flows through this grid. You do not have to wait to see more code though, everything is on <strong><a href="https://github.com/matthiasn/BirdWatch">GitHub</a></strong> already.</p>
-
-<p>Once we have discussed the architecture in detail over the next couple of weeks, we can start observing the system under load. Of course, it would be interesting to have actual user load. But with or without actual load, we want to find a way of how to generate / simulate load and then observe the system, identify the bottlenecks and remove them. For example, the clients could be simulated by connecting a load generator via ZeroMQ or the like and deliver matches back to that application and check if they are as expected (correct, complete, timely). The Twitter stream could also be simulated, for example by connecting to a load generator that either replays recorded tweets, with full control over the rate, or with artificial test cases, for which we could exactly specify the expectations on the output side.</p>
-
-<p>That&#8217;s it for now. Would you like to be informed when the next article is out? Just <strong>sign up</strong> for the <a href="http://eepurl.com/y0HWv" target="_blank"><strong>mailing list</strong></a> and I will let you know. Also, if you are interested in Clojure, you may want to check out my curated list of <strong><a href="https://github.com/matthiasn/Clojure-Resources">useful Clojure-related resources on GitHub</a></strong>.</p>
-
-<p>Cheers,
-Matthias</p>
-
-<p><strong>P.S.</strong> This series of articles is now continued in this book:</p>
-
-<iframe width="160" height="400" src="https://leanpub.com/building-a-system-in-clojure/embed" frameborder="0" allowtransparency="true"></iframe>
-
-
-
-<div class="footnotes">
-<hr/>
-<ol>
-<li id="fn:1">
-<p>In case you are interested in the animation as such, you can check out the current <strong><a href="http://matthiasnehlsen.com/blog/2014/09/23/weekly-update/">weekly review</a></strong> in which I provide some background information.<a href="#fnref:1" rev="footnote">&#8617;</a></p></li>
-</ol>
-</div>
 
 ]]></content>
   </entry>
