@@ -34,9 +34,9 @@ Then, I wanted GraphQL queries to execute in parallel and did not understand how
 
 Oh and then I tried reviving the packaging for Windows 10. If you suspect a rant now, you're wrong, to my own surprise. After installing **[cygwin](https://www.cygwin.com/)**, it has been running very smoothly, and I have published tens of versions of meo into an S3 bucket without a glitch. On Linux, however, setting up a virtual machine for publishing AppImage files was way more of a nightmare, with Electron relying on global libraries, and new versions of it that weren't available in Ubuntu, and so on. Eventually, it all worked out though, and here are the installers:
 
-- **[Mac](https://s3.eu-central-1.amazonaws.com/matthiasn-meo/meo-0.5.150.dmg)**
-- **[Linux](https://s3.eu-central-1.amazonaws.com/matthiasn-meo/meo-0.5.150-x86_64.AppImage)**
-- **[Windows](https://s3.eu-central-1.amazonaws.com/matthiasn-meo/meo+Setup+0.5.150.exe)**
+- **[Mac](https://rebrand.ly/meo-release-mac)**
+- **[Linux](http://rebrand.ly/meo-release-linux)**
+- **[Windows](http://rebrand.ly/meo-release-windows)**
 
 All of these provide auto-update functionality, which can be accessed through "Check for Updates" in the application menu. In addition, checks for a newer version run once every 24 hours.
 
